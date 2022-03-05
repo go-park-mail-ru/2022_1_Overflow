@@ -6,8 +6,6 @@ CREATE TABLE overflow.users (
     id serial  not null primary key,
     first_name varchar(30) not null,
     last_name varchar(30) not null,
-    middle_name varchar(30),
-    age integer not null,
     password varchar(30) not null,
     email varchar(234) not null
 );
@@ -16,8 +14,9 @@ CREATE TABLE overflow.mails (
     client_id serial not null,
     sender varchar(234) not null ,
     addressee varchar(234) not null ,
+    date date not null,
     theme varchar(30),
-    text varchar(500) not null ,
-    files varchar(20),
+    text text not null ,
+    files varchar(30),
     foreign key (client_id) references overflow.users(id) on delete cascade
 );
