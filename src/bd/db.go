@@ -11,18 +11,18 @@ import (
 
 // Структура для юзера
 type UserT struct {
-	id        int32
-	firstName string
-	lastName  string
-	password  string
-	email     string
+	Id        int32
+	FirstName string
+	LastName  string
+	Password  string
+	Email     string
 }
 
 // Структура письма
 type Mail struct {
-	client_id                             int32
-	sender, addressee, theme, text, files string
-	date                                  time.Time
+	Client_id                             int32
+	Sender, Addressee, Theme, Text, Files string
+	Date                                  time.Time
 }
 
 //Получить данные пользователя по его почте
@@ -37,11 +37,11 @@ func GetUserInfoByEmail(userEmail string, conn *pgxpool.Pool) (UserT, error) {
 		if err != nil {
 			return user, err
 		}
-		user.id = values[0].(int32)
-		user.firstName = values[1].(string)
-		user.lastName = values[2].(string)
-		user.password = values[3].(string)
-		user.email = values[4].(string)
+		user.Id = values[0].(int32)
+		user.FirstName = values[1].(string)
+		user.LastName = values[2].(string)
+		user.Password = values[3].(string)
+		user.Email = values[4].(string)
 	}
 	return user, nil
 }
@@ -49,7 +49,7 @@ func GetUserInfoByEmail(userEmail string, conn *pgxpool.Pool) (UserT, error) {
 //Получить данные пользователя по его айди в бд
 func GetUserInfoById(userId int, conn *pgxpool.Pool) (UserT, error) {
 	var user UserT
-	rows, err := conn.Query(context.Background(), "Select * from overflow.users where id = $1", userId)
+	rows, err := conn.Query(context.Background(), "Select * from overflow.users where Id = $1", userId)
 	if err != nil {
 		return user, err
 	}
@@ -58,24 +58,25 @@ func GetUserInfoById(userId int, conn *pgxpool.Pool) (UserT, error) {
 		if err != nil {
 			return user, err
 		}
-		user.id = values[0].(int32)
-		user.firstName = values[1].(string)
-		user.lastName = values[2].(string)
-		user.password = values[3].(string)
-		user.email = values[4].(string)
+		user.Id = values[0].(int32)
+		user.FirstName = values[1].(string)
+		user.LastName = values[2].(string)
+		user.Password = values[3].(string)
+		user.Email = values[4].(string)
 	}
 	return user, nil
 }
 
 // Добавить юзера
-func AddUser(user UserT, conn *pgxpool.Pool) {
-	conn.QueryRow(context.Background(), "insert into overflow.users(first_name, last_name, password, email) values ($1, $2, $3, $4);", user.firstName, user.lastName, user.password, user.email)
+func AddUser(user UserT, conn *pgxpool.Pool) error {
+	_, err := conn.Query(context.Background(), "insert into overflow.users(first_name, last_name, Password, email) values ($1, $2, $3, $4);", user.FirstName, user.LastName, user.Password, user.Email)
+	return err
 }
 
 // Добавить почту
-func AddMail(email Mail, conn *pgxpool.Pool) {
-	conn.QueryRow(context.Background(), "insert into overflow.mails(client_id, sender, addressee,theme,  text, files, date) values($1, $2, $3, $4, $5, $6, $7);", email.client_id, email.sender, email.addressee, email.text, email.files, email.date)
-
+func AddMail(email Mail, conn *pgxpool.Pool) error {
+	_, err := conn.Query(context.Background(), "insert into overflow.mails(client_id, sender, addressee,theme,  text, files, date) values($1, $2, $3, $4, $5, $6, $7);", email.Client_id, email.Sender, email.Addressee, email.Text, email.Files, email.Date)
+	return err
 }
 
 // Получить входящие сообщения пользователя
@@ -91,11 +92,11 @@ func GetIncomeMails(userId int, conn *pgxpool.Pool) ([]Mail, error) {
 		if err != nil {
 			return results, err
 		}
-		mails.sender = values[0].(string)
-		mails.files = values[3].(string)
-		mails.theme = values[1].(string)
-		mails.text = values[2].(string)
-		mails.date = values[4].(time.Time)
+		mails.Sender = values[0].(string)
+		mails.Files = values[3].(string)
+		mails.Theme = values[1].(string)
+		mails.Text = values[2].(string)
+		mails.Date = values[4].(time.Time)
 		results = append(results, mails)
 	}
 	return results, nil
@@ -114,11 +115,11 @@ func GetOutcomeMails(userId int, conn *pgxpool.Pool) ([]Mail, error) {
 		if err != nil {
 			return results, err
 		}
-		mails.addressee = values[0].(string)
-		mails.files = values[3].(string)
-		mails.theme = values[1].(string)
-		mails.text = values[2].(string)
-		mails.date = values[4].(time.Time)
+		mails.Addressee = values[0].(string)
+		mails.Files = values[3].(string)
+		mails.Theme = values[1].(string)
+		mails.Text = values[2].(string)
+		mails.Date = values[4].(time.Time)
 		results = append(results, mails)
 
 	}
@@ -133,10 +134,10 @@ func main() {
 		os.Exit(1)
 	}
 	var user UserT
-	user.firstName = "Mikhail"
-	user.lastName = "Rabinovich"
-	user.email = "animelov123123er69@overflow.ru"
-	user.password = "12312213123312"
+	user.FirstName = "Mikhail"
+	user.LastName = "Rabinovich"
+	user.Email = "animelov123123er69@overflow.ru"
+	user.Password = "12312213123312"
 	//AddUser(user, conn)
 	//user = GetUserInfoById(2)
 	//fmt.Print(user)
