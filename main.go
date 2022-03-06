@@ -15,32 +15,21 @@ type User struct {
 	Password  string
 }
 
-type Form struct {
-	LastName  string `json: "last_name"`
-	FirstName string `json: "first_name"`
-	Email     string `json: "email"`
-	Password  string `json: "password"`
-	PassConf  string `json: "password_confirmation"`
+type SignupHandler struct {
+	validKeys []string
 }
 
-//var passwordRegex = regexp.Compile("^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$")
+func (handler *SignupHandler) Init() {
+	handler.validKeys = []string {"first_name", "last_name", "email", "password", "password_confirmation"}
+}
 
-func handlers() http.Handler {
+func (handler *SignupHandler) Handlers() http.Handler {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/signup", UserSignup)
+	mux.HandleFunc("/signup", handler.UserSignup)
 	return mux
 }
 
-func main() {
-	address := ":8080"
-	log.Printf("Listening on %v", address)
-	err := http.ListenAndServe(address, handlers())
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func UserSignup(w http.ResponseWriter, r *http.Request) {
+func (handler *SignupHandler) UserSignup(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST method is available.", http.StatusMethodNotAllowed)
@@ -48,26 +37,26 @@ func UserSignup(w http.ResponseWriter, r *http.Request) {
 	}
 	err := r.ParseForm()
     if err != nil {
-        w.Write(createJsonResponse(1, err.Error(), nil))
+        w.Write(handler.createJsonResponse(1, err.Error(), nil))
 		return
     }
-	if err := validateData(r); err != nil {
-		w.Write(createJsonResponse(2, err.Error(), nil))
+	if err := handler.validateData(r); err != nil {
+		w.Write(handler.createJsonResponse(2, err.Error(), nil))
 		return
 	}
-	user, err := convertToUser(r)
+	user, err := handler.convertToUser(r)
 	if err != nil {
-		w.Write(createJsonResponse(3, err.Error(), nil))
+		w.Write(handler.createJsonResponse(3, err.Error(), nil))
 		return
 	}
 	if err := writeToDatabase(user); err != nil {
-		w.Write(createJsonResponse(4, err.Error(), nil))
+		w.Write(handler.createJsonResponse(4, err.Error(), nil))
 		return
 	}
-	w.Write(createJsonResponse(0, "OK", nil))
+	w.Write(handler.createJsonResponse(0, "OK", nil))
 }
 
-func createJsonResponse(status int, message string, content interface{}) []byte {
+func (handler *SignupHandler) createJsonResponse(status int, message string, content interface{}) []byte {
 	resp, _ := json.Marshal(
 		map[string]interface{}{
 			"status":  status,
@@ -78,9 +67,8 @@ func createJsonResponse(status int, message string, content interface{}) []byte 
 	return resp
 }
 
-func validateData(r *http.Request) (err error) {
-	validKeys := []string {"first_name", "last_name", "email", "password", "password_confirmation"}
-	for _, key := range validKeys {
+func (handler *SignupHandler) validateData(r *http.Request) (err error) {
+	for _, key := range handler.validKeys {
 		val := r.FormValue(key)
 		if len(strings.TrimSpace(val)) == 0 {
 			return fmt.Errorf("Поле %v не может быть пустым.", key)
@@ -92,7 +80,7 @@ func validateData(r *http.Request) (err error) {
 	return
 }
 
-func convertToUser(r *http.Request) (user User, err error) {
+func (handler *SignupHandler) convertToUser(r *http.Request) (user User, err error) {
 	user.FirstName = r.FormValue("first_name")
 	user.LastName = r.FormValue("last_name")
 	user.Email = r.FormValue("email")
@@ -101,11 +89,21 @@ func convertToUser(r *http.Request) (user User, err error) {
 }
 
 func writeToDatabase(user User) (err error) {
-	log.Println("Writing to database..")
+	//log.Println("Writing to database..")
 	return
 }
 
 func hashPassword(passw string) string {
-	log.Println("Hashing password..")
+	//log.Println("Hashing password..")
 	return passw
+}
+
+func main() {
+	address := ":8080"
+	log.Printf("Listening on %v", address)
+	var handler SignupHandler
+	err := http.ListenAndServe(address, handler.Handlers())
+	if err != nil {
+		log.Fatal(err)
+	}
 }

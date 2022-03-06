@@ -9,8 +9,10 @@ import (
 	"encoding/json"
 )
 
+var handler SignupHandler
+
 func TestSignup(t *testing.T) {
-	srv := httptest.NewServer(handlers())
+	srv := httptest.NewServer(handler.Handlers())
 	defer srv.Close()
 
 	data := url.Values{
@@ -40,7 +42,7 @@ func TestSignup(t *testing.T) {
 }
 
 func TestBadSignup(t *testing.T) {
-	srv := httptest.NewServer(handlers())
+	srv := httptest.NewServer(handler.Handlers())
 	defer srv.Close()
 
 	data := url.Values{
