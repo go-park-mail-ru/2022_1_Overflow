@@ -9,9 +9,10 @@ import (
 	"encoding/json"
 )
 
-var handler SignupHandler
-
 func TestSignup(t *testing.T) {
+	var handler SignupHandler
+	handler.Init()
+
 	srv := httptest.NewServer(handler.Handlers())
 	defer srv.Close()
 
@@ -41,7 +42,10 @@ func TestSignup(t *testing.T) {
 	}
 }
 
-func TestBadSignup(t *testing.T) {
+func TestBadPassword(t *testing.T) {
+	var handler SignupHandler
+	handler.Init()
+
 	srv := httptest.NewServer(handler.Handlers())
 	defer srv.Close()
 
@@ -66,7 +70,40 @@ func TestBadSignup(t *testing.T) {
 	}
 	
 	if response["status"].(float64) != 2 {
-		t.Errorf("Неверный статус от сервера.")
+		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", response["status"].(float64), 2)
+		return
+	}
+}
+
+func TestEmptyForm(t *testing.T) {
+	var handler SignupHandler
+	handler.Init()
+	
+	srv := httptest.NewServer(handler.Handlers())
+	defer srv.Close()
+
+	data := url.Values{
+		"last_name":             {""},
+		"first_name":            {""},
+		"email":                 {"ededededed"},
+		"password":              {"pass"},
+		"password_confirmation": {"pass"},
+	}
+	r, err := http.PostForm(fmt.Sprintf("%s/signup", srv.URL), data)
+	if (err != nil) {
+		t.Error(err)
+		return
+	}
+
+	var response map[string]interface{}
+	err = json.NewDecoder(r.Body).Decode(&response)
+	if (err != nil) {
+		t.Error(err)
+		return
+	}
+	
+	if response["status"].(float64) != 2 {
+		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", response["status"].(float64), 2)
 		return
 	}
 }
