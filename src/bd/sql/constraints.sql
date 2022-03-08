@@ -1,7 +1,6 @@
 CREATE OR REPLACE FUNCTION IsValidEmail(text) returns BOOLEAN AS
     'select $1 ~ ''^[^@\s]+@[^@\s]+(\.[^@\s]+)+$'' as result
          ' LANGUAGE sql;
-SELECT IsValidEmail('myemail@address.com');
 
 CREATE OR REPLACE  FUNCTION  IsValidName(name text) returns  BOOLEAN AS $$
     begin
@@ -25,7 +24,7 @@ BEGIN
         raise exception 'incorrect last_name';
     end if;
 
-    if new.email not like '%overflow.ru'  or IsValidEmail(new.email) != true then
+    if IsValidEmail(new.email) != true then
          raise exception 'incorrect email';
     end if;
 
@@ -63,7 +62,7 @@ FOR ROW EXECUTE PROCEDURE check_mail();
 insert into overflow.users(first_name, last_name, email, password)
 values ('Mikhail', 'Rabinovich','animelover69@overflow.ru',  '12312312');
 insert into overflow.mails(client_id, sender, addressee,theme,  text, files, date) values
-(1,'a22232a12pko@overflow.ru', 'a22apko@overflow.ru','adasd', 'pr23323', 'dropbox.ru/id1233', '01-10-2002');
+(1,'animelover69@overflow.ru', 'animelover69@overflow.ru','adasd', 'pr23323', 'dropbox.ru/id1233', '01-10-2002');
 
 
 Select * from overflow.users where id = 5

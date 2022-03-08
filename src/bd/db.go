@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"os"
 	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -124,27 +122,4 @@ func GetOutcomeMails(userId int, conn *pgxpool.Pool) ([]Mail, error) {
 
 	}
 	return results, nil
-}
-
-func main() {
-	urlExample := "postgres://postgres:postgres@localhost:5432/postgres"
-	conn, err := pgxpool.Connect(context.Background(), urlExample)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
-		os.Exit(1)
-	}
-	var user UserT
-	user.FirstName = "Mikhail"
-	user.LastName = "Rabinovich"
-	user.Email = "animelov123123er69@overflow.ru"
-	user.Password = "12312213123312"
-	//AddUser(user, conn)
-	//user = GetUserInfoById(2)
-	//fmt.Print(user)
-	//user = GetUserInfoByEmail("animelov123123er69@overflow.ru", conn)
-	//fmt.Print(user, conn)
-	results, err := GetOutcomeMails(1, conn)
-	fmt.Print(results)
-	results, err = GetIncomeMails(1, conn)
-	fmt.Print(results)
 }
