@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"https://github.com/rs/cors"
 )
 
 type UserT struct {
@@ -26,7 +27,13 @@ func (handler *SigninHandler) Init() {
 func (handler *SigninHandler) Handlers() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/signin", handler.UserSignin)
-	return mux
+	handler := cors.New(cors.Options{
+		AllowedOrigins:   []string {"*"},
+		AllowedHeaders:   []string {"Version", "Authorization", "Content-Type", "csrf_token"},
+		AllowedMethods:   []string {"GET", "POST", "PUT", "DELETE"},
+		AllowCredentials: true,
+	  }).Handler(router)
+	return handler
 }
 
 func (handler *SigninHandler) UserSignin(w http.ResponseWriter, r *http.Request) {
