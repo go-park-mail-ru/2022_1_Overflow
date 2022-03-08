@@ -1,7 +1,7 @@
 package main
 
 import (
-	"encoding/json"
+	"general"
 	"fmt"
 	"net/http"
 	"strings"
@@ -32,53 +32,32 @@ func (handler *SignupHandler) Handlers() http.Handler {
 // Основная функция-обработчик запроса регистрации.
 func (handler *SignupHandler) UserSignup(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+    w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST method is available.", http.StatusMethodNotAllowed)
 		return
 	}
 	err := r.ParseForm()
     if err != nil {
-        w.Write(handler.createJsonResponse(1, err.Error(), nil))
+        w.Write(general.CreateJsonResponse(1, err.Error(), nil))
 		return
     }
 	if err := handler.validateData(r); err != nil {
-		w.Write(handler.createJsonResponse(2, err.Error(), nil))
+		w.Write(general.CreateJsonResponse(2, err.Error(), nil))
 		return
 	}
 	user, err := handler.convertToUser(r)
 	if err != nil {
-		w.Write(handler.createJsonResponse(3, err.Error(), nil))
+		w.Write(general.CreateJsonResponse(3, err.Error(), nil))
 		return
 	}
 	if err := writeToDatabase(user); err != nil {
-		w.Write(handler.createJsonResponse(4, err.Error(), nil))
+		w.Write(general.CreateJsonResponse(4, err.Error(), nil))
 		return
 	}
-	w.Write(handler.createJsonResponse(0, "OK", nil))
-}
-
-/*
-Создать ответ на запрос в формате JSON, где:
-	status - статус ответа;
-	message - доп. сообщение ответа;
-	content - передаваемое содержимое ответа;
-
-	Статусы:
-		0 - запрос прошел успешно,
-		1 - невозможно обработать данные формы в запросе,
-		2 - данные формы не прошли валидацию,
-		3 - ошибка при преобразовании данных формы в структуру БД,
-		4 - ошибка при записи в БД.
-*/
-func (handler *SignupHandler) createJsonResponse(status int, message string, content interface{}) []byte {
-	resp, _ := json.Marshal(
-		map[string]interface{}{
-			"status":  status,
-			"message": message,
-			"content": content,
-		},
-	)
-	return resp
+	w.Write(general.CreateJsonResponse(0, "OK", nil))
 }
 
 func (handler *SignupHandler) validateData(r *http.Request) (err error) {
