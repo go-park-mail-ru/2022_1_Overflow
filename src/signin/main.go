@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"https://github.com/rs/cors"
+	"github.com/rs/cors"
 )
 
 type UserT struct {
@@ -27,13 +27,13 @@ func (handler *SigninHandler) Init() {
 func (handler *SigninHandler) Handlers() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/signin", handler.UserSignin)
-	handler := cors.New(cors.Options{
+	handle := cors.New(cors.Options{
 		AllowedOrigins:   []string {"*"},
 		AllowedHeaders:   []string {"Version", "Authorization", "Content-Type", "csrf_token"},
 		AllowedMethods:   []string {"GET", "POST", "PUT", "DELETE"},
 		AllowCredentials: true,
-	  }).Handler(router)
-	return handler
+	  }).Handler(mux)
+	return handle
 }
 
 func (handler *SigninHandler) UserSignin(w http.ResponseWriter, r *http.Request) {
@@ -75,12 +75,16 @@ func (handler *SigninHandler) validateData(r *http.Request) (err error) {
 			return fmt.Errorf("Поле %v не может быть пустым.", key)
 		}
 	}
+
+	/*
 	var user UserT
 	user, _ := GetUserInfoByEmail(r.FormValue("email"))
 
 	if r.FormValue("password") != user.Password {
 		return fmt.Errorf("Пароли не совпадают.")
 	}
+	*/
+	
 	return
 }
 
