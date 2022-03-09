@@ -38,12 +38,12 @@ func (handler *SigninHandler) Handlers() http.Handler {
 }
 
 func (handler *SigninHandler) UserSignin(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST method is available.", http.StatusMethodNotAllowed)
 		return
 	}
+
+	w.Header().Set("Content-Type", "application/json")
 	err := r.ParseForm()
 	if err != nil {
 		w.Write(handler.createJsonResponse(1, err.Error(), nil))
@@ -91,6 +91,7 @@ func main() {
 	address := ":8080"
 	log.Printf("Listening on %v", address)
 	var handler SigninHandler
+	handler.Init();
 	err := http.ListenAndServe(address, handler.Handlers())
 	if err != nil {
 		log.Fatal(err)
