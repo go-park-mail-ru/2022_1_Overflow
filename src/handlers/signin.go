@@ -2,8 +2,9 @@ package handlers
 
 import (
 	"db"
-	"general"
+	"encoding/json"
 	"fmt"
+	"general"
 	"net/http"
 	"strings"
 )
@@ -26,27 +27,30 @@ func (handler *SigninHandler) userSignin(w http.ResponseWriter, r *http.Request)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	err := r.ParseForm()
+	
+	var data map[string]interface{}
+
+	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		w.Write(general.CreateJsonResponse(1, err.Error(), nil))
 		return
 	}
-	if err := handler.validateData(r); err != nil {
+	if err := handler.validateData(data); err != nil {
 		w.Write(general.CreateJsonResponse(2, err.Error(), nil))
 		return
 	}
 
-	cookies := general.CreateCookies(r.FormValue("email"), r.FormValue("password"))
+	cookies := general.CreateCookies(data["email"].(string), data["password"].(string))
 	for _, cookie := range cookies {
 		http.SetCookie(w, &cookie)
 	}
 	w.Write(general.CreateJsonResponse(0, "OK", nil))
 }
 
-func (handler *SigninHandler) validateData(r *http.Request) (err error) {
+func (handler *SigninHandler) validateData(data map[string]interface{}) (err error) {
 	for _, key := range handler.validKeys {
-		val := r.FormValue(key)
-		if len(strings.TrimSpace(val)) == 0 {
+		val, exists := data[key]
+		if !exists || len(strings.TrimSpace(val.(string))) == 0 {
 			return fmt.Errorf("Поле %v не может быть пустым.", key)
 		}
 	}
@@ -54,14 +58,14 @@ func (handler *SigninHandler) validateData(r *http.Request) (err error) {
 	if (handler.db == nil) {
 		return
 	}
-	
-	user, _ := handler.db.GetUserInfoByEmail(r.FormValue("email"))
+
+	user, _ := handler.db.GetUserInfoByEmail(data["email"].(string))
 
 	if (user == db.UserT{}) {
 		return fmt.Errorf("Пользователь не существует.")
 	}
 
-	if r.FormValue("password") != user.Password {
+	if data["password"].(string) != user.Password {
 		return fmt.Errorf("Пароли не совпадают.")
 	}
 

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"encoding/json"
 )
 
 type SignupHandler struct {
@@ -28,16 +29,18 @@ func (handler *SignupHandler) userSignup(w http.ResponseWriter, r *http.Request)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	err := r.ParseForm()
+	var data map[string]interface{}
+
+	err := json.NewDecoder(r.Body).Decode(&data)
     if err != nil {
         w.Write(general.CreateJsonResponse(1, err.Error(), nil))
 		return
     }
-	if err := handler.validateData(r); err != nil {
+	if err := handler.validateData(data); err != nil {
 		w.Write(general.CreateJsonResponse(2, err.Error(), nil))
 		return
 	}
-	user, err := handler.convertToUser(r)
+	user, err := handler.convertToUser(data)
 	if err != nil {
 		w.Write(general.CreateJsonResponse(3, err.Error(), nil))
 		return
@@ -51,24 +54,24 @@ func (handler *SignupHandler) userSignup(w http.ResponseWriter, r *http.Request)
 	w.Write(general.CreateJsonResponse(0, "OK", nil))
 }
 
-func (handler *SignupHandler) validateData(r *http.Request) (err error) {
+func (handler *SignupHandler) validateData(data map[string]interface{}) (err error) {
 	for _, key := range handler.validKeys {
-		val := r.FormValue(key)
-		if len(strings.TrimSpace(val)) == 0 {
+		val, exists := data[key]
+		if exists || len(strings.TrimSpace(val.(string))) == 0 {
 			return fmt.Errorf("Поле %v не может быть пустым.", key)
 		}
 	}
-	if r.FormValue("password") != r.FormValue("password_confirmation") {
+	if data["password"] != data["password_confirmation"] {
 		return fmt.Errorf("Пароли не совпадают.")
 	}
 	return
 }
 
-func (handler *SignupHandler) convertToUser(r *http.Request) (user db.UserT, err error) {
-	user.FirstName = r.FormValue("first_name")
-	user.LastName = r.FormValue("last_name")
-	user.Email = r.FormValue("email")
-	user.Password = hashPassword(r.FormValue("password"))
+func (handler *SignupHandler) convertToUser(data map[string]interface{}) (user db.UserT, err error) {
+	user.FirstName = data["first_name"].(string)
+	user.LastName = data["last_name"].(string)
+	user.Email = data["email"].(string)
+	user.Password = hashPassword(data["password"].(string))
 	return
 }
 
