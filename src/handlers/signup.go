@@ -57,7 +57,7 @@ func (handler *SignupHandler) userSignup(w http.ResponseWriter, r *http.Request)
 func (handler *SignupHandler) validateData(data map[string]interface{}) (err error) {
 	for _, key := range handler.validKeys {
 		val, exists := data[key]
-		if exists || len(strings.TrimSpace(val.(string))) == 0 {
+		if !exists || len(strings.TrimSpace(val.(string))) == 0 {
 			return fmt.Errorf("Поле %v не может быть пустым.", key)
 		}
 	}
