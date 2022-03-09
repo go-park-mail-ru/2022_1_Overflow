@@ -53,6 +53,10 @@ func (handler *SigninHandler) validateData(r *http.Request) (err error) {
 
 	user, _ := handler.db.GetUserInfoByEmail(r.FormValue("email"))
 
+	if (user == db.UserT{}) {
+		return fmt.Errorf("Пользователь не существует.")
+	}
+
 	if r.FormValue("password") != user.Password {
 		return fmt.Errorf("Пароли не совпадают.")
 	}

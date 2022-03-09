@@ -8,13 +8,6 @@ import (
 	"strings"
 )
 
-type UserT struct {
-	LastName  string
-	FirstName string
-	Email     string
-	Password  string
-}
-
 type SignupHandler struct {
 	validKeys []string
 	db *db.DatabaseConnection
@@ -49,7 +42,7 @@ func (handler *SignupHandler) userSignup(w http.ResponseWriter, r *http.Request)
 		w.Write(general.CreateJsonResponse(3, err.Error(), nil))
 		return
 	}
-	if err := writeToDatabase(user); err != nil {
+	if err := handler.db.AddUser(user); err != nil {
 		w.Write(general.CreateJsonResponse(4, err.Error(), nil))
 		return
 	}
@@ -69,16 +62,11 @@ func (handler *SignupHandler) validateData(r *http.Request) (err error) {
 	return
 }
 
-func (handler *SignupHandler) convertToUser(r *http.Request) (user UserT, err error) {
+func (handler *SignupHandler) convertToUser(r *http.Request) (user db.UserT, err error) {
 	user.FirstName = r.FormValue("first_name")
 	user.LastName = r.FormValue("last_name")
 	user.Email = r.FormValue("email")
 	user.Password = hashPassword(r.FormValue("password"))
-	return
-}
-
-func writeToDatabase(user UserT) (err error) {
-	//log.Println("Writing to database..")
 	return
 }
 
