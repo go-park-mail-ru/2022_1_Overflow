@@ -4,17 +4,18 @@ import (
 	"db"
 	"general"
 	"handlers"
-	"net/http"
 	"log"
+	"net/http"
 )
 
 var address string = ":8080"
-var dbUrl string = "postgres://postgres:postgres@localhost:5432/postgres"
+var dbUrl string = "postgres://postgres:123@localhost:5432/postgres"
 
 func main() {
 	mux := http.NewServeMux()
 	var signin handlers.SigninHandler
 	var signup handlers.SignupHandler
+	var mailbox handlers.MailBox
 
 	var conn db.DatabaseConnection
 	err := conn.Create(dbUrl)
@@ -24,8 +25,9 @@ func main() {
 
 	signin.Init(mux, &conn)
 	signup.Init(mux, &conn)
+	mailbox.Init(mux, &conn)
 	mux.HandleFunc("/logout", handlers.LogoutHandler)
-	
+
 	log.Printf("Listening on %v", address)
 	err = http.ListenAndServe(address, general.SetupCORS(mux))
 	if err != nil {

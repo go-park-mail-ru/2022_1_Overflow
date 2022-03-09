@@ -20,17 +20,17 @@ type UserT struct {
 
 // Структура письма
 type Mail struct {
-	Client_id 	int32		`json:"id"`
-	Sender		string		`json:"sender"`
-	Addressee	string		`json:"addressee"`
-	Theme		string		`json:"theme"`
-	Text		string		`json:"text"`
-	Files 		string		`json:"files"`
-	Date		time.Time	`json:"date"`
+	Client_id int32     `json:"id"`
+	Sender    string    `json:"sender"`
+	Addressee string    `json:"addressee"`
+	Theme     string    `json:"theme"`
+	Text      string    `json:"text"`
+	Files     string    `json:"files"`
+	Date      time.Time `json:"date"`
 }
 
 type DatabaseConnection struct {
-	url string
+	url  string
 	conn *pgxpool.Pool
 }
 
@@ -139,7 +139,6 @@ func (c *DatabaseConnection) GetOutcomeMails(userId int) ([]Mail, error) {
 		mails.Text = values[2].(string)
 		mails.Date = values[4].(time.Time)
 		results = append(results, mails)
-
 	}
 	return results, nil
 }
