@@ -28,6 +28,9 @@ func (v *Validators) SamePasswordValidator(password, passwordConfirmation string
 	if err := v.CheckEmptyField(passwordConfirmation); err != nil {
 		return fmt.Errorf("Поле повтора пароля является пустым.")
 	}
+	if password != passwordConfirmation {
+		return fmt.Errorf("Поля пароля и повтора пароля не совпадают.")
+	}
 	return nil
 }
 
