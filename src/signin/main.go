@@ -3,10 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/rs/cors"
 	"log"
 	"net/http"
 	"strings"
-	"github.com/rs/cors"
 )
 
 type UserT struct {
@@ -27,19 +27,18 @@ func (handler *SigninHandler) Init() {
 func (handler *SigninHandler) Handlers() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/signin", handler.UserSignin)
-	handle := cors.New(cors.Options{
-		AllowedOrigins:   []string {"*"},
-		AllowedHeaders:   []string {"Version", "Authorization", "Content-Type", "csrf_token"},
-		AllowedMethods:   []string {"GET", "POST", "PUT", "DELETE"},
+	options := cors.Options{
+		AllowedOrigins:   []string{"http://localhost:80", "http://127.0.0.1:80", "http://localhost:3000", "http://127.0.0.1:3000"}, //"*"},
+		AllowedHeaders:   []string{"Origin", "Version", "Authorization", "Accept", "Accept-Encoding", "Content-Type", "Content-Length"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowCredentials: true,
-	  }).Handler(mux)
+	}
+	handle := cors.New(options).Handler(mux)
 	return handle
 }
 
 func (handler *SigninHandler) UserSignin(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-    w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST method is available.", http.StatusMethodNotAllowed)
@@ -77,14 +76,14 @@ func (handler *SigninHandler) validateData(r *http.Request) (err error) {
 	}
 
 	/*
-	var user UserT
-	user, _ := GetUserInfoByEmail(r.FormValue("email"))
+		var user UserT
+		user, _ := GetUserInfoByEmail(r.FormValue("email"))
 
-	if r.FormValue("password") != user.Password {
-		return fmt.Errorf("Пароли не совпадают.")
-	}
+		if r.FormValue("password") != user.Password {
+			return fmt.Errorf("Пароли не совпадают.")
+		}
 	*/
-	
+
 	return
 }
 
