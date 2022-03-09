@@ -83,7 +83,7 @@ func (c *DatabaseConnection) GetUserInfoById(userId int) (UserT, error) {
 
 // Добавить юзера
 func (c *DatabaseConnection) AddUser(user UserT) error {
-	_, err := c.conn.Query(context.Background(), "insert into overflow.users(first_name, last_name, Password, email) values ($1, $2, $3, $4);", user.FirstName, user.LastName, user.Password, user.Email)
+	_, err := c.conn.Query(context.Background(), "insert into overflow.users(first_name, last_name, password, email) values ($1, $2, $3, $4);", user.FirstName, user.LastName, user.Password, user.Email)
 	return err
 }
 

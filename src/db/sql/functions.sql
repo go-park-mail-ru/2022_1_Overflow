@@ -43,3 +43,5 @@ $$ language PLPGSQL;
 
 SELECT *
 FROM getOutcomeMails(1);
+
+insert into overflow.users(first_name, last_name, password, email) values ('alex', 'alex', '123', 'alex@over.com');

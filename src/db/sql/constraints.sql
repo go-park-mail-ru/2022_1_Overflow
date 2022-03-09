@@ -25,7 +25,7 @@ BEGIN
         raise exception 'incorrect last_name';
     end if;
 
-    if new.email not like '%overflow.ru'  or IsValidEmail(new.email) != true then
+    if IsValidEmail(new.email) != true then
          raise exception 'incorrect email';
     end if;
 
