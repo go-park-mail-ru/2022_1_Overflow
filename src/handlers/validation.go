@@ -5,12 +5,14 @@ import (
 	"strings"
 )
 
-type Validators struct {
-}
+type Validators struct {}
 
 func (v *Validators) EmailValidator(email string) error {
 	if err := v.CheckEmptyField(email); err != nil {
 		return fmt.Errorf("Поле адреса почты является пустым.")
+	}
+	if !strings.Contains(email, "@") {
+		return fmt.Errorf("Поле адреса почты не содержит символа @.")
 	}
 	return nil
 }
@@ -29,14 +31,21 @@ func (v *Validators) SamePasswordValidator(password, passwordConfirmation string
 	return nil
 }
 
-func (v *Validators) CheckAll(email, password, passwordConfirmation string) error {
+func (v *Validators) CheckSignup(email, password, passwordConfirmation string) error {
+	if err := v.CheckSignin(email, password); err != nil {
+		return err
+	}
+	if err := v.SamePasswordValidator(password, passwordConfirmation); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (v *Validators) CheckSignin(email, password string) error {
 	if err := v.EmailValidator(email); err != nil {
 		return err
 	}
 	if err := v.PasswordValidator(password); err != nil {
-		return err
-	}
-	if err := v.SamePasswordValidator(password, passwordConfirmation); err != nil {
 		return err
 	}
 	return nil

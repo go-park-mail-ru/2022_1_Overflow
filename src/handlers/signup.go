@@ -3,9 +3,7 @@ package handlers
 import (
 	"db"
 	"general"
-	"fmt"
 	"net/http"
-	"strings"
 	"encoding/json"
 	"github.com/gorilla/mux"
 )
@@ -37,7 +35,8 @@ func (handler *SignupHandler) userSignup(w http.ResponseWriter, r *http.Request)
         w.Write(general.CreateJsonResponse(1, err.Error(), nil))
 		return
     }
-	if err := handler.validateData(data); err != nil {
+	var validators Validators
+	if err := validators.CheckSignup(data["email"].(string), data["password"].(string), data["password_confirmation"].(string)); err != nil {
 		w.Write(general.CreateJsonResponse(2, err.Error(), nil))
 		return
 	}
@@ -53,19 +52,6 @@ func (handler *SignupHandler) userSignup(w http.ResponseWriter, r *http.Request)
 		}
 	}
 	w.Write(general.CreateJsonResponse(0, "OK", nil))
-}
-
-func (handler *SignupHandler) validateData(data map[string]interface{}) (err error) {
-	for _, key := range handler.validKeys {
-		val, exists := data[key]
-		if !exists || len(strings.TrimSpace(val.(string))) == 0 {
-			return fmt.Errorf("Поле %v не может быть пустым.", key)
-		}
-	}
-	if data["password"] != data["password_confirmation"] {
-		return fmt.Errorf("Пароли не совпадают.")
-	}
-	return
 }
 
 func (handler *SignupHandler) convertToUser(data map[string]interface{}) (user db.UserT, err error) {
