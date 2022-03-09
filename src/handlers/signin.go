@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"db"
+	//"db"
 	"general"
 	"fmt"
 	"net/http"
@@ -32,6 +32,11 @@ func (handler *SigninHandler) userSignin(w http.ResponseWriter, r *http.Request)
 	if err := handler.validateData(r); err != nil {
 		w.Write(general.CreateJsonResponse(2, err.Error(), nil))
 		return
+	}
+
+	cookies := general.CreateCookies(r.FormValue("email"), r.FormValue("password"))
+	for _, cookie := range cookies {
+		http.SetCookie(w, &cookie)
 	}
 	w.Write(general.CreateJsonResponse(0, "OK", nil))
 }
