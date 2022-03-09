@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 	"encoding/json"
+	"github.com/gorilla/mux"
 )
 
 type SignupHandler struct {
@@ -15,10 +16,10 @@ type SignupHandler struct {
 }
 
 // Инициализация обработчика регистрации. Обязательна к вызову.
-func (handler *SignupHandler) Init(mux *http.ServeMux, db *db.DatabaseConnection) {
+func (handler *SignupHandler) Init(router *mux.Router, db *db.DatabaseConnection) {
 	handler.validKeys = []string {"first_name", "last_name", "email", "password", "password_confirmation"}
 	handler.db = db
-	mux.HandleFunc("/signup", handler.userSignup)
+	router.HandleFunc("/signup", handler.userSignup)
 }
 
 // Основная функция-обработчик запроса регистрации.

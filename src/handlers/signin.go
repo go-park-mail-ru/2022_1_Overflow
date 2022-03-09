@@ -7,6 +7,7 @@ import (
 	"general"
 	"net/http"
 	"strings"
+	"github.com/gorilla/mux"
 )
 
 type SigninHandler struct {
@@ -14,10 +15,10 @@ type SigninHandler struct {
 	db *db.DatabaseConnection
 }
 
-func (handler *SigninHandler) Init(mux *http.ServeMux, db *db.DatabaseConnection) {
+func (handler *SigninHandler) Init(router *mux.Router, db *db.DatabaseConnection) {
 	handler.validKeys = []string{"email", "password"}
 	handler.db = db
-	mux.HandleFunc("/signin", handler.userSignin)
+	router.HandleFunc("/signin", handler.userSignin)
 }
 
 func (handler *SigninHandler) userSignin(w http.ResponseWriter, r *http.Request) {

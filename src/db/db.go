@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"time"
-
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 

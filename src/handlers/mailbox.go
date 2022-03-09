@@ -5,14 +5,15 @@ import (
 	"encoding/json"
 	"general"
 	"net/http"
+	"github.com/gorilla/mux"
 )
 
 type MailBox struct {
 	db *db.DatabaseConnection
 }
 
-func (mb *MailBox) Init(mux *http.ServeMux, db *db.DatabaseConnection) {
-	mux.HandleFunc("/list", mb.GetMailBox)
+func (mb *MailBox) Init(r *mux.Router, db *db.DatabaseConnection) {
+	r.HandleFunc("/list", mb.GetMailBox)
 	mb.db = db
 }
 

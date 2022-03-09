@@ -1,13 +1,14 @@
 module OverflowBackend
 
 require (
+	db v1.0.0
 	general v1.0.0
 	handlers v1.0.0
 )
 
 require (
-	db v1.0.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
+	github.com/gorilla/mux v1.8.0
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.11.0 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect

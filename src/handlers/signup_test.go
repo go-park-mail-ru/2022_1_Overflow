@@ -8,14 +8,15 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"encoding/json"
+	"github.com/gorilla/mux"
 )
 
 func TestSignup(t *testing.T) {
-	mux := http.NewServeMux()
+	r := mux.NewRouter()
 	var handler SigninHandler
-	handler.Init(mux, nil)
+	handler.Init(r, nil)
 
-	srv := httptest.NewServer(general.SetupCORS(mux))
+	srv := httptest.NewServer(general.SetupCORS(r))
 	defer srv.Close()
 
 	data := url.Values{

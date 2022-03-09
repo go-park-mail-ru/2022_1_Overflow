@@ -8,15 +8,16 @@ import (
 	"net/url"
 	"testing"
 	"general"
+	"github.com/gorilla/mux"
 )
 
 func TestSignin(t *testing.T) {
 
-	mux := http.NewServeMux()
+	r := mux.NewRouter()
 	var handler SigninHandler
-	handler.Init(mux, nil)
+	handler.Init(r, nil)
 
-	srv := httptest.NewServer(general.SetupCORS(mux))
+	srv := httptest.NewServer(general.SetupCORS(r))
 	defer srv.Close()
 
 	data := url.Values{
