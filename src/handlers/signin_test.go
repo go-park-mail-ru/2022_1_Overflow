@@ -1,11 +1,11 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"testing"
 	"general"
 	"github.com/gorilla/mux"
@@ -13,18 +13,19 @@ import (
 
 func TestSignin(t *testing.T) {
 
-	r := mux.NewRouter()
+	router := mux.NewRouter()
 	var handler SigninHandler
-	handler.Init(r, nil)
+	handler.Init(router, nil)
 
-	srv := httptest.NewServer(general.SetupCORS(r))
+	srv := httptest.NewServer(general.SetupCORS(router))
 	defer srv.Close()
 
-	data := url.Values{
-		"email":    {"ededededed"},
-		"password": {"pass"},
+	data := map[string]string{
+		"email":    "ededededed",
+		"password": "pass",
 	}
-	r, err := http.PostForm(fmt.Sprintf("%s/Signin", srv.URL), data)
+	dataJson, _ := json.Marshal(data)
+	r, err := http.Post(fmt.Sprintf("%s/signin", srv.URL), "application/json", bytes.NewBuffer(dataJson))
 	if err != nil {
 		t.Error(err)
 		return
@@ -44,18 +45,19 @@ func TestSignin(t *testing.T) {
 }
 
 func TestBadSignin(t *testing.T) {
-	mux := http.NewServeMux()
+	router := mux.NewRouter()
 	var handler SigninHandler
-	handler.Init(mux, nil)
+	handler.Init(router, nil)
 
-	srv := httptest.NewServer(general.SetupCORS(mux))
+	srv := httptest.NewServer(general.SetupCORS(router))
 	defer srv.Close()
 
-	data := url.Values{
-		"email":    {"ededededed"},
-		"password": {"pass"},
+	data := map[string]string{
+		"email":    "ededededed",
+		"password": "",
 	}
-	r, err := http.PostForm(fmt.Sprintf("%s/Signin", srv.URL), data)
+	dataJson, _ := json.Marshal(data)
+	r, err := http.Post(fmt.Sprintf("%s/signin", srv.URL), "application/json", bytes.NewBuffer(dataJson))
 	if err != nil {
 		t.Error(err)
 		return

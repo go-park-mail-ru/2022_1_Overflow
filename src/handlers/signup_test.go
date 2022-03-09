@@ -1,32 +1,33 @@
 package handlers
 
 import (
-	"general"
+	"bytes"
+	"encoding/json"
 	"fmt"
-	"testing"
-	"net/url"
+	"general"
 	"net/http"
 	"net/http/httptest"
-	"encoding/json"
+	"testing"
 	"github.com/gorilla/mux"
 )
 
 func TestSignup(t *testing.T) {
-	r := mux.NewRouter()
+	router := mux.NewRouter()
 	var handler SigninHandler
-	handler.Init(r, nil)
+	handler.Init(router, nil)
 
-	srv := httptest.NewServer(general.SetupCORS(r))
+	srv := httptest.NewServer(general.SetupCORS(router))
 	defer srv.Close()
 
-	data := url.Values{
-		"last_name":             {"John"},
-		"first_name":            {"Doe"},
-		"email":                 {"ededededed"},
-		"password":              {"pass"},
-		"password_confirmation": {"pass"},
+	data := map[string]string{
+		"last_name":             "John",
+		"first_name":            "Doe",
+		"email":                 "ededededed",
+		"password":              "pass",
+		"password_confirmation": "pass",
 	}
-	r, err := http.PostForm(fmt.Sprintf("%s/signup", srv.URL), data)
+	dataJson, _ := json.Marshal(data)
+	r, err := http.Post(fmt.Sprintf("%s/signup", srv.URL), "application/json", bytes.NewBuffer(dataJson))
 	if (err != nil) {
 		t.Error(err)
 		return
@@ -46,21 +47,23 @@ func TestSignup(t *testing.T) {
 }
 
 func TestBadPassword(t *testing.T) {
-	mux := http.NewServeMux()
+	router := mux.NewRouter()
 	var handler SigninHandler
-	handler.Init(mux, nil)
+	handler.Init(router, nil)
 
-	srv := httptest.NewServer(general.SetupCORS(mux))
+	srv := httptest.NewServer(general.SetupCORS(router))
 	defer srv.Close()
 
-	data := url.Values{
-		"last_name":             {"John"},
-		"first_name":            {"Doe"},
-		"email":                 {"ededededed"},
-		"password":              {"pass"},
-		"password_confirmation": {"passd"},
+	data := map[string]string{
+		"last_name":             "John",
+		"first_name":            "Doe",
+		"email":                 "ededededed",
+		"password":              "pass",
+		"password_confirmation": "passd",
 	}
-	r, err := http.PostForm(fmt.Sprintf("%s/signup", srv.URL), data)
+	dataJson, _ := json.Marshal(data)
+	r, err := http.Post(fmt.Sprintf("%s/signup", srv.URL), "application/json", bytes.NewBuffer(dataJson))
+
 	if (err != nil) {
 		t.Error(err)
 		return
@@ -80,21 +83,22 @@ func TestBadPassword(t *testing.T) {
 }
 
 func TestEmptyForm(t *testing.T) {
-	mux := http.NewServeMux()
+	router := mux.NewRouter()
 	var handler SigninHandler
-	handler.Init(mux, nil)
+	handler.Init(router, nil)
 
-	srv := httptest.NewServer(general.SetupCORS(mux))
+	srv := httptest.NewServer(general.SetupCORS(router))
 	defer srv.Close()
 
-	data := url.Values{
-		"last_name":             {""},
-		"first_name":            {""},
-		"email":                 {"ededededed"},
-		"password":              {"pass"},
-		"password_confirmation": {"pass"},
+	data := map[string]string{
+		"last_name":             "",
+		"first_name":            "",
+		"email":                 "ededededed",
+		"password":              "pass",
+		"password_confirmation": "passd",
 	}
-	r, err := http.PostForm(fmt.Sprintf("%s/signup", srv.URL), data)
+	dataJson, _ := json.Marshal(data)
+	r, err := http.Post(fmt.Sprintf("%s/signup", srv.URL), "application/json", bytes.NewBuffer(dataJson))
 	if (err != nil) {
 		t.Error(err)
 		return
