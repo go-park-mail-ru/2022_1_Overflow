@@ -22,8 +22,9 @@ func CreateCookie(name string, value string, expiresAt time.Time) http.Cookie {
 	return http.Cookie{
 		Name: name,
 		Value: value,
-		Secure: true,
-		SameSite: http.SameSiteNoneMode,
+		HttpOnly: false,
+		Secure: false,
+		//SameSite: http.SameSiteNoneMode,
 		Expires: expiresAt,
 	}
 }
