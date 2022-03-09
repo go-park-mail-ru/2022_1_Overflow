@@ -7,7 +7,7 @@ CREATE TABLE overflow.users (
     first_name varchar(30) not null,
     last_name varchar(30) not null,
     password varchar(30) not null,
-    email varchar(234) not null
+    email varchar(234) not null unique
 );
 CREATE TABLE overflow.mails (
     id serial not null primary key,

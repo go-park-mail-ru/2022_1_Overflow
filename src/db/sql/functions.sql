@@ -1,4 +1,4 @@
-DROP FUNCTION getincomemails(integer);
+
 drop function if exists getIncomeMails();
 create or replace function getIncomeMails(find_id integer)
 returns table
@@ -46,6 +46,11 @@ $$ language PLPGSQL;
 SELECT *
 FROM getOutcomeMails(1);
 
--- insert into overflow.users(first_name, last_name, password, email) values ('alex', 'alex', '123', 'alex@over.com');
---
--- insert into overflow.mails(client_id, sender, addressee, theme,  text, files, date) values(9, 'alex123@over.com', 'alex@over.com', 'title', 'gdgdsgsdgsdhfdhfghfghjfgjfgjfgjfgjfgj', '123', '2002-10-01')
+insert into overflow.users(first_name, last_name, password, email) values ('alex', 'alex', '123', 'alex@over.com');
+
+insert into overflow.mails(client_id, sender, addressee, theme,  text, files, date) values(1, 'alex123@over.com', 'alex@over.com', 'Крутая Тема', 'Крутой текст', '123', '2002-10-01')
+insert into overflow.mails(client_id, sender, addressee, theme,  text, files, date) values(1, 'alex123@over.com', 'alex@over.com', 'Крутая Тема', 'Крутой текст', '123', '2002-10-01')
+insert into overflow.mails(client_id, sender, addressee, theme,  text, files, date) values(1, 'alex123@over.com', 'alex@over.com', 'Крутая Тема', 'Крутой текст', '123', '2002-10-01')
+insert into overflow.mails(client_id, sender, addressee, theme,  text, files, date) values(1, 'alex123@over.com', 'alex@over.com', 'Крутая Тема', 'Крутой текст', '123', '2002-10-01')
+insert into overflow.mails(client_id, sender, addressee, theme,  text, files, date) values(1, 'alex123@over.com', 'alex@over.com', 'Крутая Тема', 'Крутой текст', '123', '2002-10-01')
+insert into overflow.mails(client_id, sender, addressee, theme,  text, files, date) values(1, 'alex123@over.com', 'alex@over.com', 'Крутая Тема', 'Крутой текст', '123', '2002-10-01')

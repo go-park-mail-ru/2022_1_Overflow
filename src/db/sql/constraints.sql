@@ -60,11 +60,3 @@ drop trigger if exists check_mail on overflow.mails;
 CREATE TRIGGER check_mail BEFORE  INSERT ON overflow.mails
 FOR ROW EXECUTE PROCEDURE check_mail();
 
-insert into overflow.users(first_name, last_name, email, password)
-values ('Mikhail', 'Rabinovich','animelover69@overflow.ru',  '12312312');
-insert into overflow.mails(client_id, sender, addressee,theme,  text, files, date) values
-(1,'a22232a12pko@overflow.ru', 'a22apko@overflow.ru','adasd', 'pr23323', 'dropbox.ru/id1233', '01-10-2002');
-
-
-Select * from overflow.users where id = 5
-
