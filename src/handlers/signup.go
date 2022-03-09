@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"general"
@@ -19,26 +19,19 @@ type SignupHandler struct {
 }
 
 // Инициализация обработчика регистрации. Обязательна к вызову.
-func (handler *SignupHandler) Init() {
+func (handler *SignupHandler) Init(mux *http.ServeMux) {
 	handler.validKeys = []string {"first_name", "last_name", "email", "password", "password_confirmation"}
-}
-
-func (handler *SignupHandler) Handlers() http.Handler {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/signup", handler.UserSignup)
-	return mux
+	mux.HandleFunc("/signup", handler.userSignup)
 }
 
 // Основная функция-обработчик запроса регистрации.
-func (handler *SignupHandler) UserSignup(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-    w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-	
+func (handler *SignupHandler) userSignup(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST method is available.", http.StatusMethodNotAllowed)
 		return
 	}
+
+	w.Header().Set("Content-Type", "application/json")
 	err := r.ParseForm()
     if err != nil {
         w.Write(general.CreateJsonResponse(1, err.Error(), nil))

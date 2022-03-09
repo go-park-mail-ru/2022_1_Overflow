@@ -1,6 +1,8 @@
 package main
 
 import (
+	"general"
+	"handlers"
 	"net/http"
 	"log"
 )
@@ -8,11 +10,15 @@ import (
 var address string = ":8080"
 
 func main() {
-	var handler SignupHandler
-	handler.Init()
+	mux := http.NewServeMux()
+	var signin handlers.SigninHandler
+	var signup handlers.SignupHandler
+
+	signin.Init(mux)
+	signup.Init(mux)
 	
 	log.Printf("Listening on %v", address)
-	err := http.ListenAndServe(address, handler.Handlers())
+	err := http.ListenAndServe(address, general.SetupCORS(mux))
 	if err != nil {
 		log.Fatal(err)
 	}
