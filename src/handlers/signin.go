@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	//"db"
+	"db"
 	"general"
 	"fmt"
 	"net/http"
@@ -10,10 +10,12 @@ import (
 
 type SigninHandler struct {
 	validKeys []string
+	db *db.DatabaseConnection
 }
 
-func (handler *SigninHandler) Init(mux *http.ServeMux) {
+func (handler *SigninHandler) Init(mux *http.ServeMux, db *db.DatabaseConnection) {
 	handler.validKeys = []string{"email", "password"}
+	handler.db = db
 	mux.HandleFunc("/signin", handler.userSignin)
 }
 
@@ -49,14 +51,11 @@ func (handler *SigninHandler) validateData(r *http.Request) (err error) {
 		}
 	}
 
-	/*
-
-	user, _ := db.GetUserInfoByEmail(r.FormValue("email"))
+	user, _ := handler.db.GetUserInfoByEmail(r.FormValue("email"))
 
 	if r.FormValue("password") != user.Password {
 		return fmt.Errorf("Пароли не совпадают.")
 	}
-	*/
 
 	return
 }

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"db"
 	"general"
 	"fmt"
 	"net/http"
@@ -16,11 +17,13 @@ type UserT struct {
 
 type SignupHandler struct {
 	validKeys []string
+	db *db.DatabaseConnection
 }
 
 // Инициализация обработчика регистрации. Обязательна к вызову.
-func (handler *SignupHandler) Init(mux *http.ServeMux) {
+func (handler *SignupHandler) Init(mux *http.ServeMux, db *db.DatabaseConnection) {
 	handler.validKeys = []string {"first_name", "last_name", "email", "password", "password_confirmation"}
+	handler.db = db
 	mux.HandleFunc("/signup", handler.userSignup)
 }
 

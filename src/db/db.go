@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"context"
@@ -25,10 +25,24 @@ type Mail struct {
 	Date                                  time.Time
 }
 
+type DatabaseConnection struct {
+	url string
+	conn *pgxpool.Pool
+}
+
+func (c *DatabaseConnection) Create(url string) (err error) {
+	c.url = url
+	c.conn, err = pgxpool.Connect(context.Background(), url)
+	if err != nil {
+		return fmt.Errorf("Unable to connect to database: %v\n", err)
+	}
+	return
+}
+
 //Получить данные пользователя по его почте
-func GetUserInfoByEmail(userEmail string, conn *pgxpool.Pool) (UserT, error) {
+func (c *DatabaseConnection) GetUserInfoByEmail(userEmail string) (UserT, error) {
 	var user UserT
-	rows, err := conn.Query(context.Background(), "Select * from overflow.users where email = $1", userEmail)
+	rows, err := c.conn.Query(context.Background(), "Select * from overflow.users where email = $1", userEmail)
 	if err != nil {
 		return user, err
 	}
@@ -47,9 +61,9 @@ func GetUserInfoByEmail(userEmail string, conn *pgxpool.Pool) (UserT, error) {
 }
 
 //Получить данные пользователя по его айди в бд
-func GetUserInfoById(userId int, conn *pgxpool.Pool) (UserT, error) {
+func (c *DatabaseConnection) GetUserInfoById(userId int) (UserT, error) {
 	var user UserT
-	rows, err := conn.Query(context.Background(), "Select * from overflow.users where Id = $1", userId)
+	rows, err := c.conn.Query(context.Background(), "Select * from overflow.users where Id = $1", userId)
 	if err != nil {
 		return user, err
 	}
@@ -68,21 +82,21 @@ func GetUserInfoById(userId int, conn *pgxpool.Pool) (UserT, error) {
 }
 
 // Добавить юзера
-func AddUser(user UserT, conn *pgxpool.Pool) error {
-	_, err := conn.Query(context.Background(), "insert into overflow.users(first_name, last_name, Password, email) values ($1, $2, $3, $4);", user.FirstName, user.LastName, user.Password, user.Email)
+func (c *DatabaseConnection) AddUser(user UserT) error {
+	_, err := c.conn.Query(context.Background(), "insert into overflow.users(first_name, last_name, Password, email) values ($1, $2, $3, $4);", user.FirstName, user.LastName, user.Password, user.Email)
 	return err
 }
 
 // Добавить почту
-func AddMail(email Mail, conn *pgxpool.Pool) error {
-	_, err := conn.Query(context.Background(), "insert into overflow.mails(client_id, sender, addressee,theme,  text, files, date) values($1, $2, $3, $4, $5, $6, $7);", email.Client_id, email.Sender, email.Addressee, email.Text, email.Files, email.Date)
+func (c *DatabaseConnection) AddMail(email Mail) error {
+	_, err := c.conn.Query(context.Background(), "insert into overflow.mails(client_id, sender, addressee,theme,  text, files, date) values($1, $2, $3, $4, $5, $6, $7);", email.Client_id, email.Sender, email.Addressee, email.Text, email.Files, email.Date)
 	return err
 }
 
 // Получить входящие сообщения пользователя
-func GetIncomeMails(userId int, conn *pgxpool.Pool) ([]Mail, error) {
+func (c *DatabaseConnection) GetIncomeMails(userId int) ([]Mail, error) {
 	var results []Mail
-	rows, err := conn.Query(context.Background(), "Select * from getIncomeMails($1)", userId)
+	rows, err := c.conn.Query(context.Background(), "Select * from getIncomeMails($1)", userId)
 	if err != nil {
 		return results, err
 	}
@@ -103,9 +117,9 @@ func GetIncomeMails(userId int, conn *pgxpool.Pool) ([]Mail, error) {
 }
 
 //Получить отправленные пользователем сообщения
-func GetOutcomeMails(userId int, conn *pgxpool.Pool) ([]Mail, error) {
+func (c *DatabaseConnection) GetOutcomeMails(userId int) ([]Mail, error) {
 	var results []Mail
-	rows, err := conn.Query(context.Background(), "Select * from getOutcomeMails($1)", userId)
+	rows, err := c.conn.Query(context.Background(), "Select * from getOutcomeMails($1)", userId)
 	if err != nil {
 		return results, err
 	}
@@ -128,9 +142,10 @@ func GetOutcomeMails(userId int, conn *pgxpool.Pool) ([]Mail, error) {
 
 func main() {
 	urlExample := "postgres://postgres:postgres@localhost:5432/postgres"
-	conn, err := pgxpool.Connect(context.Background(), urlExample)
+	var conn DatabaseConnection
+	err := conn.Create(urlExample)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Unable to c.connect to database: %v\n", err)
 		os.Exit(1)
 	}
 	var user UserT
@@ -138,13 +153,13 @@ func main() {
 	user.LastName = "Rabinovich"
 	user.Email = "animelov123123er69@overflow.ru"
 	user.Password = "12312213123312"
-	//AddUser(user, conn)
+	//AddUser(user, c.conn)
 	//user = GetUserInfoById(2)
 	//fmt.Print(user)
-	//user = GetUserInfoByEmail("animelov123123er69@overflow.ru", conn)
-	//fmt.Print(user, conn)
-	results, err := GetOutcomeMails(1, conn)
+	//user = GetUserInfoByEmail("animelov123123er69@overflow.ru", c.conn)
+	//fmt.Print(user, c.conn)
+	results, err := conn.GetOutcomeMails(1)
 	fmt.Print(results)
-	results, err = GetIncomeMails(1, conn)
+	results, err = conn.GetIncomeMails(1)
 	fmt.Print(results)
 }
