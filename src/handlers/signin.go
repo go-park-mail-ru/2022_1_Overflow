@@ -51,6 +51,10 @@ func (handler *SigninHandler) validateData(r *http.Request) (err error) {
 		}
 	}
 
+	if (handler.db == nil) {
+		return
+	}
+	
 	user, _ := handler.db.GetUserInfoByEmail(r.FormValue("email"))
 
 	if (user == db.UserT{}) {

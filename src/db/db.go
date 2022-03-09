@@ -20,9 +20,13 @@ type UserT struct {
 
 // Структура письма
 type Mail struct {
-	Client_id                             int32
-	Sender, Addressee, Theme, Text, Files string
-	Date                                  time.Time
+	Client_id 	int32		`json:"id"`
+	Sender		string		`json:"sender"`
+	Addressee	string		`json:"addressee"`
+	Theme		string		`json:"theme"`
+	Text		string		`json:"text"`
+	Files 		string		`json:"files"`
+	Date		time.Time	`json:"date"`
 }
 
 type DatabaseConnection struct {
@@ -94,7 +98,7 @@ func (c *DatabaseConnection) AddMail(email Mail) error {
 }
 
 // Получить входящие сообщения пользователя
-func (c *DatabaseConnection) GetIncomeMails(userId int) ([]Mail, error) {
+func (c *DatabaseConnection) GetIncomeMails(userId int32) ([]Mail, error) {
 	var results []Mail
 	rows, err := c.conn.Query(context.Background(), "Select * from getIncomeMails($1)", userId)
 	if err != nil {

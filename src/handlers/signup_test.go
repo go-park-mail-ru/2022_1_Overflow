@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"general"
 	"fmt"
 	"testing"
 	"net/url"
@@ -10,10 +11,11 @@ import (
 )
 
 func TestSignup(t *testing.T) {
-	var handler SignupHandler
-	handler.Init()
+	mux := http.NewServeMux()
+	var handler SigninHandler
+	handler.Init(mux, nil)
 
-	srv := httptest.NewServer(handler.Handlers())
+	srv := httptest.NewServer(general.SetupCORS(mux))
 	defer srv.Close()
 
 	data := url.Values{
@@ -43,10 +45,11 @@ func TestSignup(t *testing.T) {
 }
 
 func TestBadPassword(t *testing.T) {
-	var handler SignupHandler
-	handler.Init()
+	mux := http.NewServeMux()
+	var handler SigninHandler
+	handler.Init(mux, nil)
 
-	srv := httptest.NewServer(handler.Handlers())
+	srv := httptest.NewServer(general.SetupCORS(mux))
 	defer srv.Close()
 
 	data := url.Values{
@@ -76,10 +79,11 @@ func TestBadPassword(t *testing.T) {
 }
 
 func TestEmptyForm(t *testing.T) {
-	var handler SignupHandler
-	handler.Init()
-	
-	srv := httptest.NewServer(handler.Handlers())
+	mux := http.NewServeMux()
+	var handler SigninHandler
+	handler.Init(mux, nil)
+
+	srv := httptest.NewServer(general.SetupCORS(mux))
 	defer srv.Close()
 
 	data := url.Values{

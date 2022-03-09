@@ -42,9 +42,11 @@ func (handler *SignupHandler) userSignup(w http.ResponseWriter, r *http.Request)
 		w.Write(general.CreateJsonResponse(3, err.Error(), nil))
 		return
 	}
-	if err := handler.db.AddUser(user); err != nil {
-		w.Write(general.CreateJsonResponse(4, err.Error(), nil))
-		return
+	if (handler.db != nil) {
+		if err := handler.db.AddUser(user); err != nil {
+			w.Write(general.CreateJsonResponse(4, err.Error(), nil))
+			return
+		}
 	}
 	w.Write(general.CreateJsonResponse(0, "OK", nil))
 }

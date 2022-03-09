@@ -7,12 +7,16 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
+	"general"
 )
 
-var handler SigninHandler
-
 func TestSignin(t *testing.T) {
-	srv := httptest.NewServer(handler.Handlers())
+
+	mux := http.NewServeMux()
+	var handler SigninHandler
+	handler.Init(mux, nil)
+
+	srv := httptest.NewServer(general.SetupCORS(mux))
 	defer srv.Close()
 
 	data := url.Values{
@@ -39,7 +43,11 @@ func TestSignin(t *testing.T) {
 }
 
 func TestBadSignin(t *testing.T) {
-	srv := httptest.NewServer(handler.Handlers())
+	mux := http.NewServeMux()
+	var handler SigninHandler
+	handler.Init(mux, nil)
+
+	srv := httptest.NewServer(general.SetupCORS(mux))
 	defer srv.Close()
 
 	data := url.Values{

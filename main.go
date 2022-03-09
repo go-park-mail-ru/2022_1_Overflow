@@ -24,6 +24,7 @@ func main() {
 
 	signin.Init(mux, &conn)
 	signup.Init(mux, &conn)
+	mux.HandleFunc("/logout", handlers.LogoutHandler)
 	
 	log.Printf("Listening on %v", address)
 	err = http.ListenAndServe(address, general.SetupCORS(mux))
