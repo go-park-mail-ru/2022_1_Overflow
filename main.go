@@ -17,13 +17,16 @@ func main() {
 	var signup handlers.SignupHandler
 
 	var conn db.DatabaseConnection
-	conn.Create(dbUrl)
+	err := conn.Create(dbUrl)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	signin.Init(mux, &conn)
 	signup.Init(mux, &conn)
 	
 	log.Printf("Listening on %v", address)
-	err := http.ListenAndServe(address, general.SetupCORS(mux))
+	err = http.ListenAndServe(address, general.SetupCORS(mux))
 	if err != nil {
 		log.Fatal(err)
 	}
