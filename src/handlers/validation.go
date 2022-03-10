@@ -11,6 +11,9 @@ func (v *Validators) EmailValidator(email string) error {
 	if err := v.CheckEmptyField(email, "email"); err != nil {
 		return fmt.Errorf("Поле адреса почты является пустым.")
 	}
+	if strings.Contains(email, "@") {
+		return fmt.Errorf("Поле почты содержит символ @.")
+	}
 	return nil
 }
 
