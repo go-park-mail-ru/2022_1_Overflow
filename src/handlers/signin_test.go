@@ -1,13 +1,15 @@
 package handlers
 
 import (
+	response "OverflowBackend/src/response"
+
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"general"
+
 	"github.com/gorilla/mux"
 )
 
@@ -17,7 +19,7 @@ func TestSignin(t *testing.T) {
 	var handler SigninHandler
 	handler.Init(router, nil)
 
-	srv := httptest.NewServer(general.SetupCORS(router))
+	srv := httptest.NewServer(response.SetupCORS(router))
 	defer srv.Close()
 
 	data := map[string]string{
@@ -49,7 +51,7 @@ func TestBadSignin(t *testing.T) {
 	var handler SigninHandler
 	handler.Init(router, nil)
 
-	srv := httptest.NewServer(general.SetupCORS(router))
+	srv := httptest.NewServer(response.SetupCORS(router))
 	defer srv.Close()
 
 	data := map[string]string{

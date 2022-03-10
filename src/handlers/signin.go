@@ -1,11 +1,15 @@
 package handlers
 
 import (
-	"db"
+	db "OverflowBackend/src/db"
+	response "OverflowBackend/src/response"
+	validation "OverflowBackend/src/validation"
+	session "OverflowBackend/src/session"
+
 	"encoding/json"
 	"fmt"
-	"general"
 	"net/http"
+
 	"github.com/gorilla/mux"
 )
 
@@ -28,29 +32,29 @@ func (handler *SigninHandler) userSignin(w http.ResponseWriter, r *http.Request)
 
 	w.Header().Set("Content-Type", "application/json")
 	
-	var data map[string]interface{}
+	var data map[string]string
 
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		w.Write(general.CreateJsonResponse(1, err.Error(), nil))
+		w.Write(response.CreateJsonResponse(1, err.Error(), nil))
 		return
 	}
 	if err := handler.validateData(data); err != nil {
-		w.Write(general.CreateJsonResponse(2, err.Error(), nil))
+		w.Write(response.CreateJsonResponse(2, err.Error(), nil))
 		return
 	}
 
-	cookies := general.CreateCookies(data["email"].(string), data["password"].(string))
-	for _, cookie := range cookies {
-		http.SetCookie(w, &cookie)
+	err = session.CreateSession(w, r, data["email"])
+	if (err != nil) {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	w.Write(general.CreateJsonResponse(0, "OK", nil))
+	
+	w.Write(response.CreateJsonResponse(0, "OK", nil))
 }
 
-func (handler *SigninHandler) validateData(data map[string]interface{}) (err error) {
+func (handler *SigninHandler) validateData(data map[string]string) (err error) {
 
-	var validators Validators
-	if err = validators.CheckSignin(data["email"].(string), data["password"].(string)); err != nil {
+	if err = validation.CheckSignin(data["email"], data["password"]); err != nil {
 		return err
 	}
 
@@ -58,13 +62,13 @@ func (handler *SigninHandler) validateData(data map[string]interface{}) (err err
 		return
 	}
 
-	user, _ := handler.db.GetUserInfoByEmail(data["email"].(string))
+	user, _ := handler.db.GetUserInfoByEmail(data["email"])
 
 	if (user == db.UserT{}) {
 		return fmt.Errorf("Пользователь не существует.")
 	}
 
-	if data["password"].(string) != user.Password {
+	if data["password"] != user.Password {
 		return fmt.Errorf("Пароли не совпадают.")
 	}
 

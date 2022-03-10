@@ -1,9 +1,10 @@
 package main
 
 import (
-	"db"
-	"general"
-	"handlers"
+	//db "OverflowBackend/src/db"
+	response "OverflowBackend/src/response"
+	handlers "OverflowBackend/src/handlers"
+
 	"log"
 	"net/http"
 	"github.com/gorilla/mux"
@@ -18,19 +19,21 @@ func main() {
 	var signup handlers.SignupHandler
 	var mailbox handlers.MailBox
 
+	/*
 	var conn db.DatabaseConnection
 	err := conn.Create(dbUrl)
 	if err != nil {
 		log.Fatal(err)
 	}
+	*/
 
-	signin.Init(r, &conn)
-	signup.Init(r, &conn)
-	mailbox.Init(r, &conn)
+	signin.Init(r, nil) //&conn)
+	signup.Init(r, nil) //&conn)
+	mailbox.Init(r, nil) //&conn)
 	r.HandleFunc("/logout", handlers.LogoutHandler)
 
 	log.Printf("Listening on %v", address)
-	err = http.ListenAndServe(address, general.SetupCORS(r))
+	err := http.ListenAndServe(address, response.SetupCORS(r))
 	if err != nil {
 		log.Fatal(err)
 	}

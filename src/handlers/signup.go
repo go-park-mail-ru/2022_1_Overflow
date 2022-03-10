@@ -1,10 +1,12 @@
 package handlers
 
 import (
-	"db"
+	db "OverflowBackend/src/db"
+	response "OverflowBackend/src/response"
+	validation "OverflowBackend/src/validation"
+
 	"encoding/json"
 	"fmt"
-	"general"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -34,32 +36,31 @@ func (handler *SignupHandler) userSignup(w http.ResponseWriter, r *http.Request)
 
 	err := json.NewDecoder(r.Body).Decode(&data)
     if err != nil {
-        w.Write(general.CreateJsonResponse(1, err.Error(), nil))
+        w.Write(response.CreateJsonResponse(1, err.Error(), nil))
 		return
     }
-	var validators Validators
-	if err := validators.CheckSignup(data); err != nil {
-		w.Write(general.CreateJsonResponse(2, err.Error(), nil))
+	if err := validation.CheckSignup(data); err != nil {
+		w.Write(response.CreateJsonResponse(2, err.Error(), nil))
 		return
 	}
 	user, err := handler.convertToUser(data)
 	if err != nil {
-		w.Write(general.CreateJsonResponse(3, err.Error(), nil))
+		w.Write(response.CreateJsonResponse(3, err.Error(), nil))
 		return
 	}
 	if (handler.db != nil) {
 		userFind, _ := handler.db.GetUserInfoByEmail(data["email"])
 		if (userFind != db.UserT{}) {
 			err = fmt.Errorf("Пользователь %v уже существует.", data["email"])
-			w.Write(general.CreateJsonResponse(4, err.Error(), nil))
+			w.Write(response.CreateJsonResponse(4, err.Error(), nil))
 			return
 		}
 		if err = handler.db.AddUser(user); err != nil {
-			w.Write(general.CreateJsonResponse(4, err.Error(), nil))
+			w.Write(response.CreateJsonResponse(4, err.Error(), nil))
 			return
 		}
 	}
-	w.Write(general.CreateJsonResponse(0, "OK", nil))
+	w.Write(response.CreateJsonResponse(0, "OK", nil))
 }
 
 func (handler *SignupHandler) convertToUser(data map[string]string) (user db.UserT, err error) {

@@ -1,9 +1,10 @@
-package general
+package response
 
 import (
 	"net/http"
-	"github.com/rs/cors"
+
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 func SetupCORS(r *mux.Router) http.Handler {

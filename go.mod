@@ -1,14 +1,13 @@
 module OverflowBackend
 
 require (
-	db v1.0.0
-	general v1.0.0
-	handlers v1.0.0
+	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/sessions v1.2.1
 )
 
 require (
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/securecookie v1.1.1 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.11.0 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
@@ -22,11 +21,5 @@ require (
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 // indirect
 	golang.org/x/text v0.3.6 // indirect
 )
-
-replace db v1.0.0 => ./src/db
-
-replace general v1.0.0 => ./src/general
-
-replace handlers v1.0.0 => ./src/handlers
 
 go 1.17

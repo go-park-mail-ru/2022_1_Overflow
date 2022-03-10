@@ -1,22 +1,24 @@
 package handlers
 
 import (
+	response "OverflowBackend/src/response"
+
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"general"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
 	"github.com/gorilla/mux"
 )
 
 func TestSignup(t *testing.T) {
 	router := mux.NewRouter()
-	var handler SigninHandler
+	var handler SignupHandler
 	handler.Init(router, nil)
 
-	srv := httptest.NewServer(general.SetupCORS(router))
+	srv := httptest.NewServer(response.SetupCORS(router))
 	defer srv.Close()
 
 	data := map[string]string{
@@ -48,10 +50,10 @@ func TestSignup(t *testing.T) {
 
 func TestBadPassword(t *testing.T) {
 	router := mux.NewRouter()
-	var handler SigninHandler
+	var handler SignupHandler
 	handler.Init(router, nil)
 
-	srv := httptest.NewServer(general.SetupCORS(router))
+	srv := httptest.NewServer(response.SetupCORS(router))
 	defer srv.Close()
 
 	data := map[string]string{
@@ -84,10 +86,10 @@ func TestBadPassword(t *testing.T) {
 
 func TestEmptyForm(t *testing.T) {
 	router := mux.NewRouter()
-	var handler SigninHandler
+	var handler SignupHandler
 	handler.Init(router, nil)
 
-	srv := httptest.NewServer(general.SetupCORS(router))
+	srv := httptest.NewServer(response.SetupCORS(router))
 	defer srv.Close()
 
 	data := map[string]string{
