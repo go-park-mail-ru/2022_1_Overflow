@@ -1,7 +1,7 @@
 package main
 
 import (
-	//"db"
+	"db"
 	"general"
 	"handlers"
 	"log"
@@ -18,17 +18,15 @@ func main() {
 	var signup handlers.SignupHandler
 	var mailbox handlers.MailBox
 
-	/*
 	var conn db.DatabaseConnection
 	err := conn.Create(dbUrl)
 	if err != nil {
 		log.Fatal(err)
 	}
-	*/
 
-	signin.Init(r, nil) //&conn)
-	signup.Init(r, nil) //&conn)
-	mailbox.Init(r, nil) //&conn)
+	signin.Init(r, &conn)
+	signup.Init(r, &conn)
+	mailbox.Init(r, &conn)
 	r.HandleFunc("/logout", handlers.LogoutHandler)
 
 	log.Printf("Listening on %v", address)
