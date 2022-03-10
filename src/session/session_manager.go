@@ -77,7 +77,13 @@ func IsLoggedIn(r *http.Request) bool {
 	return !session.IsNew
 }
 
-func GetData(r *http.Request) (Session, error) {
+func GetData(r *http.Request) (data Session, err error) {
+	defer func() {
+		errRecover := recover()
+		if errRecover != nil {
+			data, err = Session{}, errRecover.(error)
+		}
+	}()
 	session, err := store.Get(r, session_name)
 	if (err != nil) {
 		return Session{}, err
