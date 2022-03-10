@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"db"
+	"encoding/json"
+	"fmt"
 	"general"
 	"net/http"
-	"encoding/json"
+
 	"github.com/gorilla/mux"
 )
 
@@ -46,6 +48,11 @@ func (handler *SignupHandler) userSignup(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	if (handler.db != nil) {
+		user, err = handler.db.GetUserInfoByEmail(data["email"])
+		if err != nil || (user == db.UserT{}) {
+			err = fmt.Errorf("Пользователь %v уже существует.", data["email"])
+			w.Write(general.CreateJsonResponse(4, err.Error(), nil))
+		}
 		if err := handler.db.AddUser(user); err != nil {
 			w.Write(general.CreateJsonResponse(4, err.Error(), nil))
 			return
