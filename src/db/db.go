@@ -39,7 +39,7 @@ func (c *DatabaseConnection) Create(url string) (err error) {
 	if err != nil {
 		return fmt.Errorf("Unable to connect to database: %v\n", err)
 	}
-	return
+	return nil
 }
 
 //Получить данные пользователя по его почте
@@ -155,11 +155,6 @@ func main() {
 	user.LastName = "Rabinovich"
 	user.Email = "animelov123123er69@overflow.ru"
 	user.Password = "12312213123312"
-	//AddUser(user, c.conn)
-	//user = GetUserInfoById(2)
-	//fmt.Print(user)
-	//user = GetUserInfoByEmail("animelov123123er69@overflow.ru", c.conn)
-	//fmt.Print(user, c.conn)
 	results, err := conn.GetOutcomeMails(1)
 	fmt.Print(results)
 	results, err = conn.GetIncomeMails(1)

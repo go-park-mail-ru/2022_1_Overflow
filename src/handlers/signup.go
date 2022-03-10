@@ -28,7 +28,7 @@ func (handler *SignupHandler) userSignup(w http.ResponseWriter, r *http.Request)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	var data map[string]interface{}
+	var data map[string]string
 
 	err := json.NewDecoder(r.Body).Decode(&data)
     if err != nil {
@@ -36,7 +36,7 @@ func (handler *SignupHandler) userSignup(w http.ResponseWriter, r *http.Request)
 		return
     }
 	var validators Validators
-	if err := validators.CheckSignup(data["email"].(string), data["password"].(string), data["password_confirmation"].(string)); err != nil {
+	if err := validators.CheckSignup(data); err != nil {
 		w.Write(general.CreateJsonResponse(2, err.Error(), nil))
 		return
 	}
@@ -54,11 +54,11 @@ func (handler *SignupHandler) userSignup(w http.ResponseWriter, r *http.Request)
 	w.Write(general.CreateJsonResponse(0, "OK", nil))
 }
 
-func (handler *SignupHandler) convertToUser(data map[string]interface{}) (user db.UserT, err error) {
-	user.FirstName = data["first_name"].(string)
-	user.LastName = data["last_name"].(string)
-	user.Email = data["email"].(string)
-	user.Password = hashPassword(data["password"].(string))
+func (handler *SignupHandler) convertToUser(data map[string]string) (user db.UserT, err error) {
+	user.FirstName = data["first_name"]
+	user.LastName = data["last_name"]
+	user.Email = data["email"]
+	user.Password = hashPassword(data["password"])
 	return
 }
 
