@@ -48,13 +48,13 @@ func (handler *SignupHandler) userSignup(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	if (handler.db != nil) {
-		user, _ = handler.db.GetUserInfoByEmail(data["email"])
-		if (user != db.UserT{}) {
+		userFind, _ := handler.db.GetUserInfoByEmail(data["email"])
+		if (userFind != db.UserT{}) {
 			err = fmt.Errorf("Пользователь %v уже существует.", data["email"])
 			w.Write(general.CreateJsonResponse(4, err.Error(), nil))
 			return
 		}
-		if err := handler.db.AddUser(user); err != nil {
+		if err = handler.db.AddUser(user); err != nil {
 			w.Write(general.CreateJsonResponse(4, err.Error(), nil))
 			return
 		}
