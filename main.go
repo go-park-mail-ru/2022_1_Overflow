@@ -30,7 +30,7 @@ func main() {
 	r.HandleFunc("/logout", handlers.LogoutHandler)
 
 	log.Printf("Listening on %v", address)
-	err := http.ListenAndServe(address, general.SetupCORS(r))
+	err = http.ListenAndServe(address, general.SetupCORS(r))
 	if err != nil {
 		log.Fatal(err)
 	}
