@@ -33,14 +33,7 @@ func TestSignin(t *testing.T) {
 		return
 	}
 
-	var response map[string]interface{}
-	err = json.NewDecoder(r.Body).Decode(&response)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	if response["status"].(float64) != 0 {
+	if r.StatusCode != 200 {
 		t.Errorf("Неверный статус от сервера.")
 		return
 	}
@@ -72,8 +65,8 @@ func TestBadSignin(t *testing.T) {
 		return
 	}
 
-	if response["status"].(float64) != 2 {
-		t.Errorf("Неверный статус от сервера.")
+	if response["status"].(float64) != 1 {
+		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", response["status"].(float64), 1)
 		return
 	}
 }

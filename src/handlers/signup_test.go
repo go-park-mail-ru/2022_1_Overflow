@@ -35,14 +35,7 @@ func TestSignup(t *testing.T) {
 		return
 	}
 
-	var response map[string]interface{}
-	err = json.NewDecoder(r.Body).Decode(&response)
-	if (err != nil) {
-		t.Error(err)
-		return
-	}
-	
-	if response["status"].(float64) != 0 {
+	if r.StatusCode != 200 {
 		t.Errorf("Неверный статус от сервера.")
 		return
 	}
@@ -78,8 +71,8 @@ func TestBadPassword(t *testing.T) {
 		return
 	}
 	
-	if response["status"].(float64) != 2 {
-		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", response["status"].(float64), 2)
+	if response["status"].(float64) != 1 {
+		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", response["status"].(float64), 1)
 		return
 	}
 }
@@ -113,8 +106,8 @@ func TestEmptyForm(t *testing.T) {
 		return
 	}
 	
-	if response["status"].(float64) != 2 {
-		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", response["status"].(float64), 2)
+	if response["status"].(float64) != 1 {
+		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", response["status"].(float64), 1)
 		return
 	}
 }
