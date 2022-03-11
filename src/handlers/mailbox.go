@@ -22,11 +22,11 @@ func (mb *MailBox) Init(r *mux.Router, db *db.DatabaseConnection) {
 
 func (mb *MailBox) getIncome(w http.ResponseWriter, r *http.Request) {
 	if !session.IsLoggedIn(r) {
-		http.Error(w, "Access denied.", http.StatusUnauthorized)
+		AccessDenied(w)
 		return
 	}
 	if r.Method != http.MethodGet {
-		http.Error(w, "Only GET method is allowed.", http.StatusMethodNotAllowed)
+		MethodNotAllowed(w, http.MethodGet)
 		return
 	}
 	var parsed []byte
@@ -60,11 +60,11 @@ func (mb *MailBox) getIncome(w http.ResponseWriter, r *http.Request) {
 
 func (mb *MailBox) getOutcome(w http.ResponseWriter, r *http.Request) {
 	if !session.IsLoggedIn(r) {
-		http.Error(w, "Access denied.", http.StatusUnauthorized)
+		AccessDenied(w)
 		return
 	}
 	if r.Method != http.MethodGet {
-		http.Error(w, "Only GET method is allowed.", http.StatusMethodNotAllowed)
+		MethodNotAllowed(w, http.MethodGet)
 		return
 	}
 	var parsed []byte

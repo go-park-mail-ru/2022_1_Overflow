@@ -26,7 +26,7 @@ func (handler *SigninHandler) Init(router *mux.Router, db *db.DatabaseConnection
 
 func (handler *SigninHandler) userSignin(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Only POST method is allowed.", http.StatusMethodNotAllowed)
+		MethodNotAllowed(w, http.MethodPost)
 		return
 	}
 

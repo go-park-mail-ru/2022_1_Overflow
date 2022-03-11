@@ -20,11 +20,11 @@ func (p *Profile) Init(router *mux.Router, db *db.DatabaseConnection) {
 
 func (p *Profile) profileHandler(w http.ResponseWriter, r *http.Request) {
 	if !session.IsLoggedIn(r) {
-		http.Error(w, "Access denied.", http.StatusUnauthorized)
+		AccessDenied(w)
 		return
 	}
 	if r.Method != http.MethodGet {
-		http.Error(w, "Only GET method is allowed.", http.StatusMethodNotAllowed)
+		MethodNotAllowed(w, http.MethodGet)
 		return
 	}
 

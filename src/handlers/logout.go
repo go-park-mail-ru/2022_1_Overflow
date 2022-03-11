@@ -7,15 +7,15 @@ import (
 )
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		http.Error(w, "Only GET method is available.", http.StatusMethodNotAllowed)
-		return
-	}
-
 	w.Header().Set("Content-Type", "application/json")
 
 	if !session.IsLoggedIn(r) {
-		http.Error(w, "Access denied.", http.StatusInternalServerError)
+		AccessDenied(w)
+		return
+	}
+
+	if r.Method != http.MethodGet {
+		MethodNotAllowed(w, http.MethodGet)
 		return
 	}
 
