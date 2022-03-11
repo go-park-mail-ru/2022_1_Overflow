@@ -16,19 +16,24 @@ type MailBox struct {
 }
 
 func (mb *MailBox) Init(r *mux.Router, db *db.DatabaseConnection) {
-	r.HandleFunc("/list", mb.GetMailBox)
+	r.HandleFunc("/income", mb.getIncome)
+	r.HandleFunc("/outcome", mb.getOutcome)
 	mb.db = db
 }
 
-func (mb *MailBox) GetMailBox(w http.ResponseWriter, r *http.Request) {
+func (mb *MailBox) getIncome(w http.ResponseWriter, r *http.Request) {
 	if !session.IsLoggedIn(r) {
-		w.Write(response.CreateJsonResponse(1, "Пользователь не выполнил вход.", nil))
+		http.Error(w, "Access denied.", http.StatusUnauthorized)
+		return
+	}
+	if r.Method != http.MethodGet {
+		http.Error(w, "Only GET method is allowed.", http.StatusMethodNotAllowed)
 		return
 	}
 	var parsed []byte
 	if mb.db != nil {
 		data, err := session.GetData(r)
-		if (err != nil) {
+		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -46,5 +51,41 @@ func (mb *MailBox) GetMailBox(w http.ResponseWriter, r *http.Request) {
 			w.Write(response.CreateJsonResponse(4, err.Error(), nil))
 		}
 	}
-	w.Write(response.CreateJsonResponse(0, "OK", string(parsed)))
+	w.Write(response.CreateJsonResponse(0, "OK", parsed))
+}
+
+func (mb *MailBox) getOutcome(w http.ResponseWriter, r *http.Request) {
+	if !session.IsLoggedIn(r) {
+		http.Error(w, "Access denied.", http.StatusUnauthorized)
+		return
+	}
+	if r.Method != http.MethodGet {
+		http.Error(w, "Only GET method is allowed.", http.StatusMethodNotAllowed)
+		return
+	}
+	var parsed []byte
+	if mb.db != nil {
+		data, err := session.GetData(r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		user, err := mb.db.GetUserInfoByEmail(data.Email)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		id := user.Id
+		mails, err := mb.db.GetOutcomeMails(id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		parsed, err = json.Marshal(mails)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+	w.Write(parsed)
 }

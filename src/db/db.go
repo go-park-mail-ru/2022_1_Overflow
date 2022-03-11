@@ -120,7 +120,7 @@ func (c *DatabaseConnection) GetIncomeMails(userId int32) ([]Mail, error) {
 }
 
 //Получить отправленные пользователем сообщения
-func (c *DatabaseConnection) GetOutcomeMails(userId int) ([]Mail, error) {
+func (c *DatabaseConnection) GetOutcomeMails(userId int32) ([]Mail, error) {
 	var results []Mail
 	rows, err := c.conn.Query(context.Background(), "Select * from getOutcomeMails($1)", userId)
 	if err != nil {

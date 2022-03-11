@@ -18,6 +18,7 @@ func main() {
 	var signin handlers.SigninHandler
 	var signup handlers.SignupHandler
 	var mailbox handlers.MailBox
+	var profile handlers.Profile
 
 	/*
 	var conn db.DatabaseConnection
@@ -30,6 +31,7 @@ func main() {
 	signin.Init(r, nil) //&conn)
 	signup.Init(r, nil) //&conn)
 	mailbox.Init(r, nil) //&conn)
+	profile.Init(r, nil)
 	r.HandleFunc("/logout", handlers.LogoutHandler)
 
 	log.Printf("Listening on %v", address)
