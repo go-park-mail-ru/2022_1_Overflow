@@ -31,22 +31,22 @@ func (handler *SigninHandler) userSignin(w http.ResponseWriter, r *http.Request)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	
 	var data map[string]string
 
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		w.Write(response.CreateJsonResponse(1, err.Error(), nil))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if err := handler.validateData(data); err != nil {
-		w.Write(response.CreateJsonResponse(2, err.Error(), nil))
+		w.Write(response.CreateJsonResponse(1, err.Error(), nil))
 		return
 	}
 
 	err = session.CreateSession(w, r, data["email"])
 	if (err != nil) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	
 	w.Write(response.CreateJsonResponse(0, "OK", nil))

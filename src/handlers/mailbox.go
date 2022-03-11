@@ -2,7 +2,6 @@ package handlers
 
 import (
 	db "OverflowBackend/src/db"
-	response "OverflowBackend/src/response"
 	session "OverflowBackend/src/session"
 
 	"encoding/json"
@@ -39,19 +38,24 @@ func (mb *MailBox) getIncome(w http.ResponseWriter, r *http.Request) {
 		}
 		user, err := mb.db.GetUserInfoByEmail(data.Email)
 		if err != nil {
-			w.Write(response.CreateJsonResponse(2, err.Error(), nil))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		id := user.Id
 		mails, err := mb.db.GetIncomeMails(id)
 		if err != nil {
-			w.Write(response.CreateJsonResponse(3, err.Error(), nil))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		parsed, err = json.Marshal(mails)
 		if err != nil {
-			w.Write(response.CreateJsonResponse(4, err.Error(), nil))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 	}
-	w.Write(response.CreateJsonResponse(0, "OK", parsed))
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(parsed)
 }
 
 func (mb *MailBox) getOutcome(w http.ResponseWriter, r *http.Request) {
@@ -87,5 +91,7 @@ func (mb *MailBox) getOutcome(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(parsed)
 }

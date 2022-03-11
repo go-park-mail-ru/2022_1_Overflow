@@ -36,27 +36,27 @@ func (handler *SignupHandler) userSignup(w http.ResponseWriter, r *http.Request)
 
 	err := json.NewDecoder(r.Body).Decode(&data)
     if err != nil {
-        w.Write(response.CreateJsonResponse(1, err.Error(), nil))
+        http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
     }
 	if err := validation.CheckSignup(data); err != nil {
-		w.Write(response.CreateJsonResponse(2, err.Error(), nil))
+		w.Write(response.CreateJsonResponse(1, err.Error(), nil))
 		return
 	}
 	user, err := handler.convertToUser(data)
 	if err != nil {
-		w.Write(response.CreateJsonResponse(3, err.Error(), nil))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if (handler.db != nil) {
 		userFind, _ := handler.db.GetUserInfoByEmail(data["email"])
 		if (userFind != db.UserT{}) {
 			err = fmt.Errorf("Пользователь %v уже существует.", data["email"])
-			w.Write(response.CreateJsonResponse(4, err.Error(), nil))
+			w.Write(response.CreateJsonResponse(2, err.Error(), nil))
 			return
 		}
 		if err = handler.db.AddUser(user); err != nil {
-			w.Write(response.CreateJsonResponse(4, err.Error(), nil))
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	}

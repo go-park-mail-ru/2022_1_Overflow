@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	response "OverflowBackend/src/response"
 	session "OverflowBackend/src/session"
 
 	"net/http"
@@ -16,11 +15,13 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if !session.IsLoggedIn(r) {
-		w.Write(response.CreateJsonResponse(1, "Пользователь не выполнил вход.", nil))
+		http.Error(w, "Access denied.", http.StatusInternalServerError)
 		return
 	}
 
-	session.DeleteSession(w, r)
-
-	w.Write(response.CreateJsonResponse(0, "OK", nil))
+	err := session.DeleteSession(w, r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
