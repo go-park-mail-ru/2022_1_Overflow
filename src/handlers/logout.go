@@ -7,8 +7,7 @@ import (
 )
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
+	
 	if !session.IsLoggedIn(r) {
 		AccessDenied(w)
 		return
