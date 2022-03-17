@@ -1,7 +1,8 @@
-package handlers
+package test
 
 import (
 	response "OverflowBackend/src/response"
+	handlers "OverflowBackend/src/handlers"
 
 	"bytes"
 	"encoding/json"
@@ -15,7 +16,7 @@ import (
 
 func TestSignup(t *testing.T) {
 	router := mux.NewRouter()
-	var handler SignupHandler
+	var handler handlers.SignupHandler
 	handler.Init(router, nil)
 
 	srv := httptest.NewServer(response.SetupCORS(router))
@@ -43,7 +44,7 @@ func TestSignup(t *testing.T) {
 
 func TestBadPassword(t *testing.T) {
 	router := mux.NewRouter()
-	var handler SignupHandler
+	var handler handlers.SignupHandler
 	handler.Init(router, nil)
 
 	srv := httptest.NewServer(response.SetupCORS(router))
@@ -79,7 +80,7 @@ func TestBadPassword(t *testing.T) {
 
 func TestEmptyForm(t *testing.T) {
 	router := mux.NewRouter()
-	var handler SignupHandler
+	var handler handlers.SignupHandler
 	handler.Init(router, nil)
 
 	srv := httptest.NewServer(response.SetupCORS(router))

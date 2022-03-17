@@ -1,6 +1,8 @@
-package session
+package test
 
 import (
+	session "OverflowBackend/src/session"
+
 	"encoding/gob"
 	"net/http"
 	"net/http/httptest"
@@ -13,7 +15,7 @@ func Init() {
 	authKeyOne := securecookie.GenerateRandomKey(64)
 	encryptionKeyOne := securecookie.GenerateRandomKey(32)
 
-	store = sessions.NewCookieStore(
+	store := sessions.NewCookieStore(
 		authKeyOne,
 		encryptionKeyOne,
 	)
@@ -25,7 +27,7 @@ func Init() {
 		Secure:   false,
 	}
 
-	gob.Register(Session{})
+	gob.Register(session.Session{})
 }
 
 func TestSessionManager(t *testing.T) {
@@ -34,12 +36,12 @@ func TestSessionManager(t *testing.T) {
 	r := httptest.NewRequest(http.MethodGet, "/", nil)
 	//w := httptest.NewRecorder()
 
-	data, err := GetData(r)
+	data, err := session.GetData(r)
 	if (err == nil) {
 		t.Error(err)
 		return
 	}
-	if (data != Session{}) {
+	if (data != session.Session{}) {
 		t.Errorf("Данные сессии не являются пустыми.")
 		return
 	}
