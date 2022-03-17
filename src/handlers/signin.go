@@ -3,14 +3,15 @@ package handlers
 import (
 	db "OverflowBackend/src/db"
 	response "OverflowBackend/src/response"
-	validation "OverflowBackend/src/validation"
 	session "OverflowBackend/src/session"
+	validation "OverflowBackend/src/validation"
 
 	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 )
 
 type SigninHandler struct {
@@ -33,6 +34,10 @@ func (handler *SigninHandler) userSignin(w http.ResponseWriter, r *http.Request)
 	w.Header().Set("Content-Type", "application/json")
 	var data map[string]string
 
+	if session.IsLoggedIn(r) {
+		w.Write(response.CreateJsonResponse(0, "OK", nil))
+	}
+
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -44,7 +49,7 @@ func (handler *SigninHandler) userSignin(w http.ResponseWriter, r *http.Request)
 	}
 
 	err = session.CreateSession(w, r, data["email"])
-	if (err != nil) {
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
