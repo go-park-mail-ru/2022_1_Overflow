@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"time"
+
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -19,13 +20,15 @@ type UserT struct {
 
 // Структура письма
 type Mail struct {
-	Client_id int32     `json:"id"`
+	Id        int32     `json:"id"`
+	Client_id int32     `json:"client_id"`
 	Sender    string    `json:"sender"`
 	Addressee string    `json:"addressee"`
 	Theme     string    `json:"theme"`
 	Text      string    `json:"text"`
 	Files     string    `json:"files"`
 	Date      time.Time `json:"date"`
+	Readed    bool      `json:"readed"`
 }
 
 type DatabaseConnection struct {
@@ -90,10 +93,53 @@ func (c *DatabaseConnection) AddUser(user UserT) error {
 	return err
 }
 
-// Добавить почту
+// Изменить пароль
+func (c *DatabaseConnection) ChangeUserPassword(user UserT, newPassword string) error {
+	_, err := c.conn.Query(context.Background(), "UPDATE overflow.users set password = $1 where id = $2;", newPassword, user.Id)
+	return err
+}
+
+// Добавить письмо
 func (c *DatabaseConnection) AddMail(email Mail) error {
 	_, err := c.conn.Query(context.Background(), "insert into overflow.mails(client_id, sender, addressee,theme,  text, files, date) values($1, $2, $3, $4, $5, $6, $7);", email.Client_id, email.Sender, email.Addressee, email.Text, email.Files, email.Date)
 	return err
+}
+
+//Удалить письмо
+func (c *DatabaseConnection) DeleteMail(email Mail) error {
+	_, err := c.conn.Query(context.Background(), "delete from overflow.mails where id = &1;", email.Id)
+	return err
+}
+
+//Прочитать письмо
+func (c *DatabaseConnection) ReadMail(email Mail) error {
+	_, err := c.conn.Query(context.Background(), "UPDATE overflow.mails set readed = $1 where id = $2;", true, email.Id)
+	return err
+}
+
+// Получить письмо по ID
+func (c *DatabaseConnection) GetMailInfoById(mailId int) (Mail, error) {
+	var mail Mail
+	rows, err := c.conn.Query(context.Background(), "Select * from overflow.mails where Id = $1", mailId)
+	if err != nil {
+		return mail, err
+	}
+	for rows.Next() {
+		values, err := rows.Values()
+		if err != nil {
+			return mail, err
+		}
+		mail.Id = values[0].(int32)
+		mail.Client_id = values[1].(int32)
+		mail.Sender = values[2].(string)
+		mail.Addressee = values[3].(string)
+		mail.Date = values[4].(time.Time)
+		mail.Theme = values[5].(string)
+		mail.Text = values[6].(string)
+		mail.Files = values[7].(string)
+		mail.Readed = values[8].(bool)
+	}
+	return mail, nil
 }
 
 // Получить входящие сообщения пользователя
@@ -114,6 +160,8 @@ func (c *DatabaseConnection) GetIncomeMails(userId int32) ([]Mail, error) {
 		mails.Theme = values[1].(string)
 		mails.Text = values[2].(string)
 		mails.Date = values[4].(time.Time)
+		mails.Readed = values[5].(bool)
+		mails.Id = values[6].(int32)
 		results = append(results, mails)
 	}
 	return results, nil
@@ -137,6 +185,7 @@ func (c *DatabaseConnection) GetOutcomeMails(userId int32) ([]Mail, error) {
 		mails.Theme = values[1].(string)
 		mails.Text = values[2].(string)
 		mails.Date = values[4].(time.Time)
+		mails.Id = values[5].(int32)
 		results = append(results, mails)
 	}
 	return results, nil

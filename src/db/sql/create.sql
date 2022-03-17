@@ -18,5 +18,9 @@ CREATE TABLE overflow.mails (
     theme varchar(30),
     text text not null ,
     files varchar(30),
+    readed bool,
     foreign key (client_id) references overflow.users(id) on delete cascade
 );
+
+UPDATE overflow.users set password = '123'
+where id = 1;
