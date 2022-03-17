@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+var MAX_FIELD_LEN int = 20
 
 func EmailValidator(email string) error {
 	if err := CheckEmptyField(email, "email"); err != nil {
@@ -34,13 +35,18 @@ func SamePasswordValidator(password, passwordConfirmation string) error {
 }
 
 func CheckSignup(data map[string]string) error {
-	if err := CheckEmptyField(data["first_name"], "Имя"); err != nil {
+	for k, v := range data {
+		if err := CheckEmptyField(v, k); err != nil {
+			return err
+		}
+		if err := CheckMaxField(v, k, MAX_FIELD_LEN); err != nil {
+			return err
+		}
+	}
+	if err := EmailValidator(data["email"]); err != nil {
 		return err
 	}
-	if err := CheckEmptyField(data["last_name"], "Фамилия"); err != nil {
-		return err
-	}
-	if err := CheckSignin(data["email"], data["password"]); err != nil {
+	if err := PasswordValidator(data["password"]); err != nil {
 		return err
 	}
 	if err := SamePasswordValidator(data["password"], data["password_confirmation"]); err != nil {
@@ -50,6 +56,18 @@ func CheckSignup(data map[string]string) error {
 }
 
 func CheckSignin(email, password string) error {
+	if err := CheckEmptyField(email, "email"); err != nil {
+		return err
+	}
+	if err := CheckEmptyField(password, "password"); err != nil {
+		return err
+	}
+	if err := CheckMaxField(email, "email", MAX_FIELD_LEN); err != nil {
+		return err
+	}
+	if err := CheckMaxField(password, "password", MAX_FIELD_LEN); err != nil {
+		return err
+	}
 	if err := EmailValidator(email); err != nil {
 		return err
 	}
@@ -65,6 +83,17 @@ func CheckEmptyField(value string, key string) error {
 			return fmt.Errorf("Поле является пустым.")
 		} else {
 			return fmt.Errorf("Поле %v является пустым.", key)
+		}
+	}
+	return nil
+}
+
+func CheckMaxField(value string, key string, max int) error {
+	if len(value) > max {
+		if len(strings.TrimSpace(key)) == 0 {
+			return fmt.Errorf("Поле превышает максимально допустимую длину (%v).", max)
+		} else {
+			return fmt.Errorf("Поле %v превышает максимально допустимую длину (%v).", max)
 		}
 	}
 	return nil
