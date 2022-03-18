@@ -1,10 +1,10 @@
 package main
 
-import "OverflowBackend/internal/app"
+import "OverflowBackend/cmd"
 
 var configPath string = "../../configs/main.yml"
 
 func main() {
-	server := app.Application{}
+	server := cmd.Application{}
 	server.Run(configPath)
 }

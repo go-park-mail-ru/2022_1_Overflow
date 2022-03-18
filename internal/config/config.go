@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"time"
 
 	"gopkg.in/yaml.v3"
 )
@@ -29,10 +30,10 @@ type Config struct {
 	Server struct {
 		Port    string `yaml:"port"`
 		Timeout struct {
-			Server	int `ytml:"server"`
-			Write	int `yaml:"write"`
-			Read	int `yaml:"read"`
-			Idle	int `yaml:"idle"`
+			Server	time.Duration `ytml:"server"`
+			Write	time.Duration `yaml:"write"`
+			Read	time.Duration `yaml:"read"`
+			Idle	time.Duration `yaml:"idle"`
 		}	`yaml:"timeout"`
 	}	`yaml:"server"`
 	Database struct {
