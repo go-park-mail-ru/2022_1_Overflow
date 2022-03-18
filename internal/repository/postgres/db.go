@@ -1,39 +1,20 @@
-package db
+package postgres
 
 import (
+	"OverflowBackend/internal/models"
 	"context"
 	"fmt"
-	"os"
 	"time"
+
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-// Структура для юзера
-type UserT struct {
-	Id        int32
-	FirstName string
-	LastName  string
-	Password  string
-	Email     string
-}
-
-// Структура письма
-type Mail struct {
-	Client_id int32     `json:"id"`
-	Sender    string    `json:"sender"`
-	Addressee string    `json:"addressee"`
-	Theme     string    `json:"theme"`
-	Text      string    `json:"text"`
-	Files     string    `json:"files"`
-	Date      time.Time `json:"date"`
-}
-
-type DatabaseConnection struct {
+type Database struct {
 	url  string
 	conn *pgxpool.Pool
 }
 
-func (c *DatabaseConnection) Create(url string) (err error) {
+func (c *Database) Create(url string) (err error) {
 	c.url = url
 	c.conn, err = pgxpool.Connect(context.Background(), url)
 	if err != nil {
@@ -42,9 +23,9 @@ func (c *DatabaseConnection) Create(url string) (err error) {
 	return nil
 }
 
-//Получить данные пользователя по его почте
-func (c *DatabaseConnection) GetUserInfoByEmail(userEmail string) (UserT, error) {
-	var user UserT
+// Получить данные пользователя по его почте
+func (c *Database) GetUserInfoByEmail(userEmail string) (models.User, error) {
+	var user models.User
 	rows, err := c.conn.Query(context.Background(), "Select * from overflow.users where email = $1", userEmail)
 	if err != nil {
 		return user, err
@@ -63,9 +44,9 @@ func (c *DatabaseConnection) GetUserInfoByEmail(userEmail string) (UserT, error)
 	return user, nil
 }
 
-//Получить данные пользователя по его айди в бд
-func (c *DatabaseConnection) GetUserInfoById(userId int) (UserT, error) {
-	var user UserT
+// Получить данные пользователя по его айди в бд
+func (c *Database) GetUserInfoById(userId int) (models.User, error) {
+	var user models.User
 	rows, err := c.conn.Query(context.Background(), "Select * from overflow.users where Id = $1", userId)
 	if err != nil {
 		return user, err
@@ -84,27 +65,27 @@ func (c *DatabaseConnection) GetUserInfoById(userId int) (UserT, error) {
 	return user, nil
 }
 
-// Добавить юзера
-func (c *DatabaseConnection) AddUser(user UserT) error {
+// Добавить пользователя
+func (c *Database) AddUser(user models.User) error {
 	_, err := c.conn.Query(context.Background(), "insert into overflow.users(first_name, last_name, password, email) values ($1, $2, $3, $4);", user.FirstName, user.LastName, user.Password, user.Email)
 	return err
 }
 
 // Добавить почту
-func (c *DatabaseConnection) AddMail(email Mail) error {
+func (c *Database) AddMail(email models.Mail) error {
 	_, err := c.conn.Query(context.Background(), "insert into overflow.mails(client_id, sender, addressee,theme,  text, files, date) values($1, $2, $3, $4, $5, $6, $7);", email.Client_id, email.Sender, email.Addressee, email.Text, email.Files, email.Date)
 	return err
 }
 
 // Получить входящие сообщения пользователя
-func (c *DatabaseConnection) GetIncomeMails(userId int32) ([]Mail, error) {
-	var results []Mail
+func (c *Database) GetIncomeMails(userId int32) ([]models.Mail, error) {
+	var results []models.Mail
 	rows, err := c.conn.Query(context.Background(), "Select * from getIncomeMails($1)", userId)
 	if err != nil {
 		return results, err
 	}
 	for rows.Next() {
-		var mails Mail
+		var mails models.Mail
 		values, err := rows.Values()
 		if err != nil {
 			return results, err
@@ -120,14 +101,14 @@ func (c *DatabaseConnection) GetIncomeMails(userId int32) ([]Mail, error) {
 }
 
 //Получить отправленные пользователем сообщения
-func (c *DatabaseConnection) GetOutcomeMails(userId int32) ([]Mail, error) {
-	var results []Mail
+func (c *Database) GetOutcomeMails(userId int32) ([]models.Mail, error) {
+	var results []models.Mail
 	rows, err := c.conn.Query(context.Background(), "Select * from getOutcomeMails($1)", userId)
 	if err != nil {
 		return results, err
 	}
 	for rows.Next() {
-		var mails Mail
+		var mails models.Mail
 		values, err := rows.Values()
 		if err != nil {
 			return results, err
@@ -140,23 +121,4 @@ func (c *DatabaseConnection) GetOutcomeMails(userId int32) ([]Mail, error) {
 		results = append(results, mails)
 	}
 	return results, nil
-}
-
-func main() {
-	urlExample := "postgres://postgres:postgres@localhost:5432/postgres"
-	var conn DatabaseConnection
-	err := conn.Create(urlExample)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to c.connect to database: %v\n", err)
-		os.Exit(1)
-	}
-	var user UserT
-	user.FirstName = "Mikhail"
-	user.LastName = "Rabinovich"
-	user.Email = "animelov123123er69@overflow.ru"
-	user.Password = "12312213123312"
-	results, err := conn.GetOutcomeMails(1)
-	fmt.Print(results)
-	results, err = conn.GetIncomeMails(1)
-	fmt.Print(results)
 }

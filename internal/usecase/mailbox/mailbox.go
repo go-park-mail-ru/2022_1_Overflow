@@ -1,26 +1,6 @@
-package handlers
+package mailbox
 
-import (
-	db "OverflowBackend/src/db"
-	session "OverflowBackend/src/session"
-
-	"encoding/json"
-	"net/http"
-
-	"github.com/gorilla/mux"
-)
-
-type MailBox struct {
-	db *db.DatabaseConnection
-}
-
-func (mb *MailBox) Init(r *mux.Router, db *db.DatabaseConnection) {
-	r.HandleFunc("/income", mb.getIncome)
-	r.HandleFunc("/outcome", mb.getOutcome)
-	mb.db = db
-}
-
-func (mb *MailBox) getIncome(w http.ResponseWriter, r *http.Request) {
+func Income(w http.ResponseWriter, r *http.Request) {
 	if !session.IsLoggedIn(r) {
 		AccessDenied(w)
 		return
@@ -58,7 +38,7 @@ func (mb *MailBox) getIncome(w http.ResponseWriter, r *http.Request) {
 	w.Write(parsed)
 }
 
-func (mb *MailBox) getOutcome(w http.ResponseWriter, r *http.Request) {
+func Outcome(w http.ResponseWriter, r *http.Request) {
 	if !session.IsLoggedIn(r) {
 		AccessDenied(w)
 		return

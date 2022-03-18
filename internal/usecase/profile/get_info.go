@@ -1,34 +1,27 @@
-package handlers
+package profile
 
 import (
-	session "OverflowBackend/src/session"
-	db "OverflowBackend/src/db"
-
+	"OverflowBackend/internal/usecase/auth"
+	"OverflowBackend/pkg"
 	"encoding/json"
 	"net/http"
-	"github.com/gorilla/mux"
 )
 
 type Profile struct {
 	db *db.DatabaseConnection
 }
 
-func (p *Profile) Init(router *mux.Router, db *db.DatabaseConnection) {
-	router.HandleFunc("/profile", p.profileHandler)
-	p.db = db
-}
-
-func (p *Profile) profileHandler(w http.ResponseWriter, r *http.Request) {
-	if !session.IsLoggedIn(r) {
-		AccessDenied(w)
+func GetInfo(w http.ResponseWriter, r *http.Request) {
+	if !auth.IsLoggedIn(r) {
+		pkg.AccessDenied(w)
 		return
 	}
 	if r.Method != http.MethodGet {
-		MethodNotAllowed(w, http.MethodGet)
+		pkg.MethodNotAllowed(w, http.MethodGet)
 		return
 	}
 
-	data, err := session.GetData(r)
+	data, err := auth.GetData(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

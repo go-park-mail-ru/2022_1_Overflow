@@ -1,0 +1,14 @@
+server:
+  port: 8080
+  timeout:
+    server: 30
+    read: 15
+    write: 10
+    idle: 5
+  
+database:
+  user: "postgres"
+  password: "123"
+  host: "localhost"
+  port: 5432
+  dbname: "postgres"

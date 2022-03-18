@@ -1,8 +1,6 @@
-package handlers
+package pkg
 
-import (
-	"net/http"
-)
+import "net/http"
 
 func MethodNotAllowed(w http.ResponseWriter, method string) {
 	http.Error(w, "Only %v method is allowed.", http.StatusMethodNotAllowed)

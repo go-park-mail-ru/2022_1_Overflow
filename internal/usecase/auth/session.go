@@ -1,19 +1,15 @@
-package session
+package auth
 
 import (
-	"net/http"
+	"OverflowBackend/internal/models"
 	"encoding/gob"
+	"net/http"
+
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 )
 
 var session_name string = "OveflowMail"
-
-// Структура сессии.
-type Session struct {
-	Email         string
-	Authenticated bool
-}
 
 // Данные всех сессий.
 var store *sessions.CookieStore
@@ -35,15 +31,15 @@ func init() {
 		Secure:   false,
 	}
 
-	gob.Register(Session{})
+	gob.Register(models.Session{})
 }
 
-func CreateSession(w http.ResponseWriter, r *http.Request, email string) error {
+func (sm SessionManager) CreateSession(w http.ResponseWriter, r *http.Request, email string) error {
 	session, err := store.Get(r, session_name)
 	if err != nil {
 		return err
 	}
-	data := &Session{
+	data := &models.Session{
 		Email:         email,
 		Authenticated: true,
 	}
@@ -52,13 +48,13 @@ func CreateSession(w http.ResponseWriter, r *http.Request, email string) error {
 	return err
 }
 
-func DeleteSession(w http.ResponseWriter, r *http.Request) error {
+func (sm SessionManager) DeleteSession(w http.ResponseWriter, r *http.Request) error {
 	session, err := store.Get(r, session_name)
 	if err != nil {
 		return err
 	}
 
-	session.Values["data"] = Session{}
+	session.Values["data"] = models.Session{}
 	session.Options.MaxAge = -1
 
 	err = session.Save(r, w)
@@ -69,7 +65,7 @@ func DeleteSession(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func IsLoggedIn(r *http.Request) bool {
+func (sm SessionManager) IsLoggedIn(r *http.Request) bool {
 	session, err := store.Get(r, session_name)
 	if err != nil {
 		return false
@@ -77,16 +73,17 @@ func IsLoggedIn(r *http.Request) bool {
 	return !session.IsNew
 }
 
-func GetData(r *http.Request) (data Session, err error) {
+func (sm SessionManager) GetData(r *http.Request) (data *models.Session, err error) {
 	defer func() {
 		errRecover := recover()
 		if errRecover != nil {
-			data, err = Session{}, errRecover.(error)
+			data, err = nil, errRecover.(error)
 		}
 	}()
 	session, err := store.Get(r, session_name)
 	if (err != nil) {
-		return Session{}, err
+		return nil, err
 	}
-	return session.Values["data"].(Session), nil
+	sessionData := session.Values["data"].(models.Session)
+	return &sessionData, nil
 }
