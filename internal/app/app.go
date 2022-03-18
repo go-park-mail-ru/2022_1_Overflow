@@ -64,6 +64,7 @@ func (app *Application) Run(configPath string) {
 			if err != http.ErrServerClosed {
 				log.Fatalf("Невозможно запустить сервер: %v", err)
 			}
+			log.Println("Получен сигнал закрытия сервера...")
 		}
 		log.Printf("Сервер запущен по адресу: %v\n", server.Addr)
 	}()
