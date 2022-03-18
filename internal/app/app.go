@@ -65,6 +65,7 @@ func (app *Application) Run(configPath string) {
 				log.Fatalf("Невозможно запустить сервер: %v", err)
 			}
 		}
+		log.Printf("Сервер запущен по адресу: %v\n", server.Addr)
 	}()
 
 	interrupt := <-runChan
