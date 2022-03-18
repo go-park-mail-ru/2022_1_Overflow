@@ -50,6 +50,7 @@ func (app *Application) Run(configPath string) {
 	router.Init(&db)
 
 	server := &http.Server {
+		Addr: fmt.Sprintf(":%v", config.Server.Port),
 		Handler: router.NewRouter(),
 		ReadTimeout: time.Duration(config.Server.Timeout.Read) * time.Second,
 		WriteTimeout: time.Duration(config.Server.Timeout.Write) * time.Second,
