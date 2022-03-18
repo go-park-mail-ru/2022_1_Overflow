@@ -28,7 +28,7 @@ func (d *RouterManager) Init(repo repository.DatabaseRepository) {
 	d.profile.Init(repo)
 	d.mailbox.Init(repo)
 	d.handlers = map[string]func(http.ResponseWriter, *http.Request) {
-		"/login": d.auth.SignIn,
+		"/signin": d.auth.SignIn,
 		"/logout": d.auth.SignOut,
 		"/signup": d.auth.SignUp,
 		"/profile": d.profile.GetInfo,
