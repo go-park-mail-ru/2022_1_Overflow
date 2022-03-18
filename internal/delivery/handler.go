@@ -3,6 +3,7 @@ package delivery
 import (
 	"OverflowBackend/internal/config"
 	"OverflowBackend/internal/usecase"
+	"OverflowBackend/internal/usecase/auth"
 
 	"net/http"
 
@@ -17,6 +18,7 @@ type RouterManager struct {
 }
 
 func (d *RouterManager) Init() {
+	d.auth = auth.Auth{}
 	d.handlers = map[string]func(http.ResponseWriter, *http.Request) {
 		"/login": d.auth.SignIn,
 		"/logout": d.auth.SignOut,
