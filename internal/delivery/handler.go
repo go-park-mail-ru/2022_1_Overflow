@@ -18,7 +18,7 @@ type RouterManager struct {
 }
 
 func (d *RouterManager) Init() {
-	d.auth = auth.Auth{}
+	d.auth = &auth.Auth{}
 	d.handlers = map[string]func(http.ResponseWriter, *http.Request) {
 		"/login": d.auth.SignIn,
 		"/logout": d.auth.SignOut,

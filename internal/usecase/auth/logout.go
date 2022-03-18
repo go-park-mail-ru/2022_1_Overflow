@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func (a *Auth) Logout(w http.ResponseWriter, r *http.Request) {
+func (a *Auth) SignOut(w http.ResponseWriter, r *http.Request) {
 	
 	if !a.sm.IsLoggedIn(r) {
 		pkg.AccessDenied(w)
