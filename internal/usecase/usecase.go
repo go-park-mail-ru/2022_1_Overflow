@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"OverflowBackend/internal/models"
+	"OverflowBackend/internal/repository"
 	"net/http"
 )
 
@@ -13,6 +14,7 @@ type GeneralUseCase interface {
 }
 
 type AuthUseCase interface {
+	Init(repository.DatabaseRepository)
 	SignOut(w http.ResponseWriter, r *http.Request)
 	SignIn(w http.ResponseWriter, r *http.Request)
 	SignUp(w http.ResponseWriter, r *http.Request)
@@ -26,11 +28,13 @@ type SessionManagerUseCase interface {
 }
 
 type ProfileUseCase interface {
-	Info(w http.ResponseWriter, r *http.Request)
+	Init(repository.DatabaseRepository)
+	GetInfo(w http.ResponseWriter, r *http.Request)
 }
 
 type MailBoxUseCase interface {
+	Init(repository.DatabaseRepository)
 	Income(w http.ResponseWriter, r *http.Request)
 	Outcome(w http.ResponseWriter, r *http.Request)
-	Send(w http.ResponseWriter, r *http.Request)
+	//Send(w http.ResponseWriter, r *http.Request)
 }

@@ -45,7 +45,7 @@ func (c *Database) GetUserInfoByEmail(userEmail string) (models.User, error) {
 }
 
 // Получить данные пользователя по его айди в бд
-func (c *Database) GetUserInfoById(userId int) (models.User, error) {
+func (c *Database) GetUserInfoById(userId int32) (models.User, error) {
 	var user models.User
 	rows, err := c.conn.Query(context.Background(), "Select * from overflow.users where Id = $1", userId)
 	if err != nil {

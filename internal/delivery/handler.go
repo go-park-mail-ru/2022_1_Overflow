@@ -2,8 +2,11 @@ package delivery
 
 import (
 	"OverflowBackend/internal/config"
+	"OverflowBackend/internal/repository"
 	"OverflowBackend/internal/usecase"
 	"OverflowBackend/internal/usecase/auth"
+	"OverflowBackend/internal/usecase/mailbox"
+	"OverflowBackend/internal/usecase/profile"
 
 	"net/http"
 
@@ -17,13 +20,18 @@ type RouterManager struct {
 	handlers map[string]func(http.ResponseWriter, *http.Request) 
 }
 
-func (d *RouterManager) Init() {
+func (d *RouterManager) Init(repo repository.DatabaseRepository) {
 	d.auth = &auth.Auth{}
+	d.profile = &profile.Profile{}
+	d.mailbox = &mailbox.MailBox{}
+	d.auth.Init(repo)
+	d.profile.Init(repo)
+	d.mailbox.Init(repo)
 	d.handlers = map[string]func(http.ResponseWriter, *http.Request) {
 		"/login": d.auth.SignIn,
 		"/logout": d.auth.SignOut,
 		"/signup": d.auth.SignUp,
-		"/profile": d.profile.Info,
+		"/profile": d.profile.GetInfo,
 		"/income": d.mailbox.Income,
 		"/outcome": d.mailbox.Outcome,
 	}

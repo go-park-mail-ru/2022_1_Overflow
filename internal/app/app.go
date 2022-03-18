@@ -47,7 +47,7 @@ func (app *Application) Run(configPath string) {
 	defer cancel()
 
 	router:= delivery.RouterManager{}
-	router.Init()
+	router.Init(&db)
 
 	server := &http.Server {
 		Handler: router.NewRouter(),
