@@ -1,18 +1,13 @@
 package profile
 
 import (
-	"OverflowBackend/internal/usecase/auth"
 	"OverflowBackend/pkg"
 	"encoding/json"
 	"net/http"
 )
 
-type Profile struct {
-	db *db.DatabaseConnection
-}
-
-func GetInfo(w http.ResponseWriter, r *http.Request) {
-	if !auth.IsLoggedIn(r) {
+func (p *Profile) GetInfo(w http.ResponseWriter, r *http.Request) {
+	if !p.sm.IsLoggedIn(r) {
 		pkg.AccessDenied(w)
 		return
 	}
@@ -21,7 +16,7 @@ func GetInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := auth.GetData(r)
+	data, err := p.sm.GetData(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

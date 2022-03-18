@@ -1,18 +1,18 @@
 package test
 
 import (
-	validation "OverflowBackend/src/validation"
-
+	"OverflowBackend/internal/models"
+	"OverflowBackend/internal/usecase/add_validation"
 	"testing"
 )
 
 func TestValidation(t *testing.T) {
-	err := validation.CheckSignup(map[string]string{
-		"first_name": "test",
-		"last_name": "test",
-		"email": "test",
-		"password": "test",
-		"password_confirmation": "test",
+	err := add_validation.CheckSignUp(models.SignUpForm{
+		FirstName: "test",
+		LastName: "test",
+		Email: "test",
+		Password: "test",
+		PasswordConf: "test",
 	})
 	if err != nil {
 		t.Error(err)
@@ -21,12 +21,12 @@ func TestValidation(t *testing.T) {
 }
 
 func TestBadEmail(t *testing.T) {
-	err := validation.CheckSignup(map[string]string{
-		"first_name": "test",
-		"last_name": "test",
-		"email": "test@",
-		"password": "test",
-		"password_confirmation": "test",
+	err := add_validation.CheckSignUp(models.SignUpForm{
+		FirstName: "test",
+		LastName: "test",
+		Email: "test@",
+		Password: "test",
+		PasswordConf: "test",
 	})
 	if err == nil {
 		t.Error(err)
@@ -35,12 +35,12 @@ func TestBadEmail(t *testing.T) {
 }
 
 func TestEmptyField(t *testing.T) {
-	err := validation.CheckSignup(map[string]string{
-		"first_name": "",
-		"last_name": "test",
-		"email": "test",
-		"password": "test",
-		"password_confirmation": "test",
+	err := add_validation.CheckSignUp(models.SignUpForm{
+		FirstName: "",
+		LastName: "test",
+		Email: "test",
+		Password: "test",
+		PasswordConf: "test",
 	})
 	if err == nil {
 		t.Error(err)

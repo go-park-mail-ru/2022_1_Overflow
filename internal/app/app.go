@@ -2,7 +2,7 @@ package app
 
 import (
 	"OverflowBackend/internal/config"
-	handlers "OverflowBackend/internal/delivery/http"
+	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/repository/postgres"
 
 	"fmt"
@@ -46,8 +46,11 @@ func (app *Application) Run(configPath string) {
 	)
 	defer cancel()
 
+	router:= delivery.RouterManager{}
+	router.Init()
+
 	server := &http.Server {
-		Handler: handlers.NewRouter(),
+		Handler: router.NewRouter(),
 		ReadTimeout: time.Duration(config.Server.Timeout.Read) * time.Second,
 		WriteTimeout: time.Duration(config.Server.Timeout.Write) * time.Second,
 		IdleTimeout: time.Duration(config.Server.Timeout.Idle) * time.Second,

@@ -3,8 +3,6 @@ package auth
 import (
 	"OverflowBackend/internal/repository"
 	"OverflowBackend/internal/usecase"
-
-	"github.com/gorilla/mux"
 )
 
 type Auth struct {
@@ -14,7 +12,7 @@ type Auth struct {
 
 type SessionManager struct {}
 
-func (a *Auth) Init(router *mux.Router, repo repository.DatabaseRepository) {
+func (a *Auth) Init(repo repository.DatabaseRepository) {
 	a.db = repo
 	a.sm = SessionManager{}
 }

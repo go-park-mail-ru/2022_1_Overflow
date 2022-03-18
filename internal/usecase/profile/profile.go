@@ -1,4 +1,4 @@
-package mailbox
+package profile
 
 import (
 	"OverflowBackend/internal/repository"
@@ -6,12 +6,12 @@ import (
 	"OverflowBackend/internal/usecase/auth"
 )
 
-type MailBox struct {
+type Profile struct {
 	db repository.DatabaseRepository
 	sm usecase.SessionManagerUseCase
 }
 
-func (mb *MailBox) Init(repo repository.DatabaseRepository) {
-	mb.db = repo
-	mb.sm = auth.SessionManager{}
+func (p *Profile) Init(repo repository.DatabaseRepository) {
+	p.db = repo
+	p.sm = auth.SessionManager{}
 }

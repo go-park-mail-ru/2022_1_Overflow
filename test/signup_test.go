@@ -1,25 +1,20 @@
 package test
 
 import (
-	response "OverflowBackend/src/response"
-	handlers "OverflowBackend/src/handlers"
-
+	"OverflowBackend/internal/delivery"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/gorilla/mux"
 )
 
 func TestSignup(t *testing.T) {
-	router := mux.NewRouter()
-	var handler handlers.SignupHandler
-	handler.Init(router, nil)
+	rm := delivery.RouterManager{}
+	rm.Init()
 
-	srv := httptest.NewServer(response.SetupCORS(router))
+	srv := httptest.NewServer(rm.NewRouter())
 	defer srv.Close()
 
 	data := map[string]string{
@@ -43,11 +38,10 @@ func TestSignup(t *testing.T) {
 }
 
 func TestBadPassword(t *testing.T) {
-	router := mux.NewRouter()
-	var handler handlers.SignupHandler
-	handler.Init(router, nil)
+	rm := delivery.RouterManager{}
+	rm.Init()
 
-	srv := httptest.NewServer(response.SetupCORS(router))
+	srv := httptest.NewServer(rm.NewRouter())
 	defer srv.Close()
 
 	data := map[string]string{
@@ -79,11 +73,10 @@ func TestBadPassword(t *testing.T) {
 }
 
 func TestEmptyForm(t *testing.T) {
-	router := mux.NewRouter()
-	var handler handlers.SignupHandler
-	handler.Init(router, nil)
+	rm := delivery.RouterManager{}
+	rm.Init()
 
-	srv := httptest.NewServer(response.SetupCORS(router))
+	srv := httptest.NewServer(rm.NewRouter())
 	defer srv.Close()
 
 	data := map[string]string{
