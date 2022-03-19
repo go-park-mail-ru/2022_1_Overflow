@@ -38,7 +38,7 @@ func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 	router.HandleFunc("/income", middlewares.Middleware(rm.d.Income, true))
 	router.HandleFunc("/outcome", middlewares.Middleware(rm.d.Outcome, true))
 	router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
-		httpSwagger.URL(fmt.Sprintf("http://0.0.0.0:%v/swagger/doc.json", swaggerPort)), //The url pointing to API definition
+		httpSwagger.URL("/swagger/doc.json"), //The url pointing to API definition
 		httpSwagger.DeepLinking(true),
 		httpSwagger.DocExpansion("none"),
 		httpSwagger.DomID("#swagger-ui"),
