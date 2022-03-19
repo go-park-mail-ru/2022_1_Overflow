@@ -6,7 +6,12 @@ import (
 	"net/http"
 )
 
-// Получение входящих сообщений.
+// Income godoc
+// @Summary Получение входящих сообщений
+// @Produce json
+// @Success 200
+// @Failure 500
+// @Router /income [get]
 func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		pkg.MethodNotAllowed(w, http.MethodGet)
@@ -27,7 +32,12 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 	w.Write(parsed)
 }
 
-// Получение исходящих сообщений.
+// Outcome godoc
+// @Summary Получение исходящих сообщений
+// @Produce json
+// @Success 200
+// @Failure 500
+// @Router /outcome [get]
 func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		pkg.MethodNotAllowed(w, http.MethodGet)

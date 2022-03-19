@@ -10,7 +10,7 @@ import (
 func HandleServer(config *config.Config, router RouterManager) {
 	server := &http.Server {
 		Addr: fmt.Sprintf(":%v", config.Server.Port),
-		Handler: router.NewRouter(),
+		Handler: router.NewRouter(config.Server.Port),
 		ReadTimeout: config.Server.Timeout.Read,
 		WriteTimeout: config.Server.Timeout.Write,
 		IdleTimeout: config.Server.Timeout.Idle,

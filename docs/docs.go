@@ -10,22 +10,127 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "contact": {
+            "name": "Роман Медников",
+            "url": "https://vk.com/l____l____l____l____l____l",
+            "email": "jellybe@yandex.ru"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/income": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Получение входящих сообщений",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/outcome": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Получение исходящих сообщений",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/profile": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Получение данных профиля пользователя",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/signin": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Выполняет аутентификацию пользователя",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/signout": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Завершение сессии пользователя",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/signup": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Выполняет регистрацию пользователя",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        }
+    }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
+	Version:          "1.0",
 	Host:             "",
-	BasePath:         "",
+	BasePath:         "/v2",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "OverMail API",
+	Description:      "API почтового сервиса команды Overflow.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

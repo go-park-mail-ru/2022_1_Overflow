@@ -6,7 +6,12 @@ import (
 	"net/http"
 )
 
-// Получение данных профиля пользователя.
+// GetInfo godoc
+// @Summary Получение данных профиля пользователя
+// @Produce json
+// @Success 200
+// @Failure 500
+// @Router /profile [get]
 func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		pkg.MethodNotAllowed(w, http.MethodGet)
