@@ -1,7 +1,8 @@
 package test
 
 import (
-	"OverflowBackend/internal/delivery"
+	"OverflowBackend/cmd"
+	"OverflowBackend/internal/repository/mock"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -11,8 +12,11 @@ import (
 )
 
 func TestSignup(t *testing.T) {
+	db := mock.MockDB{}
+	db.Create("test")
+
 	rm := cmd.RouterManager{}
-	rm.Init()
+	rm.Init(&db)
 
 	srv := httptest.NewServer(rm.NewRouter())
 	defer srv.Close()
@@ -38,8 +42,11 @@ func TestSignup(t *testing.T) {
 }
 
 func TestBadPassword(t *testing.T) {
+	db := mock.MockDB{}
+	db.Create("test")
+
 	rm := cmd.RouterManager{}
-	rm.Init()
+	rm.Init(&db)
 
 	srv := httptest.NewServer(rm.NewRouter())
 	defer srv.Close()
@@ -59,22 +66,18 @@ func TestBadPassword(t *testing.T) {
 		return
 	}
 
-	var response map[string]interface{}
-	err = json.NewDecoder(r.Body).Decode(&response)
-	if (err != nil) {
-		t.Error(err)
-		return
-	}
-	
-	if response["status"].(float64) != 1 {
-		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", response["status"].(float64), 1)
+	if r.StatusCode != 500 {
+		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, 500)
 		return
 	}
 }
 
 func TestEmptyForm(t *testing.T) {
+	db := mock.MockDB{}
+	db.Create("test")
+
 	rm := cmd.RouterManager{}
-	rm.Init()
+	rm.Init(&db)
 
 	srv := httptest.NewServer(rm.NewRouter())
 	defer srv.Close()
@@ -93,15 +96,8 @@ func TestEmptyForm(t *testing.T) {
 		return
 	}
 
-	var response map[string]interface{}
-	err = json.NewDecoder(r.Body).Decode(&response)
-	if (err != nil) {
-		t.Error(err)
-		return
-	}
-	
-	if response["status"].(float64) != 1 {
-		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", response["status"].(float64), 1)
+	if r.StatusCode != 500 {
+		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, 500)
 		return
 	}
 }

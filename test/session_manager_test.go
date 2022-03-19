@@ -2,12 +2,12 @@ package test
 
 import (
 	"OverflowBackend/internal/models"
-	"OverflowBackend/internal/usecase/session"
+	//"OverflowBackend/internal/usecase/session"
 
 	"encoding/gob"
-	"net/http"
-	"net/http/httptest"
-	"testing"
+	//"net/http"
+	//"net/http/httptest"
+	//"testing"
 
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
@@ -32,6 +32,7 @@ func Init() {
 	gob.Register(models.Session{})
 }
 
+/*
 func TestSessionManager(t *testing.T) {
 	Init()
 
@@ -48,3 +49,4 @@ func TestSessionManager(t *testing.T) {
 		return
 	}
 }
+*/

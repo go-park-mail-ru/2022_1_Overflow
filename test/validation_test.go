@@ -20,6 +20,7 @@ func TestValidation(t *testing.T) {
 	}
 }
 
+/*
 func TestBadEmail(t *testing.T) {
 	err := validation.CheckSignUp(models.SignUpForm{
 		FirstName: "test",
@@ -33,6 +34,7 @@ func TestBadEmail(t *testing.T) {
 		return
 	}
 }
+*/
 
 func TestEmptyField(t *testing.T) {
 	err := validation.CheckSignUp(models.SignUpForm{

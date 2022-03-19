@@ -3,7 +3,7 @@ package cmd
 import (
 	"OverflowBackend/internal/config"
 	"OverflowBackend/internal/delivery"
-	"OverflowBackend/internal/delivery/middlewares"
+	"OverflowBackend/internal/middlewares"
 	"OverflowBackend/internal/repository"
 	"OverflowBackend/internal/usecase"
 

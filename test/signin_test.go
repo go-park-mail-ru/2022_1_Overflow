@@ -2,6 +2,8 @@ package test
 
 import (
 	"OverflowBackend/cmd"
+	"OverflowBackend/internal/models"
+	"OverflowBackend/internal/repository/mock"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -12,15 +14,25 @@ import (
 
 func TestSignin(t *testing.T) {
 
+	db := mock.MockDB{}
+	db.Create("test")
+	db.AddUser(models.User{
+		Id: 0,
+		FirstName: "test",
+		LastName: "test",
+		Email: "test",
+		Password: "test",
+	})
+
 	rm := cmd.RouterManager{}
-	rm.Init()
+	rm.Init(&db)
 
 	srv := httptest.NewServer(rm.NewRouter())
 	defer srv.Close()
 
 	data := map[string]string{
-		"email":    "ededededed",
-		"password": "pass",
+		"email":    "test",
+		"password": "test",
 	}
 	dataJson, _ := json.Marshal(data)
 	r, err := http.Post(fmt.Sprintf("%s/signin", srv.URL), "application/json", bytes.NewBuffer(dataJson))
@@ -36,15 +48,25 @@ func TestSignin(t *testing.T) {
 }
 
 func TestBadSignin(t *testing.T) {
+	db := mock.MockDB{}
+	db.Create("test")
+	db.AddUser(models.User{
+		Id: 0,
+		FirstName: "test",
+		LastName: "test",
+		Email: "test",
+		Password: "test",
+	})
+
 	rm := cmd.RouterManager{}
-	rm.Init()
+	rm.Init(&db)
 
 	srv := httptest.NewServer(rm.NewRouter())
 	defer srv.Close()
 
 	data := map[string]string{
-		"email":    "ededededed",
-		"password": "",
+		"email":    "test",
+		"password": "pass",
 	}
 	dataJson, _ := json.Marshal(data)
 	r, err := http.Post(fmt.Sprintf("%s/signin", srv.URL), "application/json", bytes.NewBuffer(dataJson))
@@ -60,7 +82,7 @@ func TestBadSignin(t *testing.T) {
 		return
 	}
 
-	if response["status"].(float64) != 1 {
+	if response["status"].(float64) != 0 {
 		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", response["status"].(float64), 1)
 		return
 	}

@@ -37,6 +37,7 @@ type Config struct {
 		}	`yaml:"timeout"`
 	}	`yaml:"server"`
 	Database struct {
+		Type		string `yaml:"type"`
 		User		string `yaml:"user"`
 		Password	string `yaml:"password"`
 		Host		string `yaml:"host"`

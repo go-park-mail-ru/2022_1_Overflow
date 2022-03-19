@@ -3,10 +3,9 @@ package usecase
 import (
 	"OverflowBackend/internal/models"
 	"encoding/json"
-	"net/http"
 )
 
-func (uc *UseCase) Income(w http.ResponseWriter, r *http.Request, data *models.Session) (parsed []byte, err error) {
+func (uc *UseCase) Income(data *models.Session) (parsed []byte, err error) {
 	user, err := uc.db.GetUserInfoByEmail(data.Email)
 	if err != nil {
 		return
@@ -23,25 +22,20 @@ func (uc *UseCase) Income(w http.ResponseWriter, r *http.Request, data *models.S
 	return parsed, nil
 }
 
-func (uc *UseCase) Outcome(w http.ResponseWriter, r *http.Request, data *models.Session) {
+func (uc *UseCase) Outcome(data *models.Session) (parsed []byte, err error) {
 	user, err := uc.db.GetUserInfoByEmail(data.Email)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	id := user.Id
-	mails, err := uc.db.GetOutcomeMails(id)
+	mails, err := uc.db.GetIncomeMails(id)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	parsed, err := json.Marshal(mails)
+	parsed, err = json.Marshal(mails)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(parsed)
+	return parsed, nil
 }
 

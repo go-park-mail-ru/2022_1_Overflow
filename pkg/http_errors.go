@@ -1,9 +1,12 @@
 package pkg
 
-import "net/http"
+import (
+	"fmt"
+	"net/http"
+)
 
 func MethodNotAllowed(w http.ResponseWriter, method string) {
-	http.Error(w, "Only %v method is allowed.", http.StatusMethodNotAllowed)
+	http.Error(w, fmt.Sprintf("Only %v method is allowed.", method), http.StatusMethodNotAllowed)
 }
 
 func AccessDenied(w http.ResponseWriter) {
