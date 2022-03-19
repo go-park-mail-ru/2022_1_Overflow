@@ -18,7 +18,7 @@ type Application struct{}
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @BasePath /v2
+// @BasePath /
 func (app *Application) Run(configPath string) {
 	config, err := config.NewConfig(configPath)
 	if err != nil {
