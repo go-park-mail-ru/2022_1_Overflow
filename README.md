@@ -3,7 +3,7 @@
 
 Тема проекта: Почта<br>
 [Список требований](https://docs.google.com/spreadsheets/d/1h1QaRvRbF2eBUzdV1tLU62hS68bdNH-bLht6N29uDK8/) <br>
-Ссылка на сайт - [todo](http://95.163.249.116:3000)<br>
+Ссылка на сайт - [OverflowMail](http://95.163.249.116:3000)<br>
 Презентация - [todo]()
 
 ### Стэк технологий
