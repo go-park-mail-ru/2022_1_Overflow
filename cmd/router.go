@@ -3,6 +3,7 @@ package cmd
 import (
 	"OverflowBackend/internal/config"
 	"OverflowBackend/internal/delivery"
+	"OverflowBackend/internal/delivery/middlewares"
 	"OverflowBackend/internal/repository"
 	"OverflowBackend/internal/usecase"
 
@@ -14,7 +15,6 @@ import (
 type RouterManager struct {
 	d *delivery.Delivery
 	uc usecase.UseCaseInterface
-	handlers map[string]func(http.ResponseWriter, *http.Request) 
 }
 
 func (rm *RouterManager) Init(repo repository.DatabaseRepository) {
@@ -22,20 +22,15 @@ func (rm *RouterManager) Init(repo repository.DatabaseRepository) {
 	rm.uc = &usecase.UseCase{}
 	rm.uc.Init(repo)
 	rm.d.Init(rm.uc)
-	rm.handlers = map[string]func(http.ResponseWriter, *http.Request) {
-		"/signin": rm.d.SignIn,
-		"/logout": rm.d.SignOut,
-		"/signup": rm.d.SignUp,
-		"/profile": rm.d.GetInfo,
-		"/income": rm.d.Income,
-		"/outcome": rm.d.Outcome,
-	}
 }
 
-func (d *RouterManager) NewRouter() http.Handler {
+func (rm *RouterManager) NewRouter() http.Handler {
 	router := mux.NewRouter()
-	for k,v := range(d.handlers) {
-		router.HandleFunc(k, v)
-	}
+	router.HandleFunc("/signin", middlewares.Middleware(rm.d.SignIn, false))
+	router.HandleFunc("/logout", middlewares.Middleware(rm.d.SignOut, true))
+	router.HandleFunc("/signup", middlewares.Middleware(rm.d.SignUp, true))
+	router.HandleFunc("/profile", middlewares.Middleware(rm.d.GetInfo, true))
+	router.HandleFunc("/income", middlewares.Middleware(rm.d.Income, true))
+	router.HandleFunc("/outcome", middlewares.Middleware(rm.d.Outcome, true))
 	return config.SetupCORS(router)
 }
