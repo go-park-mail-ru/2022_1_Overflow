@@ -127,7 +127,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "",
-	BasePath:         "/v2",
+	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "OverMail API",
 	Description:      "API почтового сервиса команды Overflow.",
