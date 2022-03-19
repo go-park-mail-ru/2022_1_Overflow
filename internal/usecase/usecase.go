@@ -22,8 +22,8 @@ type UseCaseInterface interface {
 
 type AuthUseCase interface {
 	Init(repository.DatabaseRepository)
-	SignIn(w http.ResponseWriter, r *http.Request, data models.SignInForm)
-	SignUp(w http.ResponseWriter, r *http.Request, data models.SignUpForm)
+	SignIn(data models.SignInForm) error
+	SignUp(data models.SignUpForm) error
 }
 
 type SessionManagerUseCase interface {
@@ -35,11 +35,11 @@ type SessionManagerUseCase interface {
 
 type ProfileUseCase interface {
 	Init(repository.DatabaseRepository)
-	GetInfo(w http.ResponseWriter, r *http.Request, data *models.Session)
+	GetInfo(data *models.Session) (userJson []byte, err error)
 }
 
 type MailBoxUseCase interface {
 	Init(repository.DatabaseRepository)
-	Income(w http.ResponseWriter, r *http.Request, data *models.Session)
-	Outcome(w http.ResponseWriter, r *http.Request, data *models.Session)
+	Income(data *models.Session) (parsed []byte, err error)
+	Outcome(data *models.Session) (parsed []byte, err error)
 }

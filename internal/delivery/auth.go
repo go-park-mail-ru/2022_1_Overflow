@@ -29,7 +29,17 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	d.uc.SignIn(w, r, data)
+	if err := d.uc.SignIn(data); err != nil {
+		w.Write(pkg.CreateJsonResponse(1, err.Error(), nil))
+	}
+
+	err = session.CreateSession(w, r, data.Email)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Write(pkg.CreateJsonResponse(0, "OK", nil))
 }
 
 // Регистрация пользователя.
@@ -47,7 +57,12 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	d.uc.SignUp(w, r, data)
+	err = d.uc.SignUp(data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(pkg.CreateJsonResponse(0, "OK", nil))
 }
 
 // Завершение сессии пользователя.

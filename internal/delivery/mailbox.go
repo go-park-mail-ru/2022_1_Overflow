@@ -18,7 +18,13 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	d.uc.Income(w, r, data)
+	parsed, err := d.uc.Income(data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(parsed)
 }
 
 // Получение исходящих сообщений.
@@ -33,5 +39,11 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	d.uc.Outcome(w, r, data)
+	parsed, err := d.uc.Outcome(data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(parsed)
 }

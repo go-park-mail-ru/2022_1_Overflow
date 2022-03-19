@@ -18,5 +18,11 @@ func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	d.uc.GetInfo(w, r, data)
+	userJson, err := d.uc.GetInfo(data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(userJson)
 }
