@@ -8,6 +8,7 @@ import (
 	"net/http"
 )
 
+// Аутентификация пользователя.
 func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		pkg.MethodNotAllowed(w, http.MethodPost)
@@ -31,6 +32,7 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	d.uc.SignIn(w, r, data)
 }
 
+// Регистрация пользователя.
 func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		pkg.MethodNotAllowed(w, http.MethodPost)
@@ -48,6 +50,7 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	d.uc.SignUp(w, r, data)
 }
 
+// Завершение сессии пользователя.
 func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		pkg.MethodNotAllowed(w, http.MethodGet)

@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+// Получение данных профиля пользователя.
 func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		pkg.MethodNotAllowed(w, http.MethodGet)

@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+// Получение входящих сообщений.
 func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		pkg.MethodNotAllowed(w, http.MethodGet)
@@ -20,6 +21,7 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 	d.uc.Income(w, r, data)
 }
 
+// Получение исходящих сообщений.
 func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		pkg.MethodNotAllowed(w, http.MethodGet)

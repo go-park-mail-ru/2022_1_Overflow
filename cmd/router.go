@@ -32,5 +32,6 @@ func (rm *RouterManager) NewRouter() http.Handler {
 	router.HandleFunc("/profile", middlewares.Middleware(rm.d.GetInfo, true))
 	router.HandleFunc("/income", middlewares.Middleware(rm.d.Income, true))
 	router.HandleFunc("/outcome", middlewares.Middleware(rm.d.Outcome, true))
+	InitSwagger(router)
 	return config.SetupCORS(router)
 }
