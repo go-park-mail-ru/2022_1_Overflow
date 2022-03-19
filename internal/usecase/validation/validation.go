@@ -1,4 +1,4 @@
-package add_validation
+package validation
 
 import (
 	"OverflowBackend/internal/models"

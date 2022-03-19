@@ -1,4 +1,4 @@
-package auth
+package session
 
 import (
 	"OverflowBackend/internal/models"
@@ -34,7 +34,7 @@ func init() {
 	gob.Register(models.Session{})
 }
 
-func (sm SessionManager) CreateSession(w http.ResponseWriter, r *http.Request, email string) error {
+func CreateSession(w http.ResponseWriter, r *http.Request, email string) error {
 	session, err := store.Get(r, session_name)
 	if err != nil {
 		return err
@@ -48,7 +48,7 @@ func (sm SessionManager) CreateSession(w http.ResponseWriter, r *http.Request, e
 	return err
 }
 
-func (sm SessionManager) DeleteSession(w http.ResponseWriter, r *http.Request) error {
+func DeleteSession(w http.ResponseWriter, r *http.Request) error {
 	session, err := store.Get(r, session_name)
 	if err != nil {
 		return err
@@ -65,7 +65,7 @@ func (sm SessionManager) DeleteSession(w http.ResponseWriter, r *http.Request) e
 	return nil
 }
 
-func (sm SessionManager) IsLoggedIn(r *http.Request) bool {
+func IsLoggedIn(r *http.Request) bool {
 	session, err := store.Get(r, session_name)
 	if err != nil {
 		return false
@@ -73,7 +73,7 @@ func (sm SessionManager) IsLoggedIn(r *http.Request) bool {
 	return !session.IsNew
 }
 
-func (sm SessionManager) GetData(r *http.Request) (data *models.Session, err error) {
+func GetData(r *http.Request) (data *models.Session, err error) {
 	defer func() {
 		errRecover := recover()
 		if errRecover != nil {

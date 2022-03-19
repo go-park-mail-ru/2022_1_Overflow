@@ -2,7 +2,7 @@ package test
 
 import (
 	"OverflowBackend/internal/models"
-	"OverflowBackend/internal/usecase/auth"
+	"OverflowBackend/internal/usecase/session"
 
 	"encoding/gob"
 	"net/http"
@@ -35,12 +35,10 @@ func Init() {
 func TestSessionManager(t *testing.T) {
 	Init()
 
-	sm := auth.SessionManager{}
-
 	r := httptest.NewRequest(http.MethodGet, "/", nil)
 	//w := httptest.NewRecorder()
 
-	data, err := sm.GetData(r)
+	data, err := session.GetData(r)
 	if (err == nil) {
 		t.Error(err)
 		return

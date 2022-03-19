@@ -1,7 +1,7 @@
 package test
 
 import (
-	"OverflowBackend/internal/delivery"
+	"OverflowBackend/cmd"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -12,7 +12,7 @@ import (
 
 func TestSignin(t *testing.T) {
 
-	rm := delivery.RouterManager{}
+	rm := cmd.RouterManager{}
 	rm.Init()
 
 	srv := httptest.NewServer(rm.NewRouter())
@@ -36,7 +36,7 @@ func TestSignin(t *testing.T) {
 }
 
 func TestBadSignin(t *testing.T) {
-	rm := delivery.RouterManager{}
+	rm := cmd.RouterManager{}
 	rm.Init()
 
 	srv := httptest.NewServer(rm.NewRouter())

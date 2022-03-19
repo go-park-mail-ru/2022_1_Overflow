@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"OverflowBackend/internal/config"
-	"OverflowBackend/internal/delivery"
 	"log"
 )
 
@@ -20,7 +19,7 @@ func (app *Application) Run(configPath string) {
 		log.Fatalf("Ошибка при подключении к БД: %v", err)
 	}
 
-	router:= delivery.RouterManager{}
+	router:= RouterManager{}
 	router.Init(db)
 
 	HandleServer(config, router)

@@ -6,18 +6,24 @@ import (
 	"net/http"
 )
 
-type GeneralUseCase interface {
+type UseCase struct {
+	db repository.DatabaseRepository
+}
+
+func (uc *UseCase) Init(repo repository.DatabaseRepository) {
+	uc.db = repo
+}
+
+type UseCaseInterface interface {
 	AuthUseCase
-	SessionManagerUseCase
 	ProfileUseCase
 	MailBoxUseCase
 }
 
 type AuthUseCase interface {
 	Init(repository.DatabaseRepository)
-	SignOut(w http.ResponseWriter, r *http.Request)
-	SignIn(w http.ResponseWriter, r *http.Request)
-	SignUp(w http.ResponseWriter, r *http.Request)
+	SignIn(w http.ResponseWriter, r *http.Request, data models.SignInForm)
+	SignUp(w http.ResponseWriter, r *http.Request, data models.SignUpForm)
 }
 
 type SessionManagerUseCase interface {
@@ -29,12 +35,11 @@ type SessionManagerUseCase interface {
 
 type ProfileUseCase interface {
 	Init(repository.DatabaseRepository)
-	GetInfo(w http.ResponseWriter, r *http.Request)
+	GetInfo(w http.ResponseWriter, r *http.Request, data *models.Session)
 }
 
 type MailBoxUseCase interface {
 	Init(repository.DatabaseRepository)
-	Income(w http.ResponseWriter, r *http.Request)
-	Outcome(w http.ResponseWriter, r *http.Request)
-	//Send(w http.ResponseWriter, r *http.Request)
+	Income(w http.ResponseWriter, r *http.Request, data *models.Session)
+	Outcome(w http.ResponseWriter, r *http.Request, data *models.Session)
 }

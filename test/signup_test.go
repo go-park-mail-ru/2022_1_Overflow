@@ -11,7 +11,7 @@ import (
 )
 
 func TestSignup(t *testing.T) {
-	rm := delivery.RouterManager{}
+	rm := cmd.RouterManager{}
 	rm.Init()
 
 	srv := httptest.NewServer(rm.NewRouter())
@@ -38,7 +38,7 @@ func TestSignup(t *testing.T) {
 }
 
 func TestBadPassword(t *testing.T) {
-	rm := delivery.RouterManager{}
+	rm := cmd.RouterManager{}
 	rm.Init()
 
 	srv := httptest.NewServer(rm.NewRouter())
@@ -73,7 +73,7 @@ func TestBadPassword(t *testing.T) {
 }
 
 func TestEmptyForm(t *testing.T) {
-	rm := delivery.RouterManager{}
+	rm := cmd.RouterManager{}
 	rm.Init()
 
 	srv := httptest.NewServer(rm.NewRouter())

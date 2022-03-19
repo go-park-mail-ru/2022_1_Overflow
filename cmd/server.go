@@ -2,13 +2,12 @@ package cmd
 
 import (
 	"OverflowBackend/internal/config"
-	"OverflowBackend/internal/delivery"
 	"fmt"
 	"log"
 	"net/http"
 )
 
-func HandleServer(config *config.Config, router delivery.RouterManager) {
+func HandleServer(config *config.Config, router RouterManager) {
 	server := &http.Server {
 		Addr: fmt.Sprintf(":%v", config.Server.Port),
 		Handler: router.NewRouter(),
