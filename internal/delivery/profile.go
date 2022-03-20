@@ -46,7 +46,7 @@ func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Param Avatar body models.SettingsForm true "Форма настроек пользователя."
 // @Produce plain
-// @Router /set_profile [post]
+// @Router /profile/set [post]
 func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		pkg.MethodNotAllowed(w, http.MethodPost)
@@ -81,7 +81,7 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 // @Accept multipart/form-data
 // @Param file formData file true "Файл аватарки."
 // @Produce plain
-// @Router /set_profile/avatar [post]
+// @Router /profile/avatar/set [post]
 func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		pkg.MethodNotAllowed(w, http.MethodPost)
