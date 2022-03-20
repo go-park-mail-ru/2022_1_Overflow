@@ -13,6 +13,10 @@ func (uc *UseCase) SignIn(data models.SignInForm) error {
 	if err := validation.CheckSignIn(data); err != nil {
 		return err
 	}
+	userFind, err := uc.db.GetUserInfoByEmail(data.Email)
+	if (err != nil || userFind == models.User{}) {
+		return fmt.Errorf("Пользователь %v не существует.", data.Email)
+	}
 	return nil
 }
 
