@@ -63,13 +63,13 @@ func (uc *UseCase) GetAvatar(data *models.Session) (avatarUrl string, err error)
 		return
 	}
 	if len(matches) == 0 {
-		// вернуть заглушку
+		avatarUrl = uc.config.Server.Static.Handle + "dummy.png"
 		return
 	}
 	if len(matches) > 1 {
 		err = fmt.Errorf("Найдены дубликаты файлов.")
 		return
 	}
-	avatarUrl = uc.config.Server.Static.Handle + "/" + filepath.Base(matches[0])
+	avatarUrl = uc.config.Server.Static.Handle + filepath.Base(matches[0])
 	return
 }
