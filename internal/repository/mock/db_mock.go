@@ -64,6 +64,16 @@ func (m *MockDB) AddUser(user models.User) error {
 	return nil
 }
 
+func (m *MockDB) ChangeUserPassword(user models.User, newPassword string) error {
+	for i, val := range m.user {
+		if val["email"] == user.Email {
+			m.user[i]["password"] = newPassword
+			return nil
+		}
+	}
+	return errors.New("Пользователь не найден.")
+}
+
 func (m *MockDB) AddMail(email models.Mail) error {
 	mail := map[string]interface{} {
 		"id": 0, // потому что поле не используется (пока что)
@@ -74,9 +84,50 @@ func (m *MockDB) AddMail(email models.Mail) error {
 		"theme": email.Theme,
 		"text": email.Text,
 		"files": email.Files,
+		"read": email.Read,
 	}
 	m.mail = append(m.mail, mail)
 	return nil
+}
+
+func (m *MockDB) DeleteMail(email models.Mail) error {
+	for i, val := range m.mail {
+		if val["id"] == email.Id {
+			m.mail[i] = m.mail[len(m.mail)-1]
+			m.mail = m.mail[:len(m.mail)-1]
+			return nil
+		}
+	}
+	return nil
+}
+
+func (m *MockDB) ReadMail(email models.Mail) error {
+	for _, val := range m.mail {
+		if val["id"] == email.Id {
+			val["read"] = true
+			return nil
+		}
+	}
+	return errors.New("Письмо не найдено.")
+}
+
+func (m *MockDB) GetMailInfoById(mailId int) (models.Mail, error) {
+	for _, val := range m.mail {
+		if val["id"] == mailId {
+			mail := models.Mail{
+				Client_id: val["client_id"].(int32),
+				Sender: val["sender"].(string),
+				Addressee: val["addresse"].(string),
+				Date: val["date"].(time.Time),
+				Theme: val["theme"].(string),
+				Text: val["text"].(string),
+				Files: val["files"].(string),
+				Read: val["read"].(bool),
+			}
+			return mail, nil
+		}
+	}
+	return models.Mail{}, errors.New("Письмо не найдено.")
 }
 
 func (m *MockDB) GetIncomeMails(userId int32) ([]models.Mail, error) {
@@ -95,6 +146,7 @@ func (m *MockDB) GetIncomeMails(userId int32) ([]models.Mail, error) {
 				Theme: val["theme"].(string),
 				Text: val["text"].(string),
 				Files: val["files"].(string),
+				Read: val["read"].(bool),
 			}
 			mails = append(mails, mail)
 		}
@@ -118,6 +170,7 @@ func (m *MockDB) GetOutcomeMails(userId int32) ([]models.Mail, error) {
 				Theme: val["theme"].(string),
 				Text: val["text"].(string),
 				Files: val["files"].(string),
+				Read: val["read"].(bool),
 			}
 			mails = append(mails, mail)
 		}
