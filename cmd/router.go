@@ -30,17 +30,18 @@ func (rm *RouterManager) Init(repo repository.DatabaseRepository) {
 
 func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 	router := mux.NewRouter()
-	router.HandleFunc("/signin", middlewares.Middleware(rm.d.SignIn, false))
-	router.HandleFunc("/logout", middlewares.Middleware(rm.d.SignOut, true))
-	router.HandleFunc("/signup", middlewares.Middleware(rm.d.SignUp, false))
-	router.HandleFunc("/profile", middlewares.Middleware(rm.d.GetInfo, true))
-	router.HandleFunc("/income", middlewares.Middleware(rm.d.Income, true))
-	router.HandleFunc("/outcome", middlewares.Middleware(rm.d.Outcome, true))
+	router.HandleFunc("/signin", rm.d.SignIn)
+	router.HandleFunc("/logout", rm.d.SignOut)
+	router.HandleFunc("/signup", rm.d.SignUp)
+	router.HandleFunc("/profile", rm.d.GetInfo)
+	router.HandleFunc("/income", rm.d.Income)
+	router.HandleFunc("/outcome", rm.d.Outcome)
 	router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
 		httpSwagger.URL("/swagger/doc.json"), //The url pointing to API definition
 		httpSwagger.DeepLinking(true),
 		httpSwagger.DocExpansion("none"),
 		httpSwagger.DomID("#swagger-ui"),
 	))
+	router.Use(middlewares.Middleware)
 	return config.SetupCORS(router)
 }

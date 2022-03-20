@@ -27,7 +27,7 @@ func TestSignin(t *testing.T) {
 	rm := cmd.RouterManager{}
 	rm.Init(&db)
 
-	srv := httptest.NewServer(rm.NewRouter())
+	srv := httptest.NewServer(rm.NewRouter("8080"))
 	defer srv.Close()
 
 	data := map[string]string{
@@ -61,7 +61,7 @@ func TestBadSignin(t *testing.T) {
 	rm := cmd.RouterManager{}
 	rm.Init(&db)
 
-	srv := httptest.NewServer(rm.NewRouter())
+	srv := httptest.NewServer(rm.NewRouter("8080"))
 	defer srv.Close()
 
 	data := map[string]string{

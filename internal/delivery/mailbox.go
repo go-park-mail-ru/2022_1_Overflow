@@ -10,6 +10,7 @@ import (
 // @Summary Получение входящих сообщений
 // @Produce json
 // @Success 200
+// @Failure 401
 // @Failure 500
 // @Router /income [get]
 func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
@@ -36,6 +37,7 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 // @Summary Получение исходящих сообщений
 // @Produce json
 // @Success 200
+// @Failure 401
 // @Failure 500
 // @Router /outcome [get]
 func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {

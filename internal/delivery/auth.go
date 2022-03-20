@@ -10,7 +10,6 @@ import (
 
 // SignIn godoc
 // @Summary Выполняет аутентификацию пользователя
-// @Produce json
 // @Success 200
 // @Failure 500
 // @Router /signin [post]
@@ -43,13 +42,12 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	w.Write(pkg.CreateJsonResponse(0, "OK", nil))
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
 }
 
 // SignUp godoc
 // @Summary Выполняет регистрацию пользователя
-// @Produce json
 // @Success 200
 // @Failure 500
 // @Router /signup [post]
@@ -72,15 +70,16 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.Write(pkg.CreateJsonResponse(0, "OK", nil))
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
 }
 
 // SignIn godoc
 // @Summary Завершение сессии пользователя
-// @Produce json
 // @Success 200
+// @Failure 401
 // @Failure 500
-// @Router /signout [get]
+// @Router /logout [get]
 func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		pkg.MethodNotAllowed(w, http.MethodGet)
@@ -92,4 +91,6 @@ func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
 }

@@ -18,7 +18,7 @@ func TestSignup(t *testing.T) {
 	rm := cmd.RouterManager{}
 	rm.Init(&db)
 
-	srv := httptest.NewServer(rm.NewRouter())
+	srv := httptest.NewServer(rm.NewRouter("8080"))
 	defer srv.Close()
 
 	data := map[string]string{
@@ -48,7 +48,7 @@ func TestBadPassword(t *testing.T) {
 	rm := cmd.RouterManager{}
 	rm.Init(&db)
 
-	srv := httptest.NewServer(rm.NewRouter())
+	srv := httptest.NewServer(rm.NewRouter("8080"))
 	defer srv.Close()
 
 	data := map[string]string{
@@ -79,7 +79,7 @@ func TestEmptyForm(t *testing.T) {
 	rm := cmd.RouterManager{}
 	rm.Init(&db)
 
-	srv := httptest.NewServer(rm.NewRouter())
+	srv := httptest.NewServer(rm.NewRouter("8080"))
 	defer srv.Close()
 
 	data := map[string]string{

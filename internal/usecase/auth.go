@@ -29,8 +29,7 @@ func (uc *UseCase) SignUp(data models.SignUpForm) error {
 	
 	userFind, _ := uc.db.GetUserInfoByEmail(data.Email)
 	if (userFind != models.User{}) {
-		err = fmt.Errorf("Пользователь %v уже существует.", data.Email)
-		return err
+		return fmt.Errorf("Пользователь %v уже существует.", data.Email)
 		//w.Write(pkg.CreateJsonResponse(2, err.Error(), nil))
 	}
 	if err = uc.db.AddUser(user); err != nil {

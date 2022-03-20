@@ -7,14 +7,14 @@ import (
 )
 
 
-func CheckLogin(handler func(http.ResponseWriter, *http.Request), check bool) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if check && !session.IsLoggedIn(r) {
+func CheckLogin(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/signin" && r.URL.Path != "/signup" && !session.IsLoggedIn(r) {
 			pkg.AccessDenied(w)
 			return
 		}
-		handler(w, r)
-	}
+		handler.ServeHTTP(w, r)
+	})
 }
 
 /*
