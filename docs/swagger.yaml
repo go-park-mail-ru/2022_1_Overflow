@@ -1,3 +1,4 @@
+basePath: /
 definitions:
   models.Mail:
     description: Структура письма
@@ -68,7 +69,13 @@ definitions:
         type: string
     type: object
 info:
-  contact: {}
+  contact:
+    email: jellybe@yandex.ru
+    name: Роман Медников
+    url: https://vk.com/l____l____l____l____l____l
+  description: API почтового сервиса команды Overflow.
+  title: OverMail API
+  version: "1.0"
 paths:
   /income:
     get:
@@ -150,7 +157,29 @@ paths:
         "500":
           description: Ошибка БД, пользователь не найден или сессия не валидна.
       summary: Получение ссылки на аватарку пользователя
-  /set_profile:
+  /profile/avatar/set:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Файл аватарки.
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Успешное установка аватарки.
+          schema:
+            type: string
+        "405":
+          description: ""
+        "500":
+          description: Ошибка валидации формы, БД или сессия не валидна.
+      summary: Установка/смена аватарки пользователя
+  /profile/set:
     post:
       consumes:
       - application/json
@@ -173,28 +202,6 @@ paths:
         "500":
           description: Ошибка валидации формы, БД или сессия не валидна.
       summary: Изменение настроек пользователя
-  /set_profile/avatar:
-    post:
-      consumes:
-      - multipart/form-data
-      parameters:
-      - description: Файл аватарки.
-        in: formData
-        name: file
-        required: true
-        type: file
-      produces:
-      - text/plain
-      responses:
-        "200":
-          description: Успешное установка аватарки.
-          schema:
-            type: string
-        "405":
-          description: ""
-        "500":
-          description: Ошибка валидации формы, БД или сессия не валидна.
-      summary: Установка/смена аватарки пользователя
   /signin:
     post:
       consumes:

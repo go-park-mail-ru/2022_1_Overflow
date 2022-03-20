@@ -10,7 +10,11 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "contact": {
+            "name": "Роман Медников",
+            "url": "https://vk.com/l____l____l____l____l____l",
+            "email": "jellybe@yandex.ru"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -141,7 +145,41 @@ const docTemplate = `{
                 }
             }
         },
-        "/set_profile": {
+        "/profile/avatar/set": {
+            "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "summary": "Установка/смена аватарки пользователя",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Файл аватарки.",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешное установка аватарки.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "405": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": "Ошибка валидации формы, БД или сессия не валидна."
+                    }
+                }
+            }
+        },
+        "/profile/set": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -164,40 +202,6 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "Успешное изменение настроек.",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "405": {
-                        "description": ""
-                    },
-                    "500": {
-                        "description": "Ошибка валидации формы, БД или сессия не валидна."
-                    }
-                }
-            }
-        },
-        "/set_profile/avatar": {
-            "post": {
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "text/plain"
-                ],
-                "summary": "Установка/смена аватарки пользователя",
-                "parameters": [
-                    {
-                        "type": "file",
-                        "description": "Файл аватарки.",
-                        "name": "file",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Успешное установка аватарки.",
                         "schema": {
                             "type": "string"
                         }
@@ -384,12 +388,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
+	Version:          "1.0",
 	Host:             "",
-	BasePath:         "",
+	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "OverMail API",
+	Description:      "API почтового сервиса команды Overflow.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }
