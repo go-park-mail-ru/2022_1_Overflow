@@ -41,7 +41,7 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": ""
+                        "description": "Access denied"
                     },
                     "500": {
                         "description": ""
@@ -57,7 +57,7 @@ const docTemplate = `{
                         "description": "OK"
                     },
                     "401": {
-                        "description": ""
+                        "description": "Access denied"
                     },
                     "500": {
                         "description": ""
@@ -82,7 +82,7 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": ""
+                        "description": "Access denied"
                     },
                     "500": {
                         "description": ""
@@ -102,6 +102,9 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.User"
                         }
+                    },
+                    "401": {
+                        "description": "Access denied"
                     },
                     "500": {
                         "description": ""

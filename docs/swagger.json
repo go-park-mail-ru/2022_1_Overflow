@@ -33,7 +33,7 @@
                         }
                     },
                     "401": {
-                        "description": ""
+                        "description": "Access denied"
                     },
                     "500": {
                         "description": ""
@@ -49,7 +49,7 @@
                         "description": "OK"
                     },
                     "401": {
-                        "description": ""
+                        "description": "Access denied"
                     },
                     "500": {
                         "description": ""
@@ -74,7 +74,7 @@
                         }
                     },
                     "401": {
-                        "description": ""
+                        "description": "Access denied"
                     },
                     "500": {
                         "description": ""
@@ -94,6 +94,9 @@
                         "schema": {
                             "$ref": "#/definitions/models.User"
                         }
+                    },
+                    "401": {
+                        "description": "Access denied"
                     },
                     "500": {
                         "description": ""

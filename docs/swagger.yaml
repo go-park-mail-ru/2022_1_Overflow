@@ -56,7 +56,7 @@ paths:
               $ref: '#/definitions/models.Mail'
             type: array
         "401":
-          description: ""
+          description: Access denied
         "500":
           description: ""
       summary: Получение входящих сообщений
@@ -66,7 +66,7 @@ paths:
         "200":
           description: OK
         "401":
-          description: ""
+          description: Access denied
         "500":
           description: ""
       summary: Завершение сессии пользователя
@@ -82,7 +82,7 @@ paths:
               $ref: '#/definitions/models.Mail'
             type: array
         "401":
-          description: ""
+          description: Access denied
         "500":
           description: ""
       summary: Получение исходящих сообщений
@@ -95,6 +95,8 @@ paths:
           description: Информация о пользователе
           schema:
             $ref: '#/definitions/models.User'
+        "401":
+          description: Access denied
         "500":
           description: ""
       summary: Получение данных профиля пользователя
