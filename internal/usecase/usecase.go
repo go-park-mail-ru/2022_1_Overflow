@@ -36,6 +36,8 @@ type SessionManagerUseCase interface {
 type ProfileUseCase interface {
 	Init(repository.DatabaseRepository)
 	GetInfo(data *models.Session) (userJson []byte, err error)
+	SetAvatar(data *models.Session, avatar *models.Avatar) error
+	SetInfo(settings *models.SettingsForm) error
 }
 
 type MailBoxUseCase interface {

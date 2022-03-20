@@ -34,6 +34,8 @@ func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 	router.HandleFunc("/logout", rm.d.SignOut)
 	router.HandleFunc("/signup", rm.d.SignUp)
 	router.HandleFunc("/profile", rm.d.GetInfo)
+	router.HandleFunc("/set_profile", rm.d.SetInfo)
+	router.HandleFunc("/set_profile/avatar", rm.d.SetAvatar)
 	router.HandleFunc("/income", rm.d.Income)
 	router.HandleFunc("/outcome", rm.d.Outcome)
 	router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
