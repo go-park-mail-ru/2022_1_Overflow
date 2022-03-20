@@ -17,6 +17,9 @@ func (uc *UseCase) SignIn(data models.SignInForm) error {
 	if (err != nil || userFind == models.User{}) {
 		return fmt.Errorf("Пользователь %v не существует.", data.Email)
 	}
+	if (userFind.Password != pkg.HashPassword(data.Password)) {
+		return fmt.Errorf("Неверный пароль.")
+	}
 	return nil
 }
 
