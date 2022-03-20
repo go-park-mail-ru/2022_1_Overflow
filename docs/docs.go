@@ -154,7 +154,7 @@ const docTemplate = `{
                     {
                         "type": "file",
                         "description": "Файл аватарки.",
-                        "name": "Avatar",
+                        "name": "file",
                         "in": "formData",
                         "required": true
                     }

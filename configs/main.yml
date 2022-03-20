@@ -5,6 +5,7 @@ server:
     read: 15s
     write: 10s
     idle: 5s
+  static_dir: "static"
   
 database:
   type: "mock"

@@ -17,17 +17,17 @@ func TestSignin(t *testing.T) {
 	db := mock.MockDB{}
 	db.Create("test")
 	db.AddUser(models.User{
-		Id: 0,
+		Id:        0,
 		FirstName: "test",
-		LastName: "test",
-		Email: "test",
-		Password: "test",
+		LastName:  "test",
+		Email:     "test",
+		Password:  "test",
 	})
 
 	rm := cmd.RouterManager{}
-	rm.Init(&db)
+	rm.Init(&db, defConf)
 
-	srv := httptest.NewServer(rm.NewRouter("8080"))
+	srv := httptest.NewServer(rm.NewRouter(defConf.Server.Port))
 	defer srv.Close()
 
 	data := map[string]string{
@@ -51,17 +51,17 @@ func TestBadSignin(t *testing.T) {
 	db := mock.MockDB{}
 	db.Create("test")
 	db.AddUser(models.User{
-		Id: 0,
+		Id:        0,
 		FirstName: "test",
-		LastName: "test",
-		Email: "test",
-		Password: "test",
+		LastName:  "test",
+		Email:     "test",
+		Password:  "test",
 	})
 
 	rm := cmd.RouterManager{}
-	rm.Init(&db)
+	rm.Init(&db, defConf)
 
-	srv := httptest.NewServer(rm.NewRouter("8080"))
+	srv := httptest.NewServer(rm.NewRouter(defConf.Server.Port))
 	defer srv.Close()
 
 	data := map[string]string{

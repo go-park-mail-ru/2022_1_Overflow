@@ -27,11 +27,10 @@ func (uc *UseCase) GetInfo(data *models.Session) (settingsJson []byte, err error
 // Установка аватарки пользователя.
 func (uc *UseCase) SetAvatar(data *models.Session, avatar *models.Avatar) error {
 	format := data.Email + "_" + avatar.Name
-	dirPath := filepath.Join("..", "static")
-	if err := os.MkdirAll(dirPath, os.ModePerm); err != nil {
+	if err := os.MkdirAll(uc.config.Server.StaticDir, os.ModePerm); err != nil {
 		return err
 	}
-	path := filepath.Join(dirPath, format)
+	path := filepath.Join(uc.config.Server.StaticDir, format)
 	err := os.WriteFile(path, avatar.Content, 0644)
 	if (err != nil) {
 		return err

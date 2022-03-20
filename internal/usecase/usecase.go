@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"OverflowBackend/internal/config"
 	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/repository"
 	"net/http"
@@ -8,10 +9,12 @@ import (
 
 type UseCase struct {
 	db repository.DatabaseRepository
+	config *config.Config
 }
 
-func (uc *UseCase) Init(repo repository.DatabaseRepository) {
+func (uc *UseCase) Init(repo repository.DatabaseRepository, config *config.Config) {
 	uc.db = repo
+	uc.config = config
 }
 
 type UseCaseInterface interface {
@@ -21,7 +24,7 @@ type UseCaseInterface interface {
 }
 
 type AuthUseCase interface {
-	Init(repository.DatabaseRepository)
+	Init(repository.DatabaseRepository, *config.Config)
 	SignIn(data models.SignInForm) error
 	SignUp(data models.SignUpForm) error
 }
@@ -34,14 +37,14 @@ type SessionManagerUseCase interface {
 }
 
 type ProfileUseCase interface {
-	Init(repository.DatabaseRepository)
+	Init(repository.DatabaseRepository, *config.Config)
 	GetInfo(data *models.Session) (userJson []byte, err error)
 	SetAvatar(data *models.Session, avatar *models.Avatar) error
 	SetInfo(settings *models.SettingsForm) error
 }
 
 type MailBoxUseCase interface {
-	Init(repository.DatabaseRepository)
+	Init(repository.DatabaseRepository, *config.Config)
 	Income(data *models.Session) (parsed []byte, err error)
 	Outcome(data *models.Session) (parsed []byte, err error)
 }

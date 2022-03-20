@@ -159,7 +159,7 @@ paths:
       parameters:
       - description: Файл аватарки.
         in: formData
-        name: Avatar
+        name: file
         required: true
         type: file
       produces:

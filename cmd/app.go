@@ -29,7 +29,7 @@ func (app *Application) Run(configPath string) {
 	}
 
 	router:= RouterManager{}
-	router.Init(db)
+	router.Init(db, config)
 
 	HandleServer(config, router)
 }

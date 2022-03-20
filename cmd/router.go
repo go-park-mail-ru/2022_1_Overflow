@@ -21,11 +21,11 @@ type RouterManager struct {
 	uc usecase.UseCaseInterface
 }
 
-func (rm *RouterManager) Init(repo repository.DatabaseRepository) {
+func (rm *RouterManager) Init(repo repository.DatabaseRepository, config *config.Config) {
 	rm.d = &delivery.Delivery{}
 	rm.uc = &usecase.UseCase{}
-	rm.uc.Init(repo)
-	rm.d.Init(rm.uc)
+	rm.uc.Init(repo, config)
+	rm.d.Init(rm.uc, config)
 }
 
 func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {

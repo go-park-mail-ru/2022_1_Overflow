@@ -16,9 +16,9 @@ func TestSignup(t *testing.T) {
 	db.Create("test")
 
 	rm := cmd.RouterManager{}
-	rm.Init(&db)
+	rm.Init(&db, defConf)
 
-	srv := httptest.NewServer(rm.NewRouter("8080"))
+	srv := httptest.NewServer(rm.NewRouter(defConf.Server.Port))
 	defer srv.Close()
 
 	data := map[string]string{
@@ -46,9 +46,9 @@ func TestBadPassword(t *testing.T) {
 	db.Create("test")
 
 	rm := cmd.RouterManager{}
-	rm.Init(&db)
+	rm.Init(&db, defConf)
 
-	srv := httptest.NewServer(rm.NewRouter("8080"))
+	srv := httptest.NewServer(rm.NewRouter(defConf.Server.Port))
 	defer srv.Close()
 
 	data := map[string]string{
@@ -77,9 +77,9 @@ func TestEmptyForm(t *testing.T) {
 	db.Create("test")
 
 	rm := cmd.RouterManager{}
-	rm.Init(&db)
+	rm.Init(&db, defConf)
 
-	srv := httptest.NewServer(rm.NewRouter("8080"))
+	srv := httptest.NewServer(rm.NewRouter(defConf.Server.Port))
 	defer srv.Close()
 
 	data := map[string]string{

@@ -81,7 +81,7 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 // @Success 200 "Успешное установка аватарки."
 // @Failure 500 "Ошибка валидации формы, БД или сессия не валидна."
 // @Accept multipart/form-data
-// @Param Avatar formData file true "Файл аватарки."
+// @Param file formData file true "Файл аватарки."
 // @Produce plain
 // @Router /set_profile/avatar [post]
 func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
@@ -96,7 +96,7 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	r.ParseMultipartForm(32 << 20) // проверить макс. длину
+	//r.ParseMultipartForm(32 << 20) // проверить макс. длину
 	var buf bytes.Buffer
 
 	file, header, err := r.FormFile("file")
