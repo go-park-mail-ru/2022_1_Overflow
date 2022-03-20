@@ -79,7 +79,7 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 // SignIn godoc
 // @Summary Завершение сессии пользователя
 // @Success 200 "OK"
-// @Failure 401
+// @Failure 401 "Access denied"
 // @Failure 500
 // @Router /logout [get]
 func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {

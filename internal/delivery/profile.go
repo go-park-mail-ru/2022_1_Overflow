@@ -10,6 +10,7 @@ import (
 // @Summary Получение данных профиля пользователя
 // @Produce json
 // @Success 200 {object} models.User "Информация о пользователе"
+// @Failure 401 "Access denied"
 // @Failure 500
 // @Router /profile [get]
 func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
