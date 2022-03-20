@@ -34,6 +34,25 @@ const docTemplate = `{
                     "200": {
                         "description": ""
                     },
+                    "401": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "get": {
+                "summary": "Завершение сессии пользователя",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "401": {
+                        "description": ""
+                    },
                     "500": {
                         "description": ""
                     }
@@ -48,6 +67,9 @@ const docTemplate = `{
                 "summary": "Получение исходящих сообщений",
                 "responses": {
                     "200": {
+                        "description": ""
+                    },
+                    "401": {
                         "description": ""
                     },
                     "500": {
@@ -74,26 +96,7 @@ const docTemplate = `{
         },
         "/signin": {
             "post": {
-                "produces": [
-                    "application/json"
-                ],
                 "summary": "Выполняет аутентификацию пользователя",
-                "responses": {
-                    "200": {
-                        "description": ""
-                    },
-                    "500": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/signout": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Завершение сессии пользователя",
                 "responses": {
                     "200": {
                         "description": ""
@@ -106,9 +109,6 @@ const docTemplate = `{
         },
         "/signup": {
             "post": {
-                "produces": [
-                    "application/json"
-                ],
                 "summary": "Выполняет регистрацию пользователя",
                 "responses": {
                     "200": {

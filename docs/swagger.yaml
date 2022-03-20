@@ -18,15 +18,29 @@ paths:
       responses:
         "200":
           description: ""
+        "401":
+          description: ""
         "500":
           description: ""
       summary: Получение входящих сообщений
+  /logout:
+    get:
+      responses:
+        "200":
+          description: ""
+        "401":
+          description: ""
+        "500":
+          description: ""
+      summary: Завершение сессии пользователя
   /outcome:
     get:
       produces:
       - application/json
       responses:
         "200":
+          description: ""
+        "401":
           description: ""
         "500":
           description: ""
@@ -43,28 +57,14 @@ paths:
       summary: Получение данных профиля пользователя
   /signin:
     post:
-      produces:
-      - application/json
       responses:
         "200":
           description: ""
         "500":
           description: ""
       summary: Выполняет аутентификацию пользователя
-  /signout:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ""
-        "500":
-          description: ""
-      summary: Завершение сессии пользователя
   /signup:
     post:
-      produces:
-      - application/json
       responses:
         "200":
           description: ""
