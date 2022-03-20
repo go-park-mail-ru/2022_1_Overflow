@@ -18,6 +18,13 @@ definitions:
       theme:
         type: string
     type: object
+  models.SettingsForm:
+    properties:
+      avatar_url:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
   models.SignInForm:
     properties:
       email:
@@ -120,12 +127,49 @@ paths:
         "200":
           description: Информация о пользователе
           schema:
-            $ref: '#/definitions/models.User'
+            $ref: '#/definitions/models.SettingsForm'
         "401":
           description: Сессия отсутствует, сессия не валидна.
         "500":
           description: Ошибка БД, пользователь не найден, неверные данные сессии.
       summary: Получение данных профиля пользователя
+  /set_profile:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Форма настроек пользователя.
+        in: body
+        name: Avatar
+        required: true
+        schema:
+          $ref: '#/definitions/models.SettingsForm'
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Успешное изменение настроек.
+        "500":
+          description: Ошибка валидации формы, БД или сессия не валидна.
+      summary: Изменение настроек пользователя
+  /set_profile/avatar:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Файл аватарки.
+        in: formData
+        name: Avatar
+        required: true
+        type: file
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Успешное установка аватарки.
+        "500":
+          description: Ошибка валидации формы, БД или сессия не валидна.
+      summary: Установка/смена аватарки пользователя
   /signin:
     post:
       consumes:

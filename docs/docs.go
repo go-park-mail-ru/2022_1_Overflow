@@ -99,7 +99,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Информация о пользователе",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.SettingsForm"
                         }
                     },
                     "401": {
@@ -107,6 +107,64 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Ошибка БД, пользователь не найден, неверные данные сессии."
+                    }
+                }
+            }
+        },
+        "/set_profile": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "summary": "Изменение настроек пользователя",
+                "parameters": [
+                    {
+                        "description": "Форма настроек пользователя.",
+                        "name": "Avatar",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SettingsForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешное изменение настроек."
+                    },
+                    "500": {
+                        "description": "Ошибка валидации формы, БД или сессия не валидна."
+                    }
+                }
+            }
+        },
+        "/set_profile/avatar": {
+            "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "summary": "Установка/смена аватарки пользователя",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Файл аватарки.",
+                        "name": "Avatar",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешное установка аватарки."
+                    },
+                    "500": {
+                        "description": "Ошибка валидации формы, БД или сессия не валидна."
                     }
                 }
             }
@@ -197,6 +255,17 @@ const docTemplate = `{
                 },
                 "theme": {
                     "type": "string"
+                }
+            }
+        },
+        "models.SettingsForm": {
+            "type": "object",
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/models.User"
                 }
             }
         },
