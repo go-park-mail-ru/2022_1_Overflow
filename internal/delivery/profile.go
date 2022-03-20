@@ -44,7 +44,7 @@ func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 // @Failure 405
 // @Failure 500 "Ошибка валидации формы, БД или сессия не валидна."
 // @Accept json
-// @Param Avatar body models.SettingsForm true "Форма настроек пользователя."
+// @Param SettingsForm body models.SettingsForm true "Форма настроек пользователя."
 // @Produce plain
 // @Router /profile/set [post]
 func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {

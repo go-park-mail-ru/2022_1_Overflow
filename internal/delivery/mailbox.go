@@ -61,3 +61,12 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(parsed)
 }
+
+// Удалить письмо
+func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
+
+}

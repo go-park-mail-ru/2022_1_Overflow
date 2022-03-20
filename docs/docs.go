@@ -10,11 +10,7 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {
-            "name": "Роман Медников",
-            "url": "https://vk.com/l____l____l____l____l____l",
-            "email": "jellybe@yandex.ru"
-        },
+        "contact": {},
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -191,7 +187,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "Форма настроек пользователя.",
-                        "name": "Avatar",
+                        "name": "SettingsForm",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -290,6 +286,9 @@ const docTemplate = `{
                 "addressee": {
                     "type": "string"
                 },
+                "client_id": {
+                    "type": "integer"
+                },
                 "date": {
                     "type": "string"
                 },
@@ -298,6 +297,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "read": {
+                    "type": "boolean"
                 },
                 "sender": {
                     "type": "string"
@@ -388,12 +390,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
+	Version:          "",
 	Host:             "",
-	BasePath:         "/",
+	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "OverMail API",
-	Description:      "API почтового сервиса команды Overflow.",
+	Title:            "",
+	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

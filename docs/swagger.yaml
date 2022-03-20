@@ -1,16 +1,19 @@
-basePath: /
 definitions:
   models.Mail:
     description: Структура письма
     properties:
       addressee:
         type: string
+      client_id:
+        type: integer
       date:
         type: string
       files:
         type: string
       id:
         type: integer
+      read:
+        type: boolean
       sender:
         type: string
       text:
@@ -69,13 +72,7 @@ definitions:
         type: string
     type: object
 info:
-  contact:
-    email: jellybe@yandex.ru
-    name: Роман Медников
-    url: https://vk.com/l____l____l____l____l____l
-  description: API почтового сервиса команды Overflow.
-  title: OverMail API
-  version: "1.0"
+  contact: {}
 paths:
   /income:
     get:
@@ -186,7 +183,7 @@ paths:
       parameters:
       - description: Форма настроек пользователя.
         in: body
-        name: Avatar
+        name: SettingsForm
         required: true
         schema:
           $ref: '#/definitions/models.SettingsForm'
