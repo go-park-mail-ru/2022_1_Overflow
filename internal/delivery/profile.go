@@ -9,7 +9,7 @@ import (
 // GetInfo godoc
 // @Summary Получение данных профиля пользователя
 // @Produce json
-// @Success 200
+// @Success 200 {object} models.User "Информация о пользователе"
 // @Failure 500
 // @Router /profile [get]
 func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {

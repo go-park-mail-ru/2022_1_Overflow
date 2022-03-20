@@ -9,7 +9,7 @@ import (
 // Income godoc
 // @Summary Получение входящих сообщений
 // @Produce json
-// @Success 200
+// @Success 200 {object} []models.Mail "Список входящих писем"
 // @Failure 401
 // @Failure 500
 // @Router /income [get]
@@ -36,7 +36,7 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 // Outcome godoc
 // @Summary Получение исходящих сообщений
 // @Produce json
-// @Success 200
+// @Success 200 {object} []models.Mail "Список исходящих писем"
 // @Failure 401
 // @Failure 500
 // @Router /outcome [get]

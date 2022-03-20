@@ -32,7 +32,13 @@ const docTemplate = `{
                 "summary": "Получение входящих сообщений",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "Список входящих писем",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Mail"
+                            }
+                        }
                     },
                     "401": {
                         "description": ""
@@ -48,7 +54,7 @@ const docTemplate = `{
                 "summary": "Завершение сессии пользователя",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     },
                     "401": {
                         "description": ""
@@ -67,7 +73,13 @@ const docTemplate = `{
                 "summary": "Получение исходящих сообщений",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "Список исходящих писем",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Mail"
+                            }
+                        }
                     },
                     "401": {
                         "description": ""
@@ -86,7 +98,10 @@ const docTemplate = `{
                 "summary": "Получение данных профиля пользователя",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "Информация о пользователе",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
                     },
                     "500": {
                         "description": ""
@@ -99,7 +114,7 @@ const docTemplate = `{
                 "summary": "Выполняет аутентификацию пользователя",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     },
                     "500": {
                         "description": ""
@@ -112,11 +127,61 @@ const docTemplate = `{
                 "summary": "Выполняет регистрацию пользователя",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     },
                     "500": {
                         "description": ""
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.Mail": {
+            "description": "Структура письма",
+            "type": "object",
+            "properties": {
+                "addressee": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "files": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "sender": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "theme": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.User": {
+            "description": "Структура пользователя",
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
                 }
             }
         }

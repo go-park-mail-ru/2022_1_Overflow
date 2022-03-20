@@ -1,4 +1,37 @@
 basePath: /
+definitions:
+  models.Mail:
+    description: Структура письма
+    properties:
+      addressee:
+        type: string
+      date:
+        type: string
+      files:
+        type: string
+      id:
+        type: integer
+      sender:
+        type: string
+      text:
+        type: string
+      theme:
+        type: string
+    type: object
+  models.User:
+    description: Структура пользователя
+    properties:
+      email:
+        type: string
+      firstName:
+        type: string
+      id:
+        type: integer
+      lastName:
+        type: string
+      password:
+        type: string
+    type: object
 info:
   contact:
     email: jellybe@yandex.ru
@@ -17,7 +50,11 @@ paths:
       - application/json
       responses:
         "200":
-          description: ""
+          description: Список входящих писем
+          schema:
+            items:
+              $ref: '#/definitions/models.Mail'
+            type: array
         "401":
           description: ""
         "500":
@@ -27,7 +64,7 @@ paths:
     get:
       responses:
         "200":
-          description: ""
+          description: OK
         "401":
           description: ""
         "500":
@@ -39,7 +76,11 @@ paths:
       - application/json
       responses:
         "200":
-          description: ""
+          description: Список исходящих писем
+          schema:
+            items:
+              $ref: '#/definitions/models.Mail'
+            type: array
         "401":
           description: ""
         "500":
@@ -51,7 +92,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: ""
+          description: Информация о пользователе
+          schema:
+            $ref: '#/definitions/models.User'
         "500":
           description: ""
       summary: Получение данных профиля пользователя
@@ -59,7 +102,7 @@ paths:
     post:
       responses:
         "200":
-          description: ""
+          description: OK
         "500":
           description: ""
       summary: Выполняет аутентификацию пользователя
@@ -67,7 +110,7 @@ paths:
     post:
       responses:
         "200":
-          description: ""
+          description: OK
         "500":
           description: ""
       summary: Выполняет регистрацию пользователя

@@ -2,7 +2,8 @@ package models
 
 import "time"
 
-// Структура письма
+// Письмо
+// @Description Структура письма
 type Mail struct {
 	Client_id int32		`json:"id"`
 	Sender    string    `json:"sender"`

@@ -10,7 +10,7 @@ import (
 
 // SignIn godoc
 // @Summary Выполняет аутентификацию пользователя
-// @Success 200
+// @Success 200 "OK"
 // @Failure 500
 // @Router /signin [post]
 func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +34,8 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := d.uc.SignIn(data); err != nil {
-		w.Write(pkg.CreateJsonResponse(1, err.Error(), nil))
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		//w.Write(pkg.CreateJsonResponse(1, err.Error(), nil))
 		return
 	}
 
@@ -49,7 +50,7 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 
 // SignUp godoc
 // @Summary Выполняет регистрацию пользователя
-// @Success 200
+// @Success 200 "OK"
 // @Failure 500
 // @Router /signup [post]
 func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
@@ -77,7 +78,7 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 
 // SignIn godoc
 // @Summary Завершение сессии пользователя
-// @Success 200
+// @Success 200 "OK"
 // @Failure 401
 // @Failure 500
 // @Router /logout [get]
