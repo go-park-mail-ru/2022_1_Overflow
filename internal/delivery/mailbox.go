@@ -10,7 +10,7 @@ import (
 // @Summary Получение входящих сообщений
 // @Produce json
 // @Success 200 {object} []models.Mail "Список входящих писем"
-// @Failure 401 "Access denied"
+// @Failure 401 "Сессия отсутствует, сессия не валидна."
 // @Failure 500
 // @Router /income [get]
 func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {

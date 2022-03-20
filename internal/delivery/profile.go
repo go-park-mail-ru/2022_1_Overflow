@@ -10,8 +10,8 @@ import (
 // @Summary Получение данных профиля пользователя
 // @Produce json
 // @Success 200 {object} models.User "Информация о пользователе"
-// @Failure 401 "Access denied"
-// @Failure 500
+// @Failure 401 "Сессия отсутствует, сессия не валидна."
+// @Failure 500 "Ошибка БД, пользователь не найден, неверные данные сессии."
 // @Router /profile [get]
 func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {

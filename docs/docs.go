@@ -10,15 +10,7 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {
-            "name": "Роман Медников",
-            "url": "https://vk.com/l____l____l____l____l____l",
-            "email": "jellybe@yandex.ru"
-        },
-        "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        },
+        "contact": {},
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -41,7 +33,7 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "Access denied"
+                        "description": "Сессия отсутствует, сессия не валидна."
                     },
                     "500": {
                         "description": ""
@@ -54,10 +46,10 @@ const docTemplate = `{
                 "summary": "Завершение сессии пользователя",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Успешное завершение сессии."
                     },
                     "401": {
-                        "description": "Access denied"
+                        "description": "Сессия отсутствует, сессия не валидна."
                     },
                     "500": {
                         "description": ""
@@ -104,36 +96,64 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "Access denied"
+                        "description": "Сессия отсутствует, сессия не валидна."
                     },
                     "500": {
-                        "description": ""
+                        "description": "Ошибка БД, пользователь не найден, неверные данные сессии."
                     }
                 }
             }
         },
         "/signin": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
                 "summary": "Выполняет аутентификацию пользователя",
+                "parameters": [
+                    {
+                        "description": "Форма входа пользователя",
+                        "name": "SignInForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SignInForm"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Успешная аутентификация пользователя."
                     },
                     "500": {
-                        "description": ""
+                        "description": "Пользователь не существует, ошибка БД или валидации формы."
                     }
                 }
             }
         },
         "/signup": {
             "post": {
+                "consumes": [
+                    "application/json"
+                ],
                 "summary": "Выполняет регистрацию пользователя",
+                "parameters": [
+                    {
+                        "description": "Форма регистрации пользователя",
+                        "name": "SignUpForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SignUpForm"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "Успешная регистрация пользователя."
                     },
                     "500": {
-                        "description": ""
+                        "description": "Ошибка валидации формы, БД или пользователь уже существует."
                     }
                 }
             }
@@ -167,6 +187,44 @@ const docTemplate = `{
                 }
             }
         },
+        "models.SignInForm": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 20
+                }
+            }
+        },
+        "models.SignUpForm": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "first_name": {
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "last_name": {
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "password": {
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "password_confirmation": {
+                    "type": "string",
+                    "maxLength": 20
+                }
+            }
+        },
         "models.User": {
             "description": "Структура пользователя",
             "type": "object",
@@ -193,12 +251,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
+	Version:          "",
 	Host:             "",
-	BasePath:         "/",
+	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "OverMail API",
-	Description:      "API почтового сервиса команды Overflow.",
+	Title:            "",
+	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

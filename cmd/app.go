@@ -15,9 +15,6 @@ type Application struct{}
 // @contact.url https://vk.com/l____l____l____l____l____l
 // @contact.email jellybe@yandex.ru
 
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-
 // @BasePath /
 func (app *Application) Run(configPath string) {
 	config, err := config.NewConfig(configPath)

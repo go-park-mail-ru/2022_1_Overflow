@@ -1,4 +1,3 @@
-basePath: /
 definitions:
   models.Mail:
     description: Структура письма
@@ -18,6 +17,33 @@ definitions:
       theme:
         type: string
     type: object
+  models.SignInForm:
+    properties:
+      email:
+        maxLength: 20
+        type: string
+      password:
+        maxLength: 20
+        type: string
+    type: object
+  models.SignUpForm:
+    properties:
+      email:
+        maxLength: 20
+        type: string
+      first_name:
+        maxLength: 20
+        type: string
+      last_name:
+        maxLength: 20
+        type: string
+      password:
+        maxLength: 20
+        type: string
+      password_confirmation:
+        maxLength: 20
+        type: string
+    type: object
   models.User:
     description: Структура пользователя
     properties:
@@ -33,16 +59,7 @@ definitions:
         type: string
     type: object
 info:
-  contact:
-    email: jellybe@yandex.ru
-    name: Роман Медников
-    url: https://vk.com/l____l____l____l____l____l
-  description: API почтового сервиса команды Overflow.
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  title: OverMail API
-  version: "1.0"
+  contact: {}
 paths:
   /income:
     get:
@@ -56,7 +73,7 @@ paths:
               $ref: '#/definitions/models.Mail'
             type: array
         "401":
-          description: Access denied
+          description: Сессия отсутствует, сессия не валидна.
         "500":
           description: ""
       summary: Получение входящих сообщений
@@ -64,9 +81,9 @@ paths:
     get:
       responses:
         "200":
-          description: OK
+          description: Успешное завершение сессии.
         "401":
-          description: Access denied
+          description: Сессия отсутствует, сессия не валидна.
         "500":
           description: ""
       summary: Завершение сессии пользователя
@@ -96,24 +113,42 @@ paths:
           schema:
             $ref: '#/definitions/models.User'
         "401":
-          description: Access denied
+          description: Сессия отсутствует, сессия не валидна.
         "500":
-          description: ""
+          description: Ошибка БД, пользователь не найден, неверные данные сессии.
       summary: Получение данных профиля пользователя
   /signin:
     post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Форма входа пользователя
+        in: body
+        name: SignInForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignInForm'
       responses:
         "200":
-          description: OK
+          description: Успешная аутентификация пользователя.
         "500":
-          description: ""
+          description: Пользователь не существует, ошибка БД или валидации формы.
       summary: Выполняет аутентификацию пользователя
   /signup:
     post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Форма регистрации пользователя
+        in: body
+        name: SignUpForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignUpForm'
       responses:
         "200":
-          description: OK
+          description: Успешная регистрация пользователя.
         "500":
-          description: ""
+          description: Ошибка валидации формы, БД или пользователь уже существует.
       summary: Выполняет регистрацию пользователя
 swagger: "2.0"
