@@ -1,8 +1,16 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "API почтового сервиса команды Overflow.",
+        "title": "OverMail API",
+        "contact": {
+            "name": "Роман Медников",
+            "url": "https://vk.com/l____l____l____l____l____l",
+            "email": "jellybe@yandex.ru"
+        },
+        "version": "1.0"
     },
+    "basePath": "/",
     "paths": {
         "/income": {
             "get": {
@@ -31,6 +39,9 @@
         },
         "/logout": {
             "get": {
+                "produces": [
+                    "text/plain"
+                ],
                 "summary": "Завершение сессии пользователя",
                 "responses": {
                     "200": {
@@ -97,6 +108,9 @@
                 "consumes": [
                     "application/json"
                 ],
+                "produces": [
+                    "text/plain"
+                ],
                 "summary": "Выполняет аутентификацию пользователя",
                 "parameters": [
                     {
@@ -123,6 +137,9 @@
             "post": {
                 "consumes": [
                     "application/json"
+                ],
+                "produces": [
+                    "text/plain"
                 ],
                 "summary": "Выполняет регистрацию пользователя",
                 "parameters": [

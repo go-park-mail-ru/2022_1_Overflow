@@ -1,3 +1,4 @@
+basePath: /
 definitions:
   models.Mail:
     description: Структура письма
@@ -59,7 +60,13 @@ definitions:
         type: string
     type: object
 info:
-  contact: {}
+  contact:
+    email: jellybe@yandex.ru
+    name: Роман Медников
+    url: https://vk.com/l____l____l____l____l____l
+  description: API почтового сервиса команды Overflow.
+  title: OverMail API
+  version: "1.0"
 paths:
   /income:
     get:
@@ -79,6 +86,8 @@ paths:
       summary: Получение входящих сообщений
   /logout:
     get:
+      produces:
+      - text/plain
       responses:
         "200":
           description: Успешное завершение сессии.
@@ -128,6 +137,8 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/models.SignInForm'
+      produces:
+      - text/plain
       responses:
         "200":
           description: Успешная аутентификация пользователя.
@@ -145,6 +156,8 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/models.SignUpForm'
+      produces:
+      - text/plain
       responses:
         "200":
           description: Успешная регистрация пользователя.

@@ -14,6 +14,7 @@ import (
 // @Failure 500 "Пользователь не существует, ошибка БД или валидации формы."
 // @Accept json
 // @Param SignInForm body models.SignInForm true "Форма входа пользователя"
+// @Produce plain
 // @Router /signin [post]
 func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -56,6 +57,7 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 "Ошибка валидации формы, БД или пользователь уже существует."
 // @Accept json
 // @Param SignUpForm body models.SignUpForm true "Форма регистрации пользователя"
+// @Produce plain
 // @Router /signup [post]
 func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -85,6 +87,7 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 // @Success 200 "Успешное завершение сессии."
 // @Failure 401 "Сессия отсутствует, сессия не валидна."
 // @Failure 500
+// @Produce plain
 // @Router /logout [get]
 func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
