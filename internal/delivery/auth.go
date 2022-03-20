@@ -35,6 +35,7 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 
 	if err := d.uc.SignIn(data); err != nil {
 		w.Write(pkg.CreateJsonResponse(1, err.Error(), nil))
+		return
 	}
 
 	err = session.CreateSession(w, r, data.Email)
