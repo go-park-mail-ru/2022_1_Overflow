@@ -10,7 +10,7 @@ import (
 
 // SignIn godoc
 // @Summary Выполняет аутентификацию пользователя
-// @Success 200 "Успешная аутентификация пользователя."
+// @Success 200 {string} string "Успешная аутентификация пользователя."
 // @Failure 500 "Пользователь не существует, ошибка БД или валидации формы."
 // @Accept json
 // @Param SignInForm body models.SignInForm true "Форма входа пользователя"
@@ -53,7 +53,7 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 
 // SignUp godoc
 // @Summary Выполняет регистрацию пользователя
-// @Success 200 "Успешная регистрация пользователя."
+// @Success 200 {string} string "Успешная регистрация пользователя."
 // @Failure 500 "Ошибка валидации формы, БД или пользователь уже существует."
 // @Accept json
 // @Param SignUpForm body models.SignUpForm true "Форма регистрации пользователя"
@@ -84,7 +84,7 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 
 // SignIn godoc
 // @Summary Завершение сессии пользователя
-// @Success 200 "Успешное завершение сессии."
+// @Success 200 {string} string "Успешное завершение сессии."
 // @Failure 401 "Сессия отсутствует, сессия не валидна."
 // @Failure 500
 // @Produce plain

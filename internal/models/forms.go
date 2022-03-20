@@ -14,6 +14,7 @@ type SignUpForm struct {
 }
 
 type SettingsForm struct {
-	AvatarUrl	string	`json:"avatar_url"`
-	User		User	`json:"user"`	
+	FirstName	string	`json:"first_name"`	
+	LastName	string	`json:"last_name"`
+	Password	string	`json:"password"`
 }

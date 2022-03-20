@@ -10,11 +10,7 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {
-            "name": "Роман Медников",
-            "url": "https://vk.com/l____l____l____l____l____l",
-            "email": "jellybe@yandex.ru"
-        },
+        "contact": {},
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -37,7 +33,10 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "Сессия отсутствует, сессия не валидна."
+                        "description": "Ошибка БД, сессия отсутствует или сессия не валидна."
+                    },
+                    "405": {
+                        "description": ""
                     },
                     "500": {
                         "description": ""
@@ -53,7 +52,10 @@ const docTemplate = `{
                 "summary": "Завершение сессии пользователя",
                 "responses": {
                     "200": {
-                        "description": "Успешное завершение сессии."
+                        "description": "Успешное завершение сессии.",
+                        "schema": {
+                            "type": "string"
+                        }
                     },
                     "401": {
                         "description": "Сессия отсутствует, сессия не валидна."
@@ -81,7 +83,10 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "Access denied"
+                        "description": "Ошибка БД, сессия отсутствует или сессия не валидна."
+                    },
+                    "405": {
+                        "description": ""
                     },
                     "500": {
                         "description": ""
@@ -94,19 +99,44 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Получение данных профиля пользователя",
+                "summary": "Получение данных пользователя",
                 "responses": {
                     "200": {
                         "description": "Информация о пользователе",
                         "schema": {
-                            "$ref": "#/definitions/models.SettingsForm"
+                            "$ref": "#/definitions/models.User"
                         }
                     },
                     "401": {
                         "description": "Сессия отсутствует, сессия не валидна."
                     },
+                    "405": {
+                        "description": ""
+                    },
                     "500": {
                         "description": "Ошибка БД, пользователь не найден, неверные данные сессии."
+                    }
+                }
+            }
+        },
+        "/profile/avatar": {
+            "get": {
+                "produces": [
+                    "text/plain"
+                ],
+                "summary": "Получение ссылки на аватарку пользователя",
+                "responses": {
+                    "200": {
+                        "description": "Ссылка на аватарку в формате /{static_dir}/{file}.{ext}.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "405": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": "Ошибка БД, пользователь не найден или сессия не валидна."
                     }
                 }
             }
@@ -133,7 +163,13 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Успешное изменение настроек."
+                        "description": "Успешное изменение настроек.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "405": {
+                        "description": ""
                     },
                     "500": {
                         "description": "Ошибка валидации формы, БД или сессия не валидна."
@@ -161,7 +197,13 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Успешное установка аватарки."
+                        "description": "Успешное установка аватарки.",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "405": {
+                        "description": ""
                     },
                     "500": {
                         "description": "Ошибка валидации формы, БД или сессия не валидна."
@@ -191,7 +233,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Успешная аутентификация пользователя."
+                        "description": "Успешная аутентификация пользователя.",
+                        "schema": {
+                            "type": "string"
+                        }
                     },
                     "500": {
                         "description": "Пользователь не существует, ошибка БД или валидации формы."
@@ -221,7 +266,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Успешная регистрация пользователя."
+                        "description": "Успешная регистрация пользователя.",
+                        "schema": {
+                            "type": "string"
+                        }
                     },
                     "500": {
                         "description": "Ошибка валидации формы, БД или пользователь уже существует."
@@ -261,11 +309,14 @@ const docTemplate = `{
         "models.SettingsForm": {
             "type": "object",
             "properties": {
-                "avatar_url": {
+                "first_name": {
                     "type": "string"
                 },
-                "user": {
-                    "$ref": "#/definitions/models.User"
+                "last_name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
                 }
             }
         },
@@ -333,12 +384,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
+	Version:          "",
 	Host:             "",
-	BasePath:         "/",
+	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "OverMail API",
-	Description:      "API почтового сервиса команды Overflow.",
+	Title:            "",
+	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

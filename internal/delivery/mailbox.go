@@ -10,7 +10,8 @@ import (
 // @Summary Получение входящих сообщений
 // @Produce json
 // @Success 200 {object} []models.Mail "Список входящих писем"
-// @Failure 401 "Сессия отсутствует, сессия не валидна."
+// @Failure 401 "Ошибка БД, сессия отсутствует или сессия не валидна."
+// @Failure 405
 // @Failure 500
 // @Router /income [get]
 func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +38,8 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 // @Summary Получение исходящих сообщений
 // @Produce json
 // @Success 200 {object} []models.Mail "Список исходящих писем"
-// @Failure 401 "Access denied"
+// @Failure 401 "Ошибка БД, сессия отсутствует или сессия не валидна."
+// @Failure 405
 // @Failure 500
 // @Router /outcome [get]
 func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {

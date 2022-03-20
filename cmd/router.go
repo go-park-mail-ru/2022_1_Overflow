@@ -19,6 +19,7 @@ import (
 type RouterManager struct {
 	d *delivery.Delivery
 	uc usecase.UseCaseInterface
+	config *config.Config
 }
 
 func (rm *RouterManager) Init(repo repository.DatabaseRepository, config *config.Config) {
@@ -26,14 +27,20 @@ func (rm *RouterManager) Init(repo repository.DatabaseRepository, config *config
 	rm.uc = &usecase.UseCase{}
 	rm.uc.Init(repo, config)
 	rm.d.Init(rm.uc, config)
+	rm.config = config
 }
 
 func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 	router := mux.NewRouter()
+	fs := http.FileServer(http.Dir(rm.config.Server.Static.Dir))
+	router.PathPrefix(rm.config.Server.Static.Handle).Handler(
+		http.StripPrefix(rm.config.Server.Static.Handle, fs,
+	))
 	router.HandleFunc("/signin", rm.d.SignIn)
 	router.HandleFunc("/logout", rm.d.SignOut)
 	router.HandleFunc("/signup", rm.d.SignUp)
 	router.HandleFunc("/profile", rm.d.GetInfo)
+	router.HandleFunc("/profile/avatar", rm.d.GetAvatar)
 	router.HandleFunc("/set_profile", rm.d.SetInfo)
 	router.HandleFunc("/set_profile/avatar", rm.d.SetAvatar)
 	router.HandleFunc("/income", rm.d.Income)

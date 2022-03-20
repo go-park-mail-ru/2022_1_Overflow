@@ -31,12 +31,15 @@ type Config struct {
 	Server struct {
 		Port    string `yaml:"port"`
 		Timeout struct {
-			Server time.Duration `ytml:"server"`
+			Server time.Duration `yaml:"server"`
 			Write  time.Duration `yaml:"write"`
 			Read   time.Duration `yaml:"read"`
 			Idle   time.Duration `yaml:"idle"`
 		} `yaml:"timeout"`
-		StaticDir string `yamk:"static_dir"`
+		Static struct {
+			Dir		string  `yaml:"dir"`
+			Handle	string	`yaml:"handle"`
+		} `yaml:"static"`
 	} `yaml:"server"`
 	Database struct {
 		Type     string `yaml:"type"`
@@ -72,19 +75,10 @@ func NewConfig(configPath string) (*Config, error) {
 
 func TestConfig() *Config {
 	config := &Config{
-		Server: struct {
-			Port    string "yaml:\"port\""
-			Timeout struct {
-				Server time.Duration "ytml:\"server\""
-				Write  time.Duration "yaml:\"write\""
-				Read   time.Duration "yaml:\"read\""
-				Idle   time.Duration "yaml:\"idle\""
-			} "yaml:\"timeout\""
-			StaticDir string "yamk:\"static_dir\""
-		}{
+		Server: struct{Port string "yaml:\"port\""; Timeout struct{Server time.Duration "yaml:\"server\""; Write time.Duration "yaml:\"write\""; Read time.Duration "yaml:\"read\""; Idle time.Duration "yaml:\"idle\""} "yaml:\"timeout\""; Static struct{Dir string "yaml:\"dir\""; Handle string "yaml:\"handle\""} "yaml:\"static\""} {
 			Port: "8080",
 			Timeout: struct {
-				Server time.Duration "ytml:\"server\""
+				Server time.Duration "yaml:\"server\""
 				Write  time.Duration "yaml:\"write\""
 				Read   time.Duration "yaml:\"read\""
 				Idle   time.Duration "yaml:\"idle\""
@@ -94,7 +88,10 @@ func TestConfig() *Config {
 				Read:   5 * time.Second,
 				Idle:   5 * time.Second,
 			},
-			StaticDir: "static",
+			Static: struct{Dir string "yaml:\"dir\""; Handle string "yaml:\"handle\""}{
+				Dir: "static",
+				Handle: "/static",
+			},
 		},
 		Database: struct {
 			Type     string "yaml:\"type\""

@@ -11,10 +11,11 @@ import (
 )
 
 // GetInfo godoc
-// @Summary Получение данных профиля пользователя
+// @Summary Получение данных пользователя
 // @Produce json
-// @Success 200 {object} models.SettingsForm "Информация о пользователе"
+// @Success 200 {object} models.User "Информация о пользователе"
 // @Failure 401 "Сессия отсутствует, сессия не валидна."
+// @Failure 405
 // @Failure 500 "Ошибка БД, пользователь не найден, неверные данные сессии."
 // @Router /profile [get]
 func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +40,8 @@ func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 
 // SetInfo godoc
 // @Summary Изменение настроек пользователя
-// @Success 200 "Успешное изменение настроек."
+// @Success 200 {string} string "Успешное изменение настроек."
+// @Failure 405
 // @Failure 500 "Ошибка валидации формы, БД или сессия не валидна."
 // @Accept json
 // @Param Avatar body models.SettingsForm true "Форма настроек пользователя."
@@ -63,13 +65,8 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	if data.Email != form.User.Email {
-		http.Error(w, "Запрещено изменять почту пользователя.", http.StatusInternalServerError)
-		return
-	}
 	
-	if err := d.uc.SetInfo(&form); err != nil {
+	if err := d.uc.SetInfo(data, &form); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	w.WriteHeader(http.StatusOK)
@@ -78,7 +75,8 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 
 // SetAvatar godoc
 // @Summary Установка/смена аватарки пользователя
-// @Success 200 "Успешное установка аватарки."
+// @Success 200 {string} string "Успешное установка аватарки."
+// @Failure 405
 // @Failure 500 "Ошибка валидации формы, БД или сессия не валидна."
 // @Accept multipart/form-data
 // @Param file formData file true "Файл аватарки."
@@ -96,7 +94,6 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//r.ParseMultipartForm(32 << 20) // проверить макс. длину
 	var buf bytes.Buffer
 
 	file, header, err := r.FormFile("file")
@@ -116,4 +113,32 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
+}
+
+// GetAvatar godoc
+// @Summary Получение ссылки на аватарку пользователя
+// @Success 200 {string} string "Ссылка на аватарку в формате /{static_dir}/{file}.{ext}."
+// @Failure 405
+// @Failure 500 "Ошибка БД, пользователь не найден или сессия не валидна."
+// @Produce plain
+// @Router /profile/avatar [get]
+func (d *Delivery) GetAvatar(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		pkg.MethodNotAllowed(w, http.MethodGet)
+		return
+	}
+
+	data, err := session.GetData(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	url, err := d.uc.GetAvatar(data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(url))
 }

@@ -1,4 +1,3 @@
-basePath: /
 definitions:
   models.Mail:
     description: Структура письма
@@ -20,10 +19,12 @@ definitions:
     type: object
   models.SettingsForm:
     properties:
-      avatar_url:
+      first_name:
         type: string
-      user:
-        $ref: '#/definitions/models.User'
+      last_name:
+        type: string
+      password:
+        type: string
     type: object
   models.SignInForm:
     properties:
@@ -67,13 +68,7 @@ definitions:
         type: string
     type: object
 info:
-  contact:
-    email: jellybe@yandex.ru
-    name: Роман Медников
-    url: https://vk.com/l____l____l____l____l____l
-  description: API почтового сервиса команды Overflow.
-  title: OverMail API
-  version: "1.0"
+  contact: {}
 paths:
   /income:
     get:
@@ -87,7 +82,9 @@ paths:
               $ref: '#/definitions/models.Mail'
             type: array
         "401":
-          description: Сессия отсутствует, сессия не валидна.
+          description: Ошибка БД, сессия отсутствует или сессия не валидна.
+        "405":
+          description: ""
         "500":
           description: ""
       summary: Получение входящих сообщений
@@ -98,6 +95,8 @@ paths:
       responses:
         "200":
           description: Успешное завершение сессии.
+          schema:
+            type: string
         "401":
           description: Сессия отсутствует, сессия не валидна.
         "500":
@@ -115,7 +114,9 @@ paths:
               $ref: '#/definitions/models.Mail'
             type: array
         "401":
-          description: Access denied
+          description: Ошибка БД, сессия отсутствует или сессия не валидна.
+        "405":
+          description: ""
         "500":
           description: ""
       summary: Получение исходящих сообщений
@@ -127,12 +128,28 @@ paths:
         "200":
           description: Информация о пользователе
           schema:
-            $ref: '#/definitions/models.SettingsForm'
+            $ref: '#/definitions/models.User'
         "401":
           description: Сессия отсутствует, сессия не валидна.
+        "405":
+          description: ""
         "500":
           description: Ошибка БД, пользователь не найден, неверные данные сессии.
-      summary: Получение данных профиля пользователя
+      summary: Получение данных пользователя
+  /profile/avatar:
+    get:
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Ссылка на аватарку в формате /{static_dir}/{file}.{ext}.
+          schema:
+            type: string
+        "405":
+          description: ""
+        "500":
+          description: Ошибка БД, пользователь не найден или сессия не валидна.
+      summary: Получение ссылки на аватарку пользователя
   /set_profile:
     post:
       consumes:
@@ -149,6 +166,10 @@ paths:
       responses:
         "200":
           description: Успешное изменение настроек.
+          schema:
+            type: string
+        "405":
+          description: ""
         "500":
           description: Ошибка валидации формы, БД или сессия не валидна.
       summary: Изменение настроек пользователя
@@ -167,6 +188,10 @@ paths:
       responses:
         "200":
           description: Успешное установка аватарки.
+          schema:
+            type: string
+        "405":
+          description: ""
         "500":
           description: Ошибка валидации формы, БД или сессия не валидна.
       summary: Установка/смена аватарки пользователя
@@ -186,6 +211,8 @@ paths:
       responses:
         "200":
           description: Успешная аутентификация пользователя.
+          schema:
+            type: string
         "500":
           description: Пользователь не существует, ошибка БД или валидации формы.
       summary: Выполняет аутентификацию пользователя
@@ -205,6 +232,8 @@ paths:
       responses:
         "200":
           description: Успешная регистрация пользователя.
+          schema:
+            type: string
         "500":
           description: Ошибка валидации формы, БД или пользователь уже существует.
       summary: Выполняет регистрацию пользователя
