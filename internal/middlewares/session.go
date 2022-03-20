@@ -4,12 +4,23 @@ import (
 	"OverflowBackend/internal/usecase/session"
 	"OverflowBackend/pkg"
 	"net/http"
+	"strings"
 )
 
 
+var allowedPaths = []string {
+	"/signin",
+	"/signup",
+	"/swagger",
+}
+
 func CheckLogin(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/signin" && r.URL.Path != "/signup" && !session.IsLoggedIn(r) {
+		allowed := false
+		for _, path := range allowedPaths {
+			allowed = allowed || strings.Contains(r.URL.Path, path)
+		}
+		if !allowed && !session.IsLoggedIn(r) {
 			pkg.AccessDenied(w)
 			return
 		}
