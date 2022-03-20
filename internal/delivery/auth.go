@@ -22,10 +22,9 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	
 	if session.IsLoggedIn(r) {
-		w.Write(pkg.CreateJsonResponse(0, "OK", nil))
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
 		return
 	}
 
@@ -65,7 +64,6 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
 	var data models.SignUpForm
 
 	err := json.NewDecoder(r.Body).Decode(&data)

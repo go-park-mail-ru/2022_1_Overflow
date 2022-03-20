@@ -10,7 +10,7 @@ server:
     handle: "/static/"
   
 database:
-  type: "postgres"
+  type: "mock"
   user: "postgres"
   password: "123"
   host: "localhost"

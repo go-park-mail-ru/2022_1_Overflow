@@ -39,20 +39,22 @@ func (uc *UseCase) SetAvatar(data *models.Session, avatar *models.Avatar) error 
 
 // Установка настроек пользователя.
 func (uc *UseCase) SetInfo(data *models.Session, settings *models.SettingsForm) error {
-	user, err := uc.db.GetUserInfoByEmail(data.Email)
-	if err != nil {
-		return err
-	}
 	if settings.FirstName != "" {
-		user.FirstName = settings.FirstName
+		return fmt.Errorf("Не имплементировано.")
 	}
 	if settings.LastName != "" {
-		user.LastName = settings.LastName
+		return fmt.Errorf("Не имплементировано.")
 	}
 	if settings.Password != "" {
-		user.Password = pkg.HashPassword(settings.Password)
+		user, err := uc.db.GetUserInfoByEmail(data.Email)
+		if err != nil {
+			return err
+		}
+		err = uc.db.ChangeUserPassword(user, pkg.HashPassword(settings.Password))
+		if err != nil {
+			return err
+		}
 	}
-	// пока нет доступа к изменению в БД
 	return nil
 }
 
