@@ -7,7 +7,8 @@ func Recover(handler http.Handler) http.Handler {
 		defer func() {
 			err := recover()
 			if err != nil {
-				http.Error(w, "Internal server error.", http.StatusInternalServerError)
+				e := err.(error)
+				http.Error(w, e.Error(), http.StatusInternalServerError)
 			}
 		}()
 		handler.ServeHTTP(w, r)

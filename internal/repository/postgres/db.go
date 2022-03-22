@@ -134,9 +134,9 @@ func (c *Database) GetIncomeMails(userId int32) ([]models.Mail, error) {
 			return results, err
 		}
 		mails.Sender = values[0].(string)
-		mails.Files = values[3].(string)
 		mails.Theme = values[1].(string)
 		mails.Text = values[2].(string)
+		mails.Files = values[3].(string)
 		mails.Date = values[4].(time.Time)
 		mails.Read = values[5].(bool)
 		mails.Id = values[6].(int32)
@@ -159,9 +159,9 @@ func (c *Database) GetOutcomeMails(userId int32) ([]models.Mail, error) {
 			return results, err
 		}
 		mails.Addressee = values[0].(string)
-		mails.Files = values[3].(string)
 		mails.Theme = values[1].(string)
 		mails.Text = values[2].(string)
+		mails.Files = values[3].(string)
 		mails.Date = values[4].(time.Time)
 		mails.Id = values[5].(int32)
 		results = append(results, mails)
