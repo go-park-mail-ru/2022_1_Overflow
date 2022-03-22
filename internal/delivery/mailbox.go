@@ -63,10 +63,10 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 	w.Write(parsed)
 }
 
-// Outcome godoc
+// DeleteMail godoc
 // @Summary Удалить письмо по его id
 // @Produce json
-// @Param id
+// @Param id query string true "ID запрашиваемого письма."
 // @Success 200 "OK"
 // @Failure 401 "Письмо не принадлежит пользователю, сессия отсутствует или сессия не валидна."
 // @Failure 405
@@ -97,10 +97,10 @@ func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("OK"))
 }
 
-// Outcome godoc
-// @Summary Удалить письмо по его id
+// ReadMail godoc
+// @Summary Прочитать письмо по его id
 // @Produce json
-// @Param id
+// @Param id query string true "ID запрашиваемого письма."
 // @Success 200 "OK"
 // @Failure 401 "Письмо не принадлежит пользователю, сессия отсутствует или сессия не валидна."
 // @Failure 405

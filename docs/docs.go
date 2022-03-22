@@ -16,34 +16,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/income": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Получение входящих сообщений",
-                "responses": {
-                    "200": {
-                        "description": "Список входящих писем",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Mail"
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Ошибка БД, сессия отсутствует или сессия не валидна."
-                    },
-                    "405": {
-                        "description": ""
-                    },
-                    "500": {
-                        "description": ""
-                    }
-                }
-            }
-        },
         "/logout": {
             "get": {
                 "produces": [
@@ -66,7 +38,66 @@ const docTemplate = `{
                 }
             }
         },
-        "/outcome": {
+        "/mail/delete": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Удалить письмо по его id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID запрашиваемого письма.",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "description": "Письмо не принадлежит пользователю, сессия отсутствует или сессия не валидна."
+                    },
+                    "405": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": "Ошибка БД, неверные GET параметры."
+                    }
+                }
+            }
+        },
+        "/mail/income": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Получение входящих сообщений",
+                "responses": {
+                    "200": {
+                        "description": "Список входящих писем",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Mail"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует или сессия не валидна."
+                    },
+                    "405": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": "Ошибка БД."
+                    }
+                }
+            }
+        },
+        "/mail/outcome": {
             "get": {
                 "produces": [
                     "application/json"
@@ -83,13 +114,44 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "Ошибка БД, сессия отсутствует или сессия не валидна."
+                        "description": "Сессия отсутствует или сессия не валидна."
                     },
                     "405": {
                         "description": ""
                     },
                     "500": {
+                        "description": "Ошибка БД."
+                    }
+                }
+            }
+        },
+        "/mail/read": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Прочитать письмо по его id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID запрашиваемого письма.",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "description": "Письмо не принадлежит пользователю, сессия отсутствует или сессия не валидна."
+                    },
+                    "405": {
                         "description": ""
+                    },
+                    "500": {
+                        "description": "Ошибка БД, неверные GET параметры."
                     }
                 }
             }
@@ -219,7 +281,7 @@ const docTemplate = `{
                 "produces": [
                     "text/plain"
                 ],
-                "summary": "Выполняет аутентификацию пользователя",
+                "summary": "Выполняет аутентификацию и выставляет сессионый cookie с названием OverflowMail",
                 "parameters": [
                     {
                         "description": "Форма входа пользователя",
@@ -246,6 +308,7 @@ const docTemplate = `{
         },
         "/signup": {
             "post": {
+                "description": "Выполняет регистрацию пользователя, НЕ выставляет сессионый cookie.",
                 "consumes": [
                     "application/json"
                 ],

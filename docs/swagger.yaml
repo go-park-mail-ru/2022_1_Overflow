@@ -74,24 +74,6 @@ definitions:
 info:
   contact: {}
 paths:
-  /income:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Список входящих писем
-          schema:
-            items:
-              $ref: '#/definitions/models.Mail'
-            type: array
-        "401":
-          description: Ошибка БД, сессия отсутствует или сессия не валидна.
-        "405":
-          description: ""
-        "500":
-          description: ""
-      summary: Получение входящих сообщений
   /logout:
     get:
       produces:
@@ -106,7 +88,46 @@ paths:
         "500":
           description: ""
       summary: Завершение сессии пользователя
-  /outcome:
+  /mail/delete:
+    get:
+      parameters:
+      - description: ID запрашиваемого письма.
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Письмо не принадлежит пользователю, сессия отсутствует или
+            сессия не валидна.
+        "405":
+          description: ""
+        "500":
+          description: Ошибка БД, неверные GET параметры.
+      summary: Удалить письмо по его id
+  /mail/income:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список входящих писем
+          schema:
+            items:
+              $ref: '#/definitions/models.Mail'
+            type: array
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+        "405":
+          description: ""
+        "500":
+          description: Ошибка БД.
+      summary: Получение входящих сообщений
+  /mail/outcome:
     get:
       produces:
       - application/json
@@ -118,12 +139,33 @@ paths:
               $ref: '#/definitions/models.Mail'
             type: array
         "401":
-          description: Ошибка БД, сессия отсутствует или сессия не валидна.
+          description: Сессия отсутствует или сессия не валидна.
         "405":
           description: ""
         "500":
-          description: ""
+          description: Ошибка БД.
       summary: Получение исходящих сообщений
+  /mail/read:
+    get:
+      parameters:
+      - description: ID запрашиваемого письма.
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Письмо не принадлежит пользователю, сессия отсутствует или
+            сессия не валидна.
+        "405":
+          description: ""
+        "500":
+          description: Ошибка БД, неверные GET параметры.
+      summary: Прочитать письмо по его id
   /profile:
     get:
       produces:
@@ -219,11 +261,13 @@ paths:
             type: string
         "500":
           description: Пользователь не существует, ошибка БД или валидации формы.
-      summary: Выполняет аутентификацию пользователя
+      summary: Выполняет аутентификацию и выставляет сессионый cookie с названием
+        OverflowMail
   /signup:
     post:
       consumes:
       - application/json
+      description: Выполняет регистрацию пользователя, НЕ выставляет сессионый cookie.
       parameters:
       - description: Форма регистрации пользователя
         in: body
