@@ -46,6 +46,7 @@ func WriteJsonErrFull(w http.ResponseWriter, err JsonResponse) {
 		case STATUS_UNAUTHORIZED: w.WriteHeader(http.StatusUnauthorized)
 		case STATUS_BAD_METHOD: w.WriteHeader(http.StatusMethodNotAllowed)
 		case STATUS_BAD_VALIDATION: w.WriteHeader(http.StatusBadRequest)
+		case STATUS_WRONG_CREDS: w.WriteHeader(http.StatusBadRequest)
 		default: w.WriteHeader(http.StatusInternalServerError)
 	}
 	resp, _ := json.Marshal(err)
