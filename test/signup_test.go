@@ -1,25 +1,24 @@
 package test
 
 import (
-	response "OverflowBackend/src/response"
-	handlers "OverflowBackend/src/handlers"
-
+	"OverflowBackend/cmd"
+	"OverflowBackend/internal/repository/mock"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/gorilla/mux"
 )
 
 func TestSignup(t *testing.T) {
-	router := mux.NewRouter()
-	var handler handlers.SignupHandler
-	handler.Init(router, nil)
+	db := mock.MockDB{}
+	db.Create("test")
 
-	srv := httptest.NewServer(response.SetupCORS(router))
+	rm := cmd.RouterManager{}
+	rm.Init(&db, defConf)
+
+	srv := httptest.NewServer(rm.NewRouter(defConf.Server.Port))
 	defer srv.Close()
 
 	data := map[string]string{
@@ -43,11 +42,13 @@ func TestSignup(t *testing.T) {
 }
 
 func TestBadPassword(t *testing.T) {
-	router := mux.NewRouter()
-	var handler handlers.SignupHandler
-	handler.Init(router, nil)
+	db := mock.MockDB{}
+	db.Create("test")
 
-	srv := httptest.NewServer(response.SetupCORS(router))
+	rm := cmd.RouterManager{}
+	rm.Init(&db, defConf)
+
+	srv := httptest.NewServer(rm.NewRouter(defConf.Server.Port))
 	defer srv.Close()
 
 	data := map[string]string{
@@ -65,25 +66,20 @@ func TestBadPassword(t *testing.T) {
 		return
 	}
 
-	var response map[string]interface{}
-	err = json.NewDecoder(r.Body).Decode(&response)
-	if (err != nil) {
-		t.Error(err)
-		return
-	}
-	
-	if response["status"].(float64) != 1 {
-		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", response["status"].(float64), 1)
+	if r.StatusCode != 500 {
+		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, 500)
 		return
 	}
 }
 
 func TestEmptyForm(t *testing.T) {
-	router := mux.NewRouter()
-	var handler handlers.SignupHandler
-	handler.Init(router, nil)
+	db := mock.MockDB{}
+	db.Create("test")
 
-	srv := httptest.NewServer(response.SetupCORS(router))
+	rm := cmd.RouterManager{}
+	rm.Init(&db, defConf)
+
+	srv := httptest.NewServer(rm.NewRouter(defConf.Server.Port))
 	defer srv.Close()
 
 	data := map[string]string{
@@ -100,15 +96,8 @@ func TestEmptyForm(t *testing.T) {
 		return
 	}
 
-	var response map[string]interface{}
-	err = json.NewDecoder(r.Body).Decode(&response)
-	if (err != nil) {
-		t.Error(err)
-		return
-	}
-	
-	if response["status"].(float64) != 1 {
-		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", response["status"].(float64), 1)
+	if r.StatusCode != 500 {
+		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, 500)
 		return
 	}
 }

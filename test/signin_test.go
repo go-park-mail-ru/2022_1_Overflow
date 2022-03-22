@@ -1,31 +1,38 @@
 package test
 
 import (
-	response "OverflowBackend/src/response"
-	handlers "OverflowBackend/src/handlers"
-
+	"OverflowBackend/cmd"
+	"OverflowBackend/internal/models"
+	"OverflowBackend/internal/repository/mock"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/gorilla/mux"
 )
 
 func TestSignin(t *testing.T) {
 
-	router := mux.NewRouter()
-	var handler handlers.SigninHandler
-	handler.Init(router, nil)
+	db := mock.MockDB{}
+	db.Create("test")
+	db.AddUser(models.User{
+		Id:        0,
+		FirstName: "test",
+		LastName:  "test",
+		Email:     "test",
+		Password:  "test",
+	})
 
-	srv := httptest.NewServer(response.SetupCORS(router))
+	rm := cmd.RouterManager{}
+	rm.Init(&db, defConf)
+
+	srv := httptest.NewServer(rm.NewRouter(defConf.Server.Port))
 	defer srv.Close()
 
 	data := map[string]string{
-		"email":    "ededededed",
-		"password": "pass",
+		"email":    "test",
+		"password": "test",
 	}
 	dataJson, _ := json.Marshal(data)
 	r, err := http.Post(fmt.Sprintf("%s/signin", srv.URL), "application/json", bytes.NewBuffer(dataJson))
@@ -35,22 +42,31 @@ func TestSignin(t *testing.T) {
 	}
 
 	if r.StatusCode != 200 {
-		t.Errorf("Неверный статус от сервера.")
+		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, 200)
 		return
 	}
 }
 
 func TestBadSignin(t *testing.T) {
-	router := mux.NewRouter()
-	var handler handlers.SigninHandler
-	handler.Init(router, nil)
+	db := mock.MockDB{}
+	db.Create("test")
+	db.AddUser(models.User{
+		Id:        0,
+		FirstName: "test",
+		LastName:  "test",
+		Email:     "test",
+		Password:  "test",
+	})
 
-	srv := httptest.NewServer(response.SetupCORS(router))
+	rm := cmd.RouterManager{}
+	rm.Init(&db, defConf)
+
+	srv := httptest.NewServer(rm.NewRouter(defConf.Server.Port))
 	defer srv.Close()
 
 	data := map[string]string{
-		"email":    "ededededed",
-		"password": "",
+		"email":    "test",
+		"password": "pass",
 	}
 	dataJson, _ := json.Marshal(data)
 	r, err := http.Post(fmt.Sprintf("%s/signin", srv.URL), "application/json", bytes.NewBuffer(dataJson))
@@ -59,15 +75,8 @@ func TestBadSignin(t *testing.T) {
 		return
 	}
 
-	var response map[string]interface{}
-	err = json.NewDecoder(r.Body).Decode(&response)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	if response["status"].(float64) != 1 {
-		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", response["status"].(float64), 1)
+	if r.StatusCode != 500 {
+		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, 500)
 		return
 	}
 }

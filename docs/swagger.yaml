@@ -1,0 +1,244 @@
+definitions:
+  models.Mail:
+    description: Структура письма
+    properties:
+      addressee:
+        type: string
+      client_id:
+        type: integer
+      date:
+        type: string
+      files:
+        type: string
+      id:
+        type: integer
+      read:
+        type: boolean
+      sender:
+        type: string
+      text:
+        type: string
+      theme:
+        type: string
+    type: object
+  models.SettingsForm:
+    properties:
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+    type: object
+  models.SignInForm:
+    properties:
+      email:
+        maxLength: 20
+        type: string
+      password:
+        maxLength: 20
+        type: string
+    type: object
+  models.SignUpForm:
+    properties:
+      email:
+        maxLength: 20
+        type: string
+      first_name:
+        maxLength: 20
+        type: string
+      last_name:
+        maxLength: 20
+        type: string
+      password:
+        maxLength: 20
+        type: string
+      password_confirmation:
+        maxLength: 20
+        type: string
+    type: object
+  models.User:
+    description: Структура пользователя
+    properties:
+      email:
+        type: string
+      firstName:
+        type: string
+      id:
+        type: integer
+      lastName:
+        type: string
+      password:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /income:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список входящих писем
+          schema:
+            items:
+              $ref: '#/definitions/models.Mail'
+            type: array
+        "401":
+          description: Ошибка БД, сессия отсутствует или сессия не валидна.
+        "405":
+          description: ""
+        "500":
+          description: ""
+      summary: Получение входящих сообщений
+  /logout:
+    get:
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Успешное завершение сессии.
+          schema:
+            type: string
+        "401":
+          description: Сессия отсутствует, сессия не валидна.
+        "500":
+          description: ""
+      summary: Завершение сессии пользователя
+  /outcome:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список исходящих писем
+          schema:
+            items:
+              $ref: '#/definitions/models.Mail'
+            type: array
+        "401":
+          description: Ошибка БД, сессия отсутствует или сессия не валидна.
+        "405":
+          description: ""
+        "500":
+          description: ""
+      summary: Получение исходящих сообщений
+  /profile:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация о пользователе
+          schema:
+            $ref: '#/definitions/models.User'
+        "401":
+          description: Сессия отсутствует, сессия не валидна.
+        "405":
+          description: ""
+        "500":
+          description: Ошибка БД, пользователь не найден, неверные данные сессии.
+      summary: Получение данных пользователя
+  /profile/avatar:
+    get:
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Ссылка на аватарку в формате /{static_dir}/{file}.{ext}.
+          schema:
+            type: string
+        "405":
+          description: ""
+        "500":
+          description: Ошибка БД, пользователь не найден или сессия не валидна.
+      summary: Получение ссылки на аватарку пользователя
+  /profile/avatar/set:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Файл аватарки.
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Успешное установка аватарки.
+          schema:
+            type: string
+        "405":
+          description: ""
+        "500":
+          description: Ошибка валидации формы, БД или сессия не валидна.
+      summary: Установка/смена аватарки пользователя
+  /profile/set:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Форма настроек пользователя.
+        in: body
+        name: SettingsForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.SettingsForm'
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Успешное изменение настроек.
+          schema:
+            type: string
+        "405":
+          description: ""
+        "500":
+          description: Ошибка валидации формы, БД или сессия не валидна.
+      summary: Изменение настроек пользователя
+  /signin:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Форма входа пользователя
+        in: body
+        name: SignInForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignInForm'
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Успешная аутентификация пользователя.
+          schema:
+            type: string
+        "500":
+          description: Пользователь не существует, ошибка БД или валидации формы.
+      summary: Выполняет аутентификацию пользователя
+  /signup:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Форма регистрации пользователя
+        in: body
+        name: SignUpForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignUpForm'
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: Успешная регистрация пользователя.
+          schema:
+            type: string
+        "500":
+          description: Ошибка валидации формы, БД или пользователь уже существует.
+      summary: Выполняет регистрацию пользователя
+swagger: "2.0"

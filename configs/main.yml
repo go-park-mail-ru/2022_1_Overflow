@@ -1,0 +1,18 @@
+server:
+  port: 8080
+  timeout:
+    server: 30s
+    read: 15s
+    write: 10s
+    idle: 5s
+  static:
+    dir: "static"
+    handle: "/static/"
+  
+database:
+  type: "postgres"
+  user: "postgres"
+  password: "123"
+  host: "localhost"
+  port: 5432
+  dbname: "postgres"
