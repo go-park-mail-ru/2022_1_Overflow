@@ -11,58 +11,62 @@ import (
 // SignIn godoc
 // @Summary Выполняет аутентификацию пользователя
 // @Summary Выполняет аутентификацию и выставляет сессионый cookie с названием OverflowMail
-// @Success 200 {string} string "Успешная аутентификация пользователя."
-// @Failure 500 "Пользователь не существует, ошибка БД или валидации формы."
+// @Success 200 {object} pkg.JsonResponse "Успешная аутентификация пользователя."
+// @Failure 500 {object} pkg.JsonResponse "Пользователь не существует, ошибка БД или валидации формы."
 // @Accept json
 // @Param SignInForm body models.SignInForm true "Форма входа пользователя"
-// @Produce plain
+// @Produce json
 // @Router /signin [post]
 func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
-		pkg.MethodNotAllowed(w, http.MethodPost)
+		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
 		return
 	}
 
 	if session.IsLoggedIn(r) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
+		pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 		return
 	}
 
 	var data models.SignInForm
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		pkg.WriteJsonErrFull(w, pkg.JSON_ERR)
 		return
 	}
 
-	if err := d.uc.SignIn(data); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		//w.Write(pkg.CreateJsonResponse(1, err.Error(), nil))
+	if err := d.uc.SignIn(data); err != pkg.NO_ERR {
+		pkg.WriteJsonErrFull(w, err)
 		return
 	}
 
 	err = session.CreateSession(w, r, data.Email)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		pkg.WriteJsonErrFull(w, pkg.INTERNAL_ERR)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("OK"))
+	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
 
 // SignUp godoc
 // @Summary Выполняет регистрацию пользователя
-// @Description Выполняет регистрацию пользователя, НЕ выставляет сессионый cookie.
-// @Success 200 {string} string "Успешная регистрация пользователя."
-// @Failure 500 "Ошибка валидации формы, БД или пользователь уже существует."
+// @Description Выполняет регистрацию пользователя, выставляет сессионый cookie.
+// @Success 200 {object} pkg.JsonResponse "Вход уже выполнен, либо успешная регистрация пользователя."
+// @Failure 500 {object} pkg.JsonResponse "Ошибка валидации формы, БД или пользователь уже существует."
 // @Accept json
 // @Param SignUpForm body models.SignUpForm true "Форма регистрации пользователя"
-// @Produce plain
+// @Produce json
 // @Router /signup [post]
 func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
-		pkg.MethodNotAllowed(w, http.MethodPost)
+		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		return
+	}
+
+	if session.IsLoggedIn(r) {
+		pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 		return
 	}
 
@@ -70,36 +74,40 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		pkg.WriteJsonErrFull(w, pkg.JSON_ERR)
 		return
 	}
-	err = d.uc.SignUp(data)
+	
+	if err := d.uc.SignUp(data); err != pkg.NO_ERR {
+		pkg.WriteJsonErrFull(w, err)
+		return
+	}
+	err = session.CreateSession(w, r, data.Email)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		pkg.WriteJsonErrFull(w, pkg.INTERNAL_ERR)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("OK"))
+	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
 
 // SignIn godoc
 // @Summary Завершение сессии пользователя
-// @Success 200 {string} string "Успешное завершение сессии."
-// @Failure 401 "Сессия отсутствует, сессия не валидна."
-// @Failure 500
-// @Produce plain
+// @Success 200 {object} pkg.JsonResponse "Успешное завершение сессии."
+// @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует, сессия не валидна."
+// @Failure 500 {object} pkg.JsonResponse
+// @Produce json
 // @Router /logout [get]
 func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodGet {
-		pkg.MethodNotAllowed(w, http.MethodGet)
+		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
 		return
 	}
 
 	err := session.DeleteSession(w, r)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		pkg.WriteJsonErrFull(w, pkg.INTERNAL_ERR)
 		return
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("OK"))
+	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }

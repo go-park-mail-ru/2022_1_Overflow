@@ -4,6 +4,7 @@ import (
 	"OverflowBackend/internal/config"
 	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/repository"
+	"OverflowBackend/pkg"
 	"net/http"
 )
 
@@ -25,8 +26,8 @@ type UseCaseInterface interface {
 
 type AuthUseCase interface {
 	Init(repository.DatabaseRepository, *config.Config)
-	SignIn(data models.SignInForm) error
-	SignUp(data models.SignUpForm) error
+	SignIn(data models.SignInForm) pkg.JsonResponse
+	SignUp(data models.SignUpForm) pkg.JsonResponse
 }
 
 type SessionManagerUseCase interface {
@@ -38,16 +39,17 @@ type SessionManagerUseCase interface {
 
 type ProfileUseCase interface {
 	Init(repository.DatabaseRepository, *config.Config)
-	GetInfo(data *models.Session) (userJson []byte, err error)
-	GetAvatar(data *models.Session) (avatarUrl string, err error)
-	SetAvatar(data *models.Session, avatar *models.Avatar) error
-	SetInfo(data *models.Session, settings *models.SettingsForm) error
+	GetInfo(data *models.Session) ([]byte, pkg.JsonResponse)
+	GetAvatar(data *models.Session) (string, pkg.JsonResponse)
+	SetAvatar(data *models.Session, avatar *models.Avatar) pkg.JsonResponse
+	SetInfo(data *models.Session, settings *models.SettingsForm) pkg.JsonResponse
 }
 
 type MailBoxUseCase interface {
 	Init(repository.DatabaseRepository, *config.Config)
-	Income(data *models.Session) (parsed []byte, err error)
-	Outcome(data *models.Session) (parsed []byte, err error)
-	DeleteMail(data *models.Session, id int) error
-	ReadMail(data *models.Session, id int) error
+	Income(data *models.Session) ([]byte, pkg.JsonResponse)
+	Outcome(data *models.Session) ([]byte, pkg.JsonResponse)
+	DeleteMail(data *models.Session, id int) pkg.JsonResponse
+	ReadMail(data *models.Session, id int) pkg.JsonResponse
+	SendMail(data *models.Session, form models.MailForm) pkg.JsonResponse
 }

@@ -2,64 +2,92 @@ package usecase
 
 import (
 	"OverflowBackend/internal/models"
+	"OverflowBackend/pkg"
 	"encoding/json"
-	"fmt"
+	"time"
 )
 
-func (uc *UseCase) Income(data *models.Session) (parsed []byte, err error) {
+func (uc *UseCase) Income(data *models.Session) ([]byte, pkg.JsonResponse) {
 	user, err := uc.db.GetUserInfoByEmail(data.Email)
 	if err != nil {
-		return
+		return nil, pkg.DB_ERR
 	}
 	id := user.Id
 	mails, err := uc.db.GetIncomeMails(id)
 	if err != nil {
-		return
+		return nil, pkg.DB_ERR
 	}
-	parsed, err = json.Marshal(mails)
+	parsed, err := json.Marshal(mails)
 	if err != nil {
-		return
+		return nil, pkg.JSON_ERR
 	}
-	return parsed, nil
+	return parsed, pkg.NO_ERR
 }
 
-func (uc *UseCase) Outcome(data *models.Session) (parsed []byte, err error) {
+func (uc *UseCase) Outcome(data *models.Session) ([]byte, pkg.JsonResponse) {
 	user, err := uc.db.GetUserInfoByEmail(data.Email)
 	if err != nil {
-		return
+		return nil, pkg.DB_ERR
 	}
 	id := user.Id
 	mails, err := uc.db.GetIncomeMails(id)
 	if err != nil {
-		return
+		return nil, pkg.DB_ERR
 	}
-	parsed, err = json.Marshal(mails)
+	parsed, err := json.Marshal(mails)
 	if err != nil {
-		return
+		return nil, pkg.JSON_ERR
 	}
-	return parsed, nil
+	return parsed, pkg.NO_ERR
 }
 
-func (uc *UseCase) DeleteMail(data *models.Session, id int) error {
-	_, err := uc.db.GetMailInfoById(id)
-	if err != nil {
-		return err
-	}
-	// тут удаление письма из БД
-	return nil
-}
-
-func (uc *UseCase) ReadMail(data *models.Session, id int) error {
+func (uc *UseCase) DeleteMail(data *models.Session, id int) pkg.JsonResponse {
 	mail, err := uc.db.GetMailInfoById(id)
 	if err != nil {
-		return err
+		return pkg.DB_ERR
+	}
+	if mail.Addressee != data.Email && mail.Sender != data.Email {
+		return pkg.UNAUTHORIZED_ERR
+	}
+	err = uc.db.DeleteMail(mail)
+	if err != nil {
+		return pkg.DB_ERR
+	}
+	return pkg.NO_ERR
+}
+
+func (uc *UseCase) ReadMail(data *models.Session, id int) pkg.JsonResponse {
+	mail, err := uc.db.GetMailInfoById(id)
+	if err != nil {
+		return pkg.DB_ERR
 	}
 	if mail.Addressee != data.Email {
-		return fmt.Errorf("Письмо не принадлежит запрашивающему пользователю.")
+		return pkg.UNAUTHORIZED_ERR
 	}
 	err = uc.db.ReadMail(mail)
 	if err != nil {
-		return err
+		return pkg.DB_ERR
 	}
-	return nil
+	return pkg.NO_ERR
+}
+
+func (uc *UseCase) SendMail(data *models.Session, form models.MailForm) pkg.JsonResponse {
+	user, err := uc.db.GetUserInfoByEmail(data.Email)
+	if err != nil {
+		return pkg.DB_ERR
+	}
+	mail := models.Mail {
+		Client_id: user.Id,
+		Sender: data.Email,
+		Addressee: form.Addressee,
+		Theme: form.Theme,
+		Text: form.Text,
+		Files: form.Files,
+		Date: time.Now(),
+	}
+	err = uc.db.AddMail(mail)
+	if err != nil {
+		return pkg.DB_ERR
+	}
+	return pkg.NO_ERR
 }

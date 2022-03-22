@@ -7,8 +7,7 @@ import (
 	"strings"
 )
 
-
-var allowedPaths = []string {
+var allowedPaths = []string{
 	"/signin",
 	"/signup",
 	"/swagger",
@@ -21,7 +20,7 @@ func CheckLogin(handler http.Handler) http.Handler {
 			allowed = allowed || strings.Contains(r.URL.Path, path)
 		}
 		if !allowed && !session.IsLoggedIn(r) {
-			pkg.AccessDenied(w)
+			pkg.WriteJsonErrFull(w, pkg.UNAUTHORIZED_ERR)
 			return
 		}
 		handler.ServeHTTP(w, r)

@@ -14,83 +14,87 @@ import (
 // @Summary Получение данных пользователя
 // @Produce json
 // @Success 200 {object} models.User "Информация о пользователе"
-// @Failure 401 "Сессия отсутствует, сессия не валидна."
-// @Failure 405
-// @Failure 500 "Ошибка БД, пользователь не найден, неверные данные сессии."
+// @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует, сессия не валидна."
+// @Failure 405 {object} pkg.JsonResponse
+// @Failure 500 {object} pkg.JsonResponse "Ошибка БД, пользователь не найден, неверные данные сессии."
 // @Router /profile [get]
 func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodGet {
-		pkg.MethodNotAllowed(w, http.MethodGet)
+		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
 		return
 	}
 
-	data, err := session.GetData(r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	data, e := session.GetData(r)
+	if e != nil {
+		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
 		return
 	}
 	userJson, err := d.uc.GetInfo(data)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if err != pkg.NO_ERR {
+		pkg.WriteJsonErrFull(w, err)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
 	w.Write(userJson)
 }
 
 // SetInfo godoc
 // @Summary Изменение настроек пользователя
-// @Success 200 {string} string "Успешное изменение настроек."
-// @Failure 405
-// @Failure 500 "Ошибка валидации формы, БД или сессия не валидна."
+// @Success 200 {object} pkg.JsonResponse "Успешное изменение настроек."
+// @Failure 405 {object} pkg.JsonResponse
+// @Failure 500 {object} pkg.JsonResponse "Ошибка валидации формы, БД или сессия не валидна."
 // @Accept json
 // @Param SettingsForm body models.SettingsForm true "Форма настроек пользователя."
-// @Produce plain
+// @Produce json
 // @Router /profile/set [post]
 func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	if r.Method != http.MethodPost {
-		pkg.MethodNotAllowed(w, http.MethodPost)
+		w.WriteHeader(http.StatusBadRequest)
+		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		return
+	}
+
+	data, err := session.GetData(r)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
 		return
 	}
 
 	var form models.SettingsForm
 
-	data, err := session.GetData(r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
+		pkg.WriteJsonErrFull(w, pkg.JSON_ERR)
 		return
 	}
 
-	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if err := d.uc.SetInfo(data, &form); err != pkg.NO_ERR {
+		pkg.WriteJsonErrFull(w, err)
 		return
 	}
-	
-	if err := d.uc.SetInfo(data, &form); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("OK"))
+	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
 
 // SetAvatar godoc
 // @Summary Установка/смена аватарки пользователя
-// @Success 200 {string} string "Успешное установка аватарки."
-// @Failure 405
-// @Failure 500 "Ошибка валидации формы, БД или сессия не валидна."
+// @Success 200 {object} pkg.JsonResponse "Успешное установка аватарки."
+// @Failure 405 {object} pkg.JsonResponse
+// @Failure 500 {object} pkg.JsonResponse "Ошибка валидации формы, БД или сессия не валидна."
 // @Accept multipart/form-data
 // @Param file formData file true "Файл аватарки."
-// @Produce plain
+// @Produce json
 // @Router /profile/avatar/set [post]
 func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
-		pkg.MethodNotAllowed(w, http.MethodPost)
+		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
 		return
 	}
 
 	data, err := session.GetData(r)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
 		return
 	}
 
@@ -98,47 +102,48 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 
 	file, header, err := r.FormFile("file")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		pkg.WriteJsonErrFull(w, pkg.INTERNAL_ERR)
 		return
 	}
 	defer file.Close()
 	io.Copy(&buf, file)
 	avatar := models.Avatar{
-		Name: header.Filename,
+		Name:      header.Filename,
 		UserEmail: data.Email,
-		Content: buf.Bytes(),
+		Content:   buf.Bytes(),
 	}
-	if err := d.uc.SetAvatar(data, &avatar); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if err := d.uc.SetAvatar(data, &avatar); err != pkg.NO_ERR {
+		pkg.WriteJsonErrFull(w, err)
+		return
 	}
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("OK"))
+	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
 
 // GetAvatar godoc
 // @Summary Получение ссылки на аватарку пользователя
-// @Success 200 {string} string "Ссылка на аватарку в формате /{static_dir}/{file}.{ext}."
-// @Failure 405
-// @Failure 500 "Ошибка БД, пользователь не найден или сессия не валидна."
-// @Produce plain
+// @Success 200 {object} pkg.JsonResponse "Ссылка на аватарку в формате /{static_dir}/{file}.{ext}."
+// @Failure 405 {object} pkg.JsonResponse
+// @Failure 500 {object} pkg.JsonResponse "Ошибка БД, пользователь не найден или сессия не валидна."
+// @Produce json
 // @Router /profile/avatar [get]
 func (d *Delivery) GetAvatar(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodGet {
-		pkg.MethodNotAllowed(w, http.MethodGet)
+		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
 		return
 	}
 
-	data, err := session.GetData(r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	data, e := session.GetData(r)
+	if e != nil {
+		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
 		return
 	}
 
 	url, err := d.uc.GetAvatar(data)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if err != pkg.NO_ERR {
+		pkg.WriteJsonErrFull(w, err)
+		return
 	}
-	
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(url))
+
+	pkg.WriteJsonErr(w, pkg.STATUS_OK, url)
 }

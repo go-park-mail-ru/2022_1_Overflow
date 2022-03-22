@@ -18,3 +18,10 @@ type SettingsForm struct {
 	LastName	string	`json:"last_name"`
 	Password	string	`json:"password"`
 }
+
+type MailForm struct {
+	Addressee string    `json:"addressee"`
+	Theme     string    `json:"theme"`
+	Text      string    `json:"text"`
+	Files     string    `json:"files"`
+}

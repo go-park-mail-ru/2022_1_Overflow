@@ -9,35 +9,35 @@ import (
 
 type SessionManager struct {}
 
-func (uc *UseCase) SignIn(data models.SignInForm) error {
+func (uc *UseCase) SignIn(data models.SignInForm) pkg.JsonResponse {
 	if err := validation.CheckSignIn(data); err != nil {
-		return err
+		return pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, err.Error())
 	}
 	userFind, err := uc.db.GetUserInfoByEmail(data.Email)
 	if (err != nil || userFind == models.User{}) {
-		return fmt.Errorf("Пользователь %v не существует.", data.Email)
+		return pkg.WRONG_CREDS_ERR
 	}
 	if (userFind.Password != pkg.HashPassword(data.Password)) {
-		return fmt.Errorf("Неверный пароль.")
+		return pkg.WRONG_CREDS_ERR
 	}
-	return nil
+	return pkg.NO_ERR
 }
 
-func (uc *UseCase) SignUp(data models.SignUpForm) error {
+func (uc *UseCase) SignUp(data models.SignUpForm) pkg.JsonResponse {
 	if err := validation.CheckSignUp(data); err != nil {
-		return err
+		return pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, err.Error())
 	}
 	user, err := pkg.ConvertToUser(data)
 	if err != nil {
-		return err
+		return pkg.INTERNAL_ERR
 	}
 	
 	userFind, _ := uc.db.GetUserInfoByEmail(data.Email)
 	if (userFind != models.User{}) {
-		return fmt.Errorf("Пользователь %v уже существует.", data.Email)
+		return pkg.CreateJsonErr(pkg.STATUS_USER_EXISTS, fmt.Sprintf("Пользователь %v уже существует.", data.Email))
 	}
 	if err = uc.db.AddUser(user); err != nil {
-		return err
+		return pkg.DB_ERR
 	}
-	return nil
+	return pkg.NO_ERR
 }

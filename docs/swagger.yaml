@@ -21,6 +21,17 @@ definitions:
       theme:
         type: string
     type: object
+  models.MailForm:
+    properties:
+      addressee:
+        type: string
+      files:
+        type: string
+      text:
+        type: string
+      theme:
+        type: string
+    type: object
   models.SettingsForm:
     properties:
       first_name:
@@ -71,22 +82,33 @@ definitions:
       password:
         type: string
     type: object
+  pkg.JsonResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
 info:
   contact: {}
 paths:
   /logout:
     get:
       produces:
-      - text/plain
+      - application/json
       responses:
         "200":
           description: Успешное завершение сессии.
           schema:
-            type: string
+            $ref: '#/definitions/pkg.JsonResponse'
         "401":
           description: Сессия отсутствует, сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
-          description: ""
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Завершение сессии пользователя
   /mail/delete:
     get:
@@ -101,13 +123,21 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
         "401":
-          description: Письмо не принадлежит пользователю, сессия отсутствует или
-            сессия не валидна.
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
-          description: ""
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
-          description: Ошибка БД, неверные GET параметры.
+          description: Письмо не принадлежит пользователю, ошибка БД, неверные GET
+            параметры.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Удалить письмо по его id
   /mail/income:
     get:
@@ -122,10 +152,16 @@ paths:
             type: array
         "401":
           description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
-          description: ""
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Ошибка БД.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение входящих сообщений
   /mail/outcome:
     get:
@@ -140,10 +176,16 @@ paths:
             type: array
         "401":
           description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
-          description: ""
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Ошибка БД.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение исходящих сообщений
   /mail/read:
     get:
@@ -158,14 +200,49 @@ paths:
       responses:
         "200":
           description: OK
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
         "401":
-          description: Письмо не принадлежит пользователю, сессия отсутствует или
-            сессия не валидна.
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
-          description: ""
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
-          description: Ошибка БД, неверные GET параметры.
+          description: Письмо не принадлежит пользователю, ошибка БД, неверные GET
+            параметры.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Прочитать письмо по его id
+  /mail/send:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Форма письма
+        in: body
+        name: MailForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.MailForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешная отправка письма.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Получатель не существует, ошибка БД.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Выполняет отправку письма получателю
   /profile:
     get:
       produces:
@@ -177,24 +254,34 @@ paths:
             $ref: '#/definitions/models.User'
         "401":
           description: Сессия отсутствует, сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
-          description: ""
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Ошибка БД, пользователь не найден, неверные данные сессии.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение данных пользователя
   /profile/avatar:
     get:
       produces:
-      - text/plain
+      - application/json
       responses:
         "200":
           description: Ссылка на аватарку в формате /{static_dir}/{file}.{ext}.
           schema:
-            type: string
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
-          description: ""
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Ошибка БД, пользователь не найден или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение ссылки на аватарку пользователя
   /profile/avatar/set:
     post:
@@ -207,16 +294,20 @@ paths:
         required: true
         type: file
       produces:
-      - text/plain
+      - application/json
       responses:
         "200":
           description: Успешное установка аватарки.
           schema:
-            type: string
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
-          description: ""
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Ошибка валидации формы, БД или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Установка/смена аватарки пользователя
   /profile/set:
     post:
@@ -230,16 +321,20 @@ paths:
         schema:
           $ref: '#/definitions/models.SettingsForm'
       produces:
-      - text/plain
+      - application/json
       responses:
         "200":
           description: Успешное изменение настроек.
           schema:
-            type: string
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
-          description: ""
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Ошибка валидации формы, БД или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Изменение настроек пользователя
   /signin:
     post:
@@ -253,21 +348,23 @@ paths:
         schema:
           $ref: '#/definitions/models.SignInForm'
       produces:
-      - text/plain
+      - application/json
       responses:
         "200":
           description: Успешная аутентификация пользователя.
           schema:
-            type: string
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Пользователь не существует, ошибка БД или валидации формы.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Выполняет аутентификацию и выставляет сессионый cookie с названием
         OverflowMail
   /signup:
     post:
       consumes:
       - application/json
-      description: Выполняет регистрацию пользователя, НЕ выставляет сессионый cookie.
+      description: Выполняет регистрацию пользователя, выставляет сессионый cookie.
       parameters:
       - description: Форма регистрации пользователя
         in: body
@@ -276,13 +373,15 @@ paths:
         schema:
           $ref: '#/definitions/models.SignUpForm'
       produces:
-      - text/plain
+      - application/json
       responses:
         "200":
-          description: Успешная регистрация пользователя.
+          description: Вход уже выполнен, либо успешная регистрация пользователя.
           schema:
-            type: string
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Ошибка валидации формы, БД или пользователь уже существует.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Выполняет регистрацию пользователя
 swagger: "2.0"

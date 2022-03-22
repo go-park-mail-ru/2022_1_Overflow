@@ -19,21 +19,27 @@ const docTemplate = `{
         "/logout": {
             "get": {
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "summary": "Завершение сессии пользователя",
                 "responses": {
                     "200": {
                         "description": "Успешное завершение сессии.",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/pkg.JsonResponse"
                         }
                     },
                     "401": {
-                        "description": "Сессия отсутствует, сессия не валидна."
+                        "description": "Сессия отсутствует, сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     },
                     "500": {
-                        "description": ""
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     }
                 }
             }
@@ -55,16 +61,28 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     },
                     "401": {
-                        "description": "Письмо не принадлежит пользователю, сессия отсутствует или сессия не валидна."
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     },
                     "405": {
-                        "description": ""
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     },
                     "500": {
-                        "description": "Ошибка БД, неверные GET параметры."
+                        "description": "Письмо не принадлежит пользователю, ошибка БД, неверные GET параметры.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     }
                 }
             }
@@ -86,13 +104,22 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "Сессия отсутствует или сессия не валидна."
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     },
                     "405": {
-                        "description": ""
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     },
                     "500": {
-                        "description": "Ошибка БД."
+                        "description": "Ошибка БД.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     }
                 }
             }
@@ -114,13 +141,22 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "Сессия отсутствует или сессия не валидна."
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     },
                     "405": {
-                        "description": ""
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     },
                     "500": {
-                        "description": "Ошибка БД."
+                        "description": "Ошибка БД.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     }
                 }
             }
@@ -142,16 +178,70 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     },
                     "401": {
-                        "description": "Письмо не принадлежит пользователю, сессия отсутствует или сессия не валидна."
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     },
                     "405": {
-                        "description": ""
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     },
                     "500": {
-                        "description": "Ошибка БД, неверные GET параметры."
+                        "description": "Письмо не принадлежит пользователю, ошибка БД, неверные GET параметры.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/mail/send": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Выполняет отправку письма получателю",
+                "parameters": [
+                    {
+                        "description": "Форма письма",
+                        "name": "MailForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.MailForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешная отправка письма.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Получатель не существует, ошибка БД.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     }
                 }
             }
@@ -170,13 +260,22 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "Сессия отсутствует, сессия не валидна."
+                        "description": "Сессия отсутствует, сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     },
                     "405": {
-                        "description": ""
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     },
                     "500": {
-                        "description": "Ошибка БД, пользователь не найден, неверные данные сессии."
+                        "description": "Ошибка БД, пользователь не найден, неверные данные сессии.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     }
                 }
             }
@@ -184,21 +283,27 @@ const docTemplate = `{
         "/profile/avatar": {
             "get": {
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "summary": "Получение ссылки на аватарку пользователя",
                 "responses": {
                     "200": {
                         "description": "Ссылка на аватарку в формате /{static_dir}/{file}.{ext}.",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/pkg.JsonResponse"
                         }
                     },
                     "405": {
-                        "description": ""
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     },
                     "500": {
-                        "description": "Ошибка БД, пользователь не найден или сессия не валидна."
+                        "description": "Ошибка БД, пользователь не найден или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     }
                 }
             }
@@ -209,7 +314,7 @@ const docTemplate = `{
                     "multipart/form-data"
                 ],
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "summary": "Установка/смена аватарки пользователя",
                 "parameters": [
@@ -225,14 +330,20 @@ const docTemplate = `{
                     "200": {
                         "description": "Успешное установка аватарки.",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/pkg.JsonResponse"
                         }
                     },
                     "405": {
-                        "description": ""
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     },
                     "500": {
-                        "description": "Ошибка валидации формы, БД или сессия не валидна."
+                        "description": "Ошибка валидации формы, БД или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     }
                 }
             }
@@ -243,7 +354,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "summary": "Изменение настроек пользователя",
                 "parameters": [
@@ -261,14 +372,20 @@ const docTemplate = `{
                     "200": {
                         "description": "Успешное изменение настроек.",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/pkg.JsonResponse"
                         }
                     },
                     "405": {
-                        "description": ""
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     },
                     "500": {
-                        "description": "Ошибка валидации формы, БД или сессия не валидна."
+                        "description": "Ошибка валидации формы, БД или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     }
                 }
             }
@@ -279,7 +396,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "summary": "Выполняет аутентификацию и выставляет сессионый cookie с названием OverflowMail",
                 "parameters": [
@@ -297,23 +414,26 @@ const docTemplate = `{
                     "200": {
                         "description": "Успешная аутентификация пользователя.",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/pkg.JsonResponse"
                         }
                     },
                     "500": {
-                        "description": "Пользователь не существует, ошибка БД или валидации формы."
+                        "description": "Пользователь не существует, ошибка БД или валидации формы.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     }
                 }
             }
         },
         "/signup": {
             "post": {
-                "description": "Выполняет регистрацию пользователя, НЕ выставляет сессионый cookie.",
+                "description": "Выполняет регистрацию пользователя, выставляет сессионый cookie.",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
-                    "text/plain"
+                    "application/json"
                 ],
                 "summary": "Выполняет регистрацию пользователя",
                 "parameters": [
@@ -329,13 +449,16 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Успешная регистрация пользователя.",
+                        "description": "Вход уже выполнен, либо успешная регистрация пользователя.",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/pkg.JsonResponse"
                         }
                     },
                     "500": {
-                        "description": "Ошибка валидации формы, БД или пользователь уже существует."
+                        "description": "Ошибка валидации формы, БД или пользователь уже существует.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
                     }
                 }
             }
@@ -365,6 +488,23 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "sender": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "theme": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.MailForm": {
+            "type": "object",
+            "properties": {
+                "addressee": {
+                    "type": "string"
+                },
+                "files": {
                     "type": "string"
                 },
                 "text": {
@@ -445,6 +585,17 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
+                }
+            }
+        },
+        "pkg.JsonResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
                 }
             }
         }
