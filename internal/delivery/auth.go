@@ -10,6 +10,7 @@ import (
 
 // SignIn godoc
 // @Summary Выполняет аутентификацию пользователя
+// @Summary Выполняет аутентификацию и выставляет сессионый cookie с названием OverflowMail
 // @Success 200 {string} string "Успешная аутентификация пользователя."
 // @Failure 500 "Пользователь не существует, ошибка БД или валидации формы."
 // @Accept json
@@ -52,6 +53,7 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 
 // SignUp godoc
 // @Summary Выполняет регистрацию пользователя
+// @Description Выполняет регистрацию пользователя, НЕ выставляет сессионый cookie.
 // @Success 200 {string} string "Успешная регистрация пользователя."
 // @Failure 500 "Ошибка валидации формы, БД или пользователь уже существует."
 // @Accept json

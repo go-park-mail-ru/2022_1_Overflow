@@ -43,8 +43,10 @@ func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 	router.HandleFunc("/profile/avatar", rm.d.GetAvatar)
 	router.HandleFunc("/profile/set", rm.d.SetInfo)
 	router.HandleFunc("/profile/avatar/set", rm.d.SetAvatar)
-	router.HandleFunc("/income", rm.d.Income)
-	router.HandleFunc("/outcome", rm.d.Outcome)
+	router.HandleFunc("/mail/income", rm.d.Income)
+	router.HandleFunc("/mail/outcome", rm.d.Outcome)
+	router.HandleFunc("/mail/delete", rm.d.DeleteMail)
+	router.HandleFunc("/mail/read", rm.d.ReadMail)
 	router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
 		httpSwagger.URL("/swagger/doc.json"), //The url pointing to API definition
 		httpSwagger.DeepLinking(true),
