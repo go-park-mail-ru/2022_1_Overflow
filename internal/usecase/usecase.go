@@ -48,4 +48,6 @@ type MailBoxUseCase interface {
 	Init(repository.DatabaseRepository, *config.Config)
 	Income(data *models.Session) (parsed []byte, err error)
 	Outcome(data *models.Session) (parsed []byte, err error)
+	DeleteMail(data *models.Session, id int) error
+	ReadMail(data *models.Session, id int) error
 }

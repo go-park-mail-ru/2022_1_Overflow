@@ -4,16 +4,17 @@ import (
 	"OverflowBackend/internal/usecase/session"
 	"OverflowBackend/pkg"
 	"net/http"
+	"strconv"
 )
 
 // Income godoc
 // @Summary Получение входящих сообщений
 // @Produce json
 // @Success 200 {object} []models.Mail "Список входящих писем"
-// @Failure 401 "Ошибка БД, сессия отсутствует или сессия не валидна."
+// @Failure 401 "Сессия отсутствует или сессия не валидна."
 // @Failure 405
-// @Failure 500
-// @Router /income [get]
+// @Failure 500 "Ошибка БД."
+// @Router /mail/income [get]
 func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		pkg.MethodNotAllowed(w, http.MethodGet)
@@ -38,10 +39,10 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 // @Summary Получение исходящих сообщений
 // @Produce json
 // @Success 200 {object} []models.Mail "Список исходящих писем"
-// @Failure 401 "Ошибка БД, сессия отсутствует или сессия не валидна."
+// @Failure 401 "Сессия отсутствует или сессия не валидна."
 // @Failure 405
-// @Failure 500
-// @Router /outcome [get]
+// @Failure 500 "Ошибка БД."
+// @Router /mail/outcome [get]
 func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		pkg.MethodNotAllowed(w, http.MethodGet)
@@ -62,11 +63,70 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 	w.Write(parsed)
 }
 
-// Удалить письмо
+// Outcome godoc
+// @Summary Удалить письмо по его id
+// @Produce json
+// @Param id
+// @Success 200 "OK"
+// @Failure 401 "Письмо не принадлежит пользователю, сессия отсутствует или сессия не валидна."
+// @Failure 405
+// @Failure 500 "Ошибка БД, неверные GET параметры."
+// @Router /mail/delete [get]
 func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
-
+	if r.Method != http.MethodGet {
+		pkg.MethodNotAllowed(w, http.MethodGet)
+		return
+	}
+	data, err := session.GetData(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	idStr := r.URL.Query().Get("id")
+	id, err := strconv.Atoi(idStr)
+	if (err != nil) {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = d.uc.DeleteMail(data, id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
 }
 
+// Outcome godoc
+// @Summary Удалить письмо по его id
+// @Produce json
+// @Param id
+// @Success 200 "OK"
+// @Failure 401 "Письмо не принадлежит пользователю, сессия отсутствует или сессия не валидна."
+// @Failure 405
+// @Failure 500 "Ошибка БД, неверные GET параметры."
+// @Router /mail/read [get]
 func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
-
+	if r.Method != http.MethodGet {
+		pkg.MethodNotAllowed(w, http.MethodGet)
+		return
+	}
+	data, err := session.GetData(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	idStr := r.URL.Query().Get("id")
+	id, err := strconv.Atoi(idStr)
+	if (err != nil) {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = d.uc.ReadMail(data, id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
 }
