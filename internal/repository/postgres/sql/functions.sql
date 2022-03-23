@@ -17,12 +17,9 @@ begin
     select  email into client_email from overflow.users where overflow.users.id = find_id;
     return query select overflow.mails.sender, overflow.mails.theme, overflow.mails.text, overflow.mails.files, overflow.mails.date, overflow.mails.read, overflow.mails.id
     from overflow.mails
-    where find_id = overflow.mails.client_id and overflow.mails.addressee = client_email;
+    where overflow.mails.addressee = client_email;
 end;
 $$ language PLPGSQL;
-
-SELECT *
-FROM getIncomeMails(1);
 
 
 drop function if exists getOutcomeMails();
