@@ -1,4 +1,5 @@
 drop function if exists getIncomeMails();
+drop function if exists getIncomeMails(integer);
 create or replace function getIncomeMails(find_id integer)
 returns table
         (
@@ -25,6 +26,7 @@ FROM getIncomeMails(1);
 
 
 drop function if exists getOutcomeMails();
+drop function if exists getOutcomemails(integer);
 create or replace function getOutcomeMails(find_id integer)
 returns table
         (
