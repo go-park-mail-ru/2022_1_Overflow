@@ -5,5 +5,5 @@ import (
 )
 
 func Middleware(handler http.Handler) http.Handler {
-	return Recover(CreateSession(CheckLogin(CSRFWrapper(handler))))
+	return Recover(CreateSession(CheckLogin(handler)))
 }
