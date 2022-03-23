@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"OverflowBackend/internal/models"
+	"OverflowBackend/internal/security/xss"
 	"OverflowBackend/internal/usecase/session"
 	"OverflowBackend/pkg"
 	"encoding/json"
@@ -140,6 +141,7 @@ func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 // @Param MailForm body models.MailForm true "Форма письма"
 // @Produce json
 // @Router /mail/send [post]
+// @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
@@ -159,6 +161,11 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, pkg.JSON_ERR)
 		return
 	}
+
+	form.Addressee = xss.P.Sanitize(form.Addressee)
+	form.Files = xss.P.Sanitize(form.Files)
+	form.Text = xss.P.Sanitize(form.Text)
+	form.Theme = xss.P.Sanitize(form.Theme)
 
 	if err := d.uc.SendMail(data, form); err != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, err)

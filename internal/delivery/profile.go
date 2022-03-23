@@ -47,6 +47,7 @@ func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 // @Param SettingsForm body models.SettingsForm true "Форма настроек пользователя."
 // @Produce json
 // @Router /profile/set [post]
+// @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -85,6 +86,7 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 // @Param file formData file true "Файл аватарки."
 // @Produce json
 // @Router /profile/avatar/set [post]
+// @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {

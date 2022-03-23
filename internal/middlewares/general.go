@@ -1,7 +1,9 @@
 package middlewares
 
-import "net/http"
+import (
+	"net/http"
+)
 
 func Middleware(handler http.Handler) http.Handler {
-	return Recover(CheckLogin(handler))
+	return Recover(CreateSession(CheckLogin(CSRFWrapper(handler))))
 }

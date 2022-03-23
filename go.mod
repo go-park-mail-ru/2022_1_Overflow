@@ -1,10 +1,12 @@
 module OverflowBackend
 
 require (
+	github.com/gorilla/csrf v1.7.1
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/sessions v1.2.1
 	github.com/jackc/pgx/v4 v4.15.0
+	github.com/microcosm-cc/bluemonday v1.0.18
 	github.com/rs/cors v1.8.2
 	github.com/swaggo/swag v1.8.0
 	gopkg.in/validator.v2 v2.0.0-20210331031555-b37d688a7fb0
@@ -12,12 +14,10 @@ require (
 )
 
 require (
-	github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d // indirect
-	github.com/ghodss/yaml v1.0.0 // indirect
-	github.com/russross/blackfriday/v2 v2.0.1 // indirect
-	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
+	github.com/aymerick/douceur v0.2.0 // indirect
+	github.com/gorilla/css v1.0.0 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2 // indirect
-	github.com/urfave/cli/v2 v2.3.0 // indirect
 )
 
 require (

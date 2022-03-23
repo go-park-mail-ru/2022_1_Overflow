@@ -2,10 +2,13 @@ package delivery
 
 import (
 	"OverflowBackend/internal/models"
+	"OverflowBackend/internal/security/xss"
 	"OverflowBackend/internal/usecase/session"
 	"OverflowBackend/pkg"
 	"encoding/json"
 	"net/http"
+
+	"github.com/gorilla/csrf"
 )
 
 // SignIn godoc
@@ -17,6 +20,7 @@ import (
 // @Param SignInForm body models.SignInForm true "Форма входа пользователя"
 // @Produce json
 // @Router /signin [post]
+// @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
@@ -46,6 +50,8 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, pkg.INTERNAL_ERR)
 		return
 	}
+	csrf.Secure(false) // возможно стоит убрать
+	w.Header().Set("X-CSRF-Token", csrf.Token(r))
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
 
@@ -58,6 +64,7 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 // @Param SignUpForm body models.SignUpForm true "Форма регистрации пользователя"
 // @Produce json
 // @Router /signup [post]
+// @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
@@ -77,6 +84,10 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, pkg.JSON_ERR)
 		return
 	}
+
+	data.Email = xss.P.Sanitize(data.Email)
+	data.FirstName = xss.P.Sanitize(data.FirstName)
+	data.LastName = xss.P.Sanitize(data.LastName)
 	
 	if err := d.uc.SignUp(data); err != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, err)
@@ -86,7 +97,7 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
 
-// SignIn godoc
+// SignOut godoc
 // @Summary Завершение сессии пользователя
 // @Success 200 {object} pkg.JsonResponse "Успешное завершение сессии."
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует, сессия не валидна."
@@ -105,5 +116,21 @@ func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, pkg.INTERNAL_ERR)
 		return
 	}
+	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+}
+
+// SignInCSRF godoc
+// @Summary Получение CSRF токена
+// @Description Токен приходит в header ответа в поле X-CSRF-Token
+// @Success 200 {object} pkg.JsonResponse "Успешное получение CSRF токена."
+// @Produce json
+// @Router /signin/get [get]
+func (d *Delivery) SignInCSRF(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		return
+	}
+	csrf.Secure(false) // возможно стоит убрать
+	w.Header().Set("X-CSRF-Token", csrf.Token(r))
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }

@@ -37,6 +37,7 @@ func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 		http.StripPrefix(rm.config.Server.Static.Handle, fs,
 	))
 	router.HandleFunc("/signin", rm.d.SignIn)
+	router.HandleFunc("/signin/get", rm.d.SignInCSRF)
 	router.HandleFunc("/logout", rm.d.SignOut)
 	router.HandleFunc("/signup", rm.d.SignUp)
 	router.HandleFunc("/profile", rm.d.GetInfo)

@@ -227,6 +227,11 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/models.MailForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -293,6 +298,11 @@ paths:
         name: file
         required: true
         type: file
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -320,6 +330,11 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/models.SettingsForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -347,6 +362,11 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/models.SignInForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -360,6 +380,17 @@ paths:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Выполняет аутентификацию и выставляет сессионый cookie с названием
         OverflowMail
+  /signin/get:
+    get:
+      description: Токен приходит в header ответа в поле X-CSRF-Token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное получение CSRF токена.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Получение CSRF токена
   /signup:
     post:
       consumes:
@@ -372,6 +403,11 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/models.SignUpForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
       produces:
       - application/json
       responses:

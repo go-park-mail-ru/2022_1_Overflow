@@ -222,6 +222,13 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.MailForm"
                         }
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -324,6 +331,13 @@ const docTemplate = `{
                         "name": "file",
                         "in": "formData",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -366,6 +380,13 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.SettingsForm"
                         }
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -408,6 +429,13 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.SignInForm"
                         }
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -419,6 +447,23 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Пользователь не существует, ошибка БД или валидации формы.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/signin/get": {
+            "get": {
+                "description": "Токен приходит в header ответа в поле X-CSRF-Token",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Получение CSRF токена",
+                "responses": {
+                    "200": {
+                        "description": "Успешное получение CSRF токена.",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
                         }
@@ -445,6 +490,13 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.SignUpForm"
                         }
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
                     }
                 ],
                 "responses": {
