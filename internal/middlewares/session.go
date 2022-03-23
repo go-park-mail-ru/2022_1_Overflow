@@ -15,6 +15,7 @@ var allowedPaths = []string{
 	"/signin",
 	"/signup",
 	"/swagger",
+	"/get_token",
 }
 
 var csrfWrapper func(http.Handler) http.Handler

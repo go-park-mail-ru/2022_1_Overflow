@@ -1,8 +1,16 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "API почтового сервиса команды Overflow.",
+        "title": "OverMail API",
+        "contact": {
+            "name": "Роман Медников",
+            "url": "https://vk.com/l____l____l____l____l____l",
+            "email": "jellybe@yandex.ru"
+        },
+        "version": "1.0"
     },
+    "basePath": "/",
     "paths": {
         "/get_token": {
             "get": {
@@ -14,12 +22,6 @@
                 "responses": {
                     "200": {
                         "description": "Успешное получение CSRF токена.",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Сессия отсутствует, сессия не валидна.",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
                         }

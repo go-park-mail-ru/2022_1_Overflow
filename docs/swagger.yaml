@@ -1,3 +1,4 @@
+basePath: /
 definitions:
   models.Mail:
     description: Структура письма
@@ -90,7 +91,13 @@ definitions:
         type: integer
     type: object
 info:
-  contact: {}
+  contact:
+    email: jellybe@yandex.ru
+    name: Роман Медников
+    url: https://vk.com/l____l____l____l____l____l
+  description: API почтового сервиса команды Overflow.
+  title: OverMail API
+  version: "1.0"
 paths:
   /get_token:
     get:
@@ -100,10 +107,6 @@ paths:
       responses:
         "200":
           description: Успешное получение CSRF токена.
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-        "401":
-          description: Сессия отсутствует, сессия не валидна.
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: СSRF проверка

@@ -123,7 +123,6 @@ func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 // @Summary СSRF проверка
 // @Description Токен приходит в header ответа в поле X-CSRF-Token
 // @Success 200 {object} pkg.JsonResponse "Успешное получение CSRF токена."
-// @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует, сессия не валидна."
 // @Produce json
 // @Router /get_token [get]
 func (d *Delivery) CSRFHandler(w http.ResponseWriter, r *http.Request) {

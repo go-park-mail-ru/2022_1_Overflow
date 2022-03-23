@@ -10,7 +10,11 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "contact": {
+            "name": "Роман Медников",
+            "url": "https://vk.com/l____l____l____l____l____l",
+            "email": "jellybe@yandex.ru"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -26,12 +30,6 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "Успешное получение CSRF токена.",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Сессия отсутствует, сессия не валидна.",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
                         }
@@ -662,12 +660,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
+	Version:          "1.0",
 	Host:             "",
-	BasePath:         "",
+	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "OverMail API",
+	Description:      "API почтового сервиса команды Overflow.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }
