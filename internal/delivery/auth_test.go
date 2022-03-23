@@ -1,16 +1,19 @@
 package delivery
 
 import (
-	"OverflowBackend/cmd"
+	//"OverflowBackend/cmd"
 	"OverflowBackend/internal/config"
 	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/repository/mock"
+	"OverflowBackend/internal/usecase"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/gorilla/mux"
 )
 
 var defConf = config.TestConfig()
@@ -27,10 +30,14 @@ func TestSignin(t *testing.T) {
 		Password:  "test",
 	})
 
-	rm := cmd.RouterManager{}
-	rm.Init(&db, defConf)
+	uc := usecase.UseCase{}
+	uc.Init(&db, defConf)
+	d := Delivery{}
+	d.Init(&uc, defConf)
+	router := mux.NewRouter()
+	router.HandleFunc("/signin", d.SignIn)
 
-	srv := httptest.NewServer(rm.NewRouter(defConf.Server.Port))
+	srv := httptest.NewServer(router)
 	defer srv.Close()
 
 	data := map[string]string{
@@ -44,8 +51,8 @@ func TestSignin(t *testing.T) {
 		return
 	}
 
-	if r.StatusCode != 200 {
-		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, 200)
+	if r.StatusCode != http.StatusOK {
+		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, http.StatusOK)
 		return
 	}
 }
@@ -61,10 +68,14 @@ func TestBadSignin(t *testing.T) {
 		Password:  "test",
 	})
 
-	rm := cmd.RouterManager{}
-	rm.Init(&db, defConf)
+	uc := usecase.UseCase{}
+	uc.Init(&db, defConf)
+	d := Delivery{}
+	d.Init(&uc, defConf)
+	router := mux.NewRouter()
+	router.HandleFunc("/signin", d.SignIn)
 
-	srv := httptest.NewServer(rm.NewRouter(defConf.Server.Port))
+	srv := httptest.NewServer(router)
 	defer srv.Close()
 
 	data := map[string]string{
@@ -78,8 +89,8 @@ func TestBadSignin(t *testing.T) {
 		return
 	}
 
-	if r.StatusCode != 500 {
-		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, 500)
+	if r.StatusCode != http.StatusBadRequest {
+		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, http.StatusBadRequest)
 		return
 	}
 }
@@ -88,10 +99,14 @@ func TestSignup(t *testing.T) {
 	db := mock.MockDB{}
 	db.Create("test")
 
-	rm := cmd.RouterManager{}
-	rm.Init(&db, defConf)
+	uc := usecase.UseCase{}
+	uc.Init(&db, defConf)
+	d := Delivery{}
+	d.Init(&uc, defConf)
+	router := mux.NewRouter()
+	router.HandleFunc("/signup", d.SignUp)
 
-	srv := httptest.NewServer(rm.NewRouter(defConf.Server.Port))
+	srv := httptest.NewServer(router)
 	defer srv.Close()
 
 	data := map[string]string{
@@ -108,8 +123,8 @@ func TestSignup(t *testing.T) {
 		return
 	}
 
-	if r.StatusCode != 200 {
-		t.Errorf("Неверный статус от сервера.")
+	if r.StatusCode != http.StatusOK {
+		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, http.StatusOK)
 		return
 	}
 }
@@ -118,10 +133,14 @@ func TestBadPassword(t *testing.T) {
 	db := mock.MockDB{}
 	db.Create("test")
 
-	rm := cmd.RouterManager{}
-	rm.Init(&db, defConf)
+	uc := usecase.UseCase{}
+	uc.Init(&db, defConf)
+	d := Delivery{}
+	d.Init(&uc, defConf)
+	router := mux.NewRouter()
+	router.HandleFunc("/signup", d.SignUp)
 
-	srv := httptest.NewServer(rm.NewRouter(defConf.Server.Port))
+	srv := httptest.NewServer(router)
 	defer srv.Close()
 
 	data := map[string]string{
@@ -139,8 +158,8 @@ func TestBadPassword(t *testing.T) {
 		return
 	}
 
-	if r.StatusCode != 500 {
-		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, 500)
+	if r.StatusCode != http.StatusBadRequest {
+		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, http.StatusBadRequest)
 		return
 	}
 }
@@ -149,10 +168,14 @@ func TestEmptyForm(t *testing.T) {
 	db := mock.MockDB{}
 	db.Create("test")
 
-	rm := cmd.RouterManager{}
-	rm.Init(&db, defConf)
+	uc := usecase.UseCase{}
+	uc.Init(&db, defConf)
+	d := Delivery{}
+	d.Init(&uc, defConf)
+	router := mux.NewRouter()
+	router.HandleFunc("/signup", d.SignUp)
 
-	srv := httptest.NewServer(rm.NewRouter(defConf.Server.Port))
+	srv := httptest.NewServer(router)
 	defer srv.Close()
 
 	data := map[string]string{
@@ -169,8 +192,8 @@ func TestEmptyForm(t *testing.T) {
 		return
 	}
 
-	if r.StatusCode != 500 {
-		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, 500)
+	if r.StatusCode != http.StatusBadRequest {
+		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, http.StatusBadRequest)
 		return
 	}
 }

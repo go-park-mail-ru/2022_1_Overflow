@@ -2,12 +2,11 @@ package validation
 
 import (
 	"OverflowBackend/internal/models"
-	"OverflowBackend/internal/usecase/validation"
 	"testing"
 )
 
 func TestValidation(t *testing.T) {
-	err := validation.CheckSignUp(models.SignUpForm{
+	err := CheckSignUp(models.SignUpForm{
 		FirstName: "test",
 		LastName: "test",
 		Email: "test",
@@ -37,7 +36,7 @@ func TestBadEmail(t *testing.T) {
 */
 
 func TestEmptyField(t *testing.T) {
-	err := validation.CheckSignUp(models.SignUpForm{
+	err := CheckSignUp(models.SignUpForm{
 		FirstName: "",
 		LastName: "test",
 		Email: "test",
