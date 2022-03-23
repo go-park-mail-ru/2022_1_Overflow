@@ -35,7 +35,7 @@ func (uc *UseCase) Outcome(data *models.Session) ([]byte, pkg.JsonResponse) {
 		return nil, pkg.DB_ERR
 	}
 	id := user.Id
-	mails, err := uc.db.GetIncomeMails(id)
+	mails, err := uc.db.GetOutcomeMails(id)
 	if err != nil {
 		log.Println(err)
 		return nil, pkg.DB_ERR
@@ -86,6 +86,9 @@ func (uc *UseCase) SendMail(data *models.Session, form models.MailForm) pkg.Json
 	user, err := uc.db.GetUserInfoByEmail(data.Email)
 	if err != nil {
 		log.Println(err)
+		return pkg.DB_ERR
+	}
+	if (user == models.User{}) {
 		return pkg.DB_ERR
 	}
 	mail := models.Mail {
