@@ -4,6 +4,7 @@ import (
 	"OverflowBackend/internal/models"
 	"OverflowBackend/pkg"
 	"encoding/json"
+	"log"
 	"os"
 	"path/filepath"
 )
@@ -12,11 +13,13 @@ import (
 func (uc *UseCase) GetInfo(data *models.Session) ([]byte, pkg.JsonResponse) {
 	user, err := uc.db.GetUserInfoByEmail(data.Email)
 	if err != nil {
+		log.Println(err)
 		return nil, pkg.DB_ERR
 	}
 
 	userJson, err := json.Marshal(user)
 	if err != nil {
+		log.Println(err)
 		return nil, pkg.JSON_ERR
 	}
 	return userJson, pkg.NO_ERR
@@ -26,11 +29,13 @@ func (uc *UseCase) GetInfo(data *models.Session) ([]byte, pkg.JsonResponse) {
 func (uc *UseCase) SetAvatar(data *models.Session, avatar *models.Avatar) pkg.JsonResponse {
 	format := data.Email + "_" + avatar.Name
 	if err := os.MkdirAll(uc.config.Server.Static.Dir, os.ModePerm); err != nil {
+		log.Println(err)
 		return pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Ошибка создания папки.")
 	}
 	path := filepath.Join(uc.config.Server.Static.Dir, format)
 	err := os.WriteFile(path, avatar.Content, 0644)
 	if (err != nil) {
+		log.Println(err)
 		return pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Ошибка записи в файл.")
 	}
 	return pkg.NO_ERR
@@ -47,10 +52,12 @@ func (uc *UseCase) SetInfo(data *models.Session, settings *models.SettingsForm) 
 	if settings.Password != "" {
 		user, err := uc.db.GetUserInfoByEmail(data.Email)
 		if err != nil {
+			log.Println(err)
 			return pkg.DB_ERR
 		}
 		err = uc.db.ChangeUserPassword(user, pkg.HashPassword(settings.Password))
 		if err != nil {
+			log.Println(err)
 			return pkg.DB_ERR
 		}
 	}
@@ -61,6 +68,7 @@ func (uc *UseCase) SetInfo(data *models.Session, settings *models.SettingsForm) 
 func (uc *UseCase) GetAvatar(data *models.Session) (string, pkg.JsonResponse) {
 	matches, e := filepath.Glob(filepath.Join(uc.config.Server.Static.Dir, data.Email+"_*"))
 	if e != nil {
+		log.Println(e)
 		return "", pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Ошибка поиска файла.")
 	}
 	if len(matches) == 0 {

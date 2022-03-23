@@ -5,6 +5,7 @@ import (
 	"OverflowBackend/internal/usecase/validation"
 	"OverflowBackend/pkg"
 	"fmt"
+	"log"
 )
 
 type SessionManager struct {}
@@ -29,6 +30,7 @@ func (uc *UseCase) SignUp(data models.SignUpForm) pkg.JsonResponse {
 	}
 	user, err := pkg.ConvertToUser(data)
 	if err != nil {
+		log.Println(err)
 		return pkg.INTERNAL_ERR
 	}
 	
@@ -37,6 +39,7 @@ func (uc *UseCase) SignUp(data models.SignUpForm) pkg.JsonResponse {
 		return pkg.CreateJsonErr(pkg.STATUS_USER_EXISTS, fmt.Sprintf("Пользователь %v уже существует.", data.Email))
 	}
 	if err = uc.db.AddUser(user); err != nil {
+		log.Println(err)
 		return pkg.DB_ERR
 	}
 	return pkg.NO_ERR
