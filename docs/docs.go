@@ -428,7 +428,7 @@ const docTemplate = `{
         },
         "/signup": {
             "post": {
-                "description": "Выполняет регистрацию пользователя, выставляет сессионый cookie.",
+                "description": "Выполняет регистрацию пользователя, НЕ выставляет сессионый cookie.",
                 "consumes": [
                     "application/json"
                 ],

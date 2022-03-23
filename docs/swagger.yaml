@@ -364,7 +364,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Выполняет регистрацию пользователя, выставляет сессионый cookie.
+      description: Выполняет регистрацию пользователя, НЕ выставляет сессионый cookie.
       parameters:
       - description: Форма регистрации пользователя
         in: body

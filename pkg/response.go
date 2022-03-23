@@ -20,6 +20,7 @@ const (
 	STATUS_NO_USER        = iota
 	STATUS_NOT_IMP = iota
 	STATUS_WRONG_CREDS = iota
+	STATUS_LOGGED_IN = iota
 )
 
 type JsonResponse struct {
@@ -38,6 +39,7 @@ var (
 	GET_ERR          = JsonResponse{STATUS_BAD_GET, "Неверный GET запрос."}
 	NOT_IMPLEMENTED_ERR = JsonResponse{STATUS_NOT_IMP, "Не имплементировано."}
 	WRONG_CREDS_ERR = JsonResponse{STATUS_WRONG_CREDS, "Неверная пара логин/пароль."}
+	LOGGED_IN_ERR = JsonResponse{STATUS_LOGGED_IN, "Пользователь уже выполнил вход."}
 )
 
 func WriteJsonErrFull(w http.ResponseWriter, err JsonResponse) {

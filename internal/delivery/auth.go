@@ -51,7 +51,7 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 
 // SignUp godoc
 // @Summary Выполняет регистрацию пользователя
-// @Description Выполняет регистрацию пользователя, выставляет сессионый cookie.
+// @Description Выполняет регистрацию пользователя, НЕ выставляет сессионый cookie.
 // @Success 200 {object} pkg.JsonResponse "Вход уже выполнен, либо успешная регистрация пользователя."
 // @Failure 500 {object} pkg.JsonResponse "Ошибка валидации формы, БД или пользователь уже существует."
 // @Accept json
@@ -82,11 +82,7 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, err)
 		return
 	}
-	err = session.CreateSession(w, r, data.Email)
-	if err != nil {
-		pkg.WriteJsonErrFull(w, pkg.INTERNAL_ERR)
-		return
-	}
+
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
 
