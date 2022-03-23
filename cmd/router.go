@@ -37,7 +37,6 @@ func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 		http.StripPrefix(rm.config.Server.Static.Handle, fs,
 	))
 	router.HandleFunc("/signin", rm.d.SignIn)
-	router.HandleFunc("/signin/get", rm.d.SignInCSRF)
 	router.HandleFunc("/logout", rm.d.SignOut)
 	router.HandleFunc("/signup", rm.d.SignUp)
 	router.HandleFunc("/profile", rm.d.GetInfo)
@@ -49,6 +48,7 @@ func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 	router.HandleFunc("/mail/delete", rm.d.DeleteMail)
 	router.HandleFunc("/mail/read", rm.d.ReadMail)
 	router.HandleFunc("/mail/send", rm.d.SendMail)
+	router.HandleFunc("/get_token", rm.d.CSRFHandler)
 	router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
 		httpSwagger.URL("/swagger/doc.json"), //The url pointing to API definition
 		httpSwagger.DeepLinking(true),

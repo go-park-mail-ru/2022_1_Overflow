@@ -16,6 +16,29 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/get_token": {
+            "get": {
+                "description": "Токен приходит в header ответа в поле X-CSRF-Token",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "СSRF проверка",
+                "responses": {
+                    "200": {
+                        "description": "Успешное получение CSRF токена.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует, сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/logout": {
             "get": {
                 "produces": [
@@ -447,23 +470,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Пользователь не существует, ошибка БД или валидации формы.",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/signin/get": {
-            "get": {
-                "description": "Токен приходит в header ответа в поле X-CSRF-Token",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Получение CSRF токена",
-                "responses": {
-                    "200": {
-                        "description": "Успешное получение CSRF токена.",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
                         }

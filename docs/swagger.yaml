@@ -92,6 +92,21 @@ definitions:
 info:
   contact: {}
 paths:
+  /get_token:
+    get:
+      description: Токен приходит в header ответа в поле X-CSRF-Token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное получение CSRF токена.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "401":
+          description: Сессия отсутствует, сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: СSRF проверка
   /logout:
     get:
       produces:
@@ -380,17 +395,6 @@ paths:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Выполняет аутентификацию и выставляет сессионый cookie с названием
         OverflowMail
-  /signin/get:
-    get:
-      description: Токен приходит в header ответа в поле X-CSRF-Token
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Успешное получение CSRF токена.
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      summary: Получение CSRF токена
   /signup:
     post:
       consumes:
