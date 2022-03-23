@@ -117,7 +117,7 @@ func (m *MockDB) GetMailInfoById(mailId int) (models.Mail, error) {
 			mail := models.Mail{
 				Client_id: val["client_id"].(int32),
 				Sender: val["sender"].(string),
-				Addressee: val["addresse"].(string),
+				Addressee: val["addressee"].(string),
 				Date: val["date"].(time.Time),
 				Theme: val["theme"].(string),
 				Text: val["text"].(string),
@@ -132,16 +132,16 @@ func (m *MockDB) GetMailInfoById(mailId int) (models.Mail, error) {
 
 func (m *MockDB) GetIncomeMails(userId int32) ([]models.Mail, error) {
 	var mails []models.Mail
+	user, err := m.GetUserInfoById(userId)
+	if err != nil {
+		return mails, err
+	}
 	for _, val := range m.mail {
-		user, err := m.GetUserInfoById(userId)
-		if err != nil {
-			return mails, err
-		}
-		if val["addresse"] == user.Email {
+		if val["addressee"] == user.Email {
 			mail := models.Mail{
 				Client_id: val["client_id"].(int32),
 				Sender: val["sender"].(string),
-				Addressee: val["addresse"].(string),
+				Addressee: val["addressee"].(string),
 				Date: val["date"].(time.Time),
 				Theme: val["theme"].(string),
 				Text: val["text"].(string),
@@ -156,16 +156,16 @@ func (m *MockDB) GetIncomeMails(userId int32) ([]models.Mail, error) {
 
 func (m *MockDB) GetOutcomeMails(userId int32) ([]models.Mail, error) {
 	var mails []models.Mail
+	user, err := m.GetUserInfoById(userId)
+	if err != nil {
+		return mails, err
+	}
 	for _, val := range m.mail {
-		user, err := m.GetUserInfoById(userId)
-		if err != nil {
-			return mails, err
-		}
 		if val["sender"] == user.Email {
 			mail := models.Mail{
 				Client_id: val["client_id"].(int32),
 				Sender: val["sender"].(string),
-				Addressee: val["addresse"].(string),
+				Addressee: val["addressee"].(string),
 				Date: val["date"].(time.Time),
 				Theme: val["theme"].(string),
 				Text: val["text"].(string),

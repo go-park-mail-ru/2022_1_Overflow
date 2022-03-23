@@ -40,6 +40,11 @@ type Config struct {
 			Dir		string  `yaml:"dir"`
 			Handle	string	`yaml:"handle"`
 		} `yaml:"static"`
+		Keys struct {
+			CSRFToken string `yaml:"csrf_token"`
+			AuthKey	  string `yaml:"auth_key"`
+			EncKey	  string `yaml:"enc_key"`
+		} `yaml:"keys"`
 	} `yaml:"server"`
 	Database struct {
 		Type     string `yaml:"type"`
@@ -75,7 +80,7 @@ func NewConfig(configPath string) (*Config, error) {
 
 func TestConfig() *Config {
 	config := &Config{
-		Server: struct{Port string "yaml:\"port\""; Timeout struct{Server time.Duration "yaml:\"server\""; Write time.Duration "yaml:\"write\""; Read time.Duration "yaml:\"read\""; Idle time.Duration "yaml:\"idle\""} "yaml:\"timeout\""; Static struct{Dir string "yaml:\"dir\""; Handle string "yaml:\"handle\""} "yaml:\"static\""} {
+		Server: struct{Port string "yaml:\"port\""; Timeout struct{Server time.Duration "yaml:\"server\""; Write time.Duration "yaml:\"write\""; Read time.Duration "yaml:\"read\""; Idle time.Duration "yaml:\"idle\""} "yaml:\"timeout\""; Static struct{Dir string "yaml:\"dir\""; Handle string "yaml:\"handle\""} "yaml:\"static\""; Keys struct{CSRFToken string "yaml:\"csrf_token\""; AuthKey string "yaml:\"auth_key\""; EncKey string "yaml:\"enc_key\""} "yaml:\"keys\""} {
 			Port: "8080",
 			Timeout: struct {
 				Server time.Duration "yaml:\"server\""

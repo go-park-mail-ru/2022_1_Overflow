@@ -1,18 +1,19 @@
 package session
 
 import (
-	"OverflowBackend/internal/models"
+	//"OverflowBackend/internal/models"
 	//"OverflowBackend/internal/usecase/session"
 
-	"encoding/gob"
+	//"encoding/gob"
 	//"net/http"
 	//"net/http/httptest"
 	//"testing"
 
-	"github.com/gorilla/securecookie"
-	"github.com/gorilla/sessions"
+	//"github.com/gorilla/securecookie"
+	//"github.com/gorilla/sessions"
 )
 
+/*
 func Init() {
 	authKeyOne := securecookie.GenerateRandomKey(64)
 	encryptionKeyOne := securecookie.GenerateRandomKey(32)
@@ -31,6 +32,7 @@ func Init() {
 
 	gob.Register(models.Session{})
 }
+*/
 
 /*
 func TestSessionManager(t *testing.T) {

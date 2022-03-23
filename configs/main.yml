@@ -8,6 +8,10 @@ server:
   static:
     dir: "static"
     handle: "/static/"
+  keys:
+    csrf_token: ""
+    auth_key: "aPdSgVkYp3s6v9y$B&E)H+MbQeThWmZq"
+    enc_key: "cRfUjXn2r5u8x/A?D*G-KaPdSgVkYp3s"
   
 database:
   type: "mock"

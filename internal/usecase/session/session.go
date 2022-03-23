@@ -1,11 +1,11 @@
 package session
 
 import (
+	"OverflowBackend/internal/config"
 	"OverflowBackend/internal/models"
 	"encoding/gob"
 	"net/http"
 
-	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
 )
 
@@ -15,13 +15,13 @@ var session_name string = "OveflowMail"
 var store *sessions.CookieStore
 
 // Запускается при инициализации пакета
-func init() {
-	authKeyOne := securecookie.GenerateRandomKey(64)
-	encryptionKeyOne := securecookie.GenerateRandomKey(32)
+func Init(config *config.Config) {
+	authKeyOne := config.Server.Keys.AuthKey
+	encryptionKeyOne := config.Server.Keys.EncKey
 
 	store = sessions.NewCookieStore(
-		authKeyOne,
-		encryptionKeyOne,
+		[]byte(authKeyOne),
+		[]byte(encryptionKeyOne),
 	)
 
 	store.Options = &sessions.Options{
