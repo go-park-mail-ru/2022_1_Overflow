@@ -74,10 +74,11 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
 // @Failure 500 {object} pkg.JsonResponse "Письмо не принадлежит пользователю, ошибка БД, неверные GET параметры."
-// @Router /mail/delete [get]
+// @Router /mail/delete [post]
+// @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if r.Method != http.MethodGet {
+	if r.Method != http.MethodPost {
 		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
 		return
 	}
@@ -107,10 +108,11 @@ func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} pkg.JsonResponse"Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
 // @Failure 500 {object} pkg.JsonResponse "Письмо не принадлежит пользователю, ошибка БД, неверные GET параметры."
-// @Router /mail/read [get]
+// @Router /mail/read [post]
+// @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if r.Method != http.MethodGet {
+	if r.Method != http.MethodPost {
 		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
 		return
 	}
@@ -183,10 +185,11 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} pkg.JsonResponse"Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
 // @Failure 500 {object} pkg.JsonResponse "Письмо не принадлежит пользователю, ошибка БД, неверные GET параметры."
-// @Router /mail/forward [get]
+// @Router /mail/forward [post]
+// @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) ForwardMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if r.Method != http.MethodGet {
+	if r.Method != http.MethodPost {
 		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
 		return
 	}
