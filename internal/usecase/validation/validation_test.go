@@ -7,10 +7,10 @@ import (
 
 func TestValidation(t *testing.T) {
 	err := CheckSignUp(models.SignUpForm{
-		FirstName: "test",
-		LastName: "test",
-		Email: "test",
-		Password: "test",
+		FirstName:    "test",
+		LastName:     "test",
+		Username:     "test",
+		Password:     "test",
 		PasswordConf: "test",
 	})
 	if err != nil {
@@ -24,7 +24,7 @@ func TestBadEmail(t *testing.T) {
 	err := validation.CheckSignUp(models.SignUpForm{
 		FirstName: "test",
 		LastName: "test",
-		Email: "test@",
+		Username: "test@",
 		Password: "test",
 		PasswordConf: "test",
 	})
@@ -37,10 +37,10 @@ func TestBadEmail(t *testing.T) {
 
 func TestEmptyField(t *testing.T) {
 	err := CheckSignUp(models.SignUpForm{
-		FirstName: "",
-		LastName: "test",
-		Email: "test",
-		Password: "test",
+		FirstName:    "",
+		LastName:     "test",
+		Username:     "test",
+		Password:     "test",
 		PasswordConf: "test",
 	})
 	if err == nil {

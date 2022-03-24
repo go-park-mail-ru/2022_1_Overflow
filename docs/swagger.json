@@ -116,7 +116,7 @@
                     {
                         "type": "string",
                         "description": "Почта получателя.",
-                        "name": "email",
+                        "name": "username",
                         "in": "query",
                         "required": true
                     },
@@ -643,11 +643,11 @@
         "models.SignInForm": {
             "type": "object",
             "properties": {
-                "email": {
+                "password": {
                     "type": "string",
                     "maxLength": 20
                 },
-                "password": {
+                "username": {
                     "type": "string",
                     "maxLength": 20
                 }
@@ -656,10 +656,6 @@
         "models.SignUpForm": {
             "type": "object",
             "properties": {
-                "email": {
-                    "type": "string",
-                    "maxLength": 20
-                },
                 "first_name": {
                     "type": "string",
                     "maxLength": 20
@@ -673,6 +669,10 @@
                     "maxLength": 20
                 },
                 "password_confirmation": {
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "username": {
                     "type": "string",
                     "maxLength": 20
                 }
@@ -693,9 +693,6 @@
             "description": "Структура пользователя",
             "type": "object",
             "properties": {
-                "email": {
-                    "type": "string"
-                },
                 "firstName": {
                     "type": "string"
                 },
@@ -706,6 +703,9 @@
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }

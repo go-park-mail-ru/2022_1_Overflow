@@ -9,7 +9,7 @@ import (
 )
 
 type UseCase struct {
-	db repository.DatabaseRepository
+	db     repository.DatabaseRepository
 	config *config.Config
 }
 
@@ -31,7 +31,7 @@ type AuthUseCase interface {
 }
 
 type SessionManagerUseCase interface {
-	CreateSession(w http.ResponseWriter, r *http.Request, email string) error
+	CreateSession(w http.ResponseWriter, r *http.Request, username string) error
 	DeleteSession(w http.ResponseWriter, r *http.Request) error
 	IsLoggedIn(r *http.Request) bool
 	GetData(r *http.Request) (data *models.Session, err error)
@@ -52,5 +52,5 @@ type MailBoxUseCase interface {
 	DeleteMail(data *models.Session, id int) pkg.JsonResponse
 	ReadMail(data *models.Session, id int) pkg.JsonResponse
 	SendMail(data *models.Session, form models.MailForm) pkg.JsonResponse
-	ForwardMail(data *models.Session, mail_id int, email string) pkg.JsonResponse
+	ForwardMail(data *models.Session, mail_id int, username string) pkg.JsonResponse
 }

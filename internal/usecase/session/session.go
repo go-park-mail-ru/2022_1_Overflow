@@ -34,13 +34,13 @@ func Init(config *config.Config) {
 	gob.Register(models.Session{})
 }
 
-func CreateSession(w http.ResponseWriter, r *http.Request, email string) error {
+func CreateSession(w http.ResponseWriter, r *http.Request, username string) error {
 	session, err := store.Get(r, session_name)
 	if err != nil {
 		return err
 	}
 	data := &models.Session{
-		Email:         email,
+		Username:      username,
 		Authenticated: true,
 	}
 	session.Values["data"] = data
@@ -81,7 +81,7 @@ func GetData(r *http.Request) (data *models.Session, err error) {
 		}
 	}()
 	session, err := store.Get(r, session_name)
-	if (err != nil) {
+	if err != nil {
 		return nil, err
 	}
 	sessionData := session.Values["data"].(models.Session)

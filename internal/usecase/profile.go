@@ -13,8 +13,8 @@ import (
 // Получение информации о пользователе.
 func (uc *UseCase) GetInfo(data *models.Session) ([]byte, pkg.JsonResponse) {
 
-	user, err := uc.db.GetUserInfoByEmail(data.Email)
-	log.Info("Получение информации о пользователе: ", data.Email)
+	user, err := uc.db.GetUserInfoByEmail(data.Username)
+	log.Info("Получение информации о пользователе: ", data.Username)
 	if err != nil {
 		log.Error(err)
 		return nil, pkg.DB_ERR
@@ -31,7 +31,7 @@ func (uc *UseCase) GetInfo(data *models.Session) ([]byte, pkg.JsonResponse) {
 // Установка аватарки пользователя.
 func (uc *UseCase) SetAvatar(data *models.Session, avatar *models.Avatar) pkg.JsonResponse {
 	log.Info("Установка аватарки")
-	format := data.Email + "_" + avatar.Name
+	format := data.Username + "_" + avatar.Name
 	if err := os.MkdirAll(uc.config.Server.Static.Dir, os.ModePerm); err != nil {
 		log.Error(err)
 		return pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Ошибка создания папки.")
@@ -55,8 +55,8 @@ func (uc *UseCase) SetInfo(data *models.Session, settings *models.SettingsForm) 
 		return pkg.NOT_IMPLEMENTED_ERR
 	}
 	if settings.Password != "" {
-		log.Info("Установка настроек пользователя: ", data.Email)
-		user, err := uc.db.GetUserInfoByEmail(data.Email)
+		log.Info("Установка настроек пользователя: ", data.Username)
+		user, err := uc.db.GetUserInfoByEmail(data.Username)
 		if err != nil {
 			log.Error(err)
 			return pkg.DB_ERR
@@ -72,7 +72,7 @@ func (uc *UseCase) SetInfo(data *models.Session, settings *models.SettingsForm) 
 
 // Получение ссылки на аватарку пользователя.
 func (uc *UseCase) GetAvatar(data *models.Session) (string, pkg.JsonResponse) {
-	matches, e := filepath.Glob(filepath.Join(uc.config.Server.Static.Dir, data.Email+"_*"))
+	matches, e := filepath.Glob(filepath.Join(uc.config.Server.Static.Dir, data.Username+"_*"))
 	if e != nil {
 		log.Error(e)
 		return "", pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Ошибка поиска файла.")

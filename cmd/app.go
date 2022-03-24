@@ -3,6 +3,7 @@ package cmd
 import (
 	"OverflowBackend/internal/config"
 	"OverflowBackend/internal/usecase/session"
+
 	log "github.com/sirupsen/logrus"
 )
 
@@ -14,7 +15,7 @@ type Application struct{}
 
 // @contact.name Роман Медников
 // @contact.url https://vk.com/l____l____l____l____l____l
-// @contact.email jellybe@yandex.ru
+// @contact.username jellybe@yandex.ru
 
 // @BasePath /
 func (app *Application) Run(configPath string) {

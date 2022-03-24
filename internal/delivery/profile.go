@@ -111,7 +111,7 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 	io.Copy(&buf, file)
 	avatar := models.Avatar{
 		Name:      header.Filename,
-		UserEmail: data.Email,
+		UserEmail: data.Username,
 		Content:   buf.Bytes(),
 	}
 	if err := d.uc.SetAvatar(data, &avatar); err != pkg.NO_ERR {

@@ -2,6 +2,6 @@ package models
 
 // Структура сессии
 type Session struct {
-	Email         string
+	Username      string
 	Authenticated bool
 }

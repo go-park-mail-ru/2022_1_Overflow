@@ -10,8 +10,8 @@ import (
 )
 
 func (uc *UseCase) Income(data *models.Session) ([]byte, pkg.JsonResponse) {
-	user, err := uc.db.GetUserInfoByEmail(data.Email)
-	log.Info("Получение входящих писем, email: ", data.Email)
+	user, err := uc.db.GetUserInfoByEmail(data.Username)
+	log.Info("Получение входящих писем, username: ", data.Username)
 	if err != nil {
 		log.Error(err)
 		return nil, pkg.DB_ERR
@@ -31,8 +31,8 @@ func (uc *UseCase) Income(data *models.Session) ([]byte, pkg.JsonResponse) {
 }
 
 func (uc *UseCase) Outcome(data *models.Session) ([]byte, pkg.JsonResponse) {
-	user, err := uc.db.GetUserInfoByEmail(data.Email)
-	log.Info("Получение исходящих писем, email: ", data.Email)
+	user, err := uc.db.GetUserInfoByEmail(data.Username)
+	log.Info("Получение исходящих писем, username: ", data.Username)
 	if err != nil {
 		log.Error(err)
 		return nil, pkg.DB_ERR
@@ -58,10 +58,10 @@ func (uc *UseCase) DeleteMail(data *models.Session, id int) pkg.JsonResponse {
 		log.Error(err)
 		return pkg.DB_ERR
 	}
-	if mail.Addressee != data.Email && mail.Sender != data.Email {
+	if mail.Addressee != data.Username && mail.Sender != data.Username {
 		return pkg.UNAUTHORIZED_ERR
 	}
-	err = uc.db.DeleteMail(mail, data.Email)
+	err = uc.db.DeleteMail(mail, data.Username)
 	if err != nil {
 		log.Error(err)
 		return pkg.DB_ERR
@@ -76,7 +76,7 @@ func (uc *UseCase) ReadMail(data *models.Session, id int) pkg.JsonResponse {
 		log.Error(err)
 		return pkg.DB_ERR
 	}
-	if mail.Addressee != data.Email {
+	if mail.Addressee != data.Username {
 		return pkg.UNAUTHORIZED_ERR
 	}
 	err = uc.db.ReadMail(mail)
@@ -88,8 +88,8 @@ func (uc *UseCase) ReadMail(data *models.Session, id int) pkg.JsonResponse {
 }
 
 func (uc *UseCase) SendMail(data *models.Session, form models.MailForm) pkg.JsonResponse {
-	log.Info("Отправить письмо, email: ", data.Email)
-	user, err := uc.db.GetUserInfoByEmail(data.Email)
+	log.Info("Отправить письмо, username: ", data.Username)
+	user, err := uc.db.GetUserInfoByEmail(data.Username)
 	if err != nil {
 		log.Error(err)
 		return pkg.DB_ERR
@@ -99,7 +99,7 @@ func (uc *UseCase) SendMail(data *models.Session, form models.MailForm) pkg.Json
 	}
 	mail := models.Mail{
 		Client_id: user.Id,
-		Sender:    data.Email,
+		Sender:    data.Username,
 		Addressee: form.Addressee,
 		Theme:     form.Theme,
 		Text:      form.Text,
@@ -114,15 +114,15 @@ func (uc *UseCase) SendMail(data *models.Session, form models.MailForm) pkg.Json
 	return pkg.NO_ERR
 }
 
-func (uc *UseCase) ForwardMail(data *models.Session, mail_id int, email string) pkg.JsonResponse {
+func (uc *UseCase) ForwardMail(data *models.Session, mail_id int, username string) pkg.JsonResponse {
 	mail, err := uc.db.GetMailInfoById(mail_id)
 	if err != nil {
 		return pkg.DB_ERR
 	}
-	if mail.Sender != data.Email {
+	if mail.Sender != data.Username {
 		return pkg.UNAUTHORIZED_ERR
 	}
-	mail.Addressee = email
+	mail.Addressee = username
 	err = uc.db.AddMail(mail)
 	if err != nil {
 		return pkg.DB_ERR

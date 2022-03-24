@@ -128,7 +128,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Почта получателя.",
-                        "name": "email",
+                        "name": "username",
                         "in": "query",
                         "required": true
                     },
@@ -655,11 +655,11 @@ const docTemplate = `{
         "models.SignInForm": {
             "type": "object",
             "properties": {
-                "email": {
+                "password": {
                     "type": "string",
                     "maxLength": 20
                 },
-                "password": {
+                "username": {
                     "type": "string",
                     "maxLength": 20
                 }
@@ -668,10 +668,6 @@ const docTemplate = `{
         "models.SignUpForm": {
             "type": "object",
             "properties": {
-                "email": {
-                    "type": "string",
-                    "maxLength": 20
-                },
                 "first_name": {
                     "type": "string",
                     "maxLength": 20
@@ -685,6 +681,10 @@ const docTemplate = `{
                     "maxLength": 20
                 },
                 "password_confirmation": {
+                    "type": "string",
+                    "maxLength": 20
+                },
+                "username": {
                     "type": "string",
                     "maxLength": 20
                 }
@@ -705,9 +705,6 @@ const docTemplate = `{
             "description": "Структура пользователя",
             "type": "object",
             "properties": {
-                "email": {
-                    "type": "string"
-                },
                 "firstName": {
                     "type": "string"
                 },
@@ -718,6 +715,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }

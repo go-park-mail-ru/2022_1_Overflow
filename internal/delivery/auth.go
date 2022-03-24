@@ -45,7 +45,7 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = session.CreateSession(w, r, data.Email)
+	err = session.CreateSession(w, r, data.Username)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, pkg.INTERNAL_ERR)
 		return
@@ -85,10 +85,10 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data.Email = xss.P.Sanitize(data.Email)
+	data.Username = xss.P.Sanitize(data.Username)
 	data.FirstName = xss.P.Sanitize(data.FirstName)
 	data.LastName = xss.P.Sanitize(data.LastName)
-	
+
 	if err := d.uc.SignUp(data); err != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, err)
 		return

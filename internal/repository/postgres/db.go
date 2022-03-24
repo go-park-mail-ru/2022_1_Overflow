@@ -26,7 +26,7 @@ func (c *Database) Create(url string) (err error) {
 // Получить данные пользователя по его почте
 func (c *Database) GetUserInfoByEmail(userEmail string) (models.User, error) {
 	var user models.User
-	rows, err := c.conn.Query(context.Background(), "Select * from overflow.users where email = $1", userEmail)
+	rows, err := c.conn.Query(context.Background(), "Select * from overflow.users where username = $1", userEmail)
 	if err != nil {
 		return user, err
 	}
@@ -39,7 +39,7 @@ func (c *Database) GetUserInfoByEmail(userEmail string) (models.User, error) {
 		user.FirstName = values[1].(string)
 		user.LastName = values[2].(string)
 		user.Password = values[3].(string)
-		user.Email = values[4].(string)
+		user.Username = values[4].(string)
 	}
 	return user, nil
 }
@@ -60,14 +60,14 @@ func (c *Database) GetUserInfoById(userId int32) (models.User, error) {
 		user.FirstName = values[1].(string)
 		user.LastName = values[2].(string)
 		user.Password = values[3].(string)
-		user.Email = values[4].(string)
+		user.Username = values[4].(string)
 	}
 	return user, nil
 }
 
 // Добавить пользователя
 func (c *Database) AddUser(user models.User) error {
-	_, err := c.conn.Query(context.Background(), "insert into overflow.users(first_name, last_name, password, email) values ($1, $2, $3, $4);", user.FirstName, user.LastName, user.Password, user.Email)
+	_, err := c.conn.Query(context.Background(), "insert into overflow.users(first_name, last_name, password, username) values ($1, $2, $3, $4);", user.FirstName, user.LastName, user.Password, user.Username)
 	return err
 }
 
@@ -78,22 +78,22 @@ func (c *Database) ChangeUserPassword(user models.User, newPassword string) erro
 }
 
 // Добавить письмо
-func (c *Database) AddMail(email models.Mail) error {
-	_, err := c.conn.Query(context.Background(), "insert into overflow.mails(client_id, sender, addressee, theme, text, files, date) values($1, $2, $3, $4, $5, $6, $7);", email.Client_id, email.Sender, email.Addressee, email.Theme, email.Text, email.Files, email.Date)
+func (c *Database) AddMail(username models.Mail) error {
+	_, err := c.conn.Query(context.Background(), "insert into overflow.mails(client_id, sender, addressee, theme, text, files, date) values($1, $2, $3, $4, $5, $6, $7);", username.Client_id, username.Sender, username.Addressee, username.Theme, username.Text, username.Files, username.Date)
 	return err
 }
 
 //Удалить письмо
-func (c *Database) DeleteMail(email models.Mail, userEmail string) error {
-	_, err := c.conn.Query(context.Background(), "UPDATE overflow.mails set sender = 'null' where id = $1 and sender = $2;", email.Id, userEmail)
-	_, err = c.conn.Query(context.Background(), "UPDATE overflow.mails set addressee = 'null' where id = $1 and addressee = $2;", email.Id, userEmail)
+func (c *Database) DeleteMail(username models.Mail, userEmail string) error {
+	_, err := c.conn.Query(context.Background(), "UPDATE overflow.mails set sender = 'null' where id = $1 and sender = $2;", username.Id, userEmail)
+	_, err = c.conn.Query(context.Background(), "UPDATE overflow.mails set addressee = 'null' where id = $1 and addressee = $2;", username.Id, userEmail)
 	_, err = c.conn.Query(context.Background(), "DELETE FROM overflow.mails WHERE sender like 'null' and addressee like 'null';")
 	return err
 }
 
 //Прочитать письмо
-func (c *Database) ReadMail(email models.Mail) error {
-	_, err := c.conn.Query(context.Background(), "UPDATE overflow.mails set read = $1 where id = $2;", true, email.Id)
+func (c *Database) ReadMail(username models.Mail) error {
+	_, err := c.conn.Query(context.Background(), "UPDATE overflow.mails set read = $1 where id = $2;", true, username.Id)
 	return err
 }
 

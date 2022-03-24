@@ -26,7 +26,7 @@ func TestSignin(t *testing.T) {
 		Id:        0,
 		FirstName: "test",
 		LastName:  "test",
-		Email:     "test",
+		Username:  "test",
 		Password:  "test",
 	})
 
@@ -41,7 +41,7 @@ func TestSignin(t *testing.T) {
 	defer srv.Close()
 
 	data := map[string]string{
-		"email":    "test",
+		"username": "test",
 		"password": "test",
 	}
 	dataJson, _ := json.Marshal(data)
@@ -64,7 +64,7 @@ func TestBadSignin(t *testing.T) {
 		Id:        0,
 		FirstName: "test",
 		LastName:  "test",
-		Email:     "test",
+		Username:  "test",
 		Password:  "test",
 	})
 
@@ -79,7 +79,7 @@ func TestBadSignin(t *testing.T) {
 	defer srv.Close()
 
 	data := map[string]string{
-		"email":    "test",
+		"username": "test",
 		"password": "pass",
 	}
 	dataJson, _ := json.Marshal(data)
@@ -112,13 +112,13 @@ func TestSignup(t *testing.T) {
 	data := map[string]string{
 		"last_name":             "John",
 		"first_name":            "Doe",
-		"email":                 "ededededed",
+		"username":              "ededededed",
 		"password":              "pass",
 		"password_confirmation": "pass",
 	}
 	dataJson, _ := json.Marshal(data)
 	r, err := http.Post(fmt.Sprintf("%s/signup", srv.URL), "application/json", bytes.NewBuffer(dataJson))
-	if (err != nil) {
+	if err != nil {
 		t.Error(err)
 		return
 	}
@@ -146,14 +146,14 @@ func TestBadPassword(t *testing.T) {
 	data := map[string]string{
 		"last_name":             "John",
 		"first_name":            "Doe",
-		"email":                 "ededededed",
+		"username":              "ededededed",
 		"password":              "pass",
 		"password_confirmation": "passd",
 	}
 	dataJson, _ := json.Marshal(data)
 	r, err := http.Post(fmt.Sprintf("%s/signup", srv.URL), "application/json", bytes.NewBuffer(dataJson))
 
-	if (err != nil) {
+	if err != nil {
 		t.Error(err)
 		return
 	}
@@ -181,13 +181,13 @@ func TestEmptyForm(t *testing.T) {
 	data := map[string]string{
 		"last_name":             "",
 		"first_name":            "",
-		"email":                 "ededededed",
+		"username":              "ededededed",
 		"password":              "pass",
 		"password_confirmation": "passd",
 	}
 	dataJson, _ := json.Marshal(data)
 	r, err := http.Post(fmt.Sprintf("%s/signup", srv.URL), "application/json", bytes.NewBuffer(dataJson))
-	if (err != nil) {
+	if err != nil {
 		t.Error(err)
 		return
 	}
