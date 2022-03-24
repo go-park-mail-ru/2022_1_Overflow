@@ -27,7 +27,7 @@ func (app *Application) Run(configPath string) {
 	log.Info("Подключение к БД.")
 	db, err := HandleDatabase(config)
 
-	if err == nil {
+	if err != nil {
 		log.Fatalf("Ошибка при подключении к БД: %v", err)
 	}
 
