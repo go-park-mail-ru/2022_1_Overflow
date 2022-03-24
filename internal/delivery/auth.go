@@ -122,7 +122,7 @@ func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 // GetToken godoc
 // @Summary СSRF проверка
 // @Description Токен приходит в header ответа в поле X-CSRF-Token
-// @Success 200 {object} pkg.JsonResponse "Успешное получение CSRF токена."
+// @Success 200 {object} models.TokenModel "Успешное получение CSRF токена."
 // @Produce json
 // @Router /get_token [get]
 func (d *Delivery) CSRFHandler(w http.ResponseWriter, r *http.Request) {
@@ -131,6 +131,8 @@ func (d *Delivery) CSRFHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	csrf.Secure(false) // возможно стоит убрать
-	w.Header().Set("X-CSRF-Token", csrf.Token(r))
-	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+	token := models.TokenModel{Status: 0, Token: csrf.Token(r)}
+	resp, _ := json.Marshal(token)
+	//w.Header().Set("X-CSRF-Token", csrf.Token(r))
+	w.Write(resp)
 }

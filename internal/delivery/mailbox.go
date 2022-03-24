@@ -173,3 +173,7 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
+
+func (d *Delivery) ForwardMail(w http.ResponseWriter, r *http.Request) {
+	
+}
