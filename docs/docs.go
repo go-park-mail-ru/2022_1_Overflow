@@ -62,7 +62,7 @@ const docTemplate = `{
             }
         },
         "/mail/delete": {
-            "get": {
+            "post": {
                 "produces": [
                     "application/json"
                 ],
@@ -73,6 +73,13 @@ const docTemplate = `{
                         "description": "ID запрашиваемого письма.",
                         "name": "id",
                         "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
                         "required": true
                     }
                 ],
@@ -105,7 +112,7 @@ const docTemplate = `{
             }
         },
         "/mail/forward": {
-            "get": {
+            "post": {
                 "produces": [
                     "application/json"
                 ],
@@ -123,6 +130,13 @@ const docTemplate = `{
                         "description": "Почта получателя.",
                         "name": "email",
                         "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
                         "required": true
                     }
                 ],
@@ -229,7 +243,7 @@ const docTemplate = `{
             }
         },
         "/mail/read": {
-            "get": {
+            "post": {
                 "produces": [
                     "application/json"
                 ],
@@ -240,6 +254,13 @@ const docTemplate = `{
                         "description": "ID запрашиваемого письма.",
                         "name": "id",
                         "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
                         "required": true
                     }
                 ],
