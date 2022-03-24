@@ -87,6 +87,7 @@ func (c *Database) AddMail(email models.Mail) error {
 func (c *Database) DeleteMail(email models.Mail, userEmail string) error {
 	_, err := c.conn.Query(context.Background(), "UPDATE overflow.mails set sender = 'null' where id = $1 and sender = $2;", email.Id, userEmail)
 	_, err = c.conn.Query(context.Background(), "UPDATE overflow.mails set addressee = 'null' where id = $1 and addressee = $2;", email.Id, userEmail)
+	_, err = c.conn.Query(context.Background(), "DELETE FROM overflow.mails WHERE sender like 'null' and addressee like 'null';")
 	return err
 }
 
