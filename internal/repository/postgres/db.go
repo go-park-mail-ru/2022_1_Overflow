@@ -80,6 +80,10 @@ func (c *Database) ChangeUserPassword(user models.User, newPassword string) erro
 // Добавить письмо
 func (c *Database) AddMail(email models.Mail) error {
 	_, err := c.conn.Query(context.Background(), "insert into overflow.mails(client_id, sender, addressee, theme, text, files, date) values($1, $2, $3, $4, $5, $6, $7);", email.Client_id, email.Sender, email.Addressee, email.Theme, email.Text, email.Files, email.Date)
+	user, errt := c.GetUserInfoByEmail(email.Addressee)
+	if errt == nil {
+		_, err = c.conn.Query(context.Background(), "insert into overflow.mails(client_id, sender, addressee, theme, text, files, date) values($1, $2, $3, $4, $5, $6, $7);", user.Id, email.Sender, email.Addressee, email.Theme, email.Text, email.Files, email.Date)
+	}
 	return err
 }
 
