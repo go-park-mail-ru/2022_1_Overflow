@@ -90,11 +90,16 @@ func (m *MockDB) AddMail(email models.Mail) error {
 	return nil
 }
 
-func (m *MockDB) DeleteMail(email models.Mail) error {
+func (m *MockDB) DeleteMail(email models.Mail, userEmail string) error {
 	for i, val := range m.mail {
 		if val["id"] == email.Id {
-			m.mail[i] = m.mail[len(m.mail)-1]
-			m.mail = m.mail[:len(m.mail)-1]
+			switch {
+			case val["addressee"] == userEmail: m.mail[i]["addressee"] = ""
+			case val["sender"] == userEmail: m.mail[i]["sender"] = ""
+			default:{ 	m.mail[i] = m.mail[len(m.mail)-1]
+						m.mail = m.mail[:len(m.mail)-1]
+					}
+			}
 			return nil
 		}
 	}
