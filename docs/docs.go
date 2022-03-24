@@ -31,7 +31,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Успешное получение CSRF токена.",
                         "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
+                            "$ref": "#/definitions/models.TokenModel"
                         }
                     }
                 }
@@ -620,6 +620,17 @@ const docTemplate = `{
                 "password_confirmation": {
                     "type": "string",
                     "maxLength": 20
+                }
+            }
+        },
+        "models.TokenModel": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "integer"
+                },
+                "token": {
+                    "type": "string"
                 }
             }
         },

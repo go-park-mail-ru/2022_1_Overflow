@@ -69,6 +69,13 @@ definitions:
         maxLength: 20
         type: string
     type: object
+  models.TokenModel:
+    properties:
+      status:
+        type: integer
+      token:
+        type: string
+    type: object
   models.User:
     description: Структура пользователя
     properties:
@@ -108,7 +115,7 @@ paths:
         "200":
           description: Успешное получение CSRF токена.
           schema:
-            $ref: '#/definitions/pkg.JsonResponse'
+            $ref: '#/definitions/models.TokenModel'
       summary: СSRF проверка
   /logout:
     get:
