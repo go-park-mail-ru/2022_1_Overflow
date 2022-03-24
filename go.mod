@@ -6,6 +6,7 @@ require (
 	github.com/gorilla/sessions v1.2.1
 	github.com/jackc/pgx/v4 v4.15.0
 	github.com/rs/cors v1.8.2
+	github.com/sirupsen/logrus v1.4.2
 	github.com/swaggo/swag v1.8.0
 	gopkg.in/validator.v2 v2.0.0-20210331031555-b37d688a7fb0
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
@@ -14,6 +15,7 @@ require (
 require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
+	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/russross/blackfriday/v2 v2.0.1 // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2 // indirect

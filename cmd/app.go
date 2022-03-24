@@ -2,7 +2,8 @@ package cmd
 
 import (
 	"OverflowBackend/internal/config"
-	"log"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type Application struct{}
@@ -17,18 +18,21 @@ type Application struct{}
 
 // @BasePath /
 func (app *Application) Run(configPath string) {
+	log.Info("Чтение конфигурационного файла сервера.")
 	config, err := config.NewConfig(configPath)
 	if err != nil {
 		log.Fatalf("Ошибка при чтении конфигурационного файла сервера: %v", err)
 	}
 
+	log.Info("Подключение к БД.")
 	db, err := HandleDatabase(config)
-	
-	if err != nil {
+
+	if err == nil {
 		log.Fatalf("Ошибка при подключении к БД: %v", err)
 	}
 
-	router:= RouterManager{}
+	log.Info("Инициализация роутеров.")
+	router := RouterManager{}
 	router.Init(db, config)
 
 	HandleServer(config, router)

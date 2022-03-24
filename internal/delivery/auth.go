@@ -77,7 +77,7 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, pkg.JSON_ERR)
 		return
 	}
-	
+
 	if err := d.uc.SignUp(data); err != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, err)
 		return
