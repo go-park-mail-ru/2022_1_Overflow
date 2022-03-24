@@ -13,7 +13,7 @@ type DatabaseRepository interface {
 	GetIncomeMails(userId int32) ([]models.Mail, error)
 	GetOutcomeMails(userId int32) ([]models.Mail, error)
 	AddMail(email models.Mail) error
-	DeleteMail(email models.Mail) error
+	DeleteMail(email models.Mail, userEmail string) error
 	ReadMail(email models.Mail) error
 	GetMailInfoById(mailId int) (models.Mail, error)
 }

@@ -8,6 +8,7 @@ require (
 	github.com/jackc/pgx/v4 v4.15.0
 	github.com/microcosm-cc/bluemonday v1.0.18
 	github.com/rs/cors v1.8.2
+	github.com/sirupsen/logrus v1.4.2
 	github.com/swaggo/swag v1.8.0
 	gopkg.in/validator.v2 v2.0.0-20210331031555-b37d688a7fb0
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776
@@ -17,6 +18,7 @@ require (
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2 // indirect
 )
 
