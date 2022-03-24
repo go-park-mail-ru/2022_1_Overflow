@@ -61,7 +61,7 @@ func (uc *UseCase) DeleteMail(data *models.Session, id int) pkg.JsonResponse {
 	if mail.Addressee != data.Email && mail.Sender != data.Email {
 		return pkg.UNAUTHORIZED_ERR
 	}
-	err = uc.db.DeleteMail(mail)
+	err = uc.db.DeleteMail(mail, data.Email)
 	if err != nil {
 		log.Error(err)
 		return pkg.DB_ERR
