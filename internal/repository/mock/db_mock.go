@@ -22,7 +22,7 @@ func (m *MockDB) Fill(data map[string][]map[string]interface{}) {
 	m.mail = data["mail"]
 }
 
-func (m *MockDB) GetUserInfoByEmail(username string) (models.User, error) {
+func (m *MockDB) GetUserInfoByUsername(username string) (models.User, error) {
 	for _, val := range m.user {
 		if val["username"] == username {
 			return models.User{
@@ -110,9 +110,9 @@ func (m *MockDB) DeleteMail(username models.Mail, userEmail string) error {
 	return nil
 }
 
-func (m *MockDB) ReadMail(username models.Mail) error {
+func (m *MockDB) ReadMail(mail models.Mail) error {
 	for _, val := range m.mail {
-		if val["id"].(int32) == username.Id {
+		if val["id"].(int32) == mail.Id {
 			val["read"] = true
 			return nil
 		}
@@ -120,9 +120,9 @@ func (m *MockDB) ReadMail(username models.Mail) error {
 	return errors.New("Письмо не найдено.")
 }
 
-func (m *MockDB) GetMailInfoById(mailId int) (models.Mail, error) {
+func (m *MockDB) GetMailInfoById(mailId int32) (models.Mail, error) {
 	for _, val := range m.mail {
-		if val["id"] == mailId {
+		if val["id"].(int32) == mailId {
 			mail := models.Mail{
 				Client_id: val["client_id"].(int32),
 				Sender:    val["sender"].(string),

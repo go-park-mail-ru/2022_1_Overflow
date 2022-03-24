@@ -93,7 +93,7 @@ func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, pkg.GET_ERR)
 		return
 	}
-	if err := d.uc.DeleteMail(data, id); err != pkg.NO_ERR {
+	if err := d.uc.DeleteMail(data, int32(id)); err != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, pkg.INTERNAL_ERR)
 		return
 	}
@@ -127,7 +127,7 @@ func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, pkg.GET_ERR)
 		return
 	}
-	if err := d.uc.ReadMail(data, id); err != pkg.NO_ERR {
+	if err := d.uc.ReadMail(data, int32(id)); err != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, err)
 		return
 	}
@@ -209,7 +209,7 @@ func (d *Delivery) ForwardMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, pkg.GET_ERR)
 		return
 	}
-	e := d.uc.ForwardMail(data, id, username)
+	e := d.uc.ForwardMail(data, int32(id), username)
 	if e != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, e)
 		return

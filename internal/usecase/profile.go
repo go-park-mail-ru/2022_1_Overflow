@@ -13,7 +13,7 @@ import (
 // Получение информации о пользователе.
 func (uc *UseCase) GetInfo(data *models.Session) ([]byte, pkg.JsonResponse) {
 
-	user, err := uc.db.GetUserInfoByEmail(data.Username)
+	user, err := uc.db.GetUserInfoByUsername(data.Username)
 	log.Info("Получение информации о пользователе: ", data.Username)
 	if err != nil {
 		log.Error(err)
@@ -56,7 +56,7 @@ func (uc *UseCase) SetInfo(data *models.Session, settings *models.SettingsForm) 
 	}
 	if settings.Password != "" {
 		log.Info("Установка настроек пользователя: ", data.Username)
-		user, err := uc.db.GetUserInfoByEmail(data.Username)
+		user, err := uc.db.GetUserInfoByUsername(data.Username)
 		if err != nil {
 			log.Error(err)
 			return pkg.DB_ERR

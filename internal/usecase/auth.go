@@ -15,7 +15,7 @@ func (uc *UseCase) SignIn(data models.SignInForm) pkg.JsonResponse {
 	if err := validation.CheckSignIn(data); err != nil {
 		return pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, err.Error())
 	}
-	userFind, err := uc.db.GetUserInfoByEmail(data.Username)
+	userFind, err := uc.db.GetUserInfoByUsername(data.Username)
 	if (err != nil || userFind == models.User{}) {
 		return pkg.WRONG_CREDS_ERR
 	}
@@ -37,7 +37,7 @@ func (uc *UseCase) SignUp(data models.SignUpForm) pkg.JsonResponse {
 	}
 	log.Info("SignUp, username: ", data.Username)
 
-	userFind, _ := uc.db.GetUserInfoByEmail(data.Username)
+	userFind, _ := uc.db.GetUserInfoByUsername(data.Username)
 	if (userFind != models.User{}) {
 		return pkg.CreateJsonErr(pkg.STATUS_USER_EXISTS, fmt.Sprintf("Пользователь %v уже существует.", data.Username))
 	}

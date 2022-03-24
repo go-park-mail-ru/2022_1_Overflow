@@ -10,7 +10,7 @@ import (
 )
 
 func (uc *UseCase) Income(data *models.Session) ([]byte, pkg.JsonResponse) {
-	user, err := uc.db.GetUserInfoByEmail(data.Username)
+	user, err := uc.db.GetUserInfoByUsername(data.Username)
 	log.Info("Получение входящих писем, username: ", data.Username)
 	if err != nil {
 		log.Error(err)
@@ -31,7 +31,7 @@ func (uc *UseCase) Income(data *models.Session) ([]byte, pkg.JsonResponse) {
 }
 
 func (uc *UseCase) Outcome(data *models.Session) ([]byte, pkg.JsonResponse) {
-	user, err := uc.db.GetUserInfoByEmail(data.Username)
+	user, err := uc.db.GetUserInfoByUsername(data.Username)
 	log.Info("Получение исходящих писем, username: ", data.Username)
 	if err != nil {
 		log.Error(err)
@@ -51,7 +51,7 @@ func (uc *UseCase) Outcome(data *models.Session) ([]byte, pkg.JsonResponse) {
 	return parsed, pkg.NO_ERR
 }
 
-func (uc *UseCase) DeleteMail(data *models.Session, id int) pkg.JsonResponse {
+func (uc *UseCase) DeleteMail(data *models.Session, id int32) pkg.JsonResponse {
 	mail, err := uc.db.GetMailInfoById(id)
 	log.Info("Удаление письма, id: ", id)
 	if err != nil {
@@ -69,7 +69,7 @@ func (uc *UseCase) DeleteMail(data *models.Session, id int) pkg.JsonResponse {
 	return pkg.NO_ERR
 }
 
-func (uc *UseCase) ReadMail(data *models.Session, id int) pkg.JsonResponse {
+func (uc *UseCase) ReadMail(data *models.Session, id int32) pkg.JsonResponse {
 	log.Info("Прочитать письмо, id: ", id)
 	mail, err := uc.db.GetMailInfoById(id)
 	if err != nil {
@@ -89,7 +89,7 @@ func (uc *UseCase) ReadMail(data *models.Session, id int) pkg.JsonResponse {
 
 func (uc *UseCase) SendMail(data *models.Session, form models.MailForm) pkg.JsonResponse {
 	log.Info("Отправить письмо, username: ", data.Username)
-	user, err := uc.db.GetUserInfoByEmail(data.Username)
+	user, err := uc.db.GetUserInfoByUsername(data.Username)
 	if err != nil {
 		log.Error(err)
 		return pkg.DB_ERR
@@ -114,7 +114,7 @@ func (uc *UseCase) SendMail(data *models.Session, form models.MailForm) pkg.Json
 	return pkg.NO_ERR
 }
 
-func (uc *UseCase) ForwardMail(data *models.Session, mail_id int, username string) pkg.JsonResponse {
+func (uc *UseCase) ForwardMail(data *models.Session, mail_id int32, username string) pkg.JsonResponse {
 	mail, err := uc.db.GetMailInfoById(mail_id)
 	if err != nil {
 		return pkg.DB_ERR
