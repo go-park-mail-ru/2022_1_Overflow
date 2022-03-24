@@ -174,6 +174,42 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
 
+// ForwardMail godoc
+// @Summary Переслать уже существующее письмо
+// @Produce json
+// @Param mail_id query int true "ID запрашиваемого письма."
+// @Param email query string true "Почта получателя."
+// @Success 200 {object} pkg.JsonResponse "OK"
+// @Failure 401 {object} pkg.JsonResponse"Сессия отсутствует или сессия не валидна."
+// @Failure 405 {object} pkg.JsonResponse
+// @Failure 500 {object} pkg.JsonResponse "Письмо не принадлежит пользователю, ошибка БД, неверные GET параметры."
+// @Router /mail/read [get]
 func (d *Delivery) ForwardMail(w http.ResponseWriter, r *http.Request) {
-	
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodGet {
+		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		return
+	}
+	data, err := session.GetData(r)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
+		return
+	}
+	idStr := r.URL.Query().Get("mail_id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, pkg.GET_ERR)
+		return
+	}
+	email := r.URL.Query().Get("email")
+	if len(email) == 0 {
+		pkg.WriteJsonErrFull(w, pkg.GET_ERR)
+		return
+	}
+	e := d.uc.ForwardMail(data, id, email)
+	if e != pkg.NO_ERR {
+		pkg.WriteJsonErrFull(w, e)
+		return
+	}
+	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }

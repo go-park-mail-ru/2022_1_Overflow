@@ -52,4 +52,5 @@ type MailBoxUseCase interface {
 	DeleteMail(data *models.Session, id int) pkg.JsonResponse
 	ReadMail(data *models.Session, id int) pkg.JsonResponse
 	SendMail(data *models.Session, form models.MailForm) pkg.JsonResponse
+	ForwardMail(data *models.Session, mail_id int, email string) pkg.JsonResponse
 }

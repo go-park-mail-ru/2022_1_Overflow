@@ -179,12 +179,19 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Прочитать письмо по его id",
+                "summary": "Переслать уже существующее письмо",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "ID запрашиваемого письма.",
-                        "name": "id",
+                        "name": "mail_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Почта получателя.",
+                        "name": "email",
                         "in": "query",
                         "required": true
                     }

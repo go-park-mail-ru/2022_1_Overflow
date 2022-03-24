@@ -217,7 +217,12 @@ paths:
       parameters:
       - description: ID запрашиваемого письма.
         in: query
-        name: id
+        name: mail_id
+        required: true
+        type: integer
+      - description: Почта получателя.
+        in: query
+        name: email
         required: true
         type: string
       produces:
@@ -240,7 +245,7 @@ paths:
             параметры.
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
-      summary: Прочитать письмо по его id
+      summary: Переслать уже существующее письмо
   /mail/send:
     post:
       consumes:

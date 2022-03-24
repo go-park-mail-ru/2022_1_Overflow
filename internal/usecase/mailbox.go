@@ -113,3 +113,19 @@ func (uc *UseCase) SendMail(data *models.Session, form models.MailForm) pkg.Json
 	}
 	return pkg.NO_ERR
 }
+
+func (uc *UseCase) ForwardMail(data *models.Session, mail_id int, email string) pkg.JsonResponse {
+	mail, err := uc.db.GetMailInfoById(mail_id)
+	if err != nil {
+		return pkg.DB_ERR
+	}
+	if mail.Sender != data.Email {
+		return pkg.UNAUTHORIZED_ERR
+	}
+	mail.Addressee = email
+	err = uc.db.AddMail(mail)
+	if err != nil {
+		return pkg.DB_ERR
+	}
+	return pkg.NO_ERR
+}
