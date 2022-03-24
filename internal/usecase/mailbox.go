@@ -119,8 +119,11 @@ func (uc *UseCase) ForwardMail(data *models.Session, mail_id int32, username str
 	if err != nil {
 		return pkg.DB_ERR
 	}
-	if mail.Sender != data.Username {
-		return pkg.UNAUTHORIZED_ERR
+	switch
+	{
+		case mail.Sender == data.Username: break
+		case mail.Addressee == data.Username: mail.Sender = data.Username
+		default: return pkg.UNAUTHORIZED_ERR
 	}
 	mail.Addressee = username
 	err = uc.db.AddMail(mail)
