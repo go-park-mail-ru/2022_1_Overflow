@@ -183,7 +183,7 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 // @Failure 401 {object} pkg.JsonResponse"Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
 // @Failure 500 {object} pkg.JsonResponse "Письмо не принадлежит пользователю, ошибка БД, неверные GET параметры."
-// @Router /mail/read [get]
+// @Router /mail/forward [get]
 func (d *Delivery) ForwardMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodGet {

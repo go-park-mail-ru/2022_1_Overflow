@@ -1,16 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "API почтового сервиса команды Overflow.",
-        "title": "OverMail API",
-        "contact": {
-            "name": "Роман Медников",
-            "url": "https://vk.com/l____l____l____l____l____l",
-            "email": "jellybe@yandex.ru"
-        },
-        "version": "1.0"
+        "contact": {}
     },
-    "basePath": "/",
     "paths": {
         "/get_token": {
             "get": {
@@ -68,6 +60,56 @@
                         "type": "string",
                         "description": "ID запрашиваемого письма.",
                         "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Письмо не принадлежит пользователю, ошибка БД, неверные GET параметры.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/mail/forward": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Переслать уже существующее письмо",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID запрашиваемого письма.",
+                        "name": "mail_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Почта получателя.",
+                        "name": "email",
                         "in": "query",
                         "required": true
                     }
@@ -179,19 +221,12 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Переслать уже существующее письмо",
+                "summary": "Прочитать письмо по его id",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "ID запрашиваемого письма.",
-                        "name": "mail_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
                         "type": "string",
-                        "description": "Почта получателя.",
-                        "name": "email",
+                        "description": "ID запрашиваемого письма.",
+                        "name": "id",
                         "in": "query",
                         "required": true
                     }

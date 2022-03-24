@@ -10,11 +10,7 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {
-            "name": "Роман Медников",
-            "url": "https://vk.com/l____l____l____l____l____l",
-            "email": "jellybe@yandex.ru"
-        },
+        "contact": {},
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -76,6 +72,56 @@ const docTemplate = `{
                         "type": "string",
                         "description": "ID запрашиваемого письма.",
                         "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Письмо не принадлежит пользователю, ошибка БД, неверные GET параметры.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/mail/forward": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Переслать уже существующее письмо",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID запрашиваемого письма.",
+                        "name": "mail_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Почта получателя.",
+                        "name": "email",
                         "in": "query",
                         "required": true
                     }
@@ -187,19 +233,12 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Переслать уже существующее письмо",
+                "summary": "Прочитать письмо по его id",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "ID запрашиваемого письма.",
-                        "name": "mail_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
                         "type": "string",
-                        "description": "Почта получателя.",
-                        "name": "email",
+                        "description": "ID запрашиваемого письма.",
+                        "name": "id",
                         "in": "query",
                         "required": true
                     }
@@ -678,12 +717,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
+	Version:          "",
 	Host:             "",
-	BasePath:         "/",
+	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "OverMail API",
-	Description:      "API почтового сервиса команды Overflow.",
+	Title:            "",
+	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }
