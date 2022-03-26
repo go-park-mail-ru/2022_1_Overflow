@@ -52,7 +52,6 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusBadRequest)
 		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
 		return
 	}

@@ -117,6 +117,11 @@ func TestConfig() *Config {
 				Dir:    "static",
 				Handle: "/static",
 			},
+			Keys: struct{CSRFToken string "yaml:\"csrf_token\""; AuthKey string "yaml:\"auth_key\""; EncKey string "yaml:\"enc_key\""}{
+				CSRFToken: "",
+				AuthKey: "aPdSgVkYp3s6v9y$B&E)H+MbQeThWmZq",
+				EncKey: "cRfUjXn2r5u8x/A?D*G-KaPdSgVkYp3s",
+			},
 		},
 		Database: struct {
 			Type     string "yaml:\"type\""

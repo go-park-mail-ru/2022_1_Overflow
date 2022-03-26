@@ -5,8 +5,19 @@ import (
 	"testing"
 )
 
-func TestValidation(t *testing.T) {
+func TestSignUpVal(t *testing.T) {
 	err := CheckSignUp(models.SignUpForm{
+		FirstName:    "",
+		LastName:     "test",
+		Username:     "test",
+		Password:     "test",
+		PasswordConf: "test",
+	})
+	if err == nil {
+		t.Errorf("Неверная валидация данных SignUp.")
+		return
+	}
+	err = CheckSignUp(models.SignUpForm{
 		FirstName:    "test",
 		LastName:     "test",
 		Username:     "test",
@@ -19,31 +30,23 @@ func TestValidation(t *testing.T) {
 	}
 }
 
-/*
-func TestBadEmail(t *testing.T) {
-	err := validation.CheckSignUp(models.SignUpForm{
-		FirstName: "test",
-		LastName: "test",
-		Username: "test@",
-		Password: "test",
-		PasswordConf: "test",
+func TestSignInVal(t *testing.T) {
+	err := CheckSignIn(models.SignInForm{
+		Username: "bad@",
+		Password: "good",
 	})
+
 	if err == nil {
-		t.Error(err)
+		t.Errorf("Неверная валидация данных SignIn.")
 		return
 	}
-}
-*/
 
-func TestEmptyField(t *testing.T) {
-	err := CheckSignUp(models.SignUpForm{
-		FirstName:    "",
-		LastName:     "test",
-		Username:     "test",
-		Password:     "test",
-		PasswordConf: "test",
+	err = CheckSignIn(models.SignInForm{
+		Username: "good",
+		Password: "good",
 	})
-	if err == nil {
+
+	if err != nil {
 		t.Error(err)
 		return
 	}

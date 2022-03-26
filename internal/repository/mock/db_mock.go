@@ -9,6 +9,8 @@ import (
 type MockDB struct {
 	user []map[string]interface{}
 	mail []map[string]interface{}
+	user_id int32
+	mail_id int32
 }
 
 func (m *MockDB) Create(url string) error {
@@ -54,12 +56,13 @@ func (m *MockDB) GetUserInfoById(userId int32) (models.User, error) {
 
 func (m *MockDB) AddUser(user models.User) error {
 	u := map[string]interface{}{
-		"id":         user.Id,
+		"id":         m.user_id,
 		"first_name": user.FirstName,
 		"last_name":  user.LastName,
 		"username":   user.Username,
 		"password":   user.Password,
 	}
+	m.user_id++
 	m.user = append(m.user, u)
 	return nil
 }
@@ -76,7 +79,7 @@ func (m *MockDB) ChangeUserPassword(user models.User, newPassword string) error 
 
 func (m *MockDB) AddMail(username models.Mail) error {
 	mail := map[string]interface{}{
-		"id":        int32(0), // потому что поле не используется (пока что)
+		"id":        m.mail_id, // потому что поле не используется (пока что)
 		"client_id": username.Client_id,
 		"sender":    username.Sender,
 		"addressee": username.Addressee,
@@ -86,6 +89,7 @@ func (m *MockDB) AddMail(username models.Mail) error {
 		"files":     username.Files,
 		"read":      username.Read,
 	}
+	m.mail_id++
 	m.mail = append(m.mail, mail)
 	return nil
 }

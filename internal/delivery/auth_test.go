@@ -1,22 +1,16 @@
 package delivery
 
 import (
-	//"OverflowBackend/cmd"
-	"OverflowBackend/internal/config"
 	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/repository/mock"
-	"OverflowBackend/internal/usecase"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/http/cookiejar"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/gorilla/mux"
 )
-
-var defConf = config.TestConfig()
 
 func TestSignin(t *testing.T) {
 
@@ -30,12 +24,8 @@ func TestSignin(t *testing.T) {
 		Password:  "test",
 	})
 
-	uc := usecase.UseCase{}
-	uc.Init(&db, defConf)
 	d := Delivery{}
-	d.Init(&uc, defConf)
-	router := mux.NewRouter()
-	router.HandleFunc("/signin", d.SignIn)
+	router := InitTestRouter(&db, &d, []string{"/signin"}, []func(http.ResponseWriter, *http.Request){d.SignIn})
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -68,12 +58,8 @@ func TestBadSignin(t *testing.T) {
 		Password:  "test",
 	})
 
-	uc := usecase.UseCase{}
-	uc.Init(&db, defConf)
 	d := Delivery{}
-	d.Init(&uc, defConf)
-	router := mux.NewRouter()
-	router.HandleFunc("/signin", d.SignIn)
+	router := InitTestRouter(&db, &d, []string{"/signin"}, []func(http.ResponseWriter, *http.Request){d.SignIn})
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -99,12 +85,8 @@ func TestSignup(t *testing.T) {
 	db := mock.MockDB{}
 	db.Create("test")
 
-	uc := usecase.UseCase{}
-	uc.Init(&db, defConf)
 	d := Delivery{}
-	d.Init(&uc, defConf)
-	router := mux.NewRouter()
-	router.HandleFunc("/signup", d.SignUp)
+	router := InitTestRouter(&db, &d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp})
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -133,12 +115,8 @@ func TestBadPassword(t *testing.T) {
 	db := mock.MockDB{}
 	db.Create("test")
 
-	uc := usecase.UseCase{}
-	uc.Init(&db, defConf)
 	d := Delivery{}
-	d.Init(&uc, defConf)
-	router := mux.NewRouter()
-	router.HandleFunc("/signup", d.SignUp)
+	router := InitTestRouter(&db, &d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp})
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -168,12 +146,8 @@ func TestEmptyForm(t *testing.T) {
 	db := mock.MockDB{}
 	db.Create("test")
 
-	uc := usecase.UseCase{}
-	uc.Init(&db, defConf)
 	d := Delivery{}
-	d.Init(&uc, defConf)
-	router := mux.NewRouter()
-	router.HandleFunc("/signup", d.SignUp)
+	router := InitTestRouter(&db, &d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp})
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -194,6 +168,48 @@ func TestEmptyForm(t *testing.T) {
 
 	if r.StatusCode != http.StatusBadRequest {
 		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, http.StatusBadRequest)
+		return
+	}
+}
+
+func TestSignout(t *testing.T) {
+	jar, _ := cookiejar.New(nil)
+
+	client := &http.Client{
+		Jar: jar,
+	}
+
+	db := mock.MockDB{}
+	db.Create("test")
+	createTestUsers(&db)
+	d := Delivery{}
+	router := InitTestRouter(&db, &d, []string{"/logout", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SignOut, d.SignIn})
+
+	srv := httptest.NewServer(router)
+	defer srv.Close()
+
+	url := fmt.Sprintf("%s/logout", srv.URL)
+	
+	form := models.SignInForm{
+		Username: "test",
+		Password: "test",
+	}
+
+	err := SigninUser(client, form, srv.URL)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	
+	_, err = TestGet(client, url, http.StatusOK)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	_, err = TestGet(client, url, http.StatusUnauthorized)
+	if err != nil {
+		t.Error(err)
 		return
 	}
 }
