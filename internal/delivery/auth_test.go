@@ -6,9 +6,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 )
 
@@ -108,6 +110,68 @@ func TestSignup(t *testing.T) {
 	if r.StatusCode != http.StatusOK {
 		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, http.StatusOK)
 		return
+	}
+}
+
+func TestMultiAuth(t *testing.T) {
+	numUsers := 50
+
+	db := mock.MockDB{}
+	db.Create("test")
+
+	d := Delivery{}
+	router := InitTestRouter(&db, &d, []string{"/signin", "/signup"}, []func(http.ResponseWriter, *http.Request){d.SignIn, d.SignUp})
+
+	srv := httptest.NewServer(router)
+	defer srv.Close()
+
+	for i := 0; i < numUsers; i++ {
+		user := strconv.Itoa(i)
+		signup := func() {
+			data := map[string]string{
+				"last_name":             "John",
+				"first_name":            "Doe",
+				"username":              user,
+				"password":              "pass",
+				"password_confirmation": "pass",
+			}
+			dataJson, _ := json.Marshal(data)
+			log.Println("Регистрирую пользователя", user)
+			r, err := http.Post(fmt.Sprintf("%s/signup", srv.URL), "application/json", bytes.NewBuffer(dataJson))
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			defer r.Body.Close()
+
+			if r.StatusCode != http.StatusOK {
+				t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, http.StatusOK)
+				return
+			}
+		}
+		signup()
+
+		signin := func() {
+			form2 := models.SignInForm{
+				Username: user,
+				Password: "pass",
+			}
+
+			formJson, _ := json.Marshal(form2)
+			log.Println("Вхожу под логином", user)
+			r, err := http.Post(fmt.Sprintf("%s/signin", srv.URL), "application/json", bytes.NewBuffer(formJson))
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			defer r.Body.Close()
+
+			if r.StatusCode != http.StatusOK {
+				t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, http.StatusOK)
+				return
+			}
+		}
+		signin()
 	}
 }
 

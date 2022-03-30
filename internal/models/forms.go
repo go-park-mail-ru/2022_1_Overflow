@@ -25,3 +25,8 @@ type MailForm struct {
 	Text      string `json:"text"`
 	Files     string `json:"files"`
 }
+
+type MailResponse struct {
+	Root_id	  string `json:"root_id"`
+	Mail	  MailForm	`json:"mail"`
+}

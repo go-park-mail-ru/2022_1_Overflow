@@ -216,3 +216,37 @@ func (d *Delivery) ForwardMail(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
+
+
+// RespondMail godoc
+// @Summary Ответить на письмо пользователя
+// @Produce json
+// @Param MailResponse body models.MailResponse true "Форма ответа на письмо"
+// @Success 200 {object} pkg.JsonResponse "OK"
+// @Failure 401 {object} pkg.JsonResponse"Сессия отсутствует или сессия не валидна."
+// @Failure 405 {object} pkg.JsonResponse
+// @Failure 500 {object} pkg.JsonResponse "Письмо не принадлежит пользователю, ошибка БД, неверные GET параметры."
+// @Router /mail/respond [post]
+// @Param X-CSRF-Token header string true "CSRF токен"
+func (d *Delivery) RespondMail(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodPost {
+		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		return
+	}
+
+	_, err := session.GetData(r)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
+		return
+	}
+
+	var form models.MailResponse
+
+	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
+		pkg.WriteJsonErrFull(w, pkg.JSON_ERR)
+		return
+	}
+
+	//d.uc.RespondMail(form)
+}

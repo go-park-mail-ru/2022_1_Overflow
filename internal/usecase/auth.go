@@ -13,20 +13,23 @@ type SessionManager struct{}
 
 func (uc *UseCase) SignIn(data models.SignInForm) pkg.JsonResponse {
 	if err := validation.CheckSignIn(data); err != nil {
+		log.Debug("SignIn: ", "bad validation")
 		return pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, err.Error())
 	}
 	userFind, err := uc.db.GetUserInfoByUsername(data.Username)
 	if (err != nil || userFind == models.User{}) {
+		log.Debug("SignIn: ", "wrong username")
 		return pkg.WRONG_CREDS_ERR
 	}
 	if userFind.Password != pkg.HashPassword(data.Password) {
+		log.Debug("SignIn: ", "wrong password")
 		return pkg.WRONG_CREDS_ERR
 	}
+	log.Info("SignIn, username: ", data.Username)
 	return pkg.NO_ERR
 }
 
 func (uc *UseCase) SignUp(data models.SignUpForm) pkg.JsonResponse {
-
 	if err := validation.CheckSignUp(data); err != nil {
 		return pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, err.Error())
 	}
@@ -35,7 +38,6 @@ func (uc *UseCase) SignUp(data models.SignUpForm) pkg.JsonResponse {
 		log.Error(err)
 		return pkg.INTERNAL_ERR
 	}
-	log.Info("SignUp, username: ", data.Username)
 
 	userFind, _ := uc.db.GetUserInfoByUsername(data.Username)
 	if (userFind != models.User{}) {
@@ -45,5 +47,6 @@ func (uc *UseCase) SignUp(data models.SignUpForm) pkg.JsonResponse {
 		log.Error(err)
 		return pkg.DB_ERR
 	}
+	log.Info("SignUp, username: ", data.Username)
 	return pkg.NO_ERR
 }
