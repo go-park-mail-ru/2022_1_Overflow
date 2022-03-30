@@ -3,6 +3,7 @@ package delivery
 import (
 	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/repository/mock"
+	sqlmocker "OverflowBackend/internal/repository/sqlmock"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -16,15 +17,19 @@ import (
 
 func TestSignin(t *testing.T) {
 
-	db := mock.MockDB{}
+	db := sqlmocker.SQLMock{}
 	db.Create("test")
-	db.AddUser(models.User{
+	err := db.AddUser(models.User{
 		Id:        0,
 		FirstName: "test",
 		LastName:  "test",
 		Username:  "test",
 		Password:  "test",
 	})
+	if err != nil {
+		t.Error(err)
+		return
+	}
 
 	d := Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/signin"}, []func(http.ResponseWriter, *http.Request){d.SignIn})
