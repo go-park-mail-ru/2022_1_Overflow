@@ -6,21 +6,21 @@ import (
 )
 
 const (
-	STATUS_OK             = iota
-	STATUS_BAD_SESSION    = iota
-	STATUS_BAD_VALIDATION = iota
-	STATUS_INTERNAL       = iota
-	STATUS_ERR_JSON       = iota
-	STATUS_ERR_DB         = iota
-	STATUS_BAD_METHOD     = iota
-	STATUS_UNAUTHORIZED   = iota
-	STATUS_BAD_GET        = iota
-	STATUS_UNKNOWN        = iota
-	STATUS_USER_EXISTS    = iota
-	STATUS_NO_USER        = iota
-	STATUS_NOT_IMP = iota
-	STATUS_WRONG_CREDS = iota
-	STATUS_LOGGED_IN = iota
+	STATUS_OK             = iota // 0
+	STATUS_BAD_SESSION    = iota // 1
+	STATUS_BAD_VALIDATION = iota // 2
+	STATUS_INTERNAL       = iota // 3
+	STATUS_ERR_JSON       = iota // 4
+	STATUS_ERR_DB         = iota // 5
+	STATUS_BAD_METHOD     = iota // 6
+	STATUS_UNAUTHORIZED   = iota // 7
+	STATUS_BAD_GET        = iota // 8
+	STATUS_UNKNOWN        = iota // 9
+	STATUS_USER_EXISTS    = iota // 10
+	STATUS_NO_USER        = iota // 11
+	STATUS_NOT_IMP 		  = iota // 12
+	STATUS_WRONG_CREDS 	  = iota // 13
+	STATUS_LOGGED_IN      = iota // 14
 )
 
 type JsonResponse struct {
