@@ -3,7 +3,6 @@ package delivery
 import (
 	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/repository/mock"
-	sqlmocker "OverflowBackend/internal/repository/sqlmock"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -16,8 +15,7 @@ import (
 )
 
 func TestSignin(t *testing.T) {
-
-	db := sqlmocker.SQLMock{}
+	db := mock.MockDB{}
 	db.Create("test")
 	err := db.AddUser(models.User{
 		Id:        0,
