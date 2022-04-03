@@ -49,6 +49,7 @@ type MailBoxUseCase interface {
 	Init(repository.DatabaseRepository, *config.Config)
 	Income(data *models.Session) ([]byte, pkg.JsonResponse)
 	Outcome(data *models.Session) ([]byte, pkg.JsonResponse)
+	GetMail(data *models.Session, mail_id int32) ([]byte, pkg.JsonResponse)
 	DeleteMail(data *models.Session, id int32) pkg.JsonResponse
 	ReadMail(data *models.Session, id int32) pkg.JsonResponse
 	SendMail(data *models.Session, form models.MailForm) pkg.JsonResponse

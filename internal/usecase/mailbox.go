@@ -22,7 +22,20 @@ func (uc *UseCase) Income(data *models.Session) ([]byte, pkg.JsonResponse) {
 		log.Error(err)
 		return nil, pkg.DB_ERR
 	}
-	parsed, err := json.Marshal(mails)
+	var mails_add []models.MailAdditional
+	for _, mail := range mails {
+		mail_add := models.MailAdditional{}
+		mail_add.Mail = mail
+		mailSess := models.Session{}
+		mailSess.Username = mail.Sender
+		avatarUrl, resp := uc.GetAvatar(&mailSess)
+		if resp != pkg.NO_ERR {
+			return nil, resp
+		}
+		mail_add.AvatarUrl = avatarUrl
+		mails_add = append(mails_add, mail_add)
+	}
+	parsed, err := json.Marshal(mails_add)
 	if err != nil {
 		log.Error(err)
 		return nil, pkg.JSON_ERR
@@ -43,7 +56,38 @@ func (uc *UseCase) Outcome(data *models.Session) ([]byte, pkg.JsonResponse) {
 		log.Error(err)
 		return nil, pkg.DB_ERR
 	}
-	parsed, err := json.Marshal(mails)
+	var mails_add []models.MailAdditional
+	for _, mail := range mails {
+		mail_add := models.MailAdditional{}
+		mail_add.Mail = mail
+		mailSess := models.Session{}
+		mailSess.Username = mail.Sender
+		avatarUrl, resp := uc.GetAvatar(&mailSess)
+		if resp != pkg.NO_ERR {
+			return nil, resp
+		}
+		mail_add.AvatarUrl = avatarUrl
+		mails_add = append(mails_add, mail_add)
+	}
+	parsed, err := json.Marshal(mails_add)
+	if err != nil {
+		log.Error(err)
+		return nil, pkg.JSON_ERR
+	}
+	return parsed, pkg.NO_ERR
+}
+
+func (uc *UseCase) GetMail(data *models.Session, mail_id int32) ([]byte, pkg.JsonResponse) {
+	log.Info("Получение письма, mail_id = ", mail_id)
+	mail, err := uc.db.GetMailInfoById(mail_id)
+	if err != nil {
+		log.Error(err)
+		return nil, pkg.DB_ERR
+	}
+	if mail.Addressee != data.Username && mail.Sender != data.Username {
+		return nil, pkg.UNAUTHORIZED_ERR
+	}
+	parsed, err := json.Marshal(mail)
 	if err != nil {
 		log.Error(err)
 		return nil, pkg.JSON_ERR

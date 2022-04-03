@@ -15,3 +15,8 @@ type Mail struct {
 	Date      time.Time `json:"date"`
 	Read	  bool		`json:"read"`
 }
+
+type MailAdditional struct {
+	Mail Mail			`json:"mail"`
+	AvatarUrl string	`json:"sender_avatar"`
+}

@@ -69,7 +69,7 @@ const docTemplate = `{
                 "summary": "Удалить письмо по его id",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "ID запрашиваемого письма.",
                         "name": "id",
                         "in": "query",
@@ -168,6 +168,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/mail/get": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Получение сообщения по его id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID запрашиваемого письма.",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Объект письма.",
+                        "schema": {
+                            "$ref": "#/definitions/models.Mail"
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка БД.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/mail/income": {
             "get": {
                 "produces": [
@@ -180,7 +223,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Mail"
+                                "$ref": "#/definitions/models.MailAdditional"
                             }
                         }
                     },
@@ -217,7 +260,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Mail"
+                                "$ref": "#/definitions/models.MailAdditional"
                             }
                         }
                     },
@@ -255,6 +298,58 @@ const docTemplate = `{
                         "name": "id",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Письмо не принадлежит пользователю, ошибка БД, неверные GET параметры.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/mail/respond": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Ответить на письмо пользователя",
+                "parameters": [
+                    {
+                        "description": "Форма ответа на письмо",
+                        "name": "MailResponse",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.MailResponse"
+                        }
                     },
                     {
                         "type": "string",
@@ -621,6 +716,17 @@ const docTemplate = `{
                 }
             }
         },
+        "models.MailAdditional": {
+            "type": "object",
+            "properties": {
+                "mail": {
+                    "$ref": "#/definitions/models.Mail"
+                },
+                "sender_avatar": {
+                    "type": "string"
+                }
+            }
+        },
         "models.MailForm": {
             "type": "object",
             "properties": {
@@ -634,6 +740,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "theme": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.MailResponse": {
+            "type": "object",
+            "properties": {
+                "mail": {
+                    "$ref": "#/definitions/models.MailForm"
+                },
+                "root_id": {
                     "type": "string"
                 }
             }

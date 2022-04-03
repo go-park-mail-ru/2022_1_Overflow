@@ -13,7 +13,7 @@ import (
 // Income godoc
 // @Summary Получение входящих сообщений
 // @Produce json
-// @Success 200 {object} []models.Mail "Список входящих писем"
+// @Success 200 {object} []models.MailAdditional "Список входящих писем"
 // @Failure 401 {object} pkg.JsonResponse"Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
 // @Failure 500 {object} pkg.JsonResponse "Ошибка БД."
@@ -41,7 +41,7 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 // Outcome godoc
 // @Summary Получение исходящих сообщений
 // @Produce json
-// @Success 200 {object} []models.Mail "Список исходящих писем"
+// @Success 200 {object} []models.MailAdditional "Список исходящих писем"
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
 // @Failure 500 {object} pkg.JsonResponse "Ошибка БД."
@@ -66,10 +66,46 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 	w.Write(parsed)
 }
 
+// GetMail godoc
+// @Summary Получение сообщения по его id
+// @Produce json
+// @Param id query int true "ID запрашиваемого письма."
+// @Success 200 {object} models.Mail "Объект письма."
+// @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
+// @Failure 405 {object} pkg.JsonResponse
+// @Failure 500 {object} pkg.JsonResponse "Ошибка БД."
+// @Router /mail/get [get]
+func (d *Delivery) GetMail(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodGet {
+		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		return
+	}
+
+	data, e := session.GetData(r)
+	if e != nil {
+		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
+		return
+	}
+
+	mail_id, e := strconv.Atoi(r.URL.Query().Get("id"))
+	if e != nil {
+		pkg.WriteJsonErrFull(w, pkg.GET_ERR)
+		return
+	}
+	parsed, err := d.uc.GetMail(data, int32(mail_id))
+	if err != pkg.NO_ERR {
+		pkg.WriteJsonErrFull(w, err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(parsed)
+}
+
 // DeleteMail godoc
 // @Summary Удалить письмо по его id
 // @Produce json
-// @Param id query string true "ID запрашиваемого письма."
+// @Param id query int true "ID запрашиваемого письма."
 // @Success 200 {object} pkg.JsonResponse "OK"
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse

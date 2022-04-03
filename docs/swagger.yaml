@@ -21,6 +21,13 @@ definitions:
       theme:
         type: string
     type: object
+  models.MailAdditional:
+    properties:
+      mail:
+        $ref: '#/definitions/models.Mail'
+      sender_avatar:
+        type: string
+    type: object
   models.MailForm:
     properties:
       addressee:
@@ -30,6 +37,13 @@ definitions:
       text:
         type: string
       theme:
+        type: string
+    type: object
+  models.MailResponse:
+    properties:
+      mail:
+        $ref: '#/definitions/models.MailForm'
+      root_id:
         type: string
     type: object
   models.SettingsForm:
@@ -135,7 +149,7 @@ paths:
         in: query
         name: id
         required: true
-        type: string
+        type: integer
       - description: CSRF токен
         in: header
         name: X-CSRF-Token
@@ -201,6 +215,34 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Переслать уже существующее письмо
+  /mail/get:
+    get:
+      parameters:
+      - description: ID запрашиваемого письма.
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Объект письма.
+          schema:
+            $ref: '#/definitions/models.Mail'
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка БД.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Получение сообщения по его id
   /mail/income:
     get:
       produces:
@@ -210,7 +252,7 @@ paths:
           description: Список входящих писем
           schema:
             items:
-              $ref: '#/definitions/models.Mail'
+              $ref: '#/definitions/models.MailAdditional'
             type: array
         "401":
           description: Сессия отсутствует или сессия не валидна.
@@ -234,7 +276,7 @@ paths:
           description: Список исходящих писем
           schema:
             items:
-              $ref: '#/definitions/models.Mail'
+              $ref: '#/definitions/models.MailAdditional'
             type: array
         "401":
           description: Сессия отсутствует или сессия не валидна.
@@ -283,6 +325,41 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Прочитать письмо по его id
+  /mail/respond:
+    post:
+      parameters:
+      - description: Форма ответа на письмо
+        in: body
+        name: MailResponse
+        required: true
+        schema:
+          $ref: '#/definitions/models.MailResponse'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Письмо не принадлежит пользователю, ошибка БД, неверные GET
+            параметры.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Ответить на письмо пользователя
   /mail/send:
     post:
       consumes:
