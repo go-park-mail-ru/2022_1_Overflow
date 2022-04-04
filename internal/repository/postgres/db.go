@@ -77,6 +77,18 @@ func (c *Database) ChangeUserPassword(user models.User, newPassword string) erro
 	return err
 }
 
+// Изменить имя
+func (c *Database) ChangeUserFirstName(user models.User, newFirstName string) error {
+	_, err := c.conn.Query(context.Background(), "UPDATE overflow.users set first_name = $1 where id = $2;", newFirstName, user.Id)
+	return err
+}
+
+// Изменить фамилию
+func (c *Database) ChangeUserLastName(user models.User, newLastName string) error {
+	_, err := c.conn.Query(context.Background(), "UPDATE overflow.users set last_name = $1 where id = $2;", newLastName, user.Id)
+	return err
+}
+
 // Добавить письмо
 func (c *Database) AddMail(mail models.Mail) error {
 	_, err := c.conn.Query(context.Background(), "insert into overflow.mails(client_id, sender, addressee, theme, text, files, date) values($1, $2, $3, $4, $5, $6, $7);", mail.Client_id, mail.Sender, mail.Addressee, mail.Theme, mail.Text, mail.Files, mail.Date)
