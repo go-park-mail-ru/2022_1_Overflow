@@ -184,11 +184,12 @@ paths:
         name: mail_id
         required: true
         type: integer
-      - description: Почта получателя.
-        in: query
-        name: username
+      - description: Форма письма
+        in: body
+        name: MailForm
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/models.MailForm'
       - description: CSRF токен
         in: header
         name: X-CSRF-Token
@@ -328,6 +329,11 @@ paths:
   /mail/respond:
     post:
       parameters:
+      - description: ID запрашиваемого письма.
+        in: query
+        name: mail_id
+        required: true
+        type: integer
       - description: Форма ответа на письмо
         in: body
         name: MailResponse

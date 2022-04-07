@@ -216,7 +216,7 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 // @Summary Переслать уже существующее письмо
 // @Produce json
 // @Param mail_id query int true "ID запрашиваемого письма."
-// @Param username query string true "Почта получателя."
+// @Param MailForm body models.MailForm true "Форма письма"
 // @Success 200 {object} pkg.JsonResponse "OK"
 // @Failure 401 {object} pkg.JsonResponse"Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
@@ -240,12 +240,20 @@ func (d *Delivery) ForwardMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, pkg.GET_ERR)
 		return
 	}
-	username := r.URL.Query().Get("username")
-	if len(username) == 0 {
-		pkg.WriteJsonErrFull(w, pkg.GET_ERR)
+
+	var form models.MailForm
+
+	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
+		pkg.WriteJsonErrFull(w, pkg.JSON_ERR)
 		return
 	}
-	e := d.uc.ForwardMail(data, int32(id), username)
+
+	form.Addressee = xss.P.Sanitize(form.Addressee)
+	form.Files = xss.P.Sanitize(form.Files)
+	form.Text = xss.P.Sanitize(form.Text)
+	form.Theme = xss.P.Sanitize(form.Theme)
+
+	e := d.uc.ForwardMail(data, form, int32(id))
 	if e != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, e)
 		return
@@ -257,6 +265,7 @@ func (d *Delivery) ForwardMail(w http.ResponseWriter, r *http.Request) {
 // RespondMail godoc
 // @Summary Ответить на письмо пользователя
 // @Produce json
+// @Param mail_id query int true "ID запрашиваемого письма."
 // @Param MailResponse body models.MailResponse true "Форма ответа на письмо"
 // @Success 200 {object} pkg.JsonResponse "OK"
 // @Failure 401 {object} pkg.JsonResponse"Сессия отсутствует или сессия не валидна."
@@ -270,19 +279,34 @@ func (d *Delivery) RespondMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
 		return
 	}
-
-	_, err := session.GetData(r)
+	data, err := session.GetData(r)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
 		return
 	}
+	idStr := r.URL.Query().Get("mail_id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, pkg.GET_ERR)
+		return
+	}
 
-	var form models.MailResponse
+	var form models.MailForm
 
 	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
 		pkg.WriteJsonErrFull(w, pkg.JSON_ERR)
 		return
 	}
 
-	//d.uc.RespondMail(form)
+	form.Addressee = xss.P.Sanitize(form.Addressee)
+	form.Files = xss.P.Sanitize(form.Files)
+	form.Text = xss.P.Sanitize(form.Text)
+	form.Theme = xss.P.Sanitize(form.Theme)
+
+	e := d.uc.RespondMail(data, form, int32(id))
+	if e != pkg.NO_ERR {
+		pkg.WriteJsonErrFull(w, e)
+		return
+	}
+	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }

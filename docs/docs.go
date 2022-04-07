@@ -126,11 +126,13 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "description": "Почта получателя.",
-                        "name": "username",
-                        "in": "query",
-                        "required": true
+                        "description": "Форма письма",
+                        "name": "MailForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.MailForm"
+                        }
                     },
                     {
                         "type": "string",
@@ -342,6 +344,13 @@ const docTemplate = `{
                 ],
                 "summary": "Ответить на письмо пользователя",
                 "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID запрашиваемого письма.",
+                        "name": "mail_id",
+                        "in": "query",
+                        "required": true
+                    },
                     {
                         "description": "Форма ответа на письмо",
                         "name": "MailResponse",
