@@ -63,6 +63,16 @@ func (d *SQLMock) ChangeUserPassword(user models.User, newPassword string) error
 	return err
 }
 
+func (d *SQLMock) ChangeUserFirstName(user models.User, newFirstName string) error {
+	_, err := d.db.Query("UPDATE overflow.users set last_name = $1 where id = $2;", newFirstName, user.Id)
+	return err
+}
+
+func (d *SQLMock) ChangeUserLastName(user models.User, newLastName string) error {
+	_, err := d.db.Query("UPDATE overflow.users set last_name = $1 where id = $2;", newLastName, user.Id)
+	return err
+}
+
 func (d *SQLMock) AddMail(mail models.Mail) error {
 	_, err := d.db.Query("insert into overflow.mails(client_id, sender, addressee, theme, text, files, date) values($1, $2, $3, $4, $5, $6, $7);", mail.Client_id, mail.Sender, mail.Addressee, mail.Theme, mail.Text, mail.Files, mail.Date)
 	return err

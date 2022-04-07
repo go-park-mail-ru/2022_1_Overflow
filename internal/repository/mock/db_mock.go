@@ -77,6 +77,26 @@ func (m *MockDB) ChangeUserPassword(user models.User, newPassword string) error 
 	return errors.New("Пользователь не найден.")
 }
 
+func (m *MockDB) ChangeUserFirstName(user models.User, newFirstName string) error {
+	for i, val := range m.user {
+		if val["username"] == user.Username {
+			m.user[i]["first_name"] = newFirstName
+			return nil
+		}
+	}
+	return errors.New("Пользователь не найден.")
+}
+
+func (m *MockDB) ChangeUserLastName(user models.User, newLastName string) error {
+	for i, val := range m.user {
+		if val["username"] == user.Username {
+			m.user[i]["last_name"] = newLastName
+			return nil
+		}
+	}
+	return errors.New("Пользователь не найден.")
+}
+
 func (m *MockDB) AddMail(username models.Mail) error {
 	mail := map[string]interface{}{
 		"id":        m.mail_id, // потому что поле не используется (пока что)

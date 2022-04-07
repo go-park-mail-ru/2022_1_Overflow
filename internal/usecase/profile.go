@@ -47,20 +47,30 @@ func (uc *UseCase) SetAvatar(data *models.Session, avatar *models.Avatar) pkg.Js
 
 // Установка настроек пользователя.
 func (uc *UseCase) SetInfo(data *models.Session, settings *models.SettingsForm) pkg.JsonResponse {
-
+	log.Debug("Установка настроек пользователя: ", data.Username)
+	if (*settings == models.SettingsForm{}) {
+		return pkg.NO_ERR
+	}
+	user, err := uc.db.GetUserInfoByUsername(data.Username)
+	if err != nil {
+		log.Error(err)
+		return pkg.DB_ERR
+	}
 	if settings.FirstName != "" {
-		return pkg.NOT_IMPLEMENTED_ERR
-	}
-	if settings.LastName != "" {
-		return pkg.NOT_IMPLEMENTED_ERR
-	}
-	if settings.Password != "" {
-		log.Info("Установка настроек пользователя: ", data.Username)
-		user, err := uc.db.GetUserInfoByUsername(data.Username)
+		err = uc.db.ChangeUserFirstName(user, settings.FirstName)
 		if err != nil {
 			log.Error(err)
 			return pkg.DB_ERR
 		}
+	}
+	if settings.LastName != "" {
+		err = uc.db.ChangeUserPassword(user, settings.LastName)
+		if err != nil {
+			log.Error(err)
+			return pkg.DB_ERR
+		}
+	}
+	if settings.Password != "" {
 		err = uc.db.ChangeUserPassword(user, pkg.HashPassword(settings.Password))
 		if err != nil {
 			log.Error(err)
