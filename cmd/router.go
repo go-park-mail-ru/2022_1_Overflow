@@ -45,10 +45,12 @@ func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 	router.HandleFunc("/profile/avatar/set", rm.d.SetAvatar)
 	router.HandleFunc("/mail/income", rm.d.Income)
 	router.HandleFunc("/mail/outcome", rm.d.Outcome)
+	router.HandleFunc("/mail/get", rm.d.GetMail)
 	router.HandleFunc("/mail/delete", rm.d.DeleteMail)
 	router.HandleFunc("/mail/read", rm.d.ReadMail)
 	router.HandleFunc("/mail/send", rm.d.SendMail)
 	router.HandleFunc("/mail/forward", rm.d.ForwardMail)
+	router.HandleFunc("/mail/respond", rm.d.RespondMail)
 	router.HandleFunc("/get_token", rm.d.CSRFHandler)
 	router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
 		httpSwagger.URL("/swagger/doc.json"), //The url pointing to API definition
