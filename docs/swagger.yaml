@@ -1,3 +1,4 @@
+basePath: /
 definitions:
   models.Mail:
     description: Структура письма
@@ -37,13 +38,6 @@ definitions:
       text:
         type: string
       theme:
-        type: string
-    type: object
-  models.MailResponse:
-    properties:
-      mail:
-        $ref: '#/definitions/models.MailForm'
-      root_id:
         type: string
     type: object
   models.SettingsForm:
@@ -111,7 +105,12 @@ definitions:
         type: integer
     type: object
 info:
-  contact: {}
+  contact:
+    name: Роман Медников
+    url: https://vk.com/l____l____l____l____l____l
+  description: API почтового сервиса команды Overflow.
+  title: OverMail API
+  version: "1.0"
 paths:
   /get_token:
     get:
@@ -334,12 +333,12 @@ paths:
         name: mail_id
         required: true
         type: integer
-      - description: Форма ответа на письмо
+      - description: Форма письма
         in: body
-        name: MailResponse
+        name: MailForm
         required: true
         schema:
-          $ref: '#/definitions/models.MailResponse'
+          $ref: '#/definitions/models.MailForm'
       - description: CSRF токен
         in: header
         name: X-CSRF-Token

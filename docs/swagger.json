@@ -1,8 +1,15 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "API почтового сервиса команды Overflow.",
+        "title": "OverMail API",
+        "contact": {
+            "name": "Роман Медников",
+            "url": "https://vk.com/l____l____l____l____l____l"
+        },
+        "version": "1.0"
     },
+    "basePath": "/",
     "paths": {
         "/get_token": {
             "get": {
@@ -340,12 +347,12 @@
                         "required": true
                     },
                     {
-                        "description": "Форма ответа на письмо",
-                        "name": "MailResponse",
+                        "description": "Форма письма",
+                        "name": "MailForm",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.MailResponse"
+                            "$ref": "#/definitions/models.MailForm"
                         }
                     },
                     {
@@ -737,17 +744,6 @@
                     "type": "string"
                 },
                 "theme": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.MailResponse": {
-            "type": "object",
-            "properties": {
-                "mail": {
-                    "$ref": "#/definitions/models.MailForm"
-                },
-                "root_id": {
                     "type": "string"
                 }
             }

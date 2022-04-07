@@ -10,7 +10,10 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "contact": {
+            "name": "Роман Медников",
+            "url": "https://vk.com/l____l____l____l____l____l"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -352,12 +355,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "Форма ответа на письмо",
-                        "name": "MailResponse",
+                        "description": "Форма письма",
+                        "name": "MailForm",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.MailResponse"
+                            "$ref": "#/definitions/models.MailForm"
                         }
                     },
                     {
@@ -753,17 +756,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.MailResponse": {
-            "type": "object",
-            "properties": {
-                "mail": {
-                    "$ref": "#/definitions/models.MailForm"
-                },
-                "root_id": {
-                    "type": "string"
-                }
-            }
-        },
         "models.SettingsForm": {
             "type": "object",
             "properties": {
@@ -864,12 +856,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
+	Version:          "1.0",
 	Host:             "",
-	BasePath:         "",
+	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "OverMail API",
+	Description:      "API почтового сервиса команды Overflow.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

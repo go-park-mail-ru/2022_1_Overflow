@@ -266,7 +266,7 @@ func (d *Delivery) ForwardMail(w http.ResponseWriter, r *http.Request) {
 // @Summary Ответить на письмо пользователя
 // @Produce json
 // @Param mail_id query int true "ID запрашиваемого письма."
-// @Param MailResponse body models.MailResponse true "Форма ответа на письмо"
+// @Param MailForm body models.MailForm true "Форма письма"
 // @Success 200 {object} pkg.JsonResponse "OK"
 // @Failure 401 {object} pkg.JsonResponse"Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
