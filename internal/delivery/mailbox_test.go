@@ -1,6 +1,7 @@
-package delivery
+package delivery_test
 
 import (
+	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/repository/mock"
 	"OverflowBackend/pkg"
@@ -23,7 +24,7 @@ func TestSend(t *testing.T) {
 	db := mock.MockDB{}
 	db.Create("test")
 	createTestUsers(&db)
-	d := Delivery{}
+	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/mail/send", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SendMail, d.SignIn})
 
 	srv := httptest.NewServer(router)
@@ -79,7 +80,7 @@ func TestIncome (t *testing.T) {
 	createTestUsers(&db)
 	PrepareMails(&db, mailNum)
 
-	d := Delivery{}
+	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/mail/income", "/signin"}, []func(http.ResponseWriter, *http.Request){d.Income, d.SignIn})
 
 	srv := httptest.NewServer(router)
@@ -144,7 +145,7 @@ func TestOutcome (t *testing.T) {
 	createTestUsers(&db)
 	PrepareMails(&db, mailNum)
 
-	d := Delivery{}
+	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/mail/outcome", "/signin"}, []func(http.ResponseWriter, *http.Request){d.Outcome, d.SignIn})
 
 	srv := httptest.NewServer(router)
@@ -209,7 +210,7 @@ func TestRead(t *testing.T) {
 	createTestUsers(&db)
 	PrepareMails(&db, mailNum)
 
-	d := Delivery{}
+	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/mail/read", "/signin"}, []func(http.ResponseWriter, *http.Request){d.ReadMail, d.SignIn})
 
 	srv := httptest.NewServer(router)
@@ -273,7 +274,7 @@ func TestForward(t *testing.T) {
 	createTestUsers(&db)
 	PrepareMails(&db, mailNum)
 
-	d := Delivery{}
+	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/mail/forward", "/signin"}, []func(http.ResponseWriter, *http.Request){d.ForwardMail, d.SignIn})
 
 	srv := httptest.NewServer(router)
@@ -330,7 +331,7 @@ func TestDelete(t *testing.T) {
 	createTestUsers(&db)
 	PrepareMails(&db, mailNum)
 
-	d := Delivery{}
+	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/mail/delete", "/signin"}, []func(http.ResponseWriter, *http.Request){d.DeleteMail, d.SignIn})
 
 	srv := httptest.NewServer(router)

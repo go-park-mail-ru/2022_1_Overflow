@@ -1,6 +1,7 @@
-package delivery
+package delivery_test
 
 import (
+	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/repository/mock"
 	"bytes"
@@ -29,7 +30,7 @@ func TestSignin(t *testing.T) {
 		return
 	}
 
-	d := Delivery{}
+	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/signin"}, []func(http.ResponseWriter, *http.Request){d.SignIn})
 
 	srv := httptest.NewServer(router)
@@ -63,7 +64,7 @@ func TestBadSignin(t *testing.T) {
 		Password:  "test",
 	})
 
-	d := Delivery{}
+	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/signin"}, []func(http.ResponseWriter, *http.Request){d.SignIn})
 
 	srv := httptest.NewServer(router)
@@ -90,7 +91,7 @@ func TestSignup(t *testing.T) {
 	db := mock.MockDB{}
 	db.Create("test")
 
-	d := Delivery{}
+	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp})
 
 	srv := httptest.NewServer(router)
@@ -122,7 +123,7 @@ func TestMultiAuth(t *testing.T) {
 	db := mock.MockDB{}
 	db.Create("test")
 
-	d := Delivery{}
+	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/signin", "/signup"}, []func(http.ResponseWriter, *http.Request){d.SignIn, d.SignUp})
 
 	srv := httptest.NewServer(router)
@@ -182,7 +183,7 @@ func TestBadPassword(t *testing.T) {
 	db := mock.MockDB{}
 	db.Create("test")
 
-	d := Delivery{}
+	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp})
 
 	srv := httptest.NewServer(router)
@@ -213,7 +214,7 @@ func TestEmptyForm(t *testing.T) {
 	db := mock.MockDB{}
 	db.Create("test")
 
-	d := Delivery{}
+	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp})
 
 	srv := httptest.NewServer(router)
@@ -249,7 +250,7 @@ func TestSignout(t *testing.T) {
 	db := mock.MockDB{}
 	db.Create("test")
 	createTestUsers(&db)
-	d := Delivery{}
+	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/logout", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SignOut, d.SignIn})
 
 	srv := httptest.NewServer(router)

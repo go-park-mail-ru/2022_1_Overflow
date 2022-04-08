@@ -1,7 +1,8 @@
-package delivery
+package delivery_test
 
 import (
 	"OverflowBackend/internal/config"
+	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/middlewares"
 	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/repository"
@@ -18,7 +19,7 @@ import (
 
 var DefConf = config.TestConfig()
 
-func InitTestRouter(db repository.DatabaseRepository, d *Delivery, urls []string, handles []func(http.ResponseWriter, *http.Request)) http.Handler {
+func InitTestRouter(db repository.DatabaseRepository, d *delivery.Delivery, urls []string, handles []func(http.ResponseWriter, *http.Request)) http.Handler {
 	session.Init(DefConf)
 	uc := usecase.UseCase{}
 	uc.Init(db, DefConf)

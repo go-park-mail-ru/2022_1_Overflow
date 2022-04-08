@@ -1,6 +1,7 @@
-package delivery
+package delivery_test
 
 import (
+	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/repository/mock"
 	"encoding/json"
@@ -22,7 +23,7 @@ func TestGetInfo(t *testing.T) {
 	db.Create("test")
 	createTestUsers(&db)
 
-	d := Delivery{}
+	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/profile", "/signin"}, []func(http.ResponseWriter, *http.Request){d.GetInfo, d.SignIn})
 
 	srv := httptest.NewServer(router)
@@ -70,7 +71,7 @@ func TestSetInfo(t *testing.T) {
 	db.Create("test")
 	createTestUsers(&db)
 
-	d := Delivery{}
+	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/profile/set", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SetInfo, d.SignIn})
 
 	srv := httptest.NewServer(router)
