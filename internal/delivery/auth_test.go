@@ -4,15 +4,24 @@ import (
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/repository/mock"
+	"OverflowBackend/mocks"
+	"OverflowBackend/pkg"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/golang/mock/gomock"
 )
 
 func TestSignin(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+	
 	db := mock.MockDB{}
 	db.Create("test")
 	err := db.AddUser(models.User{
@@ -29,6 +38,14 @@ func TestSignin(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/signin"}, []func(http.ResponseWriter, *http.Request){d.SignIn})
+	d.Init(mockUC, DefConf)
+
+	data := models.SignInForm{
+		Username: "test",
+		Password: "test",
+	}
+
+	mockUC.EXPECT().SignIn(data).Return(pkg.NO_ERR)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -39,10 +56,6 @@ func TestSignin(t *testing.T) {
 		Jar: jar,
 	}
 
-	data := map[string]string{
-		"username": "test",
-		"password": "test",
-	}
 	dataJson, _ := json.Marshal(data)
 	_, err, token := Get(client, fmt.Sprintf("%s/signin", srv.URL), http.StatusOK)
 	if err != nil {
@@ -57,6 +70,11 @@ func TestSignin(t *testing.T) {
 }
 
 func TestBadSignin(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+
 	db := mock.MockDB{}
 	db.Create("test")
 	db.AddUser(models.User{
@@ -69,6 +87,14 @@ func TestBadSignin(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/signin"}, []func(http.ResponseWriter, *http.Request){d.SignIn})
+	d.Init(mockUC, DefConf)
+
+	data := models.SignInForm{
+		Username: "test",
+		Password: "pass",
+	}
+
+	mockUC.EXPECT().SignIn(data).Return(pkg.WRONG_CREDS_ERR)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -79,10 +105,6 @@ func TestBadSignin(t *testing.T) {
 		Jar: jar,
 	}
 
-	data := map[string]string{
-		"username": "test",
-		"password": "pass",
-	}
 	dataJson, _ := json.Marshal(data)
 	_, err, token := Get(client, fmt.Sprintf("%s/signin", srv.URL), http.StatusOK)
 	if err != nil {
@@ -97,11 +119,27 @@ func TestBadSignin(t *testing.T) {
 }
 
 func TestSignup(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+	
 	db := mock.MockDB{}
 	db.Create("test")
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp})
+	d.Init(mockUC, DefConf)
+
+	data := models.SignUpForm{
+		LastName:     "John",
+		FirstName:    "Doe",
+		Username:     "ededededed",
+		Password:     "pass",
+		PasswordConf: "pass",
+	}
+
+	mockUC.EXPECT().SignUp(data).Return(pkg.NO_ERR)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -112,13 +150,6 @@ func TestSignup(t *testing.T) {
 		Jar: jar,
 	}
 
-	data := map[string]string{
-		"last_name":             "John",
-		"first_name":            "Doe",
-		"username":              "ededededed",
-		"password":              "pass",
-		"password_confirmation": "pass",
-	}
 	dataJson, _ := json.Marshal(data)
 	_, err, token := Get(client, fmt.Sprintf("%s/signup", srv.URL), http.StatusOK)
 	if err != nil {
@@ -133,11 +164,27 @@ func TestSignup(t *testing.T) {
 }
 
 func TestBadPassword(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+
 	db := mock.MockDB{}
 	db.Create("test")
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp})
+	d.Init(mockUC, DefConf)
+
+	data := models.SignUpForm{
+		LastName:     "John",
+		FirstName:    "Doe",
+		Username:     "ededededed",
+		Password:     "pass",
+		PasswordConf: "passd",
+	}
+
+	mockUC.EXPECT().SignUp(data).Return(pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, ""))
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -146,14 +193,6 @@ func TestBadPassword(t *testing.T) {
 
 	client := &http.Client{
 		Jar: jar,
-	}
-
-	data := map[string]string{
-		"last_name":             "John",
-		"first_name":            "Doe",
-		"username":              "ededededed",
-		"password":              "pass",
-		"password_confirmation": "passd",
 	}
 
 	dataJson, _ := json.Marshal(data)
@@ -172,11 +211,27 @@ func TestBadPassword(t *testing.T) {
 }
 
 func TestEmptyForm(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+
 	db := mock.MockDB{}
 	db.Create("test")
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&db, &d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp})
+	d.Init(mockUC, DefConf)
+
+	data := models.SignUpForm{
+		LastName:     "",
+		FirstName:    "",
+		Username:     "ededededed",
+		Password:     "pass",
+		PasswordConf: "passd",
+	}
+
+	mockUC.EXPECT().SignUp(data).Return(pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, ""))
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -187,13 +242,6 @@ func TestEmptyForm(t *testing.T) {
 		Jar: jar,
 	}
 
-	data := map[string]string{
-		"last_name":             "",
-		"first_name":            "",
-		"username":              "ededededed",
-		"password":              "pass",
-		"password_confirmation": "passd",
-	}
 	dataJson, _ := json.Marshal(data)
 	_, err, token := Get(client, fmt.Sprintf("%s/signup", srv.URL), http.StatusOK)
 	if err != nil {

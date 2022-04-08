@@ -15,9 +15,14 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 )
 
 var DefConf = config.TestConfig()
+
+func init() {
+	log.SetLevel(log.FatalLevel)
+}
 
 func InitTestRouter(db repository.DatabaseRepository, d *delivery.Delivery, urls []string, handles []func(http.ResponseWriter, *http.Request)) http.Handler {
 	session.Init(DefConf)
