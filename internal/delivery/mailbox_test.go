@@ -41,7 +41,7 @@ func TestSend(t *testing.T) {
 
 	dataJson, _ := json.Marshal(data)
 	
-	_, err := TestPost(client, dataJson, sendUrl, http.StatusUnauthorized)
+	_, err := Post(client, dataJson, sendUrl, http.StatusForbidden, "")
 	if err != nil {
 		t.Error(err)
 		return
@@ -59,7 +59,12 @@ func TestSend(t *testing.T) {
 		return
 	}
 
-	_, err = TestPost(client, dataJson, sendUrl, http.StatusOK)
+	_, err, token := Get(client, sendUrl, http.StatusOK)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	_, err = Post(client, dataJson, sendUrl, http.StatusOK, token)
 	if err != nil {
 		t.Error(err)
 		return
@@ -88,7 +93,7 @@ func TestIncome (t *testing.T) {
 
 	url := fmt.Sprintf("%s/mail/income", srv.URL)
 
-	_, err := TestGet(client, url, http.StatusUnauthorized)
+	_, err, _ := Get(client, url, http.StatusUnauthorized)
 	if err != nil {
 		t.Error(err)
 		return
@@ -104,13 +109,13 @@ func TestIncome (t *testing.T) {
 		return
 	}
 
-	_, err = TestPost(client, nil, url, http.StatusMethodNotAllowed)
+	_, err = Post(client, nil, url, http.StatusForbidden, "")
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	r, err := TestGet(client, url, http.StatusOK)
+	r, err, _ := Get(client, url, http.StatusOK)
 	if err != nil {
 		t.Error(err)
 		return
@@ -153,7 +158,7 @@ func TestOutcome (t *testing.T) {
 
 	url := fmt.Sprintf("%s/mail/outcome", srv.URL)
 
-	_, err := TestGet(client, url, http.StatusUnauthorized)
+	_, err, _ := Get(client, url, http.StatusUnauthorized)
 	if err != nil {
 		t.Error(err)
 		return
@@ -169,13 +174,13 @@ func TestOutcome (t *testing.T) {
 		return
 	}
 
-	_, err = TestPost(client, nil, url, http.StatusMethodNotAllowed)
+	_, err = Post(client, nil, url, http.StatusForbidden, "")
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	r, err := TestGet(client, url, http.StatusOK)
+	r, err, _ := Get(client, url, http.StatusOK)
 	if err != nil {
 		t.Error(err)
 		return
@@ -228,7 +233,12 @@ func TestRead(t *testing.T) {
 
 	url := fmt.Sprintf("%s/mail/read?id=0", srv.URL)
 
-	r, err := TestPost(client, nil, url, http.StatusOK)
+	_, err, token := Get(client, url, http.StatusOK)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	r, err := Post(client, nil, url, http.StatusOK, token)
 	if err != nil {
 		t.Error(err)
 		return
@@ -290,9 +300,26 @@ func TestForward(t *testing.T) {
 		return
 	}
 
-	url := fmt.Sprintf("%s/mail/forward?mail_id=0&username=test2", srv.URL)
+	url := fmt.Sprintf("%s/mail/forward?mail_id=0", srv.URL)
 
-	_, err = TestPost(client, nil, url, http.StatusOK)
+	data := models.MailForm {
+		Addressee: "test2",
+		Theme: "forwarded",
+		Text: "hello",
+		Files: "files",
+	}
+
+	dataJson, err := json.Marshal(data)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	_, err, token := Get(client, url, http.StatusOK)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	_, err = Post(client, dataJson, url, http.StatusOK, token)
 	if err != nil {
 		t.Error(err)
 		return
@@ -349,7 +376,13 @@ func TestDelete(t *testing.T) {
 
 	url := fmt.Sprintf("%s/mail/delete?id=0", srv.URL)
 
-	_, err = TestPost(client, nil, url, http.StatusOK)
+	_, err, token := Get(client, url, http.StatusOK)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	_, err = Post(client, nil, url, http.StatusOK, token)
 	if err != nil {
 		t.Error(err)
 		return
@@ -368,7 +401,12 @@ func TestDelete(t *testing.T) {
 		return
 	}
 
-	_, err = TestPost(client, nil, url, http.StatusOK)
+	_, err, token = Get(client, url, http.StatusOK)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	_, err = Post(client, nil, url, http.StatusOK, token)
 	if err != nil {
 		t.Error(err)
 		return

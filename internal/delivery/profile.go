@@ -51,9 +51,16 @@ func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
-		return
+	switch r.Method {
+		case http.MethodPost: break
+		case http.MethodGet: {
+			pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+			return
+		}
+		default: {
+			pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+			return
+		}
 	}
 
 	data, err := session.GetData(r)
@@ -93,9 +100,16 @@ func SetInfo() {}
 // @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
-		return
+	switch r.Method {
+		case http.MethodPost: break
+		case http.MethodGet: {
+			pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+			return
+		}
+		default: {
+			pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+			return
+		}
 	}
 
 	data, err := session.GetData(r)

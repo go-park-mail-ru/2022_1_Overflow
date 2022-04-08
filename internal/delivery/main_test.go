@@ -69,7 +69,11 @@ func SigninUser(client *http.Client, form models.SignInForm, srv_url string) err
 	if err != nil {
 		return err
 	}
-	r, err := client.Post(fmt.Sprintf("%s/signin", srv_url), "application/json", bytes.NewBuffer(dataJson))
+	_, err, token := Get(client, fmt.Sprintf("%s/signin", srv_url), http.StatusOK)
+	if err != nil {
+		return err
+	}
+	r, err := Post(client, dataJson, fmt.Sprintf("%s/signin", srv_url), http.StatusOK, token)
 	if err != nil {
 		return err
 	}
@@ -79,8 +83,14 @@ func SigninUser(client *http.Client, form models.SignInForm, srv_url string) err
 	return nil
 }
 
-func TestPost(client *http.Client, data []byte, reqUrl string, expectedHttpStatus int) (*http.Response, error) {
-	r, err := client.Post(reqUrl, "application/json", bytes.NewBuffer(data))
+func Post(client *http.Client, data []byte, reqUrl string, expectedHttpStatus int, token string) (*http.Response, error) {
+	req, err := http.NewRequest("POST", reqUrl, bytes.NewBuffer(data))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("X-CSRF-Token", token)
+
+	r, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -92,15 +102,17 @@ func TestPost(client *http.Client, data []byte, reqUrl string, expectedHttpStatu
 	return r, nil
 }
 
-func TestGet(client *http.Client, reqUrl string, expectedHttpStatus int) (*http.Response, error) {
-	r, err := client.Get(reqUrl)
+func Get(client *http.Client, reqUrl string, expectedHttpStatus int) (r *http.Response, err error, token string) {
+	r, err = client.Get(reqUrl)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	if r.StatusCode != expectedHttpStatus {
-		return nil, fmt.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, expectedHttpStatus)
+		err = fmt.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, expectedHttpStatus)
+		return
 	}
 
-	return r, nil
+	token = r.Header.Get("X-CSRF-Token")
+	return
 }

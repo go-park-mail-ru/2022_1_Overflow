@@ -4,14 +4,11 @@ import (
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/repository/mock"
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
-	"strconv"
 	"testing"
 )
 
@@ -36,19 +33,25 @@ func TestSignin(t *testing.T) {
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
+	jar, _ := cookiejar.New(nil)
+
+	client := &http.Client{
+		Jar: jar,
+	}
+
 	data := map[string]string{
 		"username": "test",
 		"password": "test",
 	}
 	dataJson, _ := json.Marshal(data)
-	r, err := http.Post(fmt.Sprintf("%s/signin", srv.URL), "application/json", bytes.NewBuffer(dataJson))
+	_, err, token := Get(client, fmt.Sprintf("%s/signin", srv.URL), http.StatusOK)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-
-	if r.StatusCode != http.StatusOK {
-		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, http.StatusOK)
+	_, err = Post(client, dataJson, fmt.Sprintf("%s/signin", srv.URL), http.StatusOK, token)
+	if err != nil {
+		t.Error(err)
 		return
 	}
 }
@@ -70,19 +73,25 @@ func TestBadSignin(t *testing.T) {
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
+	jar, _ := cookiejar.New(nil)
+
+	client := &http.Client{
+		Jar: jar,
+	}
+
 	data := map[string]string{
 		"username": "test",
 		"password": "pass",
 	}
 	dataJson, _ := json.Marshal(data)
-	r, err := http.Post(fmt.Sprintf("%s/signin", srv.URL), "application/json", bytes.NewBuffer(dataJson))
+	_, err, token := Get(client, fmt.Sprintf("%s/signin", srv.URL), http.StatusOK)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-
-	if r.StatusCode != http.StatusBadRequest {
-		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, http.StatusBadRequest)
+	_, err = Post(client, dataJson, fmt.Sprintf("%s/signin", srv.URL), http.StatusBadRequest, token)
+	if err != nil {
+		t.Error(err)
 		return
 	}
 }
@@ -97,6 +106,12 @@ func TestSignup(t *testing.T) {
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
+	jar, _ := cookiejar.New(nil)
+
+	client := &http.Client{
+		Jar: jar,
+	}
+
 	data := map[string]string{
 		"last_name":             "John",
 		"first_name":            "Doe",
@@ -105,77 +120,15 @@ func TestSignup(t *testing.T) {
 		"password_confirmation": "pass",
 	}
 	dataJson, _ := json.Marshal(data)
-	r, err := http.Post(fmt.Sprintf("%s/signup", srv.URL), "application/json", bytes.NewBuffer(dataJson))
+	_, err, token := Get(client, fmt.Sprintf("%s/signup", srv.URL), http.StatusOK)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-
-	if r.StatusCode != http.StatusOK {
-		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, http.StatusOK)
+	_, err = Post(client, dataJson, fmt.Sprintf("%s/signup", srv.URL), http.StatusOK, token)
+	if err != nil {
+		t.Error(err)
 		return
-	}
-}
-
-func TestMultiAuth(t *testing.T) {
-	numUsers := 50
-
-	db := mock.MockDB{}
-	db.Create("test")
-
-	d := delivery.Delivery{}
-	router := InitTestRouter(&db, &d, []string{"/signin", "/signup"}, []func(http.ResponseWriter, *http.Request){d.SignIn, d.SignUp})
-
-	srv := httptest.NewServer(router)
-	defer srv.Close()
-
-	for i := 0; i < numUsers; i++ {
-		user := strconv.Itoa(i)
-		signup := func() {
-			data := map[string]string{
-				"last_name":             "John",
-				"first_name":            "Doe",
-				"username":              user,
-				"password":              "pass",
-				"password_confirmation": "pass",
-			}
-			dataJson, _ := json.Marshal(data)
-			log.Println("Регистрирую пользователя", user)
-			r, err := http.Post(fmt.Sprintf("%s/signup", srv.URL), "application/json", bytes.NewBuffer(dataJson))
-			if err != nil {
-				t.Error(err)
-				return
-			}
-			defer r.Body.Close()
-
-			if r.StatusCode != http.StatusOK {
-				t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, http.StatusOK)
-				return
-			}
-		}
-		signup()
-
-		signin := func() {
-			form2 := models.SignInForm{
-				Username: user,
-				Password: "pass",
-			}
-
-			formJson, _ := json.Marshal(form2)
-			log.Println("Вхожу под логином", user)
-			r, err := http.Post(fmt.Sprintf("%s/signin", srv.URL), "application/json", bytes.NewBuffer(formJson))
-			if err != nil {
-				t.Error(err)
-				return
-			}
-			defer r.Body.Close()
-
-			if r.StatusCode != http.StatusOK {
-				t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, http.StatusOK)
-				return
-			}
-		}
-		signin()
 	}
 }
 
@@ -189,6 +142,12 @@ func TestBadPassword(t *testing.T) {
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
+	jar, _ := cookiejar.New(nil)
+
+	client := &http.Client{
+		Jar: jar,
+	}
+
 	data := map[string]string{
 		"last_name":             "John",
 		"first_name":            "Doe",
@@ -196,16 +155,18 @@ func TestBadPassword(t *testing.T) {
 		"password":              "pass",
 		"password_confirmation": "passd",
 	}
-	dataJson, _ := json.Marshal(data)
-	r, err := http.Post(fmt.Sprintf("%s/signup", srv.URL), "application/json", bytes.NewBuffer(dataJson))
 
+	dataJson, _ := json.Marshal(data)
+
+	_, err, token := Get(client, fmt.Sprintf("%s/signup", srv.URL), http.StatusOK)
 	if err != nil {
 		t.Error(err)
 		return
 	}
+	_, err = Post(client, dataJson, fmt.Sprintf("%s/signup", srv.URL), http.StatusBadRequest, token)
 
-	if r.StatusCode != http.StatusBadRequest {
-		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, http.StatusBadRequest)
+	if err != nil {
+		t.Error(err)
 		return
 	}
 }
@@ -220,6 +181,12 @@ func TestEmptyForm(t *testing.T) {
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
+	jar, _ := cookiejar.New(nil)
+
+	client := &http.Client{
+		Jar: jar,
+	}
+
 	data := map[string]string{
 		"last_name":             "",
 		"first_name":            "",
@@ -228,14 +195,14 @@ func TestEmptyForm(t *testing.T) {
 		"password_confirmation": "passd",
 	}
 	dataJson, _ := json.Marshal(data)
-	r, err := http.Post(fmt.Sprintf("%s/signup", srv.URL), "application/json", bytes.NewBuffer(dataJson))
+	_, err, token := Get(client, fmt.Sprintf("%s/signup", srv.URL), http.StatusOK)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-
-	if r.StatusCode != http.StatusBadRequest {
-		t.Errorf("Неверный статус от сервера: %v. Ожидается: %v.", r.StatusCode, http.StatusBadRequest)
+	_, err = Post(client, dataJson, fmt.Sprintf("%s/signup", srv.URL), http.StatusBadRequest, token)
+	if err != nil {
+		t.Error(err)
 		return
 	}
 }
@@ -269,13 +236,23 @@ func TestSignout(t *testing.T) {
 		return
 	}
 	
-	_, err = TestGet(client, url, http.StatusOK)
+	_, err, token := Get(client, url, http.StatusOK)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	_, err = Post(client, nil, url, http.StatusOK, token)
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	_, err = TestGet(client, url, http.StatusUnauthorized)
+	_, err, token = Get(client, url, http.StatusUnauthorized)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	_, err = Post(client, nil, url, http.StatusUnauthorized, token)
 	if err != nil {
 		t.Error(err)
 		return

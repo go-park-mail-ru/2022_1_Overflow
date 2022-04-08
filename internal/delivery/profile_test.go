@@ -31,7 +31,7 @@ func TestGetInfo(t *testing.T) {
 
 	url := fmt.Sprintf("%s/profile", srv.URL)
 
-	_, err := TestGet(client, url, http.StatusUnauthorized)
+	_, err, _ := Get(client, url, http.StatusUnauthorized)
 	if err != nil {
 		t.Error(err)
 		return
@@ -47,13 +47,13 @@ func TestGetInfo(t *testing.T) {
 		return
 	}
 
-	_, err = TestPost(client, nil, url, http.StatusMethodNotAllowed)
+	_, err = Post(client, nil, url, http.StatusForbidden, "")
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	_, err = TestGet(client, url, http.StatusOK)
+	_, err, _ = Get(client, url, http.StatusOK)
 	if err != nil {
 		t.Error(err)
 		return
@@ -101,7 +101,12 @@ func TestSetInfo(t *testing.T) {
 		return
 	}
 
-	_, err = TestPost(client, dataJson, url, http.StatusOK)
+	_, err, token := Get(client, url, http.StatusOK)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	_, err = Post(client, dataJson, url, http.StatusOK, token)
 	if err != nil {
 		t.Error(err)
 		return

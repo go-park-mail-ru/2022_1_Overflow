@@ -114,9 +114,16 @@ func (d *Delivery) GetMail(w http.ResponseWriter, r *http.Request) {
 // @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
-		return
+	switch r.Method {
+		case http.MethodPost: break
+		case http.MethodGet: {
+			pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+			return
+		}
+		default: {
+			pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+			return
+		}
 	}
 	data, err := session.GetData(r)
 	if err != nil {
@@ -153,9 +160,16 @@ func DeleteMail() {}
 // @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
-		return
+	switch r.Method {
+		case http.MethodPost: break
+		case http.MethodGet: {
+			pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+			return
+		}
+		default: {
+			pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+			return
+		}
 	}
 	data, err := session.GetData(r)
 	if err != nil {
@@ -192,9 +206,16 @@ func ReadMail() {}
 // @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
-		return
+	switch r.Method {
+		case http.MethodPost: break
+		case http.MethodGet: {
+			pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+			return
+		}
+		default: {
+			pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+			return
+		}
 	}
 
 	data, err := session.GetData(r)
@@ -240,9 +261,16 @@ func SendMail() {}
 // @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) ForwardMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
-		return
+	switch r.Method {
+		case http.MethodPost: break
+		case http.MethodGet: {
+			pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+			return
+		}
+		default: {
+			pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+			return
+		}
 	}
 	data, err := session.GetData(r)
 	if err != nil {
@@ -295,9 +323,16 @@ func ForwardMail() {}
 // @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) RespondMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
-		return
+	switch r.Method {
+		case http.MethodPost: break
+		case http.MethodGet: {
+			pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+			return
+		}
+		default: {
+			pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+			return
+		}
 	}
 	data, err := session.GetData(r)
 	if err != nil {

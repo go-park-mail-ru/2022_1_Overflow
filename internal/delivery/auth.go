@@ -23,9 +23,16 @@ import (
 // @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
-		return
+	switch r.Method {
+		case http.MethodPost: break
+		case http.MethodGet: {
+			pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+			return
+		}
+		default: {
+			pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+			return
+		}
 	}
 
 	if session.IsLoggedIn(r) {
@@ -72,9 +79,16 @@ func SignIn() {}
 // @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
-		return
+	switch r.Method {
+		case http.MethodPost: break
+		case http.MethodGet: {
+			pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+			return
+		}
+		default: {
+			pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+			return
+		}
 	}
 
 	if session.IsLoggedIn(r) {
@@ -117,9 +131,16 @@ func SignUp() {}
 // @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
-		return
+	switch r.Method {
+		case http.MethodPost: break
+		case http.MethodGet: {
+			pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+			return
+		}
+		default: {
+			pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+			return
+		}
 	}
 
 	err := session.DeleteSession(w, r)
