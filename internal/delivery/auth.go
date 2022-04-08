@@ -56,7 +56,8 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /signin [get]
-// @Success 200 {object} pkg.JsonResponse
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
 func SignIn() {}
 
 // SignUp godoc
@@ -102,7 +103,8 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /signup [get]
-// @Success 200 {object} pkg.JsonResponse
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
 func SignUp() {}
 
 // SignOut godoc
@@ -112,6 +114,7 @@ func SignUp() {}
 // @Failure 500 {object} pkg.JsonResponse
 // @Produce json
 // @Router /logout [post]
+// @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
@@ -128,5 +131,6 @@ func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /logout [get]
-// @Success 200 {object} pkg.JsonResponse
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
 func SignOut() {}

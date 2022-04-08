@@ -18,6 +18,12 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }
@@ -27,6 +33,15 @@
                     "application/json"
                 ],
                 "summary": "Завершение сессии пользователя",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Успешное завершение сессии.",
@@ -56,6 +71,12 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }
@@ -116,6 +137,12 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }
@@ -302,6 +329,12 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }
@@ -362,6 +395,12 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }
@@ -431,6 +470,12 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }
@@ -552,6 +597,12 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }
@@ -609,6 +660,12 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }
@@ -668,6 +725,12 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }
@@ -721,6 +784,12 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }

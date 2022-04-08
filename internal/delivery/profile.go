@@ -77,7 +77,8 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /profile/set [get]
-// @Success 200 {object} pkg.JsonResponse
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
 func SetInfo() {}
 
 // SetAvatar godoc
@@ -125,7 +126,8 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /profile/avatar/set [get]
-// @Success 200 {object} pkg.JsonResponse
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
 func SetAvatar() {}
 
 // GetAvatar godoc

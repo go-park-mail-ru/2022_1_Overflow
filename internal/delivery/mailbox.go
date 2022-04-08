@@ -137,7 +137,8 @@ func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /mail/delete [get]
-// @Success 200 {object} pkg.JsonResponse
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
 func DeleteMail() {}
 
 // ReadMail godoc
@@ -175,7 +176,8 @@ func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /mail/read [get]
-// @Success 200 {object} pkg.JsonResponse
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
 func ReadMail() {}
 
 // SendMail godoc
@@ -221,7 +223,8 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /mail/send [get]
-// @Success 200 {object} pkg.JsonResponse
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
 func SendMail() {}
 
 // ForwardMail godoc
@@ -274,7 +277,8 @@ func (d *Delivery) ForwardMail(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /mail/forward [get]
-// @Success 200 {object} pkg.JsonResponse
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
 func ForwardMail() {}
 
 
@@ -328,5 +332,6 @@ func (d *Delivery) RespondMail(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /mail/respond [get]
-// @Success 200 {object} pkg.JsonResponse
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
 func RespondMail() {}

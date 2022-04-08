@@ -26,6 +26,12 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }
@@ -35,6 +41,15 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "summary": "Завершение сессии пользователя",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Успешное завершение сессии.",
@@ -64,6 +79,12 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }
@@ -124,6 +145,12 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }
@@ -310,6 +337,12 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }
@@ -370,6 +403,12 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }
@@ -439,6 +478,12 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }
@@ -560,6 +605,12 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }
@@ -617,6 +668,12 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }
@@ -676,6 +733,12 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }
@@ -729,6 +792,12 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
                         }
                     }
                 }
