@@ -19,25 +19,18 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/get_token": {
+        "/logout": {
             "get": {
-                "description": "Токен приходит в header ответа в поле X-CSRF-Token",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "СSRF проверка",
                 "responses": {
                     "200": {
-                        "description": "Успешное получение CSRF токена.",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.TokenModel"
+                            "$ref": "#/definitions/pkg.JsonResponse"
                         }
                     }
                 }
-            }
-        },
-        "/logout": {
-            "get": {
+            },
+            "post": {
                 "produces": [
                     "application/json"
                 ],
@@ -65,6 +58,16 @@ const docTemplate = `{
             }
         },
         "/mail/delete": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "produces": [
                     "application/json"
@@ -115,6 +118,16 @@ const docTemplate = `{
             }
         },
         "/mail/forward": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "produces": [
                     "application/json"
@@ -291,6 +304,16 @@ const docTemplate = `{
             }
         },
         "/mail/read": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "produces": [
                     "application/json"
@@ -341,6 +364,16 @@ const docTemplate = `{
             }
         },
         "/mail/respond": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "produces": [
                     "application/json"
@@ -400,6 +433,16 @@ const docTemplate = `{
             }
         },
         "/mail/send": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "consumes": [
                     "application/json"
@@ -511,6 +554,16 @@ const docTemplate = `{
             }
         },
         "/profile/avatar/set": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "consumes": [
                     "multipart/form-data"
@@ -558,6 +611,16 @@ const docTemplate = `{
             }
         },
         "/profile/set": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "consumes": [
                     "application/json"
@@ -607,6 +670,16 @@ const docTemplate = `{
             }
         },
         "/signin": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "consumes": [
                     "application/json"
@@ -650,6 +723,16 @@ const docTemplate = `{
             }
         },
         "/signup": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Выполняет регистрацию пользователя, НЕ выставляет сессионый cookie.",
                 "consumes": [
@@ -805,17 +888,6 @@ const docTemplate = `{
                 "username": {
                     "type": "string",
                     "maxLength": 20
-                }
-            }
-        },
-        "models.TokenModel": {
-            "type": "object",
-            "properties": {
-                "status": {
-                    "type": "integer"
-                },
-                "token": {
-                    "type": "string"
                 }
             }
         },

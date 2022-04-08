@@ -76,6 +76,10 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
 
+// @Router /profile/set [get]
+// @Success 200 {object} pkg.JsonResponse
+func SetInfo() {}
+
 // SetAvatar godoc
 // @Summary Установка/смена аватарки пользователя
 // @Success 200 {object} pkg.JsonResponse "Успешное установка аватарки."
@@ -119,6 +123,10 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
+
+// @Router /profile/avatar/set [get]
+// @Success 200 {object} pkg.JsonResponse
+func SetAvatar() {}
 
 // GetAvatar godoc
 // @Summary Получение ссылки на аватарку пользователя

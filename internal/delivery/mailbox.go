@@ -136,6 +136,10 @@ func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
 
+// @Router /mail/delete [get]
+// @Success 200 {object} pkg.JsonResponse
+func DeleteMail() {}
+
 // ReadMail godoc
 // @Summary Прочитать письмо по его id
 // @Produce json
@@ -169,6 +173,10 @@ func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
+
+// @Router /mail/read [get]
+// @Success 200 {object} pkg.JsonResponse
+func ReadMail() {}
 
 // SendMail godoc
 // @Summary Выполняет отправку письма получателю
@@ -211,6 +219,10 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
+
+// @Router /mail/send [get]
+// @Success 200 {object} pkg.JsonResponse
+func SendMail() {}
 
 // ForwardMail godoc
 // @Summary Переслать уже существующее письмо
@@ -261,6 +273,10 @@ func (d *Delivery) ForwardMail(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
 
+// @Router /mail/forward [get]
+// @Success 200 {object} pkg.JsonResponse
+func ForwardMail() {}
+
 
 // RespondMail godoc
 // @Summary Ответить на письмо пользователя
@@ -310,3 +326,7 @@ func (d *Delivery) RespondMail(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
+
+// @Router /mail/respond [get]
+// @Success 200 {object} pkg.JsonResponse
+func RespondMail() {}
