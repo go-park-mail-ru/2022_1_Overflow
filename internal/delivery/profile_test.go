@@ -3,33 +3,53 @@ package delivery_test
 import (
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/models"
-	"OverflowBackend/internal/repository/mock"
+	"OverflowBackend/mocks"
+	"OverflowBackend/pkg"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/golang/mock/gomock"
 )
 
 func TestGetInfo(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+	
 	jar, _ := cookiejar.New(nil)
 
 	client := &http.Client{
 		Jar: jar,
 	}
 
-	db := mock.MockDB{}
-	db.Create("test")
-	createTestUsers(&db)
-
 	d := delivery.Delivery{}
-	router := InitTestRouter(&db, &d, []string{"/profile", "/signin"}, []func(http.ResponseWriter, *http.Request){d.GetInfo, d.SignIn})
+	router := InitTestRouter(mockUC, &d, []string{"/profile", "/signin"}, []func(http.ResponseWriter, *http.Request){d.GetInfo, d.SignIn})
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
 	url := fmt.Sprintf("%s/profile", srv.URL)
+
+	signinForm := models.SignInForm{
+		Username: "test",
+		Password: "test",
+	}
+
+	info, _ := json.Marshal(models.User{
+		Id: 0,
+		FirstName: "test",
+		LastName: "test",
+		Password: "test",
+		Username: "test",
+	})
+
+	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
+	mockUC.EXPECT().GetInfo(&models.Session{Username: "test", Authenticated: true}).Return(info, pkg.NO_ERR)
 
 	_, err, _ := Get(client, url, http.StatusUnauthorized)
 	if err != nil {
@@ -37,10 +57,7 @@ func TestGetInfo(t *testing.T) {
 		return
 	}
 
-	err = SigninUser(client, models.SignInForm{
-		Username: "test",
-		Password: "test",
-	}, srv.URL)
+	err = SigninUser(client, signinForm, srv.URL)
 
 	if err != nil {
 		t.Error(err)
@@ -61,38 +78,44 @@ func TestGetInfo(t *testing.T) {
 }
 
 func TestSetInfo(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+
 	jar, _ := cookiejar.New(nil)
 
 	client := &http.Client{
 		Jar: jar,
 	}
 
-	db := mock.MockDB{}
-	db.Create("test")
-	createTestUsers(&db)
-
 	d := delivery.Delivery{}
-	router := InitTestRouter(&db, &d, []string{"/profile/set", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SetInfo, d.SignIn})
+	router := InitTestRouter(mockUC, &d, []string{"/profile/set", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SetInfo, d.SignIn})
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
-	err := SigninUser(client, models.SignInForm{
+	signinForm := models.SignInForm{
 		Username: "test",
 		Password: "test",
-	}, srv.URL)
-
-	if err != nil {
-		t.Error(err)
-		return
 	}
 
 	url := fmt.Sprintf("%s/profile/set", srv.URL)
 
-	data := map[string]string{
-		"last_name": "",
-		"first_name": "",
-		"password": "changed",
+	data := models.SettingsForm{
+		FirstName: "",
+		LastName: "",
+		Password: "changed",
+	}
+
+	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
+	mockUC.EXPECT().SetInfo(&models.Session{Username: "test", Authenticated: true}, &data).Return(pkg.NO_ERR)
+
+	err := SigninUser(client, signinForm, srv.URL)
+
+	if err != nil {
+		t.Error(err)
+		return
 	}
 
 	dataJson, err := json.Marshal(data)
@@ -111,21 +134,4 @@ func TestSetInfo(t *testing.T) {
 		t.Error(err)
 		return
 	}
-
-	/*
-
-	var dataNew map[string]string
-
-	err = json.NewDecoder(r.Body).Decode(&dataNew)
-
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	if dataNew["first_name"] != data["first_name"] || dataNew["last_name"] != data["last_name"] {
-		t.Errorf("Несоответствие данных в SetInfo.")
-		return
-	}
-	*/
 }

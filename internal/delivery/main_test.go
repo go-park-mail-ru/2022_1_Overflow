@@ -5,14 +5,12 @@ import (
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/middlewares"
 	"OverflowBackend/internal/models"
-	"OverflowBackend/internal/repository"
 	"OverflowBackend/internal/usecase"
 	"OverflowBackend/internal/usecase/session"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
@@ -24,49 +22,14 @@ func init() {
 	log.SetLevel(log.FatalLevel)
 }
 
-func InitTestRouter(db repository.DatabaseRepository, d *delivery.Delivery, urls []string, handles []func(http.ResponseWriter, *http.Request)) http.Handler {
+func InitTestRouter(uc usecase.UseCaseInterface, d *delivery.Delivery, urls []string, handles []func(http.ResponseWriter, *http.Request)) http.Handler {
 	session.Init(DefConf)
-	uc := usecase.UseCase{}
-	uc.Init(db, DefConf)
-	d.Init(&uc, DefConf)
+	d.Init(uc, DefConf)
 	router := mux.NewRouter()
 	for i := range urls {
 		router.HandleFunc(urls[i], handles[i])
 	}
 	return middlewares.Middleware(router)
-}
-
-func createTestUsers(db repository.DatabaseRepository) {
-	db.AddUser(models.User{
-		Id:        0,
-		FirstName: "test",
-		LastName:  "test",
-		Username:  "test",
-		Password:  "test",
-	})
-	db.AddUser(models.User{
-		Id:        1,
-		FirstName: "test2",
-		LastName:  "test2",
-		Username:  "test2",
-		Password:  "test2",
-	})
-}
-
-func PrepareMails(db repository.DatabaseRepository, num int) {
-	for i := 0; i < num; i++ {
-		mail := models.Mail{
-			Id: int32(i),
-			Client_id: 0,
-			Sender: "test",
-			Addressee: "test2",
-			Theme: "test",
-			Files: "test",
-			Date: time.Now(),
-			Read: false,
-		}
-		db.AddMail(mail)
-	}
 }
 
 func SigninUser(client *http.Client, form models.SignInForm, srv_url string) error {

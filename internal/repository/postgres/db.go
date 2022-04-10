@@ -157,6 +157,7 @@ func (c *Database) GetIncomeMails(userId int32) ([]models.Mail, error) {
 	if err != nil {
 		return results, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var mails models.Mail
 		values, err := rows.Values()
@@ -182,6 +183,7 @@ func (c *Database) GetOutcomeMails(userId int32) ([]models.Mail, error) {
 	if err != nil {
 		return results, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		var mails models.Mail
 		values, err := rows.Values()

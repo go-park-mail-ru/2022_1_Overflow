@@ -3,7 +3,6 @@ package delivery_test
 import (
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/models"
-	"OverflowBackend/internal/repository/mock"
 	"OverflowBackend/mocks"
 	"OverflowBackend/pkg"
 	"encoding/json"
@@ -21,23 +20,9 @@ func TestSignin(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
-	
-	db := mock.MockDB{}
-	db.Create("test")
-	err := db.AddUser(models.User{
-		Id:        0,
-		FirstName: "test",
-		LastName:  "test",
-		Username:  "test",
-		Password:  "test",
-	})
-	if err != nil {
-		t.Error(err)
-		return
-	}
 
 	d := delivery.Delivery{}
-	router := InitTestRouter(&db, &d, []string{"/signin"}, []func(http.ResponseWriter, *http.Request){d.SignIn})
+	router := InitTestRouter(mockUC, &d, []string{"/signin"}, []func(http.ResponseWriter, *http.Request){d.SignIn})
 	d.Init(mockUC, DefConf)
 
 	data := models.SignInForm{
@@ -75,18 +60,8 @@ func TestBadSignin(t *testing.T) {
 
 	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
 
-	db := mock.MockDB{}
-	db.Create("test")
-	db.AddUser(models.User{
-		Id:        0,
-		FirstName: "test",
-		LastName:  "test",
-		Username:  "test",
-		Password:  "test",
-	})
-
 	d := delivery.Delivery{}
-	router := InitTestRouter(&db, &d, []string{"/signin"}, []func(http.ResponseWriter, *http.Request){d.SignIn})
+	router := InitTestRouter(mockUC, &d, []string{"/signin"}, []func(http.ResponseWriter, *http.Request){d.SignIn})
 	d.Init(mockUC, DefConf)
 
 	data := models.SignInForm{
@@ -123,12 +98,9 @@ func TestSignup(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
-	
-	db := mock.MockDB{}
-	db.Create("test")
 
 	d := delivery.Delivery{}
-	router := InitTestRouter(&db, &d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp})
+	router := InitTestRouter(mockUC, &d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp})
 	d.Init(mockUC, DefConf)
 
 	data := models.SignUpForm{
@@ -169,11 +141,8 @@ func TestBadPassword(t *testing.T) {
 
 	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
 
-	db := mock.MockDB{}
-	db.Create("test")
-
 	d := delivery.Delivery{}
-	router := InitTestRouter(&db, &d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp})
+	router := InitTestRouter(mockUC, &d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp})
 	d.Init(mockUC, DefConf)
 
 	data := models.SignUpForm{
@@ -216,11 +185,8 @@ func TestEmptyForm(t *testing.T) {
 
 	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
 
-	db := mock.MockDB{}
-	db.Create("test")
-
 	d := delivery.Delivery{}
-	router := InitTestRouter(&db, &d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp})
+	router := InitTestRouter(mockUC, &d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp})
 	d.Init(mockUC, DefConf)
 
 	data := models.SignUpForm{
@@ -256,17 +222,19 @@ func TestEmptyForm(t *testing.T) {
 }
 
 func TestSignout(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+
 	jar, _ := cookiejar.New(nil)
 
 	client := &http.Client{
 		Jar: jar,
 	}
 
-	db := mock.MockDB{}
-	db.Create("test")
-	createTestUsers(&db)
 	d := delivery.Delivery{}
-	router := InitTestRouter(&db, &d, []string{"/logout", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SignOut, d.SignIn})
+	router := InitTestRouter(mockUC, &d, []string{"/logout", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SignOut, d.SignIn})
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -277,6 +245,8 @@ func TestSignout(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
+
+	mockUC.EXPECT().SignIn(form).Return(pkg.NO_ERR)
 
 	err := SigninUser(client, form, srv.URL)
 	if err != nil {
@@ -290,17 +260,6 @@ func TestSignout(t *testing.T) {
 		return
 	}
 	_, err = Post(client, nil, url, http.StatusOK, token)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	_, err, token = Get(client, url, http.StatusUnauthorized)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	_, err = Post(client, nil, url, http.StatusUnauthorized, token)
 	if err != nil {
 		t.Error(err)
 		return
