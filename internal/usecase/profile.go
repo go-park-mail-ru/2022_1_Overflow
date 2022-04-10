@@ -64,7 +64,7 @@ func (uc *UseCase) SetInfo(data *models.Session, settings *models.SettingsForm) 
 		}
 	}
 	if settings.LastName != "" {
-		err = uc.db.ChangeUserPassword(user, settings.LastName)
+		err = uc.db.ChangeUserLastName(user, settings.LastName)
 		if err != nil {
 			log.Error(err)
 			return pkg.DB_ERR
@@ -88,12 +88,12 @@ func (uc *UseCase) GetAvatar(data *models.Session) (string, pkg.JsonResponse) {
 		return "", pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Ошибка поиска файла.")
 	}
 	if len(matches) == 0 {
-		avatarUrl := uc.config.Server.Static.Handle + "dummy.png"
+		avatarUrl := pkg.JoinURL(uc.config.Server.Static.Handle, "dummy.png")
 		return avatarUrl, pkg.NO_ERR
 	}
 	if len(matches) > 1 {
 		return "", pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Найдены дубликаты файлов.")
 	}
-	avatarUrl := uc.config.Server.Static.Handle + filepath.Base(matches[0])
+	avatarUrl := pkg.JoinURL(uc.config.Server.Static.Handle, filepath.Base(matches[0]))
 	return avatarUrl, pkg.NO_ERR
 }

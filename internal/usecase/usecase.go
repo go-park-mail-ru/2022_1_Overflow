@@ -6,11 +6,13 @@ import (
 	"OverflowBackend/internal/repository"
 	"OverflowBackend/pkg"
 	"net/http"
+	"time"
 )
 
 type UseCase struct {
 	db     repository.DatabaseRepository
 	config *config.Config
+	Time time.Time
 }
 
 func (uc *UseCase) Init(repo repository.DatabaseRepository, config *config.Config) {

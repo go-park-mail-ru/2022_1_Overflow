@@ -27,6 +27,7 @@ require (
 )
 
 require (
+	bou.ke/monkey v1.0.2
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect

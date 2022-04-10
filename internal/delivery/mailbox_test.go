@@ -11,6 +11,7 @@ import (
 	"net/http/cookiejar"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 )
@@ -80,7 +81,7 @@ func TestSend(t *testing.T) {
 	}
 }
 
-func TestIncome (t *testing.T) {
+func TestIncome(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
@@ -136,7 +137,7 @@ func TestIncome (t *testing.T) {
 	}
 }
 
-func TestOutcome (t *testing.T) {
+func TestOutcome(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
@@ -356,6 +357,76 @@ func TestDelete(t *testing.T) {
 	_, err = Post(client, nil, url, http.StatusOK, token)
 	if err != nil {
 		t.Error(err)
+		return
+	}
+}
+
+func TestGetMail(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+
+	jar, _ := cookiejar.New(nil)
+
+	client := &http.Client{
+		Jar: jar,
+	}
+
+	d := delivery.Delivery{}
+	router := InitTestRouter(mockUC, &d, []string{"/mail/get", "/signin"}, []func(http.ResponseWriter, *http.Request){d.GetMail, d.SignIn})
+
+	srv := httptest.NewServer(router)
+	defer srv.Close()
+
+	url := fmt.Sprintf("%s/mail/get?id=0", srv.URL)
+
+	signinForm :=  models.SignInForm{
+		Username: "test",
+		Password: "test",
+	}
+
+	mail := models.Mail{
+		Id:        0,
+		Client_id: 0,
+		Sender:    "test",
+		Addressee: "test2",
+		Theme:     "test",
+		Text:      "test",
+		Files:     "files",
+		Date:      time.Now(),
+		Read:      false,
+	}
+
+	mailBytes, _ := json.Marshal(mail)
+
+	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
+	mockUC.EXPECT().GetMail(&models.Session{Username: "test", Authenticated: true}, int32(0)).Return(mailBytes, pkg.NO_ERR)
+
+	err := SigninUser(client, signinForm, srv.URL)
+
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	r, err, _ := Get(client, url, http.StatusOK)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	var resp pkg.JsonResponse
+
+	err = json.NewDecoder(r.Body).Decode(&resp)
+
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if resp.Status != pkg.STATUS_OK {
+		t.Errorf("Статус тела ответа не соответствует ожидаемому. Получено: %v, ожидается: %v.", resp.Status, pkg.STATUS_OK)
 		return
 	}
 }

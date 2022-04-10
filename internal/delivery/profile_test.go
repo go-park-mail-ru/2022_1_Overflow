@@ -103,8 +103,8 @@ func TestSetInfo(t *testing.T) {
 	url := fmt.Sprintf("%s/profile/set", srv.URL)
 
 	data := models.SettingsForm{
-		FirstName: "",
-		LastName: "",
+		FirstName: "changed",
+		LastName: "changed",
 		Password: "changed",
 	}
 
