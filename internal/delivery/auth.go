@@ -55,6 +55,11 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
 
+// @Router /signin [get]
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
+func SignIn() {}
+
 // SignUp godoc
 // @Summary Выполняет регистрацию пользователя
 // @Description Выполняет регистрацию пользователя, НЕ выставляет сессионый cookie.
@@ -97,16 +102,22 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
 
+// @Router /signup [get]
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
+func SignUp() {}
+
 // SignOut godoc
 // @Summary Завершение сессии пользователя
 // @Success 200 {object} pkg.JsonResponse "Успешное завершение сессии."
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует, сессия не валидна."
 // @Failure 500 {object} pkg.JsonResponse
 // @Produce json
-// @Router /logout [get]
+// @Router /logout [post]
+// @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if r.Method != http.MethodGet {
+	if r.Method != http.MethodPost {
 		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
 		return
 	}
@@ -119,20 +130,7 @@ func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
 
-// GetToken godoc
-// @Summary СSRF проверка
-// @Description Токен приходит в header ответа в поле X-CSRF-Token
-// @Success 200 {object} models.TokenModel "Успешное получение CSRF токена."
-// @Produce json
-// @Router /get_token [get]
-func (d *Delivery) CSRFHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
-		return
-	}
-	csrf.Secure(false) // возможно стоит убрать
-	token := models.TokenModel{Status: 0, Token: csrf.Token(r)}
-	resp, _ := json.Marshal(token)
-	//w.Header().Set("X-CSRF-Token", csrf.Token(r))
-	w.Write(resp)
-}
+// @Router /logout [get]
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
+func SignOut() {}

@@ -76,6 +76,11 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
 
+// @Router /profile/set [get]
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
+func SetInfo() {}
+
 // SetAvatar godoc
 // @Summary Установка/смена аватарки пользователя
 // @Success 200 {object} pkg.JsonResponse "Успешное установка аватарки."
@@ -119,6 +124,11 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
+
+// @Router /profile/avatar/set [get]
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
+func SetAvatar() {}
 
 // GetAvatar godoc
 // @Summary Получение ссылки на аватарку пользователя

@@ -136,6 +136,11 @@ func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
 
+// @Router /mail/delete [get]
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
+func DeleteMail() {}
+
 // ReadMail godoc
 // @Summary Прочитать письмо по его id
 // @Produce json
@@ -169,6 +174,11 @@ func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
+
+// @Router /mail/read [get]
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
+func ReadMail() {}
 
 // SendMail godoc
 // @Summary Выполняет отправку письма получателю
@@ -211,6 +221,11 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
+
+// @Router /mail/send [get]
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
+func SendMail() {}
 
 // ForwardMail godoc
 // @Summary Переслать уже существующее письмо
@@ -261,6 +276,11 @@ func (d *Delivery) ForwardMail(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
 
+// @Router /mail/forward [get]
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
+func ForwardMail() {}
+
 
 // RespondMail godoc
 // @Summary Ответить на письмо пользователя
@@ -310,3 +330,8 @@ func (d *Delivery) RespondMail(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 }
+
+// @Router /mail/respond [get]
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
+func RespondMail() {}

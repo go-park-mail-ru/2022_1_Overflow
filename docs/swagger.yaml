@@ -76,13 +76,6 @@ definitions:
         maxLength: 20
         type: string
     type: object
-  models.TokenModel:
-    properties:
-      status:
-        type: integer
-      token:
-        type: string
-    type: object
   models.User:
     description: Структура пользователя
     properties:
@@ -112,19 +105,24 @@ info:
   title: OverMail API
   version: "1.0"
 paths:
-  /get_token:
-    get:
-      description: Токен приходит в header ответа в поле X-CSRF-Token
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Успешное получение CSRF токена.
-          schema:
-            $ref: '#/definitions/models.TokenModel'
-      summary: СSRF проверка
   /logout:
     get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+    post:
+      parameters:
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -142,6 +140,16 @@ paths:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Завершение сессии пользователя
   /mail/delete:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       parameters:
       - description: ID запрашиваемого письма.
@@ -176,6 +184,16 @@ paths:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Удалить письмо по его id
   /mail/forward:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       parameters:
       - description: ID запрашиваемого письма.
@@ -292,6 +310,16 @@ paths:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение исходящих сообщений
   /mail/read:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       parameters:
       - description: ID запрашиваемого письма.
@@ -326,6 +354,16 @@ paths:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Прочитать письмо по его id
   /mail/respond:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       parameters:
       - description: ID запрашиваемого письма.
@@ -366,6 +404,16 @@ paths:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Ответить на письмо пользователя
   /mail/send:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       consumes:
       - application/json
@@ -438,6 +486,16 @@ paths:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение ссылки на аватарку пользователя
   /profile/avatar/set:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       consumes:
       - multipart/form-data
@@ -469,6 +527,16 @@ paths:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Установка/смена аватарки пользователя
   /profile/set:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       consumes:
       - application/json
@@ -501,6 +569,16 @@ paths:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Изменение настроек пользователя
   /signin:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       consumes:
       - application/json
@@ -530,6 +608,16 @@ paths:
       summary: Выполняет аутентификацию и выставляет сессионый cookie с названием
         OverflowMail
   /signup:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       consumes:
       - application/json
