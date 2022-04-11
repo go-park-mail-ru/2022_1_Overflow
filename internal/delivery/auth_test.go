@@ -42,12 +42,12 @@ func TestSignin(t *testing.T) {
 	}
 
 	dataJson, _ := json.Marshal(data)
-	_, err, token := Get(client, fmt.Sprintf("%s/signin", srv.URL), http.StatusOK)
+	_, err, token := Get(client, fmt.Sprintf("%s/signin", srv.URL), http.StatusMethodNotAllowed)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	_, err = Post(client, dataJson, fmt.Sprintf("%s/signin", srv.URL), http.StatusOK, token)
+	_, err = Post(client, dataJson, fmt.Sprintf("%s/signin", srv.URL), http.StatusOK, token, "")
 	if err != nil {
 		t.Error(err)
 		return
@@ -81,12 +81,12 @@ func TestBadSignin(t *testing.T) {
 	}
 
 	dataJson, _ := json.Marshal(data)
-	_, err, token := Get(client, fmt.Sprintf("%s/signin", srv.URL), http.StatusOK)
+	_, err, token := Get(client, fmt.Sprintf("%s/signin", srv.URL), http.StatusMethodNotAllowed)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	_, err = Post(client, dataJson, fmt.Sprintf("%s/signin", srv.URL), http.StatusBadRequest, token)
+	_, err = Post(client, dataJson, fmt.Sprintf("%s/signin", srv.URL), http.StatusBadRequest, token, "")
 	if err != nil {
 		t.Error(err)
 		return
@@ -123,12 +123,12 @@ func TestSignup(t *testing.T) {
 	}
 
 	dataJson, _ := json.Marshal(data)
-	_, err, token := Get(client, fmt.Sprintf("%s/signup", srv.URL), http.StatusOK)
+	_, err, token := Get(client, fmt.Sprintf("%s/signup", srv.URL), http.StatusMethodNotAllowed)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	_, err = Post(client, dataJson, fmt.Sprintf("%s/signup", srv.URL), http.StatusOK, token)
+	_, err = Post(client, dataJson, fmt.Sprintf("%s/signup", srv.URL), http.StatusOK, token, "")
 	if err != nil {
 		t.Error(err)
 		return
@@ -166,12 +166,12 @@ func TestBadPassword(t *testing.T) {
 
 	dataJson, _ := json.Marshal(data)
 
-	_, err, token := Get(client, fmt.Sprintf("%s/signup", srv.URL), http.StatusOK)
+	_, err, token := Get(client, fmt.Sprintf("%s/signup", srv.URL), http.StatusMethodNotAllowed)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	_, err = Post(client, dataJson, fmt.Sprintf("%s/signup", srv.URL), http.StatusBadRequest, token)
+	_, err = Post(client, dataJson, fmt.Sprintf("%s/signup", srv.URL), http.StatusBadRequest, token, "")
 
 	if err != nil {
 		t.Error(err)
@@ -209,12 +209,12 @@ func TestEmptyForm(t *testing.T) {
 	}
 
 	dataJson, _ := json.Marshal(data)
-	_, err, token := Get(client, fmt.Sprintf("%s/signup", srv.URL), http.StatusOK)
+	_, err, token := Get(client, fmt.Sprintf("%s/signup", srv.URL), http.StatusMethodNotAllowed)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	_, err = Post(client, dataJson, fmt.Sprintf("%s/signup", srv.URL), http.StatusBadRequest, token)
+	_, err = Post(client, dataJson, fmt.Sprintf("%s/signup", srv.URL), http.StatusBadRequest, token, "")
 	if err != nil {
 		t.Error(err)
 		return
@@ -254,12 +254,12 @@ func TestSignout(t *testing.T) {
 		return
 	}
 	
-	_, err, token := Get(client, url, http.StatusOK)
+	_, err, token := Get(client, url, http.StatusMethodNotAllowed)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	_, err = Post(client, nil, url, http.StatusOK, token)
+	_, err = Post(client, nil, url, http.StatusOK, token, "")
 	if err != nil {
 		t.Error(err)
 		return

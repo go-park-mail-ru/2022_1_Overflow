@@ -37,11 +37,11 @@ func SigninUser(client *http.Client, form models.SignInForm, srv_url string) err
 	if err != nil {
 		return err
 	}
-	_, err, token := Get(client, fmt.Sprintf("%s/signin", srv_url), http.StatusOK)
+	_, err, token := Get(client, fmt.Sprintf("%s/signin", srv_url), http.StatusMethodNotAllowed)
 	if err != nil {
 		return err
 	}
-	r, err := Post(client, dataJson, fmt.Sprintf("%s/signin", srv_url), http.StatusOK, token)
+	r, err := Post(client, dataJson, fmt.Sprintf("%s/signin", srv_url), http.StatusOK, token, "")
 	if err != nil {
 		return err
 	}
@@ -51,12 +51,15 @@ func SigninUser(client *http.Client, form models.SignInForm, srv_url string) err
 	return nil
 }
 
-func Post(client *http.Client, data []byte, reqUrl string, expectedHttpStatus int, token string) (*http.Response, error) {
+func Post(client *http.Client, data []byte, reqUrl string, expectedHttpStatus int, token string, contentType string) (*http.Response, error) {
 	req, err := http.NewRequest("POST", reqUrl, bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("X-CSRF-Token", token)
+	if contentType != "" {
+		req.Header.Add("Content-Type", contentType)
+	}
 
 	r, err := client.Do(req)
 	if err != nil {

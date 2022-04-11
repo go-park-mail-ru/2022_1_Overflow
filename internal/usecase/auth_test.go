@@ -32,6 +32,26 @@ func TestSignIn(t *testing.T) {
 		t.Errorf("Неверный ответ от UseCase.")
 		return
 	}
+
+	mockDB.EXPECT().GetUserInfoByUsername("test").Return(models.User{}, nil)
+	r = uc.SignIn(form)
+	if r != pkg.WRONG_CREDS_ERR {
+		t.Errorf("Неверный ответ от UseCase.")
+		return
+	}
+
+	mockDB.EXPECT().GetUserInfoByUsername("test").Return(models.User{
+		Id: 0,
+		FirstName: "test",
+		LastName: "test",
+		Username: "test",
+		Password: "pass",
+	}, nil)
+	r = uc.SignIn(form)
+	if r != pkg.WRONG_CREDS_ERR {
+		t.Errorf("Неверный ответ от UseCase.")
+		return
+	}
 }
 
 func TestSignUp(t *testing.T) {

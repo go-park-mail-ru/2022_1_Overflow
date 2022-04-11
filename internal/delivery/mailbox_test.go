@@ -54,7 +54,7 @@ func TestSend(t *testing.T) {
 
 	dataJson, _ := json.Marshal(data)
 	
-	_, err := Post(client, dataJson, sendUrl, http.StatusForbidden, "")
+	_, err := Post(client, dataJson, sendUrl, http.StatusForbidden, "", "")
 	if err != nil {
 		t.Error(err)
 		return
@@ -69,12 +69,12 @@ func TestSend(t *testing.T) {
 		return
 	}
 
-	_, err, token := Get(client, sendUrl, http.StatusOK)
+	_, err, token := Get(client, sendUrl, http.StatusMethodNotAllowed)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	_, err = Post(client, dataJson, sendUrl, http.StatusOK, token)
+	_, err = Post(client, dataJson, sendUrl, http.StatusOK, token, "")
 	if err != nil {
 		t.Error(err)
 		return
@@ -124,7 +124,7 @@ func TestIncome(t *testing.T) {
 		return
 	}
 
-	_, err = Post(client, nil, url, http.StatusForbidden, "")
+	_, err = Post(client, nil, url, http.StatusForbidden, "", "")
 	if err != nil {
 		t.Error(err)
 		return
@@ -180,7 +180,7 @@ func TestOutcome(t *testing.T) {
 		return
 	}
 
-	_, err = Post(client, nil, url, http.StatusForbidden, "")
+	_, err = Post(client, nil, url, http.StatusForbidden, "", "")
 	if err != nil {
 		t.Error(err)
 		return
@@ -228,12 +228,12 @@ func TestRead(t *testing.T) {
 
 	url := fmt.Sprintf("%s/mail/read?id=0", srv.URL)
 
-	_, err, token := Get(client, url, http.StatusOK)
+	_, err, token := Get(client, url, http.StatusMethodNotAllowed)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	r, err := Post(client, nil, url, http.StatusOK, token)
+	r, err := Post(client, nil, url, http.StatusOK, token, "")
 	if err != nil {
 		t.Error(err)
 		return
@@ -254,7 +254,7 @@ func TestRead(t *testing.T) {
 	}
 }
 
-func TestForward(t *testing.T) {
+func TestForwardMail(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
@@ -301,12 +301,71 @@ func TestForward(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	_, err, token := Get(client, url, http.StatusOK)
+	_, err, token := Get(client, url, http.StatusMethodNotAllowed)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	_, err = Post(client, dataJson, url, http.StatusOK, token)
+	_, err = Post(client, dataJson, url, http.StatusOK, token, "")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+}
+
+func TestRespondMail(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+
+	jar, _ := cookiejar.New(nil)
+
+	client := &http.Client{
+		Jar: jar,
+	}
+
+	d := delivery.Delivery{}
+	router := InitTestRouter(mockUC, &d, []string{"/mail/respond", "/signin"}, []func(http.ResponseWriter, *http.Request){d.RespondMail, d.SignIn})
+
+	srv := httptest.NewServer(router)
+	defer srv.Close()
+
+	url := fmt.Sprintf("%s/mail/respond?mail_id=0", srv.URL)
+
+	data := models.MailForm{
+		Addressee: "test2",
+		Theme: "forwarded",
+		Text: "hello",
+		Files: "files",
+	}
+
+	signinForm := models.SignInForm{
+		Username: "test",
+		Password: "test",
+	}
+
+	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
+	mockUC.EXPECT().RespondMail(&models.Session{Username: "test", Authenticated: true}, data, int32(0)).Return(pkg.NO_ERR)
+
+	err := SigninUser(client, signinForm, srv.URL)
+
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	dataJson, err := json.Marshal(data)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	_, err, token := Get(client, url, http.StatusMethodNotAllowed)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	_, err = Post(client, dataJson, url, http.StatusOK, token, "")
 	if err != nil {
 		t.Error(err)
 		return
@@ -348,13 +407,13 @@ func TestDelete(t *testing.T) {
 		return
 	}
 
-	_, err, token := Get(client, url, http.StatusOK)
+	_, err, token := Get(client, url, http.StatusMethodNotAllowed)
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	_, err = Post(client, nil, url, http.StatusOK, token)
+	_, err = Post(client, nil, url, http.StatusOK, token, "")
 	if err != nil {
 		t.Error(err)
 		return
