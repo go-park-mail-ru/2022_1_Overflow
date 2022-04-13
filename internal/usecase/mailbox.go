@@ -141,6 +141,14 @@ func (uc *UseCase) SendMail(data *models.Session, form models.MailForm) pkg.Json
 	if (user == models.User{}) {
 		return pkg.DB_ERR
 	}
+	userAddressee, err := uc.db.GetUserInfoByUsername(form.Addressee)
+	if err != nil {
+		log.Error(err)
+		return pkg.DB_ERR
+	}
+	if (userAddressee == models.User{}) {
+		return pkg.NO_USER_EXIST
+	}
 	mail := models.Mail{
 		Client_id: user.Id,
 		Sender:    data.Username,

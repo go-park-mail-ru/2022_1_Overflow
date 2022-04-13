@@ -40,6 +40,7 @@ var (
 	NOT_IMPLEMENTED_ERR = JsonResponse{STATUS_NOT_IMP, "Не имплементировано."}
 	WRONG_CREDS_ERR = JsonResponse{STATUS_WRONG_CREDS, "Неверная пара логин/пароль."}
 	LOGGED_IN_ERR = JsonResponse{STATUS_LOGGED_IN, "Пользователь уже выполнил вход."}
+	NO_USER_EXIST = JsonResponse{STATUS_NO_USER, "Пользователя не существует."}
 )
 
 func WriteJsonErrFull(w http.ResponseWriter, err JsonResponse) {
@@ -49,6 +50,7 @@ func WriteJsonErrFull(w http.ResponseWriter, err JsonResponse) {
 		case STATUS_BAD_METHOD: w.WriteHeader(http.StatusMethodNotAllowed)
 		case STATUS_BAD_VALIDATION: w.WriteHeader(http.StatusBadRequest)
 		case STATUS_WRONG_CREDS: w.WriteHeader(http.StatusBadRequest)
+		case STATUS_NO_USER: w.WriteHeader(http.StatusNotFound)
 		default: w.WriteHeader(http.StatusInternalServerError)
 	}
 	resp, _ := json.Marshal(err)

@@ -252,11 +252,19 @@ func TestSendMail(t *testing.T) {
 		Username:  session.Username,
 	}
 
+	user2 := models.User{
+		Id: 1,
+		FirstName: "test2",
+		LastName:  "test2",
+		Password:  "test2",
+		Username: "test2",
+	}
+
 	mail := models.Mail{
 		Id:        0,
 		Client_id: 0,
 		Sender:    user.Username,
-		Addressee: "test2",
+		Addressee: user2.Username,
 		Theme:     "test",
 		Text:      "test",
 		Files:     "files",
@@ -272,6 +280,7 @@ func TestSendMail(t *testing.T) {
 	}
 
 	mockDB.EXPECT().GetUserInfoByUsername(session.Username).Return(user, nil)
+	mockDB.EXPECT().GetUserInfoByUsername(form.Addressee).Return(user2, nil)
 	mockDB.EXPECT().AddMail(mail).Return(nil)
 
 	r := uc.SendMail(&session, form)
@@ -307,13 +316,21 @@ func TestForwardMail(t *testing.T) {
 		Password:  "test2",
 	}
 
+	user2 := models.User{
+		Id: 1,
+		FirstName: "test3",
+		LastName:  "test3",
+		Password:  "test3",
+		Username: "test3",
+	}
+
 	session := models.Session{
 		Username:      user.Username,
 		Authenticated: true,
 	}
 
 	form := models.MailForm{
-		Addressee: "test3",
+		Addressee: user2.Username,
 		Theme:     "test",
 		Text:      "test",
 		Files:     "files",
@@ -332,6 +349,7 @@ func TestForwardMail(t *testing.T) {
 
 	mockDB.EXPECT().GetMailInfoById(mail1.Id).Return(mail1, nil)
 	mockDB.EXPECT().GetUserInfoByUsername(user.Username).Return(user, nil)
+	mockDB.EXPECT().GetUserInfoByUsername(form.Addressee).Return(user2, nil)
 	mockDB.EXPECT().AddMail(mail2).Return(nil)
 
 	r := uc.ForwardMail(&session, form, int32(0))
@@ -360,10 +378,18 @@ func TestRespondMail(t *testing.T) {
 		Password:  "test",
 	}
 
+	user2 := models.User{
+		Id: 1,
+		FirstName: "test2",
+		LastName:  "test2",
+		Password:  "test2",
+		Username: "test2",
+	}
+
 	mail1 := models.Mail{
 		Id: int32(0),
 		Client_id: 0,
-		Sender: "test2",
+		Sender: user2.Username,
 		Addressee: "test",
 		Theme: "test",
 		Text: "test",
@@ -373,7 +399,7 @@ func TestRespondMail(t *testing.T) {
 	}
 
 	form := models.MailForm{
-		Addressee: mail1.Sender,
+		Addressee: user2.Username,
 		Theme: "response",
 		Text: "test",
 		Files: "files",
@@ -392,6 +418,7 @@ func TestRespondMail(t *testing.T) {
 
 	mockDB.EXPECT().GetMailInfoById(mail1.Id).Return(mail1, nil)
 	mockDB.EXPECT().GetUserInfoByUsername(user.Username).Return(user, nil)
+	mockDB.EXPECT().GetUserInfoByUsername(form.Addressee).Return(user2, nil)
 	mockDB.EXPECT().AddMail(mail2).Return(nil)
 
 	r := uc.RespondMail(&session, form, mail1.Id)
