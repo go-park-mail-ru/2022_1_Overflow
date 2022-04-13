@@ -3,29 +3,21 @@ package sqlmocker
 import (
 	"OverflowBackend/internal/models"
 	"database/sql"
-	"fmt"
-
-	"github.com/DATA-DOG/go-sqlmock"
 )
 
 type SQLMock struct {
-	url string
-	db *sql.DB
-	mock sqlmock.Sqlmock
+	Url string
+	Db *sql.DB
 }
 
 func (d *SQLMock) Create(url string) (err error) {
-	d.url = url
-	d.db, d.mock, err = sqlmock.New()
-	if err != nil {
-		return fmt.Errorf("Unable to connect to database: %v\n", err)
-	}
+	d.Url = url
 	return nil
 }
 
 func (d *SQLMock) GetUserInfoByUsername(username string) (models.User, error) {
 	var user models.User
-	rows, err := d.db.Query("Select * from overflow.users where username = $1", username)
+	rows, err := d.Db.Query("Select * from overflow.users where username = $1", username)
 	if err != nil {
 		return user, err
 	}
@@ -40,7 +32,7 @@ func (d *SQLMock) GetUserInfoByUsername(username string) (models.User, error) {
 
 func (d *SQLMock) GetUserInfoById(userId int32) (models.User, error) {
 	var user models.User
-	rows, err := d.db.Query("Select * from overflow.users where Id = $1", userId)
+	rows, err := d.Db.Query("Select * from overflow.users where Id = $1", userId)
 	if err != nil {
 		return user, err
 	}
@@ -54,51 +46,51 @@ func (d *SQLMock) GetUserInfoById(userId int32) (models.User, error) {
 }
 
 func (d *SQLMock) AddUser(user models.User) error {
-	_, err := d.db.Query("insert into overflow.users(first_name, last_name, password, username) values ($1, $2, $3, $4);", user.FirstName, user.LastName, user.Password, user.Username)
+	_, err := d.Db.Query("insert into overflow.users(first_name, last_name, password, username) values ($1, $2, $3, $4);", user.FirstName, user.LastName, user.Password, user.Username)
 	return err
 }
 
 func (d *SQLMock) ChangeUserPassword(user models.User, newPassword string) error {
-	_, err := d.db.Query("UPDATE overflow.users set password = $1 where id = $2;", newPassword, user.Id)
+	_, err := d.Db.Query("UPDATE overflow.users set password = $1 where id = $2;", newPassword, user.Id)
 	return err
 }
 
 func (d *SQLMock) ChangeUserFirstName(user models.User, newFirstName string) error {
-	_, err := d.db.Query("UPDATE overflow.users set last_name = $1 where id = $2;", newFirstName, user.Id)
+	_, err := d.Db.Query("UPDATE overflow.users set last_name = $1 where id = $2;", newFirstName, user.Id)
 	return err
 }
 
 func (d *SQLMock) ChangeUserLastName(user models.User, newLastName string) error {
-	_, err := d.db.Query("UPDATE overflow.users set last_name = $1 where id = $2;", newLastName, user.Id)
+	_, err := d.Db.Query("UPDATE overflow.users set last_name = $1 where id = $2;", newLastName, user.Id)
 	return err
 }
 
 func (d *SQLMock) AddMail(mail models.Mail) error {
-	_, err := d.db.Query("insert into overflow.mails(client_id, sender, addressee, theme, text, files, date) values($1, $2, $3, $4, $5, $6, $7);", mail.Client_id, mail.Sender, mail.Addressee, mail.Theme, mail.Text, mail.Files, mail.Date)
+	_, err := d.Db.Query("insert into overflow.mails(client_id, sender, addressee, theme, text, files, date) values($1, $2, $3, $4, $5, $6, $7);", mail.Client_id, mail.Sender, mail.Addressee, mail.Theme, mail.Text, mail.Files, mail.Date)
 	return err
 }
 
 func (d *SQLMock) DeleteMail(mail models.Mail, username string) error {
-	_, err := d.db.Query("UPDATE overflow.mails set sender = 'null' where id = $1 and sender = $2;", mail.Id, username)
+	_, err := d.Db.Query("UPDATE overflow.mails set sender = 'null' where id = $1 and sender = $2;", mail.Id, username)
 	if err != nil {
 		return err
 	}
-	_, err = d.db.Query("UPDATE overflow.mails set addressee = 'null' where id = $1 and addressee = $2;", mail.Id, username)
+	_, err = d.Db.Query("UPDATE overflow.mails set addressee = 'null' where id = $1 and addressee = $2;", mail.Id, username)
 	if err != nil {
 		return err
 	}
-	_, err = d.db.Query("DELETE FROM overflow.mails WHERE sender like 'null' and addressee like 'null';")
+	_, err = d.Db.Query("DELETE FROM overflow.mails WHERE sender like 'null' and addressee like 'null';")
 	return err
 }
 
 func (d *SQLMock) ReadMail(mail models.Mail) error {
-	_, err := d.db.Query("UPDATE overflow.mails set read = $1 where id = $2;", true, mail.Id)
+	_, err := d.Db.Query("UPDATE overflow.mails set read = $1 where id = $2;", true, mail.Id)
 	return err
 }
 
 func (d *SQLMock) GetMailInfoById(mailId int32) (models.Mail, error) {
 	var mail models.Mail
-	rows, err := d.db.Query("Select * from overflow.mails where Id = $1", mailId)
+	rows, err := d.Db.Query("Select * from overflow.mails where Id = $1", mailId)
 	if err != nil {
 		return mail, err
 	}
@@ -113,7 +105,7 @@ func (d *SQLMock) GetMailInfoById(mailId int32) (models.Mail, error) {
 
 func (d *SQLMock) GetIncomeMails(userId int32) ([]models.Mail, error) {
 	var results []models.Mail
-	rows, err := d.db.Query("Select * from getIncomeMails($1)", userId)
+	rows, err := d.Db.Query("Select * from getIncomeMails($1)", userId)
 	if err != nil {
 		return results, err
 	}
@@ -130,7 +122,7 @@ func (d *SQLMock) GetIncomeMails(userId int32) ([]models.Mail, error) {
 
 func (d *SQLMock) GetOutcomeMails(userId int32) ([]models.Mail, error) {
 	var results []models.Mail
-	rows, err := d.db.Query("Select * from getOutcomeMails($1)", userId)
+	rows, err := d.Db.Query("Select * from getOutcomeMails($1)", userId)
 	if err != nil {
 		return results, err
 	}

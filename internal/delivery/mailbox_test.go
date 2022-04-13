@@ -1,8 +1,9 @@
-package delivery
+package delivery_test
 
 import (
+	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/models"
-	"OverflowBackend/internal/repository/mock"
+	"OverflowBackend/mocks"
 	"OverflowBackend/pkg"
 	"encoding/json"
 	"fmt"
@@ -10,26 +11,36 @@ import (
 	"net/http/cookiejar"
 	"net/http/httptest"
 	"testing"
+	"time"
+
+	"github.com/golang/mock/gomock"
 )
 
 
 func TestSend(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+
 	jar, _ := cookiejar.New(nil)
 
 	client := &http.Client{
 		Jar: jar,
 	}
 
-	db := mock.MockDB{}
-	db.Create("test")
-	createTestUsers(&db)
-	d := Delivery{}
-	router := InitTestRouter(&db, &d, []string{"/mail/send", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SendMail, d.SignIn})
+	d := delivery.Delivery{}
+	router := InitTestRouter(mockUC, &d, []string{"/mail/send", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SendMail, d.SignIn})
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
 	sendUrl := fmt.Sprintf("%s/mail/send", srv.URL)
+
+	signinForm := models.SignInForm{
+		Username: "test",
+		Password: "test",
+	}
 
 	data := models.MailForm{
 		Addressee: "test2",
@@ -38,9 +49,12 @@ func TestSend(t *testing.T) {
 		Files: "test",
 	}
 
+	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
+	mockUC.EXPECT().SendMail(&models.Session{Username: "test", Authenticated: true}, data).Return(pkg.NO_ERR)
+
 	dataJson, _ := json.Marshal(data)
 	
-	_, err := TestPost(client, dataJson, sendUrl, http.StatusUnauthorized)
+	_, err := Post(client, dataJson, sendUrl, http.StatusForbidden, "", "")
 	if err != nil {
 		t.Error(err)
 		return
@@ -48,25 +62,30 @@ func TestSend(t *testing.T) {
 
 	// ==============================================
 
-	err = SigninUser(client, models.SignInForm{
-		Username: "test",
-		Password: "test",
-	}, srv.URL)
+	err = SigninUser(client, signinForm, srv.URL)
 
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	_, err = TestPost(client, dataJson, sendUrl, http.StatusOK)
+	_, err, token := Get(client, sendUrl, http.StatusMethodNotAllowed)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	_, err = Post(client, dataJson, sendUrl, http.StatusOK, token, "")
 	if err != nil {
 		t.Error(err)
 		return
 	}
 }
 
-func TestIncome (t *testing.T) {
-	mailNum := 5
+func TestIncome(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -74,64 +93,55 @@ func TestIncome (t *testing.T) {
 		Jar: jar,
 	}
 
-	db := mock.MockDB{}
-	db.Create("test")
-	createTestUsers(&db)
-	PrepareMails(&db, mailNum)
-
-	d := Delivery{}
-	router := InitTestRouter(&db, &d, []string{"/mail/income", "/signin"}, []func(http.ResponseWriter, *http.Request){d.Income, d.SignIn})
+	d := delivery.Delivery{}
+	router := InitTestRouter(mockUC, &d, []string{"/mail/income", "/signin"}, []func(http.ResponseWriter, *http.Request){d.Income, d.SignIn})
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
 	url := fmt.Sprintf("%s/mail/income", srv.URL)
 
-	_, err := TestGet(client, url, http.StatusUnauthorized)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	err = SigninUser(client, models.SignInForm{
+	signinForm := models.SignInForm{
 		Username: "test2",
 		Password: "test2",
-	}, srv.URL)
+	}
+
+	mails, _ := json.Marshal([]models.MailAdditional{})
+
+	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
+	mockUC.EXPECT().Income(&models.Session{Username:"test2", Authenticated: true}).Return(mails, pkg.NO_ERR)
+
+	_, err, _ := Get(client, url, http.StatusUnauthorized)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	err = SigninUser(client, signinForm, srv.URL)
 
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	_, err = TestPost(client, nil, url, http.StatusMethodNotAllowed)
+	_, err = Post(client, nil, url, http.StatusForbidden, "", "")
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	r, err := TestGet(client, url, http.StatusOK)
+	_, err, _ = Get(client, url, http.StatusOK)
 	if err != nil {
 		t.Error(err)
-		return
-	}
-
-	var mails []models.Mail
-
-	err = json.NewDecoder(r.Body).Decode(&mails)
-
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	if len(mails) != mailNum {
-		t.Errorf("Количество сообщений не соответствует ожидаемому. Получено: %v, ожидается: %v.", len(mails), mailNum)
 		return
 	}
 }
 
-func TestOutcome (t *testing.T) {
-	mailNum := 5
+func TestOutcome(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -139,64 +149,55 @@ func TestOutcome (t *testing.T) {
 		Jar: jar,
 	}
 
-	db := mock.MockDB{}
-	db.Create("test")
-	createTestUsers(&db)
-	PrepareMails(&db, mailNum)
-
-	d := Delivery{}
-	router := InitTestRouter(&db, &d, []string{"/mail/outcome", "/signin"}, []func(http.ResponseWriter, *http.Request){d.Outcome, d.SignIn})
+	d := delivery.Delivery{}
+	router := InitTestRouter(mockUC, &d, []string{"/mail/outcome", "/signin"}, []func(http.ResponseWriter, *http.Request){d.Outcome, d.SignIn})
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
 	url := fmt.Sprintf("%s/mail/outcome", srv.URL)
 
-	_, err := TestGet(client, url, http.StatusUnauthorized)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	err = SigninUser(client, models.SignInForm{
+	signinForm := models.SignInForm{
 		Username: "test",
 		Password: "test",
-	}, srv.URL)
+	}
+
+	mails, _ := json.Marshal([]models.MailAdditional{})
+
+	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
+	mockUC.EXPECT().Outcome(&models.Session{Username:"test", Authenticated: true}).Return(mails, pkg.NO_ERR)
+
+	_, err, _ := Get(client, url, http.StatusUnauthorized)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	err = SigninUser(client, signinForm, srv.URL)
 
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	_, err = TestPost(client, nil, url, http.StatusMethodNotAllowed)
+	_, err = Post(client, nil, url, http.StatusForbidden, "", "")
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	r, err := TestGet(client, url, http.StatusOK)
+	_, err, _ = Get(client, url, http.StatusOK)
 	if err != nil {
 		t.Error(err)
-		return
-	}
-
-	var mails []models.Mail
-
-	err = json.NewDecoder(r.Body).Decode(&mails)
-
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	if len(mails) != mailNum {
-		t.Errorf("Количество сообщений не соответствует ожидаемому. Получено: %v, ожидается: %v.", len(mails), mailNum)
 		return
 	}
 }
 
 func TestRead(t *testing.T) {
-	mailNum := 5
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -204,21 +205,21 @@ func TestRead(t *testing.T) {
 		Jar: jar,
 	}
 
-	db := mock.MockDB{}
-	db.Create("test")
-	createTestUsers(&db)
-	PrepareMails(&db, mailNum)
-
-	d := Delivery{}
-	router := InitTestRouter(&db, &d, []string{"/mail/read", "/signin"}, []func(http.ResponseWriter, *http.Request){d.ReadMail, d.SignIn})
+	d := delivery.Delivery{}
+	router := InitTestRouter(mockUC, &d, []string{"/mail/read", "/signin"}, []func(http.ResponseWriter, *http.Request){d.ReadMail, d.SignIn})
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
-	err := SigninUser(client, models.SignInForm{
+	signinForm := models.SignInForm{
 		Username: "test2",
 		Password: "test2",
-	}, srv.URL)
+	}
+
+	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
+	mockUC.EXPECT().ReadMail(&models.Session{Username: "test2", Authenticated: true}, int32(0)).Return(pkg.NO_ERR)
+
+	err := SigninUser(client, signinForm, srv.URL)
 
 	if err != nil {
 		t.Error(err)
@@ -227,7 +228,12 @@ func TestRead(t *testing.T) {
 
 	url := fmt.Sprintf("%s/mail/read?id=0", srv.URL)
 
-	r, err := TestPost(client, nil, url, http.StatusOK)
+	_, err, token := Get(client, url, http.StatusMethodNotAllowed)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	r, err := Post(client, nil, url, http.StatusOK, token, "")
 	if err != nil {
 		t.Error(err)
 		return
@@ -246,21 +252,13 @@ func TestRead(t *testing.T) {
 		t.Errorf("Статус тела ответа не соответствует ожидаемому. Получено: %v, ожидается: %v.", resp.Status, pkg.STATUS_OK)
 		return
 	}
-
-	mail, err := db.GetMailInfoById(0)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	if mail.Read != true {
-		t.Errorf("Письмо не было прочитано.")
-		return
-	}
 }
 
-func TestForward(t *testing.T) {
-	mailNum := 5
+func TestForwardMail(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -268,56 +266,117 @@ func TestForward(t *testing.T) {
 		Jar: jar,
 	}
 
-	db := mock.MockDB{}
-	db.Create("test")
-	createTestUsers(&db)
-	PrepareMails(&db, mailNum)
-
-	d := Delivery{}
-	router := InitTestRouter(&db, &d, []string{"/mail/forward", "/signin"}, []func(http.ResponseWriter, *http.Request){d.ForwardMail, d.SignIn})
+	d := delivery.Delivery{}
+	router := InitTestRouter(mockUC, &d, []string{"/mail/forward", "/signin"}, []func(http.ResponseWriter, *http.Request){d.ForwardMail, d.SignIn})
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
-	err := SigninUser(client, models.SignInForm{
+	url := fmt.Sprintf("%s/mail/forward?mail_id=0", srv.URL)
+
+	data := models.MailForm {
+		Addressee: "test2",
+		Theme: "forwarded",
+		Text: "hello",
+		Files: "files",
+	}
+
+	signinForm := models.SignInForm{
 		Username: "test",
 		Password: "test",
-	}, srv.URL)
+	}
+
+	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
+	mockUC.EXPECT().ForwardMail(&models.Session{Username: "test", Authenticated: true}, data, int32(0)).Return(pkg.NO_ERR)
+
+	err := SigninUser(client, signinForm, srv.URL)
 
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	url := fmt.Sprintf("%s/mail/forward?mail_id=0&username=test2", srv.URL)
+	dataJson, err := json.Marshal(data)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	_, err, token := Get(client, url, http.StatusMethodNotAllowed)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	_, err = Post(client, dataJson, url, http.StatusOK, token, "")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+}
 
-	_, err = TestPost(client, nil, url, http.StatusOK)
+func TestRespondMail(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+
+	jar, _ := cookiejar.New(nil)
+
+	client := &http.Client{
+		Jar: jar,
+	}
+
+	d := delivery.Delivery{}
+	router := InitTestRouter(mockUC, &d, []string{"/mail/respond", "/signin"}, []func(http.ResponseWriter, *http.Request){d.RespondMail, d.SignIn})
+
+	srv := httptest.NewServer(router)
+	defer srv.Close()
+
+	url := fmt.Sprintf("%s/mail/respond?mail_id=0", srv.URL)
+
+	data := models.MailForm{
+		Addressee: "test2",
+		Theme: "forwarded",
+		Text: "hello",
+		Files: "files",
+	}
+
+	signinForm := models.SignInForm{
+		Username: "test",
+		Password: "test",
+	}
+
+	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
+	mockUC.EXPECT().RespondMail(&models.Session{Username: "test", Authenticated: true}, data, int32(0)).Return(pkg.NO_ERR)
+
+	err := SigninUser(client, signinForm, srv.URL)
+
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	user, err := db.GetUserInfoByUsername("test")
+	dataJson, err := json.Marshal(data)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	mails, err := db.GetOutcomeMails(user.Id)
-
+	_, err, token := Get(client, url, http.StatusMethodNotAllowed)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-
-	mailNum++
-	if len(mails) != mailNum {
-		t.Errorf("Количество сообщений не соответствует ожидаемому. Получено: %v, ожидается: %v.", len(mails), mailNum)
+	_, err = Post(client, dataJson, url, http.StatusOK, token, "")
+	if err != nil {
+		t.Error(err)
 		return
 	}
 }
 
 func TestDelete(t *testing.T) {
-	mailNum := 5
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -325,69 +384,108 @@ func TestDelete(t *testing.T) {
 		Jar: jar,
 	}
 
-	db := mock.MockDB{}
-	db.Create("test")
-	createTestUsers(&db)
-	PrepareMails(&db, mailNum)
-
-	d := Delivery{}
-	router := InitTestRouter(&db, &d, []string{"/mail/delete", "/signin"}, []func(http.ResponseWriter, *http.Request){d.DeleteMail, d.SignIn})
+	d := delivery.Delivery{}
+	router := InitTestRouter(mockUC, &d, []string{"/mail/delete", "/signin"}, []func(http.ResponseWriter, *http.Request){d.DeleteMail, d.SignIn})
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
-	err := SigninUser(client, models.SignInForm{
-		Username: "test",
-		Password: "test",
-	}, srv.URL)
-
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
 	url := fmt.Sprintf("%s/mail/delete?id=0", srv.URL)
 
-	_, err = TestPost(client, nil, url, http.StatusOK)
-	if err != nil {
-		t.Error(err)
-		return
+	signinForm :=  models.SignInForm{
+		Username: "test",
+		Password: "test",
 	}
 
-	jar, _ = cookiejar.New(nil)
-	client.Jar = jar
+	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
+	mockUC.EXPECT().DeleteMail(&models.Session{Username: "test", Authenticated: true}, int32(0)).Return(pkg.NO_ERR)
 
-	err = SigninUser(client, models.SignInForm{
-		Username: "test2",
-		Password: "test2",
-	}, srv.URL)
-
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	_, err = TestPost(client, nil, url, http.StatusOK)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	user, err := db.GetUserInfoByUsername("test")
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	mails, err := db.GetOutcomeMails(user.Id)
+	err := SigninUser(client, signinForm, srv.URL)
 
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	mailNum--
-	if len(mails) != mailNum {
-		t.Errorf("Количество сообщений не соответствует ожидаемому. Получено: %v, ожидается: %v.", len(mails), mailNum)
+	_, err, token := Get(client, url, http.StatusMethodNotAllowed)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	_, err = Post(client, nil, url, http.StatusOK, token, "")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+}
+
+func TestGetMail(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+
+	jar, _ := cookiejar.New(nil)
+
+	client := &http.Client{
+		Jar: jar,
+	}
+
+	d := delivery.Delivery{}
+	router := InitTestRouter(mockUC, &d, []string{"/mail/get", "/signin"}, []func(http.ResponseWriter, *http.Request){d.GetMail, d.SignIn})
+
+	srv := httptest.NewServer(router)
+	defer srv.Close()
+
+	url := fmt.Sprintf("%s/mail/get?id=0", srv.URL)
+
+	signinForm :=  models.SignInForm{
+		Username: "test",
+		Password: "test",
+	}
+
+	mail := models.Mail{
+		Id:        0,
+		Client_id: 0,
+		Sender:    "test",
+		Addressee: "test2",
+		Theme:     "test",
+		Text:      "test",
+		Files:     "files",
+		Date:      time.Now(),
+		Read:      false,
+	}
+
+	mailBytes, _ := json.Marshal(mail)
+
+	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
+	mockUC.EXPECT().GetMail(&models.Session{Username: "test", Authenticated: true}, int32(0)).Return(mailBytes, pkg.NO_ERR)
+
+	err := SigninUser(client, signinForm, srv.URL)
+
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	r, err, _ := Get(client, url, http.StatusOK)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	var resp pkg.JsonResponse
+
+	err = json.NewDecoder(r.Body).Decode(&resp)
+
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if resp.Status != pkg.STATUS_OK {
+		t.Errorf("Статус тела ответа не соответствует ожидаемому. Получено: %v, ожидается: %v.", resp.Status, pkg.STATUS_OK)
 		return
 	}
 }

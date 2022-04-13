@@ -118,6 +118,7 @@ func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
 		return
 	}
+
 	data, err := session.GetData(r)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
@@ -157,6 +158,7 @@ func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
 		return
 	}
+
 	data, err := session.GetData(r)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
@@ -244,6 +246,7 @@ func (d *Delivery) ForwardMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
 		return
 	}
+
 	data, err := session.GetData(r)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
@@ -299,6 +302,7 @@ func (d *Delivery) RespondMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
 		return
 	}
+	
 	data, err := session.GetData(r)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)

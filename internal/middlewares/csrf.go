@@ -8,20 +8,6 @@ import (
 	"github.com/gorilla/csrf"
 )
 
-type loggingResponseWriter struct {
-	http.ResponseWriter
-	statusCode int
-}
-
-func NewLoggingResponseWriter(w http.ResponseWriter) *loggingResponseWriter {
-	return &loggingResponseWriter{w, http.StatusOK}
-}
-
-func (lrw *loggingResponseWriter) WriteHeader(code int) {
-	lrw.statusCode = code
-	lrw.ResponseWriter.WriteHeader(code)
-}
-
 var csrfWrapper func(http.Handler) http.Handler
 
 func init() {
@@ -48,11 +34,6 @@ func CSRFGetWrapper(handler http.Handler) http.Handler {
 		if r.Method == http.MethodGet {
 			w.Header().Set("X-CSRF-Token", csrf.Token(r))
 		}
-		lrw := NewLoggingResponseWriter(w)
-		handler.ServeHTTP(lrw, r)
-		if lrw.statusCode == http.StatusMethodNotAllowed {
-			w.WriteHeader(http.StatusOK)
-			//pkg.WriteJsonErrFull(w, pkg.NO_ERR)
-		}
+		handler.ServeHTTP(w, r)
 	})
 }

@@ -50,7 +50,6 @@ func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 // @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
 	if r.Method != http.MethodPost {
 		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
 		return
