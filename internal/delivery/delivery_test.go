@@ -23,6 +23,7 @@ func init() {
 }
 
 func InitTestRouter(uc usecase.UseCaseInterface, d *delivery.Delivery, urls []string, handles []func(http.ResponseWriter, *http.Request)) http.Handler {
+	middlewares.Init(DefConf)
 	session.Init(DefConf)
 	d.Init(uc, DefConf)
 	router := mux.NewRouter()

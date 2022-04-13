@@ -14,7 +14,6 @@ var session_name string = "OveflowMail"
 // Данные всех сессий.
 var store *sessions.CookieStore
 
-// Запускается при инициализации пакета
 func Init(config *config.Config) {
 	authKeyOne := config.Server.Keys.AuthKey
 	encryptionKeyOne := config.Server.Keys.EncKey

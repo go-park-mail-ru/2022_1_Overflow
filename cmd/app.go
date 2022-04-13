@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"OverflowBackend/internal/config"
+	"OverflowBackend/internal/middlewares"
 	"OverflowBackend/internal/usecase/session"
 
 	log "github.com/sirupsen/logrus"
@@ -32,6 +33,7 @@ func (app *Application) Run(configPath string) {
 		log.Fatalf("Ошибка при подключении к БД: %v", err)
 	}
 
+	middlewares.Init(config)
 	session.Init(config)
 	
 	log.Info("Инициализация роутеров.")

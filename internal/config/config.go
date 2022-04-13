@@ -41,9 +41,9 @@ type Config struct {
 			Handle string `yaml:"handle"`
 		} `yaml:"static"`
 		Keys struct {
-			CSRFToken string `yaml:"csrf_token"`
-			AuthKey   string `yaml:"auth_key"`
-			EncKey    string `yaml:"enc_key"`
+			CSRFAuthKey string `yaml:"csrf_authkey"`
+			AuthKey     string `yaml:"auth_key"`
+			EncKey      string `yaml:"enc_key"`
 		} `yaml:"keys"`
 	} `yaml:"server"`
 	Database struct {
@@ -93,9 +93,9 @@ func TestConfig() *Config {
 				Handle string "yaml:\"handle\""
 			} "yaml:\"static\""
 			Keys struct {
-				CSRFToken string "yaml:\"csrf_token\""
-				AuthKey   string "yaml:\"auth_key\""
-				EncKey    string "yaml:\"enc_key\""
+				CSRFAuthKey string "yaml:\"csrf_authkey\""
+				AuthKey     string "yaml:\"auth_key\""
+				EncKey      string "yaml:\"enc_key\""
 			} "yaml:\"keys\""
 		}{
 			Port: "8080",
@@ -117,10 +117,14 @@ func TestConfig() *Config {
 				Dir:    "static",
 				Handle: "/static",
 			},
-			Keys: struct{CSRFToken string "yaml:\"csrf_token\""; AuthKey string "yaml:\"auth_key\""; EncKey string "yaml:\"enc_key\""}{
-				CSRFToken: "",
-				AuthKey: "aPdSgVkYp3s6v9y$B&E)H+MbQeThWmZq",
-				EncKey: "cRfUjXn2r5u8x/A?D*G-KaPdSgVkYp3s",
+			Keys: struct {
+				CSRFAuthKey string "yaml:\"csrf_authkey\""
+				AuthKey     string "yaml:\"auth_key\""
+				EncKey      string "yaml:\"enc_key\""
+			}{
+				CSRFAuthKey: "7ad7b8be40fef684833eaf00770082cf",
+				AuthKey:     "aPdSgVkYp3s6v9y$B&E)H+MbQeThWmZq",
+				EncKey:      "cRfUjXn2r5u8x/A?D*G-KaPdSgVkYp3s",
 			},
 		},
 		Database: struct {
