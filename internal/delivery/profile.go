@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"OverflowBackend/internal/models"
+	"OverflowBackend/internal/security/xss"
 	"OverflowBackend/internal/usecase/session"
 	"OverflowBackend/pkg"
 	"bytes"
@@ -67,6 +68,10 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, pkg.JSON_ERR)
 		return
 	}
+
+	form.FirstName = xss.P.Sanitize(form.FirstName)
+	form.LastName = xss.P.Sanitize(form.LastName)
+	form.Password = xss.P.Sanitize(form.Password)
 
 	if err := d.uc.SetInfo(data, &form); err != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, err)

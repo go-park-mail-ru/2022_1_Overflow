@@ -94,6 +94,12 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	data.FirstName = xss.P.Sanitize(data.FirstName)
 	data.LastName = xss.P.Sanitize(data.LastName)
 
+	passSanitized := xss.P.Sanitize(data.Password)
+	if passSanitized != data.Password {
+		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, "Пароль содержит недопустимое содержимое.")
+		return
+	}
+
 	if err := d.uc.SignUp(data); err != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, err)
 		return
