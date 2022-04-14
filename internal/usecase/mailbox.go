@@ -149,6 +149,11 @@ func (uc *UseCase) SendMail(data *models.Session, form models.MailForm) pkg.Json
 	if (userAddressee == models.User{}) {
 		return pkg.NO_USER_EXIST
 	}
+	location, err := time.LoadLocation("Europe/Moscow")
+	if err != nil {
+		log.Error(err)
+		return pkg.INTERNAL_ERR
+	}
 	mail := models.Mail{
 		Client_id: user.Id,
 		Sender:    data.Username,
@@ -156,7 +161,7 @@ func (uc *UseCase) SendMail(data *models.Session, form models.MailForm) pkg.Json
 		Theme:     form.Theme,
 		Text:      form.Text,
 		Files:     form.Files,
-		Date:      time.Now(),
+		Date:      time.Now().In(location),
 	}
 	err = uc.db.AddMail(mail)
 	if err != nil {
