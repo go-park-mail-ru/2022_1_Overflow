@@ -80,7 +80,10 @@ func (c *Database) GetUserInfoById(userId int32) (models.User, error) {
 
 // Добавить пользователя
 func (c *Database) AddUser(user models.User) error {
-	_, err := c.Conn.Query(context.Background(), "insert into overflow.users(first_name, last_name, password, username) values ($1, $2, $3, $4);", user.FirstName, user.LastName, user.Password, user.Username)
+	res, err := c.Conn.Query(context.Background(), "insert into overflow.users(first_name, last_name, password, username) values ($1, $2, $3, $4);", user.FirstName, user.LastName, user.Password, user.Username)
+	if err == nil {
+		res.Close()
+	}
 	return err
 }
 
@@ -104,27 +107,38 @@ func (c *Database) ChangeUserLastName(user models.User, newLastName string) erro
 
 // Добавить письмо
 func (c *Database) AddMail(mail models.Mail) error {
-	_, err := c.Conn.Query(context.Background(), "insert into overflow.mails(client_id, sender, addressee, theme, text, files, date) values($1, $2, $3, $4, $5, $6, $7);", mail.Client_id, mail.Sender, mail.Addressee, mail.Theme, mail.Text, mail.Files, mail.Date)
+	res, err := c.Conn.Query(context.Background(), "insert into overflow.mails(client_id, sender, addressee, theme, text, files, date) values($1, $2, $3, $4, $5, $6, $7);", mail.Client_id, mail.Sender, mail.Addressee, mail.Theme, mail.Text, mail.Files, mail.Date)
+	if err == nil {
+		res.Close()
+	}
 	return err
 }
 
 //Удалить письмо
 func (c *Database) DeleteMail(mail models.Mail, username string) error {
-	_, err := c.Conn.Query(context.Background(), "UPDATE overflow.mails set sender = 'null' where id = $1 and sender = $2;", mail.Id, username)
+	res, err := c.Conn.Query(context.Background(), "UPDATE overflow.mails set sender = 'null' where id = $1 and sender = $2;", mail.Id, username)
 	if err != nil {
 		return err
 	}
-	_, err = c.Conn.Query(context.Background(), "UPDATE overflow.mails set addressee = 'null' where id = $1 and addressee = $2;", mail.Id, username)
+	res.Close()
+	res, err = c.Conn.Query(context.Background(), "UPDATE overflow.mails set addressee = 'null' where id = $1 and addressee = $2;", mail.Id, username)
 	if err != nil {
 		return err
 	}
-	_, err = c.Conn.Query(context.Background(), "DELETE FROM overflow.mails WHERE sender like 'null' and addressee like 'null';")
+	res.Close()
+	res, err = c.Conn.Query(context.Background(), "DELETE FROM overflow.mails WHERE sender like 'null' and addressee like 'null';")
+	if err == nil {
+		res.Close()
+	}
 	return err
 }
 
 //Прочитать письмо
 func (c *Database) ReadMail(mail models.Mail) error {
-	_, err := c.Conn.Query(context.Background(), "UPDATE overflow.mails set read = $1 where id = $2;", true, mail.Id)
+	res, err := c.Conn.Query(context.Background(), "UPDATE overflow.mails set read = $1 where id = $2;", true, mail.Id)
+	if err == nil {
+		res.Close()
+	}
 	return err
 }
 
