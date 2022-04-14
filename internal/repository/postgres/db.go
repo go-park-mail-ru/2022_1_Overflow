@@ -88,19 +88,19 @@ func (c *Database) AddUser(user models.User) error {
 
 // Изменить пароль
 func (c *Database) ChangeUserPassword(user models.User, newPassword string) error {
-	_, err := c.Conn.Query(context.Background(), "UPDATE overflow.users set password = $1 where id = $2;", newPassword, user.Id)
+	_, err := c.Conn.Exec(context.Background(), "UPDATE overflow.users set password = $1 where id = $2;", newPassword, user.Id)
 	return err
 }
 
 // Изменить имя
 func (c *Database) ChangeUserFirstName(user models.User, newFirstName string) error {
-	_, err := c.Conn.Query(context.Background(), "UPDATE overflow.users set first_name = $1 where id = $2;", newFirstName, user.Id)
+	_, err := c.Conn.Exec(context.Background(), "UPDATE overflow.users set first_name = $1 where id = $2;", newFirstName, user.Id)
 	return err
 }
 
 // Изменить фамилию
 func (c *Database) ChangeUserLastName(user models.User, newLastName string) error {
-	_, err := c.Conn.Query(context.Background(), "UPDATE overflow.users set last_name = $1 where id = $2;", newLastName, user.Id)
+	_, err := c.Conn.Exec(context.Background(), "UPDATE overflow.users set last_name = $1 where id = $2;", newLastName, user.Id)
 	return err
 }
 

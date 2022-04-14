@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jackc/pgconn"
 	"github.com/pashagolub/pgxmock"
 )
 
@@ -145,12 +146,12 @@ func TestChangeUserPassword(t *testing.T) {
 	}
 	new_password := "pass"
 
-	mock.ExpectQuery(
+	mock.ExpectExec(
 		regexp.QuoteMeta("UPDATE overflow.users set password = $1 where id = $2;"),
 	).WithArgs(
 		new_password,
 		user.Id,
-	).WillReturnRows(&pgxmock.Rows{})
+	).WillReturnResult(pgconn.CommandTag{})
 
 	testDB := postgres.Database{
 		Conn:   mock,
@@ -185,12 +186,12 @@ func TestChangeUserFirstName(t *testing.T) {
 	}
 	new_firstname := "Doe"
 
-	mock.ExpectQuery(
+	mock.ExpectExec(
 		regexp.QuoteMeta("UPDATE overflow.users set first_name = $1 where id = $2;"),
 	).WithArgs(
 		new_firstname,
 		user.Id,
-	).WillReturnRows(&pgxmock.Rows{})
+	).WillReturnResult(pgconn.CommandTag{})
 
 	testDB := postgres.Database{
 		Conn: mock,
@@ -225,12 +226,12 @@ func TestChangeUserLastName(t *testing.T) {
 	}
 	new_lastname := "John"
 
-	mock.ExpectQuery(
+	mock.ExpectExec(
 		regexp.QuoteMeta("UPDATE overflow.users set last_name = $1 where id = $2;"),
 	).WithArgs(
 		new_lastname,
 		user.Id,
-	).WillReturnRows(&pgxmock.Rows{})
+	).WillReturnResult(pgconn.CommandTag{})
 
 	testDB := postgres.Database{
 		Conn: mock,
