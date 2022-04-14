@@ -27,7 +27,7 @@ func (uc *UseCase) Income(data *models.Session) ([]byte, pkg.JsonResponse) {
 		mail_add := models.MailAdditional{}
 		mail_add.Mail = mail
 		mailSess := models.Session{}
-		mailSess.Username = mail.Sender
+		mailSess.Username = mail.Addressee
 		avatarUrl, resp := uc.GetAvatar(&mailSess)
 		if resp != pkg.NO_ERR {
 			return nil, resp
