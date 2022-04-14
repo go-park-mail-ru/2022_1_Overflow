@@ -13,10 +13,12 @@ type SessionManager struct{}
 
 func (uc *UseCase) SignIn(data models.SignInForm) pkg.JsonResponse {
 	log.Info("SignIn: ", "handling usecase")
+	log.Info("SignIn: ", "handling validation")
 	if err := validation.CheckSignIn(data); err != nil {
 		log.Error("SignIn: ", "bad validation")
 		return pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, err.Error())
 	}
+	log.Info("SignIn: ", "handling db")
 	userFind, err := uc.db.GetUserInfoByUsername(data.Username)
 	if (err != nil || userFind == models.User{}) {
 		log.Error("SignIn: ", "wrong username")
