@@ -27,8 +27,6 @@ func TestAddUser(t *testing.T) {
 		Username:  "john",
 	}
 
-	mock.ExpectBegin()
-
 	mock.ExpectQuery(
 		regexp.QuoteMeta("insert into overflow.users(first_name, last_name, password, username) values ($1, $2, $3, $4);"),
 	).WithArgs(
@@ -38,15 +36,8 @@ func TestAddUser(t *testing.T) {
 		user.Username,
 	).WillReturnRows(&pgxmock.Rows{})
 
-	conn, err := mock.Begin(context.Background())
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
 	testDB := postgres.Database{
-		Db:   mock,
-		Conn: conn,
+		Conn:   mock,
 	}
 
 	err = testDB.AddUser(user)
@@ -77,23 +68,14 @@ func TestGetUserInfoByUsername(t *testing.T) {
 		Username:  "john",
 	}
 
-	mock.ExpectBegin()
-
 	mock.ExpectQuery(
 		regexp.QuoteMeta("Select * from overflow.users where username = $1;"),
 	).WithArgs(
 		user.Username,
 	).WillReturnRows(pgxmock.NewRows([]string{"id", "first_name", "last_name", "password", "username"}))
 
-	conn, err := mock.Begin(context.Background())
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
 	testDB := postgres.Database{
-		Db:   mock,
-		Conn: conn,
+		Conn: mock,
 	}
 
 	_, err = testDB.GetUserInfoByUsername(user.Username)
@@ -124,23 +106,14 @@ func TestGetUserInfoById(t *testing.T) {
 		Username:  "john",
 	}
 
-	mock.ExpectBegin()
-
 	mock.ExpectQuery(
 		regexp.QuoteMeta("Select * from overflow.users where id = $1;"),
 	).WithArgs(
 		user.Id,
 	).WillReturnRows(pgxmock.NewRows([]string{"id", "first_name", "last_name", "password", "username"}))
 
-	conn, err := mock.Begin(context.Background())
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
 	testDB := postgres.Database{
-		Db:   mock,
-		Conn: conn,
+		Conn: mock,
 	}
 
 	_, err = testDB.GetUserInfoById(user.Id)
@@ -172,8 +145,6 @@ func TestChangeUserPassword(t *testing.T) {
 	}
 	new_password := "pass"
 
-	mock.ExpectBegin()
-
 	mock.ExpectQuery(
 		regexp.QuoteMeta("UPDATE overflow.users set password = $1 where id = $2;"),
 	).WithArgs(
@@ -181,15 +152,8 @@ func TestChangeUserPassword(t *testing.T) {
 		user.Id,
 	).WillReturnRows(&pgxmock.Rows{})
 
-	conn, err := mock.Begin(context.Background())
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
 	testDB := postgres.Database{
-		Db:   mock,
-		Conn: conn,
+		Conn:   mock,
 	}
 
 	err = testDB.ChangeUserPassword(user, new_password)
@@ -221,8 +185,6 @@ func TestChangeUserFirstName(t *testing.T) {
 	}
 	new_firstname := "Doe"
 
-	mock.ExpectBegin()
-
 	mock.ExpectQuery(
 		regexp.QuoteMeta("UPDATE overflow.users set first_name = $1 where id = $2;"),
 	).WithArgs(
@@ -230,15 +192,8 @@ func TestChangeUserFirstName(t *testing.T) {
 		user.Id,
 	).WillReturnRows(&pgxmock.Rows{})
 
-	conn, err := mock.Begin(context.Background())
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
 	testDB := postgres.Database{
-		Db:   mock,
-		Conn: conn,
+		Conn: mock,
 	}
 
 	err = testDB.ChangeUserFirstName(user, new_firstname)
@@ -270,8 +225,6 @@ func TestChangeUserLastName(t *testing.T) {
 	}
 	new_lastname := "John"
 
-	mock.ExpectBegin()
-
 	mock.ExpectQuery(
 		regexp.QuoteMeta("UPDATE overflow.users set last_name = $1 where id = $2;"),
 	).WithArgs(
@@ -279,15 +232,8 @@ func TestChangeUserLastName(t *testing.T) {
 		user.Id,
 	).WillReturnRows(&pgxmock.Rows{})
 
-	conn, err := mock.Begin(context.Background())
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
 	testDB := postgres.Database{
-		Db:   mock,
-		Conn: conn,
+		Conn: mock,
 	}
 
 	err = testDB.ChangeUserLastName(user, new_lastname)
@@ -322,8 +268,6 @@ func TestAddMail(t *testing.T) {
 		Read:      false,
 	}
 
-	mock.ExpectBegin()
-
 	mock.ExpectQuery(
 		regexp.QuoteMeta("insert into overflow.mails(client_id, sender, addressee, theme, text, files, date) values($1, $2, $3, $4, $5, $6, $7);"),
 	).WithArgs(
@@ -336,15 +280,8 @@ func TestAddMail(t *testing.T) {
 		mail.Date,
 	).WillReturnRows(&pgxmock.Rows{})
 
-	conn, err := mock.Begin(context.Background())
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
 	testDB := postgres.Database{
-		Db:   mock,
-		Conn: conn,
+		Conn: mock,
 	}
 
 	err = testDB.AddMail(mail)

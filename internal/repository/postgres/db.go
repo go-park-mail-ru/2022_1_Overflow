@@ -22,12 +22,12 @@ type PgxIface interface {
 
 type Database struct {
 	url  string
-	Db PgxIface
+	Conn PgxIface
 }
 
 func (c *Database) Create(url string) (err error) {
 	c.url = url
-	c.Db, err = pgx.Connect(context.Background(), url)
+	c.Conn, err = pgx.Connect(context.Background(), url)
 	if err != nil {
 		return fmt.Errorf("Unable to connect to database: %v\n", err)
 	}
@@ -37,20 +37,13 @@ func (c *Database) Create(url string) (err error) {
 // Получить данные пользователя по его почте
 func (c *Database) GetUserInfoByUsername(username string) (models.User, error) {
 	var user models.User
-	tx, err := c.Db.Begin(context.Background())
+	rows, err := c.Conn.Query(context.Background(), "Select * from overflow.users where username = $1;", username)
 	if err != nil {
-		tx.Rollback(context.Background())
-		return user, fmt.Errorf("Unable to connect to database: %v\n", err)
-	}
-	rows, err := tx.Query(context.Background(), "Select * from overflow.users where username = $1;", username)
-	if err != nil {
-		_ = tx.Rollback(context.Background())
 		return user, err
 	}
 	for rows.Next() {
 		values, err := rows.Values()
 		if err != nil {
-			_ = tx.Rollback(context.Background())
 			return user, err
 		}
 		user.Id = values[0].(int32)
@@ -59,13 +52,13 @@ func (c *Database) GetUserInfoByUsername(username string) (models.User, error) {
 		user.Password = values[3].(string)
 		user.Username = values[4].(string)
 	}
-	return user, tx.Commit(context.Background())
+	return user, nil
 }
 
 // Получить данные пользователя по его айди в бд
 func (c *Database) GetUserInfoById(userId int32) (models.User, error) {
 	var user models.User
-	rows, err := tx.Query(context.Background(), "Select * from overflow.users where id = $1;", userId)
+	rows, err := c.Conn.Query(context.Background(), "Select * from overflow.users where id = $1;", userId)
 	if err != nil {
 		return user, err
 	}
@@ -85,58 +78,58 @@ func (c *Database) GetUserInfoById(userId int32) (models.User, error) {
 
 // Добавить пользователя
 func (c *Database) AddUser(user models.User) error {
-	_, err := tx.Query(context.Background(), "insert into overflow.users(first_name, last_name, password, username) values ($1, $2, $3, $4);", user.FirstName, user.LastName, user.Password, user.Username)
+	_, err := c.Conn.Query(context.Background(), "insert into overflow.users(first_name, last_name, password, username) values ($1, $2, $3, $4);", user.FirstName, user.LastName, user.Password, user.Username)
 	return err
 }
 
 // Изменить пароль
 func (c *Database) ChangeUserPassword(user models.User, newPassword string) error {
-	_, err := tx.Query(context.Background(), "UPDATE overflow.users set password = $1 where id = $2;", newPassword, user.Id)
+	_, err := c.Conn.Query(context.Background(), "UPDATE overflow.users set password = $1 where id = $2;", newPassword, user.Id)
 	return err
 }
 
 // Изменить имя
 func (c *Database) ChangeUserFirstName(user models.User, newFirstName string) error {
-	_, err := tx.Query(context.Background(), "UPDATE overflow.users set first_name = $1 where id = $2;", newFirstName, user.Id)
+	_, err := c.Conn.Query(context.Background(), "UPDATE overflow.users set first_name = $1 where id = $2;", newFirstName, user.Id)
 	return err
 }
 
 // Изменить фамилию
 func (c *Database) ChangeUserLastName(user models.User, newLastName string) error {
-	_, err := tx.Query(context.Background(), "UPDATE overflow.users set last_name = $1 where id = $2;", newLastName, user.Id)
+	_, err := c.Conn.Query(context.Background(), "UPDATE overflow.users set last_name = $1 where id = $2;", newLastName, user.Id)
 	return err
 }
 
 // Добавить письмо
 func (c *Database) AddMail(mail models.Mail) error {
-	_, err := tx.Query(context.Background(), "insert into overflow.mails(client_id, sender, addressee, theme, text, files, date) values($1, $2, $3, $4, $5, $6, $7);", mail.Client_id, mail.Sender, mail.Addressee, mail.Theme, mail.Text, mail.Files, mail.Date)
+	_, err := c.Conn.Query(context.Background(), "insert into overflow.mails(client_id, sender, addressee, theme, text, files, date) values($1, $2, $3, $4, $5, $6, $7);", mail.Client_id, mail.Sender, mail.Addressee, mail.Theme, mail.Text, mail.Files, mail.Date)
 	return err
 }
 
 //Удалить письмо
 func (c *Database) DeleteMail(mail models.Mail, username string) error {
-	_, err := tx.Query(context.Background(), "UPDATE overflow.mails set sender = 'null' where id = $1 and sender = $2;", mail.Id, username)
+	_, err := c.Conn.Query(context.Background(), "UPDATE overflow.mails set sender = 'null' where id = $1 and sender = $2;", mail.Id, username)
 	if err != nil {
 		return err
 	}
-	_, err = tx.Query(context.Background(), "UPDATE overflow.mails set addressee = 'null' where id = $1 and addressee = $2;", mail.Id, username)
+	_, err = c.Conn.Query(context.Background(), "UPDATE overflow.mails set addressee = 'null' where id = $1 and addressee = $2;", mail.Id, username)
 	if err != nil {
 		return err
 	}
-	_, err = tx.Query(context.Background(), "DELETE FROM overflow.mails WHERE sender like 'null' and addressee like 'null';")
+	_, err = c.Conn.Query(context.Background(), "DELETE FROM overflow.mails WHERE sender like 'null' and addressee like 'null';")
 	return err
 }
 
 //Прочитать письмо
 func (c *Database) ReadMail(mail models.Mail) error {
-	_, err := tx.Query(context.Background(), "UPDATE overflow.mails set read = $1 where id = $2;", true, mail.Id)
+	_, err := c.Conn.Query(context.Background(), "UPDATE overflow.mails set read = $1 where id = $2;", true, mail.Id)
 	return err
 }
 
 // Получить письмо по ID
 func (c *Database) GetMailInfoById(mailId int32) (models.Mail, error) {
 	var mail models.Mail
-	rows, err := tx.Query(context.Background(), "Select * from overflow.mails where Id = $1", mailId)
+	rows, err := c.Conn.Query(context.Background(), "Select * from overflow.mails where Id = $1", mailId)
 	if err != nil {
 		return mail, err
 	}
@@ -161,7 +154,7 @@ func (c *Database) GetMailInfoById(mailId int32) (models.Mail, error) {
 // Получить входящие сообщения пользователя
 func (c *Database) GetIncomeMails(userId int32) ([]models.Mail, error) {
 	var results []models.Mail
-	rows, err := tx.Query(context.Background(), "Select * from getIncomeMails($1)", userId)
+	rows, err := c.Conn.Query(context.Background(), "Select * from getIncomeMails($1)", userId)
 	if err != nil {
 		return results, err
 	}
@@ -187,7 +180,7 @@ func (c *Database) GetIncomeMails(userId int32) ([]models.Mail, error) {
 //Получить отправленные пользователем сообщения
 func (c *Database) GetOutcomeMails(userId int32) ([]models.Mail, error) {
 	var results []models.Mail
-	rows, err := tx.Query(context.Background(), "Select * from getOutcomeMails($1)", userId)
+	rows, err := c.Conn.Query(context.Background(), "Select * from getOutcomeMails($1)", userId)
 	if err != nil {
 		return results, err
 	}
