@@ -8,6 +8,8 @@ import (
 
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
+
+	//log "github.com/sirupsen/logrus"
 )
 
 type PgxIface interface {
@@ -41,6 +43,7 @@ func (c *Database) GetUserInfoByUsername(username string) (models.User, error) {
 	if err != nil {
 		return user, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		values, err := rows.Values()
 		if err != nil {
@@ -62,6 +65,7 @@ func (c *Database) GetUserInfoById(userId int32) (models.User, error) {
 	if err != nil {
 		return user, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		values, err := rows.Values()
 		if err != nil {
@@ -133,6 +137,7 @@ func (c *Database) GetMailInfoById(mailId int32) (models.Mail, error) {
 	if err != nil {
 		return mail, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		values, err := rows.Values()
 		if err != nil {
