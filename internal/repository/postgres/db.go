@@ -8,7 +8,7 @@ import (
 
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
-
+	"github.com/jackc/pgx/v4/pgxpool"
 	//log "github.com/sirupsen/logrus"
 )
 
@@ -18,8 +18,6 @@ type PgxIface interface {
 	QueryRow(context.Context, string, ...interface{}) pgx.Row
 	Query(context.Context, string, ...interface{}) (pgx.Rows, error)
 	Ping(context.Context) error
-	Prepare(context.Context, string, string) (*pgconn.StatementDescription, error)
-	Close(context.Context) error
 }
 
 type Database struct {
@@ -29,7 +27,7 @@ type Database struct {
 
 func (c *Database) Create(url string) (err error) {
 	c.url = url
-	c.Conn, err = pgx.Connect(context.Background(), url)
+	c.Conn, err = pgxpool.Connect(context.Background(), url)
 	if err != nil {
 		return fmt.Errorf("Unable to connect to database: %v\n", err)
 	}
