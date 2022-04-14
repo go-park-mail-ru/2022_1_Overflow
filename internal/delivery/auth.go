@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/csrf"
+	log "github.com/sirupsen/logrus"
 )
 
 // SignIn godoc
@@ -23,16 +24,19 @@ import (
 // @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	log.Info("SignIn: ", "checking method")
 	if r.Method != http.MethodPost {
 		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
 		return
 	}
 
+	log.Info("SignIn: ", "checking session")
 	if session.IsLoggedIn(r) {
 		pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 		return
 	}
 
+	log.Info("SignIn: ", "checking data")
 	var data models.SignInForm
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
@@ -45,6 +49,7 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Info("SignIn: ", "creating session")
 	err = session.CreateSession(w, r, data.Username)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, pkg.INTERNAL_ERR)
@@ -72,28 +77,30 @@ func SignIn() {}
 // @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	log.Info("SignUp: ", "checking method")
 	if r.Method != http.MethodPost {
 		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
 		return
 	}
 
+	log.Info("SignUp: ", "checking session")
 	if session.IsLoggedIn(r) {
 		pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 		return
 	}
 
+	log.Info("SignUp: ", "checking data")
 	var data models.SignUpForm
-
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, pkg.JSON_ERR)
 		return
 	}
 
+	log.Info("SignUp: ", "sanitizing data")
 	data.Username = xss.P.Sanitize(data.Username)
 	data.FirstName = xss.P.Sanitize(data.FirstName)
 	data.LastName = xss.P.Sanitize(data.LastName)
-
 	passSanitized := xss.P.Sanitize(data.Password)
 	if passSanitized != data.Password {
 		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, "Пароль содержит недопустимое содержимое.")

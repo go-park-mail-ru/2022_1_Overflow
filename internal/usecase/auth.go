@@ -12,17 +12,18 @@ import (
 type SessionManager struct{}
 
 func (uc *UseCase) SignIn(data models.SignInForm) pkg.JsonResponse {
+	log.Info("SignIn: ", "handling usecase")
 	if err := validation.CheckSignIn(data); err != nil {
-		log.Debug("SignIn: ", "bad validation")
+		log.Error("SignIn: ", "bad validation")
 		return pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, err.Error())
 	}
 	userFind, err := uc.db.GetUserInfoByUsername(data.Username)
 	if (err != nil || userFind == models.User{}) {
-		log.Debug("SignIn: ", "wrong username")
+		log.Error("SignIn: ", "wrong username")
 		return pkg.WRONG_CREDS_ERR
 	}
 	if userFind.Password != pkg.HashPassword(data.Password) {
-		log.Debug("SignIn: ", "wrong password")
+		log.Error("SignIn: ", "wrong password")
 		return pkg.WRONG_CREDS_ERR
 	}
 	log.Info("SignIn, username: ", data.Username)
@@ -30,6 +31,7 @@ func (uc *UseCase) SignIn(data models.SignInForm) pkg.JsonResponse {
 }
 
 func (uc *UseCase) SignUp(data models.SignUpForm) pkg.JsonResponse {
+	log.Info("SignUp: ", "handling usecase")
 	if err := validation.CheckSignUp(data); err != nil {
 		return pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, err.Error())
 	}
