@@ -35,6 +35,7 @@ type Config struct {
 			Write  time.Duration `yaml:"write"`
 			Read   time.Duration `yaml:"read"`
 			Idle   time.Duration `yaml:"idle"`
+			CSRFTimeout time.Duration `yaml:"csrf_timeout"`
 		} `yaml:"timeout"`
 		Static struct {
 			Dir    string `yaml:"dir"`
@@ -83,10 +84,11 @@ func TestConfig() *Config {
 		Server: struct {
 			Port    string "yaml:\"port\""
 			Timeout struct {
-				Server time.Duration "yaml:\"server\""
-				Write  time.Duration "yaml:\"write\""
-				Read   time.Duration "yaml:\"read\""
-				Idle   time.Duration "yaml:\"idle\""
+				Server time.Duration "yaml:\"server\"";
+				Write time.Duration "yaml:\"write\"";
+				Read time.Duration "yaml:\"read\"";
+				Idle time.Duration "yaml:\"idle\"";
+				CSRFTimeout time.Duration "yaml:\"csrf_timeout\""
 			} "yaml:\"timeout\""
 			Static struct {
 				Dir    string "yaml:\"dir\""
@@ -99,16 +101,12 @@ func TestConfig() *Config {
 			} "yaml:\"keys\""
 		}{
 			Port: "8080",
-			Timeout: struct {
-				Server time.Duration "yaml:\"server\""
-				Write  time.Duration "yaml:\"write\""
-				Read   time.Duration "yaml:\"read\""
-				Idle   time.Duration "yaml:\"idle\""
-			}{
+			Timeout: struct{Server time.Duration "yaml:\"server\""; Write time.Duration "yaml:\"write\""; Read time.Duration "yaml:\"read\""; Idle time.Duration "yaml:\"idle\""; CSRFTimeout time.Duration "yaml:\"csrf_timeout\""} {
 				Server: 10 * time.Second,
 				Write:  5 * time.Second,
 				Read:   5 * time.Second,
 				Idle:   5 * time.Second,
+				CSRFTimeout: 15 * time.Minute,
 			},
 			Static: struct {
 				Dir    string "yaml:\"dir\""
