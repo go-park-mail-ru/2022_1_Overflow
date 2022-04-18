@@ -31,16 +31,30 @@ func (uc *UseCase) GetInfo(data *models.Session) ([]byte, pkg.JsonResponse) {
 // Установка аватарки пользователя.
 func (uc *UseCase) SetAvatar(data *models.Session, avatar *models.Avatar) pkg.JsonResponse {
 	log.Info("Установка аватарки")
-	format := data.Username + "_" + avatar.Name
+	// создание папки с файлами, если она не существует
 	if err := os.MkdirAll(uc.config.Server.Static.Dir, os.ModePerm); err != nil {
 		log.Error(err)
 		return pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Ошибка создания папки.")
+	}
+	// хеширование имени пользователя и имени аватара, приведение к соответствующему формату
+	hashedUser := pkg.HashString(data.Username)
+	format := hashedUser + "_" + pkg.HashString(avatar.Name) + filepath.Ext(avatar.Name)
+	matches, e := filepath.Glob(filepath.Join(uc.config.Server.Static.Dir, hashedUser+"_*"))
+	if e != nil {
+		log.Error(e)
+		return pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Ошибка поиска файла.")
 	}
 	path := filepath.Join(uc.config.Server.Static.Dir, format)
 	err := os.WriteFile(path, avatar.Content, 0644)
 	if err != nil {
 		log.Error(err)
 		return pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Ошибка записи в файл.")
+	}
+	// если остались старые файлы (старые автарки), то удаляем их
+	if len(matches) > 0 {
+		for _, match := range matches {
+			os.Remove(match)
+		}
 	}
 	return pkg.NO_ERR
 }
@@ -82,7 +96,7 @@ func (uc *UseCase) SetInfo(data *models.Session, settings *models.SettingsForm) 
 
 // Получение ссылки на аватарку пользователя.
 func (uc *UseCase) GetAvatar(data *models.Session) (string, pkg.JsonResponse) {
-	matches, e := filepath.Glob(filepath.Join(uc.config.Server.Static.Dir, data.Username+"_*"))
+	matches, e := filepath.Glob(filepath.Join(uc.config.Server.Static.Dir, pkg.HashString(data.Username)+"_*"))
 	if e != nil {
 		log.Error(e)
 		return "", pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Ошибка поиска файла.")
