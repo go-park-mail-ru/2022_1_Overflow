@@ -14,7 +14,7 @@ server:
     enc_key: "cRfUjXn2r5u8x/A?D*G-KaPdSgVkYp3s"
   
 database:
-  type: "postgres"
+  type: "mock"
   user: "postgres"
   password: "123"
   host: "localhost"

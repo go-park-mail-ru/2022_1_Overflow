@@ -24,8 +24,7 @@ func Init(config *config.Config) {
 	)
 
 	store.Options = &sessions.Options{
-		//Path: "/",
-		MaxAge:   60 * 15, // 15 мин
+		MaxAge:   0,
 		HttpOnly: false,
 		Secure:   false,
 	}
