@@ -165,32 +165,3 @@ func (uc *UseCase) SendMail(data *models.Session, form models.MailForm) pkg.Json
 	}
 	return pkg.NO_ERR
 }
-
-func (uc *UseCase) ForwardMail(data *models.Session, form models.MailForm, mail_id int32) pkg.JsonResponse {
-	log.Debug("Пересылка письма, sender = ", data.Username, ", addressee = ", form.Addressee)
-	mailInner, err := uc.db.GetMailInfoById(mail_id)
-	if err != nil {
-		return pkg.DB_ERR
-	}
-	switch
-	{
-		case mailInner.Sender == data.Username: break
-		case mailInner.Addressee == data.Username: mailInner.Sender = data.Username
-		default: return pkg.UNAUTHORIZED_ERR
-	}
-	form = pkg.MailWrapper(form, mailInner)
-	return uc.SendMail(data, form)
-}
-
-func (uc *UseCase) RespondMail(data *models.Session, form models.MailForm, mail_id int32) pkg.JsonResponse {
-	log.Debug("Ответ на письмо, sender = ", data.Username, ", addressee = ", form.Addressee)
-	mailInner, err := uc.db.GetMailInfoById(mail_id)
-	if err != nil {
-		return pkg.DB_ERR
-	}
-	if mailInner.Addressee != data.Username || form.Addressee != mailInner.Sender {
-		return pkg.UNAUTHORIZED_ERR
-	}
-	form = pkg.MailWrapper(form, mailInner)
-	return uc.SendMail(data, form)
-}

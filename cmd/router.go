@@ -49,8 +49,6 @@ func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 	router.HandleFunc("/mail/delete", rm.d.DeleteMail)
 	router.HandleFunc("/mail/read", rm.d.ReadMail)
 	router.HandleFunc("/mail/send", rm.d.SendMail)
-	router.HandleFunc("/mail/forward", rm.d.ForwardMail)
-	router.HandleFunc("/mail/respond", rm.d.RespondMail)
 	router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
 		httpSwagger.URL("/swagger/doc.json"), //The url pointing to API definition
 		httpSwagger.DeepLinking(true),

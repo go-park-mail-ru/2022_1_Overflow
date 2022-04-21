@@ -51,20 +51,6 @@ func (mr *MockUseCaseInterfaceMockRecorder) DeleteMail(arg0, arg1 interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMail", reflect.TypeOf((*MockUseCaseInterface)(nil).DeleteMail), arg0, arg1)
 }
 
-// ForwardMail mocks base method.
-func (m *MockUseCaseInterface) ForwardMail(arg0 *models.Session, arg1 models.MailForm, arg2 int32) pkg.JsonResponse {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ForwardMail", arg0, arg1, arg2)
-	ret0, _ := ret[0].(pkg.JsonResponse)
-	return ret0
-}
-
-// ForwardMail indicates an expected call of ForwardMail.
-func (mr *MockUseCaseInterfaceMockRecorder) ForwardMail(arg0, arg1, arg2 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ForwardMail", reflect.TypeOf((*MockUseCaseInterface)(nil).ForwardMail), arg0, arg1, arg2)
-}
-
 // GetAvatar mocks base method.
 func (m *MockUseCaseInterface) GetAvatar(arg0 *models.Session) (string, pkg.JsonResponse) {
 	m.ctrl.T.Helper()
@@ -164,20 +150,6 @@ func (m *MockUseCaseInterface) ReadMail(arg0 *models.Session, arg1 int32) pkg.Js
 func (mr *MockUseCaseInterfaceMockRecorder) ReadMail(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadMail", reflect.TypeOf((*MockUseCaseInterface)(nil).ReadMail), arg0, arg1)
-}
-
-// RespondMail mocks base method.
-func (m *MockUseCaseInterface) RespondMail(arg0 *models.Session, arg1 models.MailForm, arg2 int32) pkg.JsonResponse {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RespondMail", arg0, arg1, arg2)
-	ret0, _ := ret[0].(pkg.JsonResponse)
-	return ret0
-}
-
-// RespondMail indicates an expected call of RespondMail.
-func (mr *MockUseCaseInterfaceMockRecorder) RespondMail(arg0, arg1, arg2 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RespondMail", reflect.TypeOf((*MockUseCaseInterface)(nil).RespondMail), arg0, arg1, arg2)
 }
 
 // SendMail mocks base method.

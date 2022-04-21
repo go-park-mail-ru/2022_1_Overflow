@@ -183,56 +183,6 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Удалить письмо по его id
-  /mail/forward:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-    post:
-      parameters:
-      - description: ID запрашиваемого письма.
-        in: query
-        name: mail_id
-        required: true
-        type: integer
-      - description: Форма письма
-        in: body
-        name: MailForm
-        required: true
-        schema:
-          $ref: '#/definitions/models.MailForm'
-      - description: CSRF токен
-        in: header
-        name: X-CSRF-Token
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-        "401":
-          description: Сессия отсутствует или сессия не валидна.
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-        "405":
-          description: Method Not Allowed
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-        "500":
-          description: Письмо не принадлежит пользователю, ошибка БД, неверные GET
-            параметры.
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      summary: Переслать уже существующее письмо
   /mail/get:
     get:
       parameters:
@@ -353,56 +303,6 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Прочитать письмо по его id
-  /mail/respond:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-    post:
-      parameters:
-      - description: ID запрашиваемого письма.
-        in: query
-        name: mail_id
-        required: true
-        type: integer
-      - description: Форма письма
-        in: body
-        name: MailForm
-        required: true
-        schema:
-          $ref: '#/definitions/models.MailForm'
-      - description: CSRF токен
-        in: header
-        name: X-CSRF-Token
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-        "401":
-          description: Сессия отсутствует или сессия не валидна.
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-        "405":
-          description: Method Not Allowed
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-        "500":
-          description: Письмо не принадлежит пользователю, ошибка БД, неверные GET
-            параметры.
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      summary: Ответить на письмо пользователя
   /mail/send:
     get:
       responses:
