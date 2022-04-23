@@ -14,7 +14,7 @@ CREATE TABLE overflow.mails (
     client_id serial not null,
     sender varchar(234) not null ,
     addressee varchar(234) not null ,
-    date date not null,
+    date timestamp not null,
     theme varchar(30),
     text text not null ,
     files varchar(30),
