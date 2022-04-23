@@ -165,7 +165,7 @@ func TestGetAvatar(t *testing.T) {
 	expAvatarUrl := "/static/dummy.png"
 
 	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
-	mockUC.EXPECT().GetAvatar(&models.Session{Username: "test", Authenticated: true}).Return(expAvatarUrl, pkg.NO_ERR)
+	mockUC.EXPECT().GetAvatar("test").Return(expAvatarUrl, pkg.NO_ERR)
 
 	err := SigninUser(client, signinForm, srv.URL)
 	if err != nil {

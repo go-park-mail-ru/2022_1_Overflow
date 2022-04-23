@@ -13,6 +13,9 @@ var csrfToken string
 var csrfTokenTicker *time.Ticker
 
 func GetCSRFToken(r *http.Request) (token string, isNew bool){
+	token = csrf.Token(r)
+	return
+	/*
 	if len(csrfToken) == 0 {
 		isNew = true
 		token = csrf.Token(r)
@@ -35,6 +38,7 @@ func GetCSRFToken(r *http.Request) (token string, isNew bool){
 	}
 	csrfToken = token
 	return
+	*/
 }
 
 func Init(config *config.Config) {
