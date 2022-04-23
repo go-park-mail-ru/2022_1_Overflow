@@ -7,7 +7,7 @@ returns table
             theme varchar(30),
             text text,
             files varchar(20),
-            date date,
+            date timestamp,
             read bool,
             id int
         ) as $$
@@ -31,7 +31,7 @@ returns table
             theme varchar(30),
             text text,
             files varchar(20),
-            date date,
+            date timestamp,
             id int
         ) as $$
 declare
