@@ -33,10 +33,14 @@ func (app *Application) Run(configPath string) {
 		log.Fatalf("Ошибка при подключении к БД: %v", err)
 	}
 
-	middlewares.Init(config)
-	session.Init(config)
+	log.Info("Инициализация менджера сессий.")
+	err = session.Init(config)
+	if err != nil {
+		log.Fatalf("Ошибка при инициализации менеджера сессий: %v", err)
+	}
 	
 	log.Info("Инициализация роутеров.")
+	middlewares.Init(config)
 	router := RouterManager{}
 	router.Init(db, config)
 

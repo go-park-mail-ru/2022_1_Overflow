@@ -25,7 +25,7 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, e := session.GetData(r)
+	data, e := session.Manager.GetData(r)
 	if e != nil {
 		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
 		return
@@ -53,7 +53,7 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, e := session.GetData(r)
+	data, e := session.Manager.GetData(r)
 	if e != nil {
 		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
 		return
@@ -82,7 +82,7 @@ func (d *Delivery) GetMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, e := session.GetData(r)
+	data, e := session.Manager.GetData(r)
 	if e != nil {
 		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
 		return
@@ -119,7 +119,7 @@ func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := session.GetData(r)
+	data, err := session.Manager.GetData(r)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
 		return
@@ -159,7 +159,7 @@ func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := session.GetData(r)
+	data, err := session.Manager.GetData(r)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
 		return
@@ -199,7 +199,7 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := session.GetData(r)
+	data, err := session.Manager.GetData(r)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
 		return

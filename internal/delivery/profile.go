@@ -26,7 +26,7 @@ func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, e := session.GetData(r)
+	data, e := session.Manager.GetData(r)
 	if e != nil {
 		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
 		return
@@ -56,7 +56,7 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := session.GetData(r)
+	data, err := session.Manager.GetData(r)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
 		return
@@ -102,7 +102,7 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, err := session.GetData(r)
+	data, err := session.Manager.GetData(r)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
 		return
@@ -152,7 +152,7 @@ func (d *Delivery) GetAvatar(w http.ResponseWriter, r *http.Request) {
 
 	username := r.URL.Query().Get("username")
 	if len(username) == 0 {
-		data, e := session.GetData(r)
+		data, e := session.Manager.GetData(r)
 		if e != nil {
 			pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
 			return

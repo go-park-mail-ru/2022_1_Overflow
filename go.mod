@@ -15,10 +15,12 @@ require (
 )
 
 require (
+	github.com/antonlindstrom/pgstore v0.0.0-20220421113606-e3a6e3fed12a // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
+	github.com/lib/pq v1.10.5 // indirect
 	github.com/pashagolub/pgxmock v1.4.4 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2 // indirect

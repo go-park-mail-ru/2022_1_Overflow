@@ -31,7 +31,7 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Info("SignIn: ", "checking session")
-	if session.IsLoggedIn(r) {
+	if session.Manager.IsLoggedIn(r) {
 		pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 		return
 	}
@@ -50,7 +50,7 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Info("SignIn: ", "creating session")
-	err = session.CreateSession(w, r, data.Username)
+	err = session.Manager.CreateSession(w, r, data.Username)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, pkg.INTERNAL_ERR)
 		return
@@ -84,7 +84,7 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Info("SignUp: ", "checking session")
-	if session.IsLoggedIn(r) {
+	if session.Manager.IsLoggedIn(r) {
 		pkg.WriteJsonErrFull(w, pkg.NO_ERR)
 		return
 	}
@@ -135,7 +135,7 @@ func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := session.DeleteSession(w, r)
+	err := session.Manager.DeleteSession(w, r)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, pkg.INTERNAL_ERR)
 		return
