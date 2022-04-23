@@ -17,7 +17,7 @@ func (pm *PostgresManager) Init(config *config.Config) (err error) {
 	authKeyOne := config.Server.Keys.AuthKey
 	encryptionKeyOne := config.Server.Keys.EncKey
 
-	dbUrl := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=verify-full",
+	dbUrl := fmt.Sprintf("postgres://%v:%v@%v:%v/%v",
 		config.Database.User,
 		config.Database.Password,
 		config.Database.Host,
