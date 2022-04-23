@@ -52,28 +52,28 @@ definitions:
   models.SignInForm:
     properties:
       password:
-        maxLength: 20
+        maxLength: 45
         type: string
       username:
-        maxLength: 20
+        maxLength: 45
         type: string
     type: object
   models.SignUpForm:
     properties:
       first_name:
-        maxLength: 20
+        maxLength: 45
         type: string
       last_name:
-        maxLength: 20
+        maxLength: 45
         type: string
       password:
-        maxLength: 20
+        maxLength: 45
         type: string
       password_confirmation:
-        maxLength: 20
+        maxLength: 45
         type: string
       username:
-        maxLength: 20
+        maxLength: 45
         type: string
     type: object
   models.User:
@@ -369,6 +369,13 @@ paths:
       summary: Получение данных пользователя
   /profile/avatar:
     get:
+      description: Получение ссылки на аватарку текущего пользователя или пользователя
+        с конкретным логином (username).
+      parameters:
+      - description: Имя пользователя, соответствующее аватарке.
+        in: query
+        name: username
+        type: string
       produces:
       - application/json
       responses:

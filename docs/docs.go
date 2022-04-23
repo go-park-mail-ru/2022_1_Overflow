@@ -422,10 +422,19 @@ const docTemplate = `{
         },
         "/profile/avatar": {
             "get": {
+                "description": "Получение ссылки на аватарку текущего пользователя или пользователя с конкретным логином (username).",
                 "produces": [
                     "application/json"
                 ],
                 "summary": "Получение ссылки на аватарку пользователя",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Имя пользователя, соответствующее аватарке.",
+                        "name": "username",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Ссылка на аватарку в формате /{static_dir}/{file}.{ext}.",
@@ -777,11 +786,11 @@ const docTemplate = `{
             "properties": {
                 "password": {
                     "type": "string",
-                    "maxLength": 20
+                    "maxLength": 45
                 },
                 "username": {
                     "type": "string",
-                    "maxLength": 20
+                    "maxLength": 45
                 }
             }
         },
@@ -790,23 +799,23 @@ const docTemplate = `{
             "properties": {
                 "first_name": {
                     "type": "string",
-                    "maxLength": 20
+                    "maxLength": 45
                 },
                 "last_name": {
                     "type": "string",
-                    "maxLength": 20
+                    "maxLength": 45
                 },
                 "password": {
                     "type": "string",
-                    "maxLength": 20
+                    "maxLength": 45
                 },
                 "password_confirmation": {
                     "type": "string",
-                    "maxLength": 20
+                    "maxLength": 45
                 },
                 "username": {
                     "type": "string",
-                    "maxLength": 20
+                    "maxLength": 45
                 }
             }
         },
