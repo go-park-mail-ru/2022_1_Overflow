@@ -10,7 +10,7 @@ server:
     dir: "static"
     handle: "/static/"
   keys:
-    csrf_token: "7ad7b8be40fef684833eaf00770082cf"
+    csrf_authkey: "7ad7b8be40fef684833eaf00770082cf"
     auth_key: "aPdSgVkYp3s6v9y$B&E)H+MbQeThWmZq"
     enc_key: "cRfUjXn2r5u8x/A?D*G-KaPdSgVkYp3s"
   
