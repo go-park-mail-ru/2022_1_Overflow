@@ -32,7 +32,7 @@ func (pm *PostgresManager) Init(config *config.Config) (err error) {
 		[]byte(encryptionKeyOne),
 	)
 	pm.store.Options = &sessions.Options{
-		MaxAge:   0,
+		MaxAge:   10*365*24*60*60,
 		HttpOnly: false,
 		Secure:   false,
 	}
