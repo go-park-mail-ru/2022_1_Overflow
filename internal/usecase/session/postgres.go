@@ -3,10 +3,12 @@ package session
 import (
 	"OverflowBackend/internal/config"
 	"OverflowBackend/internal/models"
+	"encoding/gob"
 	"fmt"
 	"net/http"
 
 	"github.com/antonlindstrom/pgstore"
+	"github.com/gorilla/sessions"
 )
 
 type PostgresManager struct {
@@ -29,6 +31,13 @@ func (pm *PostgresManager) Init(config *config.Config) (err error) {
 		[]byte(authKeyOne),
 		[]byte(encryptionKeyOne),
 	)
+	pm.store.Options = &sessions.Options{
+		MaxAge:   0,
+		HttpOnly: false,
+		Secure:   false,
+	}
+
+	gob.Register(models.Session{})
 	return
 }
 
