@@ -26,9 +26,7 @@ func (uc *UseCase) Income(data *models.Session) ([]byte, pkg.JsonResponse) {
 	for _, mail := range mails {
 		mail_add := models.MailAdditional{}
 		mail_add.Mail = mail
-		mailSess := models.Session{}
-		mailSess.Username = mail.Sender
-		avatarUrl, resp := uc.GetAvatar(&mailSess)
+		avatarUrl, resp := uc.GetAvatar(mail.Sender)
 		if resp != pkg.NO_ERR {
 			return nil, resp
 		}
@@ -60,9 +58,7 @@ func (uc *UseCase) Outcome(data *models.Session) ([]byte, pkg.JsonResponse) {
 	for _, mail := range mails {
 		mail_add := models.MailAdditional{}
 		mail_add.Mail = mail
-		mailSess := models.Session{}
-		mailSess.Username = mail.Addressee
-		avatarUrl, resp := uc.GetAvatar(&mailSess)
+		avatarUrl, resp := uc.GetAvatar(mail.Addressee)
 		if resp != pkg.NO_ERR {
 			return nil, resp
 		}

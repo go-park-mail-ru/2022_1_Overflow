@@ -52,7 +52,7 @@ func (mr *MockUseCaseInterfaceMockRecorder) DeleteMail(arg0, arg1 interface{}) *
 }
 
 // GetAvatar mocks base method.
-func (m *MockUseCaseInterface) GetAvatar(arg0 *models.Session) (string, pkg.JsonResponse) {
+func (m *MockUseCaseInterface) GetAvatar(arg0 string) (string, pkg.JsonResponse) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAvatar", arg0)
 	ret0, _ := ret[0].(string)

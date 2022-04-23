@@ -136,6 +136,8 @@ func SetAvatar() {}
 
 // GetAvatar godoc
 // @Summary Получение ссылки на аватарку пользователя
+// @Description Получение ссылки на аватарку текущего пользователя или пользователя с конкретным логином (username).
+// @Param username query string false "Имя пользователя, соответствующее аватарке."
 // @Success 200 {object} pkg.JsonResponse "Ссылка на аватарку в формате /{static_dir}/{file}.{ext}."
 // @Failure 405 {object} pkg.JsonResponse
 // @Failure 500 {object} pkg.JsonResponse "Ошибка БД, пользователь не найден или сессия не валидна."
@@ -148,13 +150,17 @@ func (d *Delivery) GetAvatar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, e := session.GetData(r)
-	if e != nil {
-		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
-		return
+	username := r.URL.Query().Get("username")
+	if len(username) == 0 {
+		data, e := session.GetData(r)
+		if e != nil {
+			pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
+			return
+		}
+		username = data.Username
 	}
-
-	url, err := d.uc.GetAvatar(data)
+	
+	url, err := d.uc.GetAvatar(username)
 	if err != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, err)
 		return

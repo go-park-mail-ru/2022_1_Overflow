@@ -42,7 +42,7 @@ type SessionManagerUseCase interface {
 type ProfileUseCase interface {
 	Init(repository.DatabaseRepository, *config.Config)
 	GetInfo(data *models.Session) ([]byte, pkg.JsonResponse)
-	GetAvatar(data *models.Session) (string, pkg.JsonResponse)
+	GetAvatar(username string) (string, pkg.JsonResponse)
 	SetAvatar(data *models.Session, avatar *models.Avatar) pkg.JsonResponse
 	SetInfo(data *models.Session, settings *models.SettingsForm) pkg.JsonResponse
 }

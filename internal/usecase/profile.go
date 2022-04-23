@@ -95,8 +95,8 @@ func (uc *UseCase) SetInfo(data *models.Session, settings *models.SettingsForm) 
 }
 
 // Получение ссылки на аватарку пользователя.
-func (uc *UseCase) GetAvatar(data *models.Session) (string, pkg.JsonResponse) {
-	matches, e := filepath.Glob(filepath.Join(uc.config.Server.Static.Dir, pkg.HashString(data.Username)+"_*"))
+func (uc *UseCase) GetAvatar(username string) (string, pkg.JsonResponse) {
+	matches, e := filepath.Glob(filepath.Join(uc.config.Server.Static.Dir, pkg.HashString(username)+"_*"))
 	if e != nil {
 		log.Error(e)
 		return "", pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Ошибка поиска файла.")
