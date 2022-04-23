@@ -15,17 +15,17 @@ func (uc *UseCase) SignIn(data models.SignInForm) pkg.JsonResponse {
 	log.Info("SignIn: ", "handling usecase")
 	log.Info("SignIn: ", "handling validation")
 	if err := validation.CheckSignIn(data); err != nil {
-		log.Error("SignIn: ", "bad validation")
+		log.Errorf("SignIn: %v", err)
 		return pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, err.Error())
 	}
 	log.Info("SignIn: ", "handling db")
 	userFind, err := uc.db.GetUserInfoByUsername(data.Username)
 	if (err != nil || userFind == models.User{}) {
-		log.Error("SignIn: ", "wrong username")
+		log.Errorf("SignIn: %v", err)
 		return pkg.WRONG_CREDS_ERR
 	}
 	if userFind.Password != pkg.HashPassword(data.Password) {
-		log.Error("SignIn: ", "wrong password")
+		log.Errorf("SignIn: %v", err)
 		return pkg.WRONG_CREDS_ERR
 	}
 	log.Info("SignIn, username: ", data.Username)
@@ -39,7 +39,7 @@ func (uc *UseCase) SignUp(data models.SignUpForm) pkg.JsonResponse {
 	}
 	user, err := pkg.ConvertToUser(data)
 	if err != nil {
-		log.Error(err)
+		log.Errorf("SignUp: %v", err)
 		return pkg.INTERNAL_ERR
 	}
 
@@ -48,7 +48,7 @@ func (uc *UseCase) SignUp(data models.SignUpForm) pkg.JsonResponse {
 		return pkg.CreateJsonErr(pkg.STATUS_USER_EXISTS, fmt.Sprintf("Пользователь %v уже существует.", data.Username))
 	}
 	if err = uc.db.AddUser(user); err != nil {
-		log.Error(err)
+		log.Errorf("SignUp: %v", err)
 		return pkg.DB_ERR
 	}
 	log.Info("SignUp, username: ", data.Username)

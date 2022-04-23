@@ -52,6 +52,7 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	log.Info("SignIn: ", "creating session")
 	err = session.Manager.CreateSession(w, r, data.Username)
 	if err != nil {
+		log.Errorf("SignIn: %v", err)
 		pkg.WriteJsonErrFull(w, pkg.INTERNAL_ERR)
 		return
 	}
