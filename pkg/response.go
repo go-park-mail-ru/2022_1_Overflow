@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"OverflowBackend/proto/utils_proto"
 	"encoding/json"
 	"net/http"
 )
@@ -23,27 +24,22 @@ const (
 	STATUS_LOGGED_IN      = iota // 14
 )
 
-type JsonResponse struct {
-	Status  int		`json:"status"`
-	Message string	`json:"message"`
-}
-
 var (
-	NO_ERR           = JsonResponse{STATUS_OK, "OK"}
-	SESSION_ERR      = JsonResponse{STATUS_BAD_SESSION, "Ошибка получения сессии."}
-	INTERNAL_ERR     = JsonResponse{STATUS_INTERNAL, "Внутренняя ошибка сервера."}
-	JSON_ERR         = JsonResponse{STATUS_ERR_JSON, "Ошибка конвертации JSON."}
-	DB_ERR           = JsonResponse{STATUS_ERR_DB, "Ошибка базы данных."}
-	BAD_METHOD_ERR   = JsonResponse{STATUS_BAD_METHOD, "Запрещенный HTTP метод."}
-	UNAUTHORIZED_ERR = JsonResponse{STATUS_UNAUTHORIZED, "Отказано в доступе."}
-	GET_ERR          = JsonResponse{STATUS_BAD_GET, "Неверный GET запрос."}
-	NOT_IMPLEMENTED_ERR = JsonResponse{STATUS_NOT_IMP, "Не имплементировано."}
-	WRONG_CREDS_ERR = JsonResponse{STATUS_WRONG_CREDS, "Неверная пара логин/пароль."}
-	LOGGED_IN_ERR = JsonResponse{STATUS_LOGGED_IN, "Пользователь уже выполнил вход."}
-	NO_USER_EXIST = JsonResponse{STATUS_NO_USER, "Пользователя не существует."}
+	NO_ERR           = utils_proto.JsonResponse{Status: STATUS_OK, Message: "OK"}
+	SESSION_ERR      = utils_proto.JsonResponse{Status: STATUS_BAD_SESSION, Message: "Ошибка получения сессии."}
+	INTERNAL_ERR     = utils_proto.JsonResponse{Status: STATUS_INTERNAL, Message: "Внутренняя ошибка сервера."}
+	JSON_ERR         = utils_proto.JsonResponse{Status: STATUS_ERR_JSON, Message: "Ошибка конвертации JSON."}
+	DB_ERR           = utils_proto.JsonResponse{Status: STATUS_ERR_DB, Message: "Ошибка базы данных."}
+	BAD_METHOD_ERR   = utils_proto.JsonResponse{Status: STATUS_BAD_METHOD, Message: "Запрещенный HTTP метод."}
+	UNAUTHORIZED_ERR = utils_proto.JsonResponse{Status: STATUS_UNAUTHORIZED, Message: "Отказано в доступе."}
+	GET_ERR          = utils_proto.JsonResponse{Status: STATUS_BAD_GET, Message: "Неверный GET запрос."}
+	NOT_IMPLEMENTED_ERR = utils_proto.JsonResponse{Status: STATUS_NOT_IMP, Message: "Не имплементировано."}
+	WRONG_CREDS_ERR = utils_proto.JsonResponse{Status: STATUS_WRONG_CREDS, Message: "Неверная пара логин/пароль."}
+	LOGGED_IN_ERR = utils_proto.JsonResponse{Status: STATUS_LOGGED_IN, Message: "Пользователь уже выполнил вход."}
+	NO_USER_EXIST = utils_proto.JsonResponse{Status: STATUS_NO_USER, Message: "Пользователя не существует."}
 )
 
-func WriteJsonErrFull(w http.ResponseWriter, err JsonResponse) {
+func WriteJsonErrFull(w http.ResponseWriter, err *utils_proto.JsonResponse) {
 	switch err.Status {
 		case STATUS_OK: w.WriteHeader(http.StatusOK)
 		case STATUS_UNAUTHORIZED: w.WriteHeader(http.StatusUnauthorized)
@@ -57,18 +53,18 @@ func WriteJsonErrFull(w http.ResponseWriter, err JsonResponse) {
 	w.Write(resp)
 }
 
-func WriteJsonErr(w http.ResponseWriter, status int, message string) {
-	err := JsonResponse{
-		status,
-		message,
+func WriteJsonErr(w http.ResponseWriter, status int32, message string) {
+	err := utils_proto.JsonResponse{
+		Status: status,
+		Message: message,
 	}
-	WriteJsonErrFull(w, err)
+	WriteJsonErrFull(w, &err)
 }
 
-func CreateJsonErr(status int, message string) JsonResponse {
-	err := JsonResponse{
-		status,
-		message,
+func CreateJsonErr(status int32, message string) *utils_proto.JsonResponse {
+	err := utils_proto.JsonResponse{
+		Status: status,
+		Message: message,
 	}
-	return err
+	return &err
 }

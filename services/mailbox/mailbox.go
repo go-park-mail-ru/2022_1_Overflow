@@ -1,32 +1,53 @@
-package usecase
+package mailbox
 
 import (
-	"OverflowBackend/internal/models"
 	"OverflowBackend/pkg"
+	"OverflowBackend/proto/mailbox_proto"
+	"OverflowBackend/proto/profile_proto"
+	"OverflowBackend/proto/repository_proto"
+	"OverflowBackend/proto/utils_proto"
+	"context"
 	"encoding/json"
 	"time"
 
 	log "github.com/sirupsen/logrus"
 )
 
-func (uc *UseCase) Income(data *models.Session) ([]byte, pkg.JsonResponse) {
-	user, err := uc.db.GetUserInfoByUsername(data.Username)
+type MailBoxService struct {
+	db repository_proto.DatabaseRepositoryClient
+	profile profile_proto.ProfileClient
+}
+
+func (s *MailBoxService) Init(db repository_proto.DatabaseRepositoryClient, profile profile_proto.ProfileClient) {
+	s.db = db
+	s.profile = profile
+}
+
+func (s *MailBoxService) Income(data *utils_proto.Session) *mailbox_proto.ResponseMails {
+	resp, err := s.db.GetUserInfoByUsername(context.Background(), &repository_proto.GetUserInfoByUsernameRequest{Username: data.Username})
 	log.Debug("Получение входящих писем, username = ", data.Username)
 	if err != nil {
 		log.Error(err)
-		return nil, pkg.DB_ERR
+		return &mailbox_proto.ResponseMails{Response: &pkg.DB_ERR, Mails: nil}
 	}
-	id := user.Id
-	mails, err := uc.db.GetIncomeMails(id)
+	if resp.Response.Status != utils_proto.DatabaseStatus_OK {
+		return &mailbox_proto.ResponseMails{Response: &pkg.DB_ERR, Mails: nil}
+	}
+	user := resp.User
+	resp2, err := s.db.GetIncomeMails(context.Background(), &repository_proto.GetIncomeMailsRequest{UserId: user.Id})
 	if err != nil {
 		log.Error(err)
-		return nil, pkg.DB_ERR
+		return &mailbox_proto.ResponseMails{Response: &pkg.DB_ERR, Mails: nil}
 	}
-	var mails_add []models.MailAdditional
+	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
+		return &mailbox_proto.ResponseMails{Response: &pkg.DB_ERR, Mails: nil}
+	}
+	mails := resp2.Mails
+	var mails_add []utils_proto.MailAdditional
 	for _, mail := range mails {
-		mail_add := models.MailAdditional{}
+		mail_add := utils_proto.MailAdditional{}
 		mail_add.Mail = mail
-		avatarUrl, resp := uc.GetAvatar(mail.Sender)
+		avatarUrl, resp := s.profile.GetAvatar(mail.Sender)
 		if resp != pkg.NO_ERR {
 			return nil, resp
 		}

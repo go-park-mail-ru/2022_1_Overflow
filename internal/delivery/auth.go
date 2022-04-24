@@ -3,7 +3,7 @@ package delivery
 import (
 	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/security/xss"
-	"OverflowBackend/internal/usecase/session"
+	"OverflowBackend/internal/session"
 	"OverflowBackend/pkg"
 	"encoding/json"
 	"net/http"

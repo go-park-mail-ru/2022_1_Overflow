@@ -1,4 +1,4 @@
-package models
+package m
 
 type Avatar struct {
 	Name string

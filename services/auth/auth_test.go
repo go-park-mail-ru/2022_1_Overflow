@@ -1,4 +1,4 @@
-package usecase_test
+package auth_test
 
 import (
 	"OverflowBackend/internal/models"

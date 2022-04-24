@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"OverflowBackend/internal/usecase/session"
+	"OverflowBackend/internal/session"
 	"OverflowBackend/pkg"
 	"net/http"
 	"strings"

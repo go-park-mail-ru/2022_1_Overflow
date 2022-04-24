@@ -1,8 +1,11 @@
 package pkg
 
-import "OverflowBackend/internal/models"
+import (
+	"OverflowBackend/proto/auth_proto"
+	"OverflowBackend/proto/utils_proto"
+)
 
-func ConvertToUser(data models.SignUpForm) (user models.User, err error) {
+func ConvertToUser(data *auth_proto.SignUpForm) (user utils_proto.User, err error) {
 	user.FirstName = data.FirstName
 	user.LastName = data.LastName
 	user.Username = data.Username

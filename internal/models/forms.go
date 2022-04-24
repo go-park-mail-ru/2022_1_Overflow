@@ -1,4 +1,4 @@
-package models
+package m
 
 type SignInForm struct {
 	Username string `json:"username" validate:"nonzero,max=45,regexp=^[a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*$"`

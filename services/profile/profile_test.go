@@ -1,4 +1,4 @@
-package usecase_test
+package profile_test
 
 import (
 	"OverflowBackend/internal/models"
@@ -20,16 +20,16 @@ func TestGetInfo(t *testing.T) {
 	mockDB, uc := InitTestUseCase(mockCtrl)
 
 	session := models.Session{
-		Username: "test",
+		Username:      "test",
 		Authenticated: true,
 	}
 
 	user := models.User{
-		Id: 0,
+		Id:        0,
 		FirstName: "test",
-		LastName: "test",
-		Password: "test",
-		Username: "test",
+		LastName:  "test",
+		Password:  "test",
+		Username:  "test",
 	}
 
 	mockDB.EXPECT().GetUserInfoByUsername(user.Username).Return(user, nil)
@@ -61,22 +61,22 @@ func TestSetInfo(t *testing.T) {
 	mockDB, uc := InitTestUseCase(mockCtrl)
 
 	session := models.Session{
-		Username: "test",
+		Username:      "test",
 		Authenticated: true,
 	}
 
 	user := models.User{
-		Id: 0,
+		Id:        0,
 		FirstName: "test",
-		LastName: "test",
-		Password: "test",
-		Username: "test",
+		LastName:  "test",
+		Password:  "test",
+		Username:  "test",
 	}
 
 	settings := models.SettingsForm{
 		FirstName: "test2",
-		LastName: "test2",
-		Password: "test2",
+		LastName:  "test2",
+		Password:  "test2",
 	}
 
 	mockDB.EXPECT().GetUserInfoByUsername(user.Username).Return(user, nil)
@@ -98,14 +98,14 @@ func TestSetAvatar(t *testing.T) {
 	_, uc := InitTestUseCase(mockCtrl)
 
 	session := models.Session{
-		Username: "test",
+		Username:      "test",
 		Authenticated: true,
 	}
 
 	avatar := models.Avatar{
-		Name: "avatar",
+		Name:      "avatar",
 		UserEmail: session.Username,
-		Content: []byte{10, 10, 10, 10},
+		Content:   []byte{10, 10, 10, 10},
 	}
 
 	r := uc.SetAvatar(&session, &avatar)
@@ -114,7 +114,7 @@ func TestSetAvatar(t *testing.T) {
 		return
 	}
 
-	monkey.Patch(os.MkdirAll, func(path string, perm fs.FileMode) error {return fmt.Errorf("Ошибка.")})
+	monkey.Patch(os.MkdirAll, func(path string, perm fs.FileMode) error { return fmt.Errorf("Ошибка.") })
 
 	r = uc.SetAvatar(&session, &avatar)
 	if r.Status != pkg.STATUS_UNKNOWN {

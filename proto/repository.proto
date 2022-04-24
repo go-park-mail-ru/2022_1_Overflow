@@ -1,0 +1,91 @@
+syntax = "proto3";
+package repository_proto;
+
+option go_package = "./repository_proto";
+
+import "proto/utils.proto";
+
+service DatabaseRepository {
+    rpc Create(CreateRequest) returns (utils.DatabaseResponse) {}
+
+    rpc GetUserInfoByUsername(GetUserInfoByUsernameRequest) returns (ResponseUser) {}
+    rpc GetUserInfoById(GetUserInfoByIdRequest) returns (ResponseUser) {}
+
+    rpc AddUser(AddUserRequest) returns (utils.DatabaseResponse) {}
+
+    rpc ChangeUserPassword(ChangeForm) returns (utils.DatabaseResponse) {}
+    rpc ChangeUserFirstName(ChangeForm) returns (utils.DatabaseResponse) {}
+    rpc ChangeUserLastName(ChangeForm) returns (utils.DatabaseResponse) {}
+
+    rpc GetIncomeMails(GetIncomeMailsRequest) returns (ResponseMails) {}
+    rpc GetOutcomeMails(GetOutcomeMailsRequest) returns (ResponseMails) {}
+    rpc AddMail(AddMailRequest) returns (utils.DatabaseResponse) {}
+    rpc DeleteMail(DeleteMailRequest) returns (utils.DatabaseResponse) {}
+    rpc ReadMail(ReadMailRequest) returns (utils.DatabaseResponse) {}
+    rpc GetMailInfoById(GetMailInfoByIdRequest) returns (ResponseMail) {}
+}
+
+// ================ requests ================
+
+message CreateRequest {
+    string url = 1;
+}
+
+message GetUserInfoByUsernameRequest {
+    string username = 1;
+}
+
+message GetUserInfoByIdRequest {
+    int32 userId = 1;
+}
+
+message AddUserRequest {
+    utils.User user = 1;
+}
+
+message ChangeForm {
+    utils.User user = 1;
+    string data = 2;
+}
+
+message GetIncomeMailsRequest {
+    int32 userId = 1;
+}
+
+message GetOutcomeMailsRequest {
+    int32 userId = 1;
+}
+
+message AddMailRequest {
+    utils.Mail mail = 1;
+}
+
+message DeleteMailRequest {
+    utils.Mail mail = 1;
+    string username = 2;
+}
+
+message ReadMailRequest {
+    utils.Mail mail = 1;
+}
+
+message GetMailInfoByIdRequest {
+    int32 mailId = 1;
+}
+
+// ================= responses ==================
+
+message ResponseUser {
+    utils.DatabaseResponse response = 1;
+    utils.User user = 2;
+}
+
+message ResponseMail {
+    utils.DatabaseResponse response = 1;
+    utils.Mail mail = 2;
+}
+
+message ResponseMails {
+    utils.DatabaseResponse response = 1;
+    repeated utils.Mail mails = 2;
+}

@@ -1,4 +1,4 @@
-package usecase_test
+package mailbox_test
 
 import (
 	"OverflowBackend/internal/models"

@@ -1,4 +1,4 @@
-package usecase
+package profile
 
 import (
 	"OverflowBackend/internal/models"
@@ -10,9 +10,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// Получение информации о пользователе.
-func (uc *UseCase) GetInfo(data *models.Session) ([]byte, pkg.JsonResponse) {
+type ProfileService struct {
 
+}
+
+// Получение информации о пользователе.
+func (s *ProfileService) GetInfo(data *models.Session) ([]byte, pkg.JsonResponse) {
 	user, err := uc.db.GetUserInfoByUsername(data.Username)
 	log.Info("Получение информации о пользователе: ", data.Username)
 	if err != nil {
@@ -29,7 +32,7 @@ func (uc *UseCase) GetInfo(data *models.Session) ([]byte, pkg.JsonResponse) {
 }
 
 // Установка аватарки пользователя.
-func (uc *UseCase) SetAvatar(data *models.Session, avatar *models.Avatar) pkg.JsonResponse {
+func (s *ProfileService) SetAvatar(data *models.Session, avatar *models.Avatar) pkg.JsonResponse {
 	log.Info("Установка аватарки")
 	// создание папки с файлами, если она не существует
 	if err := os.MkdirAll(uc.config.Server.Static.Dir, os.ModePerm); err != nil {
@@ -60,7 +63,7 @@ func (uc *UseCase) SetAvatar(data *models.Session, avatar *models.Avatar) pkg.Js
 }
 
 // Установка настроек пользователя.
-func (uc *UseCase) SetInfo(data *models.Session, settings *models.SettingsForm) pkg.JsonResponse {
+func (s *ProfileService) SetInfo(data *models.Session, settings *models.SettingsForm) pkg.JsonResponse {
 	log.Debug("Установка настроек пользователя: ", data.Username)
 	if (*settings == models.SettingsForm{}) {
 		return pkg.NO_ERR
@@ -95,7 +98,7 @@ func (uc *UseCase) SetInfo(data *models.Session, settings *models.SettingsForm) 
 }
 
 // Получение ссылки на аватарку пользователя.
-func (uc *UseCase) GetAvatar(username string) (string, pkg.JsonResponse) {
+func (s *ProfileService) GetAvatar(username string) (string, pkg.JsonResponse) {
 	matches, e := filepath.Glob(filepath.Join(uc.config.Server.Static.Dir, pkg.HashString(username)+"_*"))
 	if e != nil {
 		log.Error(e)

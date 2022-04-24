@@ -3,7 +3,7 @@ package cmd
 import (
 	"OverflowBackend/internal/config"
 	"OverflowBackend/internal/middlewares"
-	"OverflowBackend/internal/usecase/session"
+	"OverflowBackend/internal/session"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -38,7 +38,7 @@ func (app *Application) Run(configPath string) {
 	if err != nil {
 		log.Fatalf("Ошибка при инициализации менеджера сессий: %v", err)
 	}
-	
+
 	log.Info("Инициализация роутеров.")
 	middlewares.Init(config)
 	router := RouterManager{}

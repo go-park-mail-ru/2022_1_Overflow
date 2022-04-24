@@ -1,28 +1,28 @@
 package validation
 
 import (
-	"OverflowBackend/internal/models"
+	"OverflowBackend/proto/auth_proto"
 	"testing"
 )
 
 func TestSignUpVal(t *testing.T) {
-	err := CheckSignUp(models.SignUpForm{
+	err := CheckSignUp(&auth_proto.SignUpForm{
 		FirstName:    "",
 		LastName:     "test",
 		Username:     "test",
 		Password:     "test",
-		PasswordConf: "test",
+		PasswordConfirmation: "test",
 	})
 	if err == nil {
 		t.Errorf("Неверная валидация данных SignUp.")
 		return
 	}
-	err = CheckSignUp(models.SignUpForm{
+	err = CheckSignUp(&auth_proto.SignUpForm{
 		FirstName:    "test",
 		LastName:     "test",
 		Username:     "test",
 		Password:     "test",
-		PasswordConf: "test",
+		PasswordConfirmation: "test",
 	})
 	if err != nil {
 		t.Error(err)
@@ -31,7 +31,7 @@ func TestSignUpVal(t *testing.T) {
 }
 
 func TestSignInVal(t *testing.T) {
-	err := CheckSignIn(models.SignInForm{
+	err := CheckSignIn(&auth_proto.SignInForm{
 		Username: "bad@",
 		Password: "good",
 	})
@@ -41,7 +41,7 @@ func TestSignInVal(t *testing.T) {
 		return
 	}
 
-	err = CheckSignIn(models.SignInForm{
+	err = CheckSignIn(&auth_proto.SignInForm{
 		Username: "good",
 		Password: "good",
 	})
