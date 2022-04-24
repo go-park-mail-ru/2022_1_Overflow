@@ -1,6 +1,7 @@
 package mailbox
 
 import (
+	"OverflowBackend/internal/config"
 	"OverflowBackend/pkg"
 	"OverflowBackend/proto/mailbox_proto"
 	"OverflowBackend/proto/profile_proto"
@@ -14,11 +15,13 @@ import (
 )
 
 type MailBoxService struct {
+	config *config.Config
 	db repository_proto.DatabaseRepositoryClient
 	profile profile_proto.ProfileClient
 }
 
-func (s *MailBoxService) Init(db repository_proto.DatabaseRepositoryClient, profile profile_proto.ProfileClient) {
+func (s *MailBoxService) Init(config *config.Config, db repository_proto.DatabaseRepositoryClient, profile profile_proto.ProfileClient) {
+	s.config = config
 	s.db = db
 	s.profile = profile
 }

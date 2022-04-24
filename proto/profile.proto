@@ -7,7 +7,7 @@ import "proto/utils.proto";
 
 service Profile {
     rpc GetInfo(GetInfoRequest) returns (GetInfoResponse) {}
-    rpc SetInfo(SettingsForm) returns (utils.JsonResponse) {}
+    rpc SetInfo(SetInfoRequest) returns (utils.JsonResponse) {}
     rpc GetAvatar(GetAvatarRequest) returns (GetAvatarResponse) {}
     rpc SetAvatar(SetAvatarRequest) returns (utils.JsonResponse) {}
 }
@@ -27,6 +27,11 @@ message Avatar {
 message SetAvatarRequest {
     utils.Session data = 1;
     Avatar avatar = 2;
+}
+
+message SetInfoRequest {
+    utils.Session data = 1;
+    SettingsForm form = 2;
 }
 
 message GetInfoRequest {
