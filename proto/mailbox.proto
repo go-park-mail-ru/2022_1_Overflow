@@ -36,10 +36,10 @@ message ReadMailRequest {
 
 message ResponseMail {
     utils.JsonResponse response = 1;
-    utils.Mail mail = 2;
+    bytes mail = 2;
 }
 
 message ResponseMails {
     utils.JsonResponse response = 1;
-    repeated utils.MailAdditional mails = 2;
+    bytes mails = 2;
 }

@@ -9,9 +9,10 @@ import (
 	"OverflowBackend/proto/utils_proto"
 	"context"
 	"encoding/json"
-	"time"
 
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type MailBoxService struct {
@@ -50,138 +51,208 @@ func (s *MailBoxService) Income(data *utils_proto.Session) *mailbox_proto.Respon
 	for _, mail := range mails {
 		mail_add := utils_proto.MailAdditional{}
 		mail_add.Mail = mail
-		avatarUrl, resp := s.profile.GetAvatar(mail.Sender)
-		if resp != pkg.NO_ERR {
-			return nil, resp
+		resp, err := s.profile.GetAvatar(
+			context.Background(),
+			&profile_proto.GetAvatarRequest{Username: mail.Sender},
+		)
+		if err != nil {
+			return &mailbox_proto.ResponseMails{Response: &pkg.INTERNAL_ERR, Mails: nil}
 		}
-		mail_add.AvatarUrl = avatarUrl
+		if !proto.Equal(resp.Response, &pkg.NO_ERR) {
+			return &mailbox_proto.ResponseMails{Response: resp.Response, Mails: nil}
+		}
+		mail_add.AvatarUrl = resp.Url
 		mails_add = append(mails_add, mail_add)
 	}
 	parsed, err := json.Marshal(mails_add)
 	if err != nil {
 		log.Error(err)
-		return nil, pkg.JSON_ERR
+		return &mailbox_proto.ResponseMails{Response: &pkg.JSON_ERR, Mails: nil}
 	}
-	return parsed, pkg.NO_ERR
+	return &mailbox_proto.ResponseMails{Response: &pkg.NO_ERR, Mails: parsed}
 }
 
-func (uc *UseCase) Outcome(data *models.Session) ([]byte, pkg.JsonResponse) {
-	user, err := uc.db.GetUserInfoByUsername(data.Username)
+func (s *MailBoxService) Outcome(data *utils_proto.Session) *mailbox_proto.ResponseMails {
+	resp, err := s.db.GetUserInfoByUsername(context.Background(), &repository_proto.GetUserInfoByUsernameRequest{Username: data.Username})
 	log.Debug("Получение исходящих писем, username = ", data.Username)
 	if err != nil {
 		log.Error(err)
-		return nil, pkg.DB_ERR
+		return &mailbox_proto.ResponseMails{Response: &pkg.DB_ERR, Mails: nil}
 	}
-	id := user.Id
-	mails, err := uc.db.GetOutcomeMails(id)
+	if resp.Response.Status != utils_proto.DatabaseStatus_OK {
+		return &mailbox_proto.ResponseMails{Response: &pkg.DB_ERR, Mails: nil}
+	}
+	user := resp.User
+	resp2, err := s.db.GetOutcomeMails(context.Background(), &repository_proto.GetOutcomeMailsRequest{UserId: user.Id})
 	if err != nil {
 		log.Error(err)
-		return nil, pkg.DB_ERR
+		return &mailbox_proto.ResponseMails{Response: &pkg.DB_ERR, Mails: nil}
 	}
-	var mails_add []models.MailAdditional
+	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
+		return &mailbox_proto.ResponseMails{Response: &pkg.DB_ERR, Mails: nil}
+	}
+	mails := resp2.Mails
+	var mails_add []utils_proto.MailAdditional
 	for _, mail := range mails {
-		mail_add := models.MailAdditional{}
+		mail_add := utils_proto.MailAdditional{}
 		mail_add.Mail = mail
-		avatarUrl, resp := uc.GetAvatar(mail.Addressee)
-		if resp != pkg.NO_ERR {
-			return nil, resp
+		resp, err := s.profile.GetAvatar(
+			context.Background(),
+			&profile_proto.GetAvatarRequest{Username: mail.Addressee},
+		)
+		if err != nil {
+			return &mailbox_proto.ResponseMails{Response: &pkg.INTERNAL_ERR, Mails: nil}
 		}
-		mail_add.AvatarUrl = avatarUrl
+		if !proto.Equal(resp.Response, &pkg.NO_ERR) {
+			return &mailbox_proto.ResponseMails{Response: resp.Response, Mails: nil}
+		}
+		mail_add.AvatarUrl = resp.Url
 		mails_add = append(mails_add, mail_add)
 	}
 	parsed, err := json.Marshal(mails_add)
 	if err != nil {
 		log.Error(err)
-		return nil, pkg.JSON_ERR
+		return &mailbox_proto.ResponseMails{Response: &pkg.JSON_ERR, Mails: nil}
 	}
-	return parsed, pkg.NO_ERR
+	return &mailbox_proto.ResponseMails{Response: &pkg.NO_ERR, Mails: parsed}
 }
 
-func (uc *UseCase) GetMail(data *models.Session, mail_id int32) ([]byte, pkg.JsonResponse) {
-	log.Debug("Получение письма, mail_id = ", mail_id)
-	mail, err := uc.db.GetMailInfoById(mail_id)
+func (s *MailBoxService) GetMail(request *mailbox_proto.GetMailRequest) *mailbox_proto.ResponseMail {
+	log.Debug("Получение письма, mail_id = ", request.Id)
+	resp, err := s.db.GetMailInfoById(context.Background(), &repository_proto.GetMailInfoByIdRequest{
+		MailId: request.Id,
+	})
 	if err != nil {
 		log.Error(err)
-		return nil, pkg.DB_ERR
+		return &mailbox_proto.ResponseMail{Response: &pkg.DB_ERR, Mail: nil}
 	}
+	if resp.Response.Status != utils_proto.DatabaseStatus_OK {
+		return &mailbox_proto.ResponseMail{Response: &pkg.DB_ERR, Mail: nil}
+	}
+	mail := resp.Mail
+	data := request.Data
 	if mail.Addressee != data.Username && mail.Sender != data.Username {
-		return nil, pkg.UNAUTHORIZED_ERR
+		return &mailbox_proto.ResponseMail{Response: &pkg.UNAUTHORIZED_ERR, Mail: nil}
 	}
 	parsed, err := json.Marshal(mail)
 	if err != nil {
 		log.Error(err)
-		return nil, pkg.JSON_ERR
+		return &mailbox_proto.ResponseMail{Response: &pkg.JSON_ERR, Mail: nil}
 	}
-	return parsed, pkg.NO_ERR
+	return &mailbox_proto.ResponseMail{Response: &pkg.NO_ERR, Mail: parsed}
 }
 
-func (uc *UseCase) DeleteMail(data *models.Session, id int32) pkg.JsonResponse {
-	mail, err := uc.db.GetMailInfoById(id)
-	log.Debug("Удаление письма, id = ", id)
+func (s *MailBoxService) DeleteMail(request *mailbox_proto.DeleteMailRequest) *utils_proto.JsonResponse {
+	log.Debug("Удаление письма, id = ", request.Id)
+	resp, err := s.db.GetMailInfoById(context.Background(), &repository_proto.GetMailInfoByIdRequest{
+		MailId: request.Id,
+	})
 	if err != nil {
 		log.Error(err)
-		return pkg.DB_ERR
+		return &pkg.DB_ERR
 	}
+	if resp.Response.Status != utils_proto.DatabaseStatus_OK {
+		return &pkg.DB_ERR
+	}
+	mail := resp.Mail
+	data := request.Data
 	if mail.Addressee != data.Username && mail.Sender != data.Username {
-		return pkg.UNAUTHORIZED_ERR
+		return &pkg.UNAUTHORIZED_ERR
 	}
-	err = uc.db.DeleteMail(mail, data.Username)
+	resp2, err := s.db.DeleteMail(context.Background(), &repository_proto.DeleteMailRequest{
+		Mail: mail,
+		Username: data.Username,
+	})
 	if err != nil {
 		log.Error(err)
-		return pkg.DB_ERR
+		return &pkg.DB_ERR
 	}
-	return pkg.NO_ERR
+	if resp2.Status != utils_proto.DatabaseStatus_OK {
+		return &pkg.DB_ERR
+	}
+	return &pkg.NO_ERR
 }
 
-func (uc *UseCase) ReadMail(data *models.Session, id int32) pkg.JsonResponse {
-	log.Debug("Прочитать письмо, id = ", id)
-	mail, err := uc.db.GetMailInfoById(id)
+func (s *MailBoxService) ReadMail(request *mailbox_proto.ReadMailRequest) *utils_proto.JsonResponse {
+	log.Debug("Прочитать письмо, id = ", request.Id)
+	resp, err := s.db.GetMailInfoById(context.Background(), &repository_proto.GetMailInfoByIdRequest{
+		MailId: request.Id,
+	})
 	if err != nil {
 		log.Error(err)
-		return pkg.DB_ERR
+		return &pkg.DB_ERR
 	}
+	if resp.Response.Status != utils_proto.DatabaseStatus_OK {
+		return &pkg.DB_ERR
+	}
+	mail := resp.Mail
+	data := request.Data
 	if mail.Addressee != data.Username {
-		return pkg.UNAUTHORIZED_ERR
+		return &pkg.UNAUTHORIZED_ERR
 	}
-	err = uc.db.ReadMail(mail)
+	resp2, err := s.db.ReadMail(context.Background(), &repository_proto.ReadMailRequest{
+		Mail: mail,
+	})
 	if err != nil {
 		log.Error(err)
-		return pkg.DB_ERR
+		return &pkg.DB_ERR
 	}
-	return pkg.NO_ERR
+	if resp2.Status != utils_proto.DatabaseStatus_OK {
+		return &pkg.DB_ERR
+	}
+	return &pkg.NO_ERR
 }
 
-func (uc *UseCase) SendMail(data *models.Session, form models.MailForm) pkg.JsonResponse {
-	log.Debug("Отправить письмо, username = ", data.Username)
-	user, err := uc.db.GetUserInfoByUsername(data.Username)
+func (s *MailBoxService) SendMail(request *mailbox_proto.SendMailRequest) *utils_proto.JsonResponse {
+	log.Debug("Отправить письмо, username = ", request.Data.Username)
+	resp, err := s.db.GetUserInfoByUsername(context.Background(), &repository_proto.GetUserInfoByUsernameRequest{
+		Username: request.Data.Username,
+	})
 	if err != nil {
 		log.Error(err)
-		return pkg.DB_ERR
+		return &pkg.DB_ERR
 	}
-	if (user == models.User{}) {
-		return pkg.DB_ERR
+	if resp.Response.Status != utils_proto.DatabaseStatus_OK {
+		return &pkg.DB_ERR
 	}
-	userAddressee, err := uc.db.GetUserInfoByUsername(form.Addressee)
+	data := request.Data
+	user := resp.User
+	if (proto.Equal(user, &utils_proto.User{})) {
+		return &pkg.DB_ERR
+	}
+	resp2, err := s.db.GetUserInfoByUsername(context.Background(), &repository_proto.GetUserInfoByUsernameRequest{
+		Username: request.Form.Addressee,
+	})
 	if err != nil {
 		log.Error(err)
-		return pkg.DB_ERR
+		return &pkg.DB_ERR
 	}
-	if (userAddressee == models.User{}) {
-		return pkg.NO_USER_EXIST
+	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
+		return &pkg.DB_ERR
 	}
-	mail := models.Mail{
-		Client_id: user.Id,
+	userAddressee := resp2.User
+	if (proto.Equal(userAddressee, &utils_proto.User{})) {
+		return &pkg.NO_USER_EXIST
+	}
+	form := request.Form
+	mail := utils_proto.Mail{
+		ClientId: user.Id,
 		Sender:    data.Username,
 		Addressee: form.Addressee,
 		Theme:     form.Theme,
 		Text:      form.Text,
 		Files:     form.Files,
-		Date:      time.Now(),
+		Date:      timestamppb.Now(),
 	}
-	err = uc.db.AddMail(mail)
+	resp3, err := s.db.AddMail(context.Background(), &repository_proto.AddMailRequest{
+		Mail: &mail,
+	})
 	if err != nil {
 		log.Error(err)
-		return pkg.DB_ERR
+		return &pkg.DB_ERR
 	}
-	return pkg.NO_ERR
+	if resp3.Status != utils_proto.DatabaseStatus_OK {
+		return &pkg.DB_ERR
+	}
+	return &pkg.NO_ERR
 }

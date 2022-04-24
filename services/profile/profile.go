@@ -20,8 +20,9 @@ type ProfileService struct {
 	db repository_proto.DatabaseRepositoryClient
 }
 
-func (s *ProfileService) Init(config *config.Config) {
+func (s *ProfileService) Init(config *config.Config, db repository_proto.DatabaseRepositoryClient) {
 	s.config = config
+	s.db = db
 }
 
 // Получение информации о пользователе.
