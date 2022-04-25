@@ -47,7 +47,7 @@ func (s *MailBoxService) Income(data *utils_proto.Session) *mailbox_proto.Respon
 		return &mailbox_proto.ResponseMails{Response: &pkg.DB_ERR, Mails: nil}
 	}
 	mails := resp2.Mails
-	var mails_add []utils_proto.MailAdditional
+	var mails_add []*utils_proto.MailAdditional
 	for _, mail := range mails {
 		mail_add := utils_proto.MailAdditional{}
 		mail_add.Mail = mail
@@ -62,7 +62,7 @@ func (s *MailBoxService) Income(data *utils_proto.Session) *mailbox_proto.Respon
 			return &mailbox_proto.ResponseMails{Response: resp.Response, Mails: nil}
 		}
 		mail_add.AvatarUrl = resp.Url
-		mails_add = append(mails_add, mail_add)
+		mails_add = append(mails_add, &mail_add)
 	}
 	parsed, err := json.Marshal(mails_add)
 	if err != nil {

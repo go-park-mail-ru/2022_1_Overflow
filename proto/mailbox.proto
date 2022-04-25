@@ -5,7 +5,7 @@ option go_package = "./mailbox_proto";
 
 import "proto/utils.proto";
 
-service Profile {
+service Mailbox {
     rpc Income(utils.Session) returns (ResponseMails) {}
     rpc Outcome(utils.Session) returns (ResponseMails) {}
     rpc GetMail(GetMailRequest) returns (ResponseMail) {}

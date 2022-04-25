@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"OverflowBackend/internal/config"
 	"OverflowBackend/internal/validation"
 	"OverflowBackend/pkg"
 	auth_proto "OverflowBackend/proto/auth_proto"
@@ -9,15 +10,17 @@ import (
 	"context"
 	"fmt"
 
-	"google.golang.org/protobuf/proto"
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/proto"
 )
 
 type AuthService struct {
+	config *config.Config
 	db repository_proto.DatabaseRepositoryClient
 }
 
-func (s *AuthService) Init(db repository_proto.DatabaseRepositoryClient) {
+func (s *AuthService) Init(config *config.Config, db repository_proto.DatabaseRepositoryClient) {
+	s.config = config
 	s.db = db
 }
 

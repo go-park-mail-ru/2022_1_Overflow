@@ -1,7 +1,8 @@
 package postgres
 
 import (
-	"OverflowBackend/internal/models"
+	"OverflowBackend/proto/repository_proto"
+	"OverflowBackend/proto/utils_proto"
 	"context"
 	"fmt"
 	"time"
@@ -9,6 +10,8 @@ import (
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 	//log "github.com/sirupsen/logrus"
 )
 
@@ -35,17 +38,27 @@ func (c *Database) Create(url string) (err error) {
 }
 
 // Получить данные пользователя по его почте
-func (c *Database) GetUserInfoByUsername(username string) (models.User, error) {
-	var user models.User
-	rows, err := c.Conn.Query(context.Background(), "Select * from overflow.users where username = $1;", username)
+func (c *Database) GetUserInfoByUsername(request *repository_proto.GetUserInfoByUsernameRequest) *repository_proto.ResponseUser {
+	var user utils_proto.User
+	rows, err := c.Conn.Query(context.Background(), "Select * from overflow.users where username = $1;", request.Username)
 	if err != nil {
-		return user, err
+		return &repository_proto.ResponseUser{
+			User: &user,
+			Response: &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			},
+		}
 	}
 	defer rows.Close()
 	for rows.Next() {
 		values, err := rows.Values()
 		if err != nil {
-			return user, err
+			return &repository_proto.ResponseUser{
+				User: &user,
+				Response: &utils_proto.DatabaseResponse{
+					Status: utils_proto.DatabaseStatus_ERROR,
+				},
+			}
 		}
 		user.Id = values[0].(int32)
 		user.FirstName = values[1].(string)
@@ -53,21 +66,36 @@ func (c *Database) GetUserInfoByUsername(username string) (models.User, error) {
 		user.Password = values[3].(string)
 		user.Username = values[4].(string)
 	}
-	return user, nil
+	return &repository_proto.ResponseUser{
+		User: &user,
+		Response: &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		},
+	}
 }
 
 // Получить данные пользователя по его айди в бд
-func (c *Database) GetUserInfoById(userId int32) (models.User, error) {
-	var user models.User
-	rows, err := c.Conn.Query(context.Background(), "Select * from overflow.users where id = $1;", userId)
+func (c *Database) GetUserInfoById(request *repository_proto.GetUserInfoByIdRequest) *repository_proto.ResponseUser{
+	var user utils_proto.User
+	rows, err := c.Conn.Query(context.Background(), "Select * from overflow.users where id = $1;", request.UserId)
 	if err != nil {
-		return user, err
+		return &repository_proto.ResponseUser{
+			User: &user,
+			Response: &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			},
+		}
 	}
 	defer rows.Close()
 	for rows.Next() {
 		values, err := rows.Values()
 		if err != nil {
-			return user, err
+			return &repository_proto.ResponseUser{
+				User: &user,
+				Response: &utils_proto.DatabaseResponse{
+					Status: utils_proto.DatabaseStatus_ERROR,
+				},
+			}
 		}
 		user.Id = values[0].(int32)
 		user.FirstName = values[1].(string)
@@ -75,146 +103,253 @@ func (c *Database) GetUserInfoById(userId int32) (models.User, error) {
 		user.Password = values[3].(string)
 		user.Username = values[4].(string)
 	}
-	return user, nil
+	return &repository_proto.ResponseUser{
+		User: &user,
+		Response: &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		},
+	}
 }
 
 // Добавить пользователя
-func (c *Database) AddUser(user models.User) error {
+func (c *Database) AddUser(request *repository_proto.AddUserRequest) *utils_proto.DatabaseResponse {
+	user := request.User
 	res, err := c.Conn.Query(context.Background(), "insert into overflow.users(first_name, last_name, password, username) values ($1, $2, $3, $4);", user.FirstName, user.LastName, user.Password, user.Username)
 	if err == nil {
 		res.Close()
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		}
+	} else {
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}
 	}
-	return err
 }
 
 // Изменить пароль
-func (c *Database) ChangeUserPassword(user models.User, newPassword string) error {
-	_, err := c.Conn.Exec(context.Background(), "UPDATE overflow.users set password = $1 where id = $2;", newPassword, user.Id)
-	return err
+func (c *Database) ChangeUserPassword(request *repository_proto.ChangeForm) *utils_proto.DatabaseResponse {
+	_, err := c.Conn.Exec(context.Background(), "UPDATE overflow.users set password = $1 where id = $2;", request.Data, request.User.Id)
+	if err == nil {
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		}
+	} else {
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}
+	}
 }
 
 // Изменить имя
-func (c *Database) ChangeUserFirstName(user models.User, newFirstName string) error {
-	_, err := c.Conn.Exec(context.Background(), "UPDATE overflow.users set first_name = $1 where id = $2;", newFirstName, user.Id)
-	return err
+func (c *Database) ChangeUserFirstName(request *repository_proto.ChangeForm) *utils_proto.DatabaseResponse {
+	_, err := c.Conn.Exec(context.Background(), "UPDATE overflow.users set first_name = $1 where id = $2;", request.Data, request.User.Id)
+	if err == nil {
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		}
+	} else {
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}
+	}
 }
 
 // Изменить фамилию
-func (c *Database) ChangeUserLastName(user models.User, newLastName string) error {
-	_, err := c.Conn.Exec(context.Background(), "UPDATE overflow.users set last_name = $1 where id = $2;", newLastName, user.Id)
-	return err
+func (c *Database) ChangeUserLastName(request *repository_proto.ChangeForm) *utils_proto.DatabaseResponse {
+	_, err := c.Conn.Exec(context.Background(), "UPDATE overflow.users set last_name = $1 where id = $2;", request.Data, request.User.Id)
+	if err == nil {
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		}
+	} else {
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}
+	}
 }
 
 // Добавить письмо
-func (c *Database) AddMail(mail models.Mail) error {
-	res, err := c.Conn.Query(context.Background(), "insert into overflow.mails(client_id, sender, addressee, theme, text, files, date) values($1, $2, $3, $4, $5, $6, $7);", mail.Client_id, mail.Sender, mail.Addressee, mail.Theme, mail.Text, mail.Files, mail.Date)
+func (c *Database) AddMail(request *repository_proto.AddMailRequest) *utils_proto.DatabaseResponse {
+	mail := request.Mail
+	res, err := c.Conn.Query(context.Background(), "insert into overflow.mails(client_id, sender, addressee, theme, text, files, date) values($1, $2, $3, $4, $5, $6, $7);", mail.ClientId, mail.Sender, mail.Addressee, mail.Theme, mail.Text, mail.Files, mail.Date)
 	if err == nil {
 		res.Close()
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		}
+	} else {
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}
 	}
-	return err
 }
 
 //Удалить письмо
-func (c *Database) DeleteMail(mail models.Mail, username string) error {
+func (c *Database) DeleteMail(request *repository_proto.DeleteMailRequest) *utils_proto.DatabaseResponse {
+	mail := request.Mail
+	username := request.Username
 	res, err := c.Conn.Query(context.Background(), "UPDATE overflow.mails set sender = 'null' where id = $1 and sender = $2;", mail.Id, username)
 	if err != nil {
-		return err
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}
 	}
 	res.Close()
 	res, err = c.Conn.Query(context.Background(), "UPDATE overflow.mails set addressee = 'null' where id = $1 and addressee = $2;", mail.Id, username)
 	if err != nil {
-		return err
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}
 	}
 	res.Close()
 	res, err = c.Conn.Query(context.Background(), "DELETE FROM overflow.mails WHERE sender like 'null' and addressee like 'null';")
 	if err == nil {
 		res.Close()
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		}
+	} else {
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}
 	}
-	return err
 }
 
 //Прочитать письмо
-func (c *Database) ReadMail(mail models.Mail) error {
+func (c *Database) ReadMail(request *repository_proto.ReadMailRequest) *utils_proto.DatabaseResponse {
+	mail := request.Mail
 	res, err := c.Conn.Query(context.Background(), "UPDATE overflow.mails set read = $1 where id = $2;", true, mail.Id)
 	if err == nil {
 		res.Close()
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		}
+	} else {
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}
 	}
-	return err
 }
 
 // Получить письмо по ID
-func (c *Database) GetMailInfoById(mailId int32) (models.Mail, error) {
-	var mail models.Mail
-	rows, err := c.Conn.Query(context.Background(), "Select * from overflow.mails where Id = $1", mailId)
+func (c *Database) GetMailInfoById(request *repository_proto.GetMailInfoByIdRequest) *repository_proto.ResponseMail {
+	var mail utils_proto.Mail
+	rows, err := c.Conn.Query(context.Background(), "Select * from overflow.mails where Id = $1", request.MailId)
 	if err != nil {
-		return mail, err
+		return &repository_proto.ResponseMail{
+			Mail: &mail,
+			Response: &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			},
+		}
 	}
 	defer rows.Close()
 	for rows.Next() {
 		values, err := rows.Values()
 		if err != nil {
-			return mail, err
+			return &repository_proto.ResponseMail{
+				Mail: &mail,
+				Response: &utils_proto.DatabaseResponse{
+					Status: utils_proto.DatabaseStatus_ERROR,
+				},
+			}
 		}
 		mail.Id = values[0].(int32)
-		mail.Client_id = values[1].(int32)
+		mail.ClientId = values[1].(int32)
 		mail.Sender = values[2].(string)
 		mail.Addressee = values[3].(string)
-		mail.Date = values[4].(time.Time)
+		mail.Date = timestamppb.New(values[4].(time.Time))
 		mail.Theme = values[5].(string)
 		mail.Text = values[6].(string)
 		mail.Files = values[7].(string)
-		mail.Read = values[8].(bool)
+		mail.Read = wrapperspb.Bool(values[8].(bool))
 	}
-	return mail, nil
+	return &repository_proto.ResponseMail{
+		Mail: &mail,
+		Response: &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		},
+	}
 }
 
 // Получить входящие сообщения пользователя
-func (c *Database) GetIncomeMails(userId int32) ([]models.Mail, error) {
-	var results []models.Mail
-	rows, err := c.Conn.Query(context.Background(), "Select * from getIncomeMails($1)", userId)
+func (c *Database) GetIncomeMails(request *repository_proto.GetIncomeMailsRequest) *repository_proto.ResponseMails {
+	var results []*utils_proto.Mail
+	rows, err := c.Conn.Query(context.Background(), "Select * from getIncomeMails($1)", request.UserId)
 	if err != nil {
-		return results, err
+		return &repository_proto.ResponseMails{
+			Mails: results,
+			Response: &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			},
+		}
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var mails models.Mail
+		var mail utils_proto.Mail
 		values, err := rows.Values()
 		if err != nil {
-			return results, err
+			return &repository_proto.ResponseMails{
+				Mails: results,
+				Response: &utils_proto.DatabaseResponse{
+					Status: utils_proto.DatabaseStatus_ERROR,
+				},
+			}
 		}
-		mails.Sender = values[0].(string)
-		mails.Theme = values[1].(string)
-		mails.Text = values[2].(string)
-		mails.Files = values[3].(string)
-		mails.Date = values[4].(time.Time)
-		mails.Read = values[5].(bool)
-		mails.Id = values[6].(int32)
-		results = append(results, mails)
+		mail.Sender = values[0].(string)
+		mail.Theme = values[1].(string)
+		mail.Text = values[2].(string)
+		mail.Files = values[3].(string)
+		mail.Date = timestamppb.New(values[4].(time.Time))
+		mail.Read = wrapperspb.Bool(values[5].(bool))
+		mail.Id = values[6].(int32)
+		results = append(results, &mail)
 	}
-	return results, nil
+	return &repository_proto.ResponseMails{
+		Mails: results,
+		Response: &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		},
+	}
 }
 
 //Получить отправленные пользователем сообщения
-func (c *Database) GetOutcomeMails(userId int32) ([]models.Mail, error) {
-	var results []models.Mail
-	rows, err := c.Conn.Query(context.Background(), "Select * from getOutcomeMails($1)", userId)
+func (c *Database) GetOutcomeMails(request *repository_proto.GetOutcomeMailsRequest) *repository_proto.ResponseMails {
+	var results []*utils_proto.Mail
+	rows, err := c.Conn.Query(context.Background(), "Select * from getOutcomeMails($1)", request.UserId)
 	if err != nil {
-		return results, err
+		return &repository_proto.ResponseMails{
+			Mails: results,
+			Response: &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			},
+		}
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var mails models.Mail
+		var mail utils_proto.Mail
 		values, err := rows.Values()
 		if err != nil {
-			return results, err
+			return &repository_proto.ResponseMails{
+				Mails: results,
+				Response: &utils_proto.DatabaseResponse{
+					Status: utils_proto.DatabaseStatus_ERROR,
+				},
+			}
 		}
-		mails.Addressee = values[0].(string)
-		mails.Theme = values[1].(string)
-		mails.Text = values[2].(string)
-		mails.Files = values[3].(string)
-		mails.Date = values[4].(time.Time)
-		mails.Id = values[5].(int32)
-		results = append(results, mails)
+		mail.Addressee = values[0].(string)
+		mail.Theme = values[1].(string)
+		mail.Text = values[2].(string)
+		mail.Files = values[3].(string)
+		mail.Date = timestamppb.New(values[4].(time.Time))
+		mail.Id = values[5].(int32)
+		results = append(results, &mail)
 	}
-	return results, nil
+	return &repository_proto.ResponseMails{
+		Mails: results,
+		Response: &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		},
+	}
 }

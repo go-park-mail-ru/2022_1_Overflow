@@ -1,25 +1,26 @@
 package repository
 
 import (
-	"OverflowBackend/internal/models"
+	"OverflowBackend/proto/repository_proto"
+	"OverflowBackend/proto/utils_proto"
 )
 
 type DatabaseRepository interface {
 	Create(url string) error
 
-	GetUserInfoByUsername(username string) (models.User, error)
-	GetUserInfoById(userId int32) (models.User, error)
+	GetUserInfoByUsername(*repository_proto.GetUserInfoByUsernameRequest) *repository_proto.ResponseUser
+	GetUserInfoById(*repository_proto.GetUserInfoByIdRequest) *repository_proto.ResponseUser
 
-	AddUser(user models.User) error
+	AddUser(*repository_proto.AddUserRequest) *utils_proto.DatabaseResponse
 	
-	ChangeUserPassword(user models.User, newPassword string) error
-	ChangeUserFirstName(user models.User, newFirstName string) error
-	ChangeUserLastName(user models.User, newLastName string) error
+	ChangeUserPassword(*repository_proto.ChangeForm) *utils_proto.DatabaseResponse
+	ChangeUserFirstName(*repository_proto.ChangeForm) *utils_proto.DatabaseResponse
+	ChangeUserLastName(*repository_proto.ChangeForm) *utils_proto.DatabaseResponse
 
-	GetIncomeMails(userId int32) ([]models.Mail, error)
-	GetOutcomeMails(userId int32) ([]models.Mail, error)
-	AddMail(mail models.Mail) error
-	DeleteMail(mail models.Mail, username string) error
-	ReadMail(mail models.Mail) error
-	GetMailInfoById(mailId int32) (models.Mail, error)
+	GetIncomeMails(*repository_proto.GetIncomeMailsRequest) *repository_proto.ResponseMails
+	GetOutcomeMails(*repository_proto.GetOutcomeMailsRequest) *repository_proto.ResponseMails
+	AddMail(*repository_proto.AddMailRequest) *utils_proto.DatabaseResponse
+	DeleteMail(*repository_proto.DeleteMailRequest) *utils_proto.DatabaseResponse
+	ReadMail(*repository_proto.ReadMailRequest) *utils_proto.DatabaseResponse
+	GetMailInfoById(*repository_proto.GetMailInfoByIdRequest) repository_proto.ResponseMail
 }
