@@ -2,13 +2,14 @@ package session
 
 import (
 	"OverflowBackend/internal/config"
-	"OverflowBackend/internal/models"
+	"OverflowBackend/proto/utils_proto"
 	"encoding/gob"
 	"fmt"
 	"net/http"
 
 	"github.com/antonlindstrom/pgstore"
 	"github.com/gorilla/sessions"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 type PostgresManager struct {
@@ -37,7 +38,7 @@ func (pm *PostgresManager) Init(config *config.Config) (err error) {
 		Secure:   false,
 	}
 
-	gob.Register(models.Session{})
+	gob.Register(utils_proto.Session{})
 	return
 }
 
@@ -46,9 +47,9 @@ func (pm *PostgresManager) CreateSession(w http.ResponseWriter, r *http.Request,
 	if err != nil {
 		return err
 	}
-	data := &models.Session{
+	data := &utils_proto.Session{
 		Username:      username,
-		Authenticated: true,
+		Authenticated: wrapperspb.Bool(true),
 	}
 	session.Values["data"] = data
 	err = session.Save(r, w)
@@ -61,7 +62,7 @@ func (pm *PostgresManager) DeleteSession(w http.ResponseWriter, r *http.Request)
 		return err
 	}
 
-	session.Values["data"] = models.Session{}
+	session.Values["data"] = &utils_proto.Session{}
 	session.Options.MaxAge = -1
 
 	err = session.Save(r, w)
@@ -80,7 +81,7 @@ func (pm *PostgresManager) IsLoggedIn(r *http.Request) bool {
 	return !session.IsNew
 }
 
-func (pm *PostgresManager) GetData(r *http.Request) (data *models.Session, err error) {
+func (pm *PostgresManager) GetData(r *http.Request) (data *utils_proto.Session, err error) {
 	defer func() {
 		errRecover := recover()
 		if errRecover != nil {
@@ -91,6 +92,6 @@ func (pm *PostgresManager) GetData(r *http.Request) (data *models.Session, err e
 	if err != nil {
 		return nil, err
 	}
-	sessionData := session.Values["data"].(models.Session)
-	return &sessionData, nil
+	sessionData := session.Values["data"].(*utils_proto.Session)
+	return sessionData, nil
 }

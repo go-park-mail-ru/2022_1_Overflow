@@ -2,7 +2,7 @@ package session
 
 import (
 	"OverflowBackend/internal/config"
-	"OverflowBackend/internal/models"
+	"OverflowBackend/proto/utils_proto"
 	"net/http"
 )
 
@@ -13,7 +13,7 @@ type SessionManager interface {
 	CreateSession(w http.ResponseWriter, r *http.Request, username string) error
 	DeleteSession(w http.ResponseWriter, r *http.Request) error
 	IsLoggedIn(r *http.Request) bool
-	GetData(r *http.Request) (data *models.Session, err error)
+	GetData(r *http.Request) (data *utils_proto.Session, err error)
 }
 
 func Init(config *config.Config) error {

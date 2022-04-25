@@ -391,8 +391,8 @@ var file_proto_mailbox_proto_rawDesc = []byte{
 	0x0b, 0x32, 0x13, 0x2e, 0x75, 0x74, 0x69, 0x6c, 0x73, 0x2e, 0x4a, 0x73, 0x6f, 0x6e, 0x52, 0x65,
 	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x52, 0x08, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
 	0x12, 0x14, 0x0a, 0x05, 0x6d, 0x61, 0x69, 0x6c, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52,
-	0x05, 0x6d, 0x61, 0x69, 0x6c, 0x73, 0x32, 0x94, 0x03, 0x0a, 0x07, 0x50, 0x72, 0x6f, 0x66, 0x69,
-	0x6c, 0x65, 0x12, 0x38, 0x0a, 0x06, 0x49, 0x6e, 0x63, 0x6f, 0x6d, 0x65, 0x12, 0x0e, 0x2e, 0x75,
+	0x05, 0x6d, 0x61, 0x69, 0x6c, 0x73, 0x32, 0x94, 0x03, 0x0a, 0x07, 0x4d, 0x61, 0x69, 0x6c, 0x62,
+	0x6f, 0x78, 0x12, 0x38, 0x0a, 0x06, 0x49, 0x6e, 0x63, 0x6f, 0x6d, 0x65, 0x12, 0x0e, 0x2e, 0x75,
 	0x74, 0x69, 0x6c, 0x73, 0x2e, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x1a, 0x1c, 0x2e, 0x6d,
 	0x61, 0x69, 0x6c, 0x62, 0x6f, 0x78, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x52, 0x65, 0x73,
 	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x4d, 0x61, 0x69, 0x6c, 0x73, 0x22, 0x00, 0x12, 0x39, 0x0a, 0x07,
@@ -453,18 +453,18 @@ var file_proto_mailbox_proto_depIdxs = []int32{
 	6,  // 4: mailbox_proto.ReadMailRequest.data:type_name -> utils.Session
 	8,  // 5: mailbox_proto.ResponseMail.response:type_name -> utils.JsonResponse
 	8,  // 6: mailbox_proto.ResponseMails.response:type_name -> utils.JsonResponse
-	6,  // 7: mailbox_proto.Profile.Income:input_type -> utils.Session
-	6,  // 8: mailbox_proto.Profile.Outcome:input_type -> utils.Session
-	0,  // 9: mailbox_proto.Profile.GetMail:input_type -> mailbox_proto.GetMailRequest
-	1,  // 10: mailbox_proto.Profile.DeleteMail:input_type -> mailbox_proto.DeleteMailRequest
-	3,  // 11: mailbox_proto.Profile.ReadMail:input_type -> mailbox_proto.ReadMailRequest
-	2,  // 12: mailbox_proto.Profile.SendMail:input_type -> mailbox_proto.SendMailRequest
-	5,  // 13: mailbox_proto.Profile.Income:output_type -> mailbox_proto.ResponseMails
-	5,  // 14: mailbox_proto.Profile.Outcome:output_type -> mailbox_proto.ResponseMails
-	4,  // 15: mailbox_proto.Profile.GetMail:output_type -> mailbox_proto.ResponseMail
-	8,  // 16: mailbox_proto.Profile.DeleteMail:output_type -> utils.JsonResponse
-	8,  // 17: mailbox_proto.Profile.ReadMail:output_type -> utils.JsonResponse
-	8,  // 18: mailbox_proto.Profile.SendMail:output_type -> utils.JsonResponse
+	6,  // 7: mailbox_proto.Mailbox.Income:input_type -> utils.Session
+	6,  // 8: mailbox_proto.Mailbox.Outcome:input_type -> utils.Session
+	0,  // 9: mailbox_proto.Mailbox.GetMail:input_type -> mailbox_proto.GetMailRequest
+	1,  // 10: mailbox_proto.Mailbox.DeleteMail:input_type -> mailbox_proto.DeleteMailRequest
+	3,  // 11: mailbox_proto.Mailbox.ReadMail:input_type -> mailbox_proto.ReadMailRequest
+	2,  // 12: mailbox_proto.Mailbox.SendMail:input_type -> mailbox_proto.SendMailRequest
+	5,  // 13: mailbox_proto.Mailbox.Income:output_type -> mailbox_proto.ResponseMails
+	5,  // 14: mailbox_proto.Mailbox.Outcome:output_type -> mailbox_proto.ResponseMails
+	4,  // 15: mailbox_proto.Mailbox.GetMail:output_type -> mailbox_proto.ResponseMail
+	8,  // 16: mailbox_proto.Mailbox.DeleteMail:output_type -> utils.JsonResponse
+	8,  // 17: mailbox_proto.Mailbox.ReadMail:output_type -> utils.JsonResponse
+	8,  // 18: mailbox_proto.Mailbox.SendMail:output_type -> utils.JsonResponse
 	13, // [13:19] is the sub-list for method output_type
 	7,  // [7:13] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name
@@ -579,10 +579,10 @@ var _ grpc.ClientConnInterface
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion6
 
-// ProfileClient is the client API for Profile service.
+// MailboxClient is the client API for Mailbox service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type ProfileClient interface {
+type MailboxClient interface {
 	Income(ctx context.Context, in *utils_proto.Session, opts ...grpc.CallOption) (*ResponseMails, error)
 	Outcome(ctx context.Context, in *utils_proto.Session, opts ...grpc.CallOption) (*ResponseMails, error)
 	GetMail(ctx context.Context, in *GetMailRequest, opts ...grpc.CallOption) (*ResponseMail, error)
@@ -591,70 +591,70 @@ type ProfileClient interface {
 	SendMail(ctx context.Context, in *SendMailRequest, opts ...grpc.CallOption) (*utils_proto.JsonResponse, error)
 }
 
-type profileClient struct {
+type mailboxClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewProfileClient(cc grpc.ClientConnInterface) ProfileClient {
-	return &profileClient{cc}
+func NewMailboxClient(cc grpc.ClientConnInterface) MailboxClient {
+	return &mailboxClient{cc}
 }
 
-func (c *profileClient) Income(ctx context.Context, in *utils_proto.Session, opts ...grpc.CallOption) (*ResponseMails, error) {
+func (c *mailboxClient) Income(ctx context.Context, in *utils_proto.Session, opts ...grpc.CallOption) (*ResponseMails, error) {
 	out := new(ResponseMails)
-	err := c.cc.Invoke(ctx, "/mailbox_proto.Profile/Income", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/mailbox_proto.Mailbox/Income", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *profileClient) Outcome(ctx context.Context, in *utils_proto.Session, opts ...grpc.CallOption) (*ResponseMails, error) {
+func (c *mailboxClient) Outcome(ctx context.Context, in *utils_proto.Session, opts ...grpc.CallOption) (*ResponseMails, error) {
 	out := new(ResponseMails)
-	err := c.cc.Invoke(ctx, "/mailbox_proto.Profile/Outcome", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/mailbox_proto.Mailbox/Outcome", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *profileClient) GetMail(ctx context.Context, in *GetMailRequest, opts ...grpc.CallOption) (*ResponseMail, error) {
+func (c *mailboxClient) GetMail(ctx context.Context, in *GetMailRequest, opts ...grpc.CallOption) (*ResponseMail, error) {
 	out := new(ResponseMail)
-	err := c.cc.Invoke(ctx, "/mailbox_proto.Profile/GetMail", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/mailbox_proto.Mailbox/GetMail", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *profileClient) DeleteMail(ctx context.Context, in *DeleteMailRequest, opts ...grpc.CallOption) (*utils_proto.JsonResponse, error) {
+func (c *mailboxClient) DeleteMail(ctx context.Context, in *DeleteMailRequest, opts ...grpc.CallOption) (*utils_proto.JsonResponse, error) {
 	out := new(utils_proto.JsonResponse)
-	err := c.cc.Invoke(ctx, "/mailbox_proto.Profile/DeleteMail", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/mailbox_proto.Mailbox/DeleteMail", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *profileClient) ReadMail(ctx context.Context, in *ReadMailRequest, opts ...grpc.CallOption) (*utils_proto.JsonResponse, error) {
+func (c *mailboxClient) ReadMail(ctx context.Context, in *ReadMailRequest, opts ...grpc.CallOption) (*utils_proto.JsonResponse, error) {
 	out := new(utils_proto.JsonResponse)
-	err := c.cc.Invoke(ctx, "/mailbox_proto.Profile/ReadMail", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/mailbox_proto.Mailbox/ReadMail", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *profileClient) SendMail(ctx context.Context, in *SendMailRequest, opts ...grpc.CallOption) (*utils_proto.JsonResponse, error) {
+func (c *mailboxClient) SendMail(ctx context.Context, in *SendMailRequest, opts ...grpc.CallOption) (*utils_proto.JsonResponse, error) {
 	out := new(utils_proto.JsonResponse)
-	err := c.cc.Invoke(ctx, "/mailbox_proto.Profile/SendMail", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/mailbox_proto.Mailbox/SendMail", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ProfileServer is the server API for Profile service.
-type ProfileServer interface {
+// MailboxServer is the server API for Mailbox service.
+type MailboxServer interface {
 	Income(context.Context, *utils_proto.Session) (*ResponseMails, error)
 	Outcome(context.Context, *utils_proto.Session) (*ResponseMails, error)
 	GetMail(context.Context, *GetMailRequest) (*ResponseMail, error)
@@ -663,168 +663,168 @@ type ProfileServer interface {
 	SendMail(context.Context, *SendMailRequest) (*utils_proto.JsonResponse, error)
 }
 
-// UnimplementedProfileServer can be embedded to have forward compatible implementations.
-type UnimplementedProfileServer struct {
+// UnimplementedMailboxServer can be embedded to have forward compatible implementations.
+type UnimplementedMailboxServer struct {
 }
 
-func (*UnimplementedProfileServer) Income(context.Context, *utils_proto.Session) (*ResponseMails, error) {
+func (*UnimplementedMailboxServer) Income(context.Context, *utils_proto.Session) (*ResponseMails, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Income not implemented")
 }
-func (*UnimplementedProfileServer) Outcome(context.Context, *utils_proto.Session) (*ResponseMails, error) {
+func (*UnimplementedMailboxServer) Outcome(context.Context, *utils_proto.Session) (*ResponseMails, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Outcome not implemented")
 }
-func (*UnimplementedProfileServer) GetMail(context.Context, *GetMailRequest) (*ResponseMail, error) {
+func (*UnimplementedMailboxServer) GetMail(context.Context, *GetMailRequest) (*ResponseMail, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMail not implemented")
 }
-func (*UnimplementedProfileServer) DeleteMail(context.Context, *DeleteMailRequest) (*utils_proto.JsonResponse, error) {
+func (*UnimplementedMailboxServer) DeleteMail(context.Context, *DeleteMailRequest) (*utils_proto.JsonResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteMail not implemented")
 }
-func (*UnimplementedProfileServer) ReadMail(context.Context, *ReadMailRequest) (*utils_proto.JsonResponse, error) {
+func (*UnimplementedMailboxServer) ReadMail(context.Context, *ReadMailRequest) (*utils_proto.JsonResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReadMail not implemented")
 }
-func (*UnimplementedProfileServer) SendMail(context.Context, *SendMailRequest) (*utils_proto.JsonResponse, error) {
+func (*UnimplementedMailboxServer) SendMail(context.Context, *SendMailRequest) (*utils_proto.JsonResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendMail not implemented")
 }
 
-func RegisterProfileServer(s *grpc.Server, srv ProfileServer) {
-	s.RegisterService(&_Profile_serviceDesc, srv)
+func RegisterMailboxServer(s *grpc.Server, srv MailboxServer) {
+	s.RegisterService(&_Mailbox_serviceDesc, srv)
 }
 
-func _Profile_Income_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Mailbox_Income_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(utils_proto.Session)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProfileServer).Income(ctx, in)
+		return srv.(MailboxServer).Income(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/mailbox_proto.Profile/Income",
+		FullMethod: "/mailbox_proto.Mailbox/Income",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileServer).Income(ctx, req.(*utils_proto.Session))
+		return srv.(MailboxServer).Income(ctx, req.(*utils_proto.Session))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Profile_Outcome_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Mailbox_Outcome_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(utils_proto.Session)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProfileServer).Outcome(ctx, in)
+		return srv.(MailboxServer).Outcome(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/mailbox_proto.Profile/Outcome",
+		FullMethod: "/mailbox_proto.Mailbox/Outcome",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileServer).Outcome(ctx, req.(*utils_proto.Session))
+		return srv.(MailboxServer).Outcome(ctx, req.(*utils_proto.Session))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Profile_GetMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Mailbox_GetMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetMailRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProfileServer).GetMail(ctx, in)
+		return srv.(MailboxServer).GetMail(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/mailbox_proto.Profile/GetMail",
+		FullMethod: "/mailbox_proto.Mailbox/GetMail",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileServer).GetMail(ctx, req.(*GetMailRequest))
+		return srv.(MailboxServer).GetMail(ctx, req.(*GetMailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Profile_DeleteMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Mailbox_DeleteMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteMailRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProfileServer).DeleteMail(ctx, in)
+		return srv.(MailboxServer).DeleteMail(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/mailbox_proto.Profile/DeleteMail",
+		FullMethod: "/mailbox_proto.Mailbox/DeleteMail",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileServer).DeleteMail(ctx, req.(*DeleteMailRequest))
+		return srv.(MailboxServer).DeleteMail(ctx, req.(*DeleteMailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Profile_ReadMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Mailbox_ReadMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ReadMailRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProfileServer).ReadMail(ctx, in)
+		return srv.(MailboxServer).ReadMail(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/mailbox_proto.Profile/ReadMail",
+		FullMethod: "/mailbox_proto.Mailbox/ReadMail",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileServer).ReadMail(ctx, req.(*ReadMailRequest))
+		return srv.(MailboxServer).ReadMail(ctx, req.(*ReadMailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Profile_SendMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Mailbox_SendMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SendMailRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ProfileServer).SendMail(ctx, in)
+		return srv.(MailboxServer).SendMail(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/mailbox_proto.Profile/SendMail",
+		FullMethod: "/mailbox_proto.Mailbox/SendMail",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileServer).SendMail(ctx, req.(*SendMailRequest))
+		return srv.(MailboxServer).SendMail(ctx, req.(*SendMailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Profile_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "mailbox_proto.Profile",
-	HandlerType: (*ProfileServer)(nil),
+var _Mailbox_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "mailbox_proto.Mailbox",
+	HandlerType: (*MailboxServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Income",
-			Handler:    _Profile_Income_Handler,
+			Handler:    _Mailbox_Income_Handler,
 		},
 		{
 			MethodName: "Outcome",
-			Handler:    _Profile_Outcome_Handler,
+			Handler:    _Mailbox_Outcome_Handler,
 		},
 		{
 			MethodName: "GetMail",
-			Handler:    _Profile_GetMail_Handler,
+			Handler:    _Mailbox_GetMail_Handler,
 		},
 		{
 			MethodName: "DeleteMail",
-			Handler:    _Profile_DeleteMail_Handler,
+			Handler:    _Mailbox_DeleteMail_Handler,
 		},
 		{
 			MethodName: "ReadMail",
-			Handler:    _Profile_ReadMail_Handler,
+			Handler:    _Mailbox_ReadMail_Handler,
 		},
 		{
 			MethodName: "SendMail",
-			Handler:    _Profile_SendMail_Handler,
+			Handler:    _Mailbox_SendMail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

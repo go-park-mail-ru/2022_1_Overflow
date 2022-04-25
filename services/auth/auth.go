@@ -24,68 +24,67 @@ func (s *AuthService) Init(config *config.Config, db repository_proto.DatabaseRe
 	s.db = db
 }
 
-func (s *AuthService) SignIn(data *auth_proto.SignInForm) *utils_proto.JsonResponse {
+func (s *AuthService) SignIn(context context.Context, data *auth_proto.SignInForm) (*utils_proto.JsonResponse, error) {
 	log.Info("SignIn: ", "handling usecase")
 	log.Info("SignIn: ", "handling validation")
 	if err := validation.CheckSignIn(data); err != nil {
 		log.Errorf("SignIn: %v", err)
-		return pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, err.Error())
+		return pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, err.Error()), err
 	}
 	log.Info("SignIn: ", "handling db")
 	req := repository_proto.GetUserInfoByUsernameRequest{
 		Username: data.Username,
 	}
-	resp, err := s.db.GetUserInfoByUsername(context.Background(), &req)
+	resp, err := s.db.GetUserInfoByUsername(context, &req)
 	if (err != nil) {
 		log.Errorf("SignIn: %v", err)
-		return &pkg.WRONG_CREDS_ERR
+		return &pkg.WRONG_CREDS_ERR, err
 	}
 	userFind := resp.User
 	if (proto.Equal(userFind, &utils_proto.User{})) {
-		return &pkg.WRONG_CREDS_ERR
+		return &pkg.WRONG_CREDS_ERR, nil
 	}
 	if userFind.Password != pkg.HashPassword(data.Password) {
-		log.Errorf("SignIn: %v", err)
-		return &pkg.WRONG_CREDS_ERR
+		return &pkg.WRONG_CREDS_ERR, nil
 	}
 	log.Info("SignIn, username: ", data.Username)
-	return &pkg.NO_ERR
+	return &pkg.NO_ERR, nil
 }
 
-func (s *AuthService) SignUp(data *auth_proto.SignUpForm) *utils_proto.JsonResponse {
+func (s *AuthService) SignUp(context context.Context, data *auth_proto.SignUpForm) (*utils_proto.JsonResponse, error) {
 	log.Info("SignUp: ", "handling usecase")
 	log.Info("SignUp: ", "handling validaton")
 	if err := validation.CheckSignUp(data); err != nil {
-		return pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, err.Error())
+		return pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, err.Error()), err
 	}
 	user, err := pkg.ConvertToUser(data)
 	if err != nil {
 		log.Errorf("SignUp: %v", err)
-		return &pkg.INTERNAL_ERR
+		return &pkg.INTERNAL_ERR, err
 	}
 	req := repository_proto.GetUserInfoByUsernameRequest{
 		Username: data.Username,
 	}
-	resp, err := s.db.GetUserInfoByUsername(context.Background(), &req)
+	resp, err := s.db.GetUserInfoByUsername(context, &req)
 	if err != nil {
 		log.Errorf("SignUp: %v", err)
-		return &pkg.INTERNAL_ERR
+		return &pkg.INTERNAL_ERR, err
 	}
 	userFind := resp.User
-	if (proto.Equal(userFind, &utils_proto.User{})) {
-		return pkg.CreateJsonErr(pkg.STATUS_USER_EXISTS, fmt.Sprintf("Пользователь %v уже существует.", data.Username))
+	if (!proto.Equal(userFind, &utils_proto.User{})) {
+		return pkg.CreateJsonErr(pkg.STATUS_USER_EXISTS, fmt.Sprintf("Пользователь %v уже существует.", data.Username)), nil
 	}
 	req2 := repository_proto.AddUserRequest{
 		User: &user,
 	}
-	resp2, err := s.db.AddUser(context.Background(), &req2); 
+	resp2, err := s.db.AddUser(context, &req2); 
 	if err != nil {
 		log.Errorf("SignUp: %v", err)
-		return &pkg.DB_ERR
+		return &pkg.DB_ERR, err
 	}
 	if resp2.Status == 1 {
-		return &pkg.DB_ERR
+		return &pkg.DB_ERR, nil
 	}
 	log.Info("SignUp, username: ", data.Username)
-	return &pkg.NO_ERR
+	return &pkg.NO_ERR, nil
 }

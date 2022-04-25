@@ -6,14 +6,15 @@ import (
 	"OverflowBackend/proto/profile_proto"
 	"OverflowBackend/proto/repository_proto"
 	"OverflowBackend/proto/utils_proto"
+	"context"
 )
 
 type MailBoxServiceInterface interface {
 	Init(config *config.Config, db repository_proto.DatabaseRepositoryClient, profile profile_proto.ProfileClient)
-	Income(data *utils_proto.Session) *mailbox_proto.ResponseMails
-	Outcome(data *utils_proto.Session) *mailbox_proto.ResponseMails
-	GetMail(request *mailbox_proto.GetMailRequest) *mailbox_proto.ResponseMail
-	DeleteMail(request *mailbox_proto.DeleteMailRequest) *utils_proto.JsonResponse
-	ReadMail(request *mailbox_proto.ReadMailRequest) *utils_proto.JsonResponse
-	SendMail(request *mailbox_proto.SendMailRequest) *utils_proto.JsonResponse
+	Income(context context.Context, data *utils_proto.Session) (*mailbox_proto.ResponseMails, error)
+	Outcome(context context.Context, data *utils_proto.Session) (*mailbox_proto.ResponseMails, error)
+	GetMail(context context.Context, request *mailbox_proto.GetMailRequest) (*mailbox_proto.ResponseMail, error)
+	DeleteMail(context context.Context, request *mailbox_proto.DeleteMailRequest) (*utils_proto.JsonResponse, error)
+	ReadMail(context context.Context, request *mailbox_proto.ReadMailRequest) (*utils_proto.JsonResponse, error)
+	SendMail(context context.Context, request *mailbox_proto.SendMailRequest) (*utils_proto.JsonResponse, error)
 }

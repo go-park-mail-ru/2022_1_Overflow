@@ -6,8 +6,6 @@ option go_package = "./repository_proto";
 import "proto/utils.proto";
 
 service DatabaseRepository {
-    rpc Create(CreateRequest) returns (utils.DatabaseResponse) {}
-
     rpc GetUserInfoByUsername(GetUserInfoByUsernameRequest) returns (ResponseUser) {}
     rpc GetUserInfoById(GetUserInfoByIdRequest) returns (ResponseUser) {}
 
@@ -26,10 +24,6 @@ service DatabaseRepository {
 }
 
 // ================ requests ================
-
-message CreateRequest {
-    string url = 1;
-}
 
 message GetUserInfoByUsernameRequest {
     string username = 1;

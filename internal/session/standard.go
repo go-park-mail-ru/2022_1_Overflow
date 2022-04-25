@@ -2,11 +2,12 @@ package session
 
 import (
 	"OverflowBackend/internal/config"
-	"OverflowBackend/internal/models"
+	"OverflowBackend/proto/utils_proto"
 	"encoding/gob"
 	"net/http"
 
 	"github.com/gorilla/sessions"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 var session_name string = "OveflowMail"
@@ -31,7 +32,7 @@ func (s *StandardManager) Init(config *config.Config) (err error) {
 		Secure:   false,
 	}
 
-	gob.Register(models.Session{})
+	gob.Register(&utils_proto.Session{})
 	return
 }
 
@@ -40,9 +41,9 @@ func (s *StandardManager) CreateSession(w http.ResponseWriter, r *http.Request, 
 	if err != nil {
 		return err
 	}
-	data := &models.Session{
+	data := &utils_proto.Session{
 		Username:      username,
-		Authenticated: true,
+		Authenticated: wrapperspb.Bool(true),
 	}
 	session.Values["data"] = data
 	err = session.Save(r, w)
@@ -55,7 +56,7 @@ func (s *StandardManager) DeleteSession(w http.ResponseWriter, r *http.Request) 
 		return err
 	}
 
-	session.Values["data"] = models.Session{}
+	session.Values["data"] = &utils_proto.Session{}
 	session.Options.MaxAge = -1
 
 	err = session.Save(r, w)
@@ -74,7 +75,7 @@ func (s *StandardManager) IsLoggedIn(r *http.Request) bool {
 	return !session.IsNew
 }
 
-func (s *StandardManager) GetData(r *http.Request) (data *models.Session, err error) {
+func (s *StandardManager) GetData(r *http.Request) (data *utils_proto.Session, err error) {
 	defer func() {
 		errRecover := recover()
 		if errRecover != nil {
@@ -85,6 +86,6 @@ func (s *StandardManager) GetData(r *http.Request) (data *models.Session, err er
 	if err != nil {
 		return nil, err
 	}
-	sessionData := session.Values["data"].(models.Session)
-	return &sessionData, nil
+	sessionData := session.Values["data"].(*utils_proto.Session)
+	return sessionData, nil
 }

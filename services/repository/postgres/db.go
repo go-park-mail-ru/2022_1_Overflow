@@ -38,16 +38,16 @@ func (c *Database) Create(url string) (err error) {
 }
 
 // Получить данные пользователя по его почте
-func (c *Database) GetUserInfoByUsername(request *repository_proto.GetUserInfoByUsernameRequest) *repository_proto.ResponseUser {
+func (c *Database) GetUserInfoByUsername(context context.Context, request *repository_proto.GetUserInfoByUsernameRequest) (*repository_proto.ResponseUser, error) {
 	var user utils_proto.User
-	rows, err := c.Conn.Query(context.Background(), "Select * from overflow.users where username = $1;", request.Username)
+	rows, err := c.Conn.Query(context, "Select * from overflow.users where username = $1;", request.Username)
 	if err != nil {
 		return &repository_proto.ResponseUser{
 			User: &user,
 			Response: &utils_proto.DatabaseResponse{
 				Status: utils_proto.DatabaseStatus_ERROR,
 			},
-		}
+		}, err
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -58,7 +58,7 @@ func (c *Database) GetUserInfoByUsername(request *repository_proto.GetUserInfoBy
 				Response: &utils_proto.DatabaseResponse{
 					Status: utils_proto.DatabaseStatus_ERROR,
 				},
-			}
+			}, err
 		}
 		user.Id = values[0].(int32)
 		user.FirstName = values[1].(string)
@@ -71,20 +71,20 @@ func (c *Database) GetUserInfoByUsername(request *repository_proto.GetUserInfoBy
 		Response: &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,
 		},
-	}
+	}, nil
 }
 
 // Получить данные пользователя по его айди в бд
-func (c *Database) GetUserInfoById(request *repository_proto.GetUserInfoByIdRequest) *repository_proto.ResponseUser{
+func (c *Database) GetUserInfoById(context context.Context, request *repository_proto.GetUserInfoByIdRequest) (*repository_proto.ResponseUser, error) {
 	var user utils_proto.User
-	rows, err := c.Conn.Query(context.Background(), "Select * from overflow.users where id = $1;", request.UserId)
+	rows, err := c.Conn.Query(context, "Select * from overflow.users where id = $1;", request.UserId)
 	if err != nil {
 		return &repository_proto.ResponseUser{
 			User: &user,
 			Response: &utils_proto.DatabaseResponse{
 				Status: utils_proto.DatabaseStatus_ERROR,
 			},
-		}
+		}, err
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -95,7 +95,7 @@ func (c *Database) GetUserInfoById(request *repository_proto.GetUserInfoByIdRequ
 				Response: &utils_proto.DatabaseResponse{
 					Status: utils_proto.DatabaseStatus_ERROR,
 				},
-			}
+			}, err
 		}
 		user.Id = values[0].(int32)
 		user.FirstName = values[1].(string)
@@ -108,141 +108,141 @@ func (c *Database) GetUserInfoById(request *repository_proto.GetUserInfoByIdRequ
 		Response: &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,
 		},
-	}
+	}, nil
 }
 
 // Добавить пользователя
-func (c *Database) AddUser(request *repository_proto.AddUserRequest) *utils_proto.DatabaseResponse {
+func (c *Database) AddUser(context context.Context, request *repository_proto.AddUserRequest) (*utils_proto.DatabaseResponse, error) {
 	user := request.User
-	res, err := c.Conn.Query(context.Background(), "insert into overflow.users(first_name, last_name, password, username) values ($1, $2, $3, $4);", user.FirstName, user.LastName, user.Password, user.Username)
+	res, err := c.Conn.Query(context, "insert into overflow.users(first_name, last_name, password, username) values ($1, $2, $3, $4);", user.FirstName, user.LastName, user.Password, user.Username)
 	if err == nil {
 		res.Close()
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,
-		}
+		}, err
 	} else {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
-		}
+		}, err
 	}
 }
 
 // Изменить пароль
-func (c *Database) ChangeUserPassword(request *repository_proto.ChangeForm) *utils_proto.DatabaseResponse {
-	_, err := c.Conn.Exec(context.Background(), "UPDATE overflow.users set password = $1 where id = $2;", request.Data, request.User.Id)
+func (c *Database) ChangeUserPassword(context context.Context, request *repository_proto.ChangeForm) (*utils_proto.DatabaseResponse, error) {
+	_, err := c.Conn.Exec(context, "UPDATE overflow.users set password = $1 where id = $2;", request.Data, request.User.Id)
 	if err == nil {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,
-		}
+		}, err
 	} else {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
-		}
+		}, err
 	}
 }
 
 // Изменить имя
-func (c *Database) ChangeUserFirstName(request *repository_proto.ChangeForm) *utils_proto.DatabaseResponse {
-	_, err := c.Conn.Exec(context.Background(), "UPDATE overflow.users set first_name = $1 where id = $2;", request.Data, request.User.Id)
+func (c *Database) ChangeUserFirstName(context context.Context, request *repository_proto.ChangeForm) (*utils_proto.DatabaseResponse, error) {
+	_, err := c.Conn.Exec(context, "UPDATE overflow.users set first_name = $1 where id = $2;", request.Data, request.User.Id)
 	if err == nil {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,
-		}
+		}, err
 	} else {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
-		}
+		}, err
 	}
 }
 
 // Изменить фамилию
-func (c *Database) ChangeUserLastName(request *repository_proto.ChangeForm) *utils_proto.DatabaseResponse {
-	_, err := c.Conn.Exec(context.Background(), "UPDATE overflow.users set last_name = $1 where id = $2;", request.Data, request.User.Id)
+func (c *Database) ChangeUserLastName(context context.Context, request *repository_proto.ChangeForm) (*utils_proto.DatabaseResponse, error) {
+	_, err := c.Conn.Exec(context, "UPDATE overflow.users set last_name = $1 where id = $2;", request.Data, request.User.Id)
 	if err == nil {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,
-		}
+		}, err
 	} else {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
-		}
+		}, err
 	}
 }
 
 // Добавить письмо
-func (c *Database) AddMail(request *repository_proto.AddMailRequest) *utils_proto.DatabaseResponse {
+func (c *Database) AddMail(context context.Context, request *repository_proto.AddMailRequest) (*utils_proto.DatabaseResponse, error) {
 	mail := request.Mail
-	res, err := c.Conn.Query(context.Background(), "insert into overflow.mails(client_id, sender, addressee, theme, text, files, date) values($1, $2, $3, $4, $5, $6, $7);", mail.ClientId, mail.Sender, mail.Addressee, mail.Theme, mail.Text, mail.Files, mail.Date)
+	res, err := c.Conn.Query(context, "insert into overflow.mails(client_id, sender, addressee, theme, text, files, date) values($1, $2, $3, $4, $5, $6, $7);", mail.ClientId, mail.Sender, mail.Addressee, mail.Theme, mail.Text, mail.Files, mail.Date)
 	if err == nil {
 		res.Close()
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,
-		}
+		}, err
 	} else {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
-		}
+		}, err
 	}
 }
 
 //Удалить письмо
-func (c *Database) DeleteMail(request *repository_proto.DeleteMailRequest) *utils_proto.DatabaseResponse {
+func (c *Database) DeleteMail(context context.Context, request *repository_proto.DeleteMailRequest) (*utils_proto.DatabaseResponse, error) {
 	mail := request.Mail
 	username := request.Username
-	res, err := c.Conn.Query(context.Background(), "UPDATE overflow.mails set sender = 'null' where id = $1 and sender = $2;", mail.Id, username)
+	res, err := c.Conn.Query(context, "UPDATE overflow.mails set sender = 'null' where id = $1 and sender = $2;", mail.Id, username)
 	if err != nil {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
-		}
+		}, err
 	}
 	res.Close()
-	res, err = c.Conn.Query(context.Background(), "UPDATE overflow.mails set addressee = 'null' where id = $1 and addressee = $2;", mail.Id, username)
+	res, err = c.Conn.Query(context, "UPDATE overflow.mails set addressee = 'null' where id = $1 and addressee = $2;", mail.Id, username)
 	if err != nil {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
-		}
+		}, err
 	}
 	res.Close()
-	res, err = c.Conn.Query(context.Background(), "DELETE FROM overflow.mails WHERE sender like 'null' and addressee like 'null';")
+	res, err = c.Conn.Query(context, "DELETE FROM overflow.mails WHERE sender like 'null' and addressee like 'null';")
 	if err == nil {
 		res.Close()
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,
-		}
+		}, err
 	} else {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
-		}
+		}, err
 	}
 }
 
 //Прочитать письмо
-func (c *Database) ReadMail(request *repository_proto.ReadMailRequest) *utils_proto.DatabaseResponse {
+func (c *Database) ReadMail(context context.Context, request *repository_proto.ReadMailRequest) (*utils_proto.DatabaseResponse, error) {
 	mail := request.Mail
-	res, err := c.Conn.Query(context.Background(), "UPDATE overflow.mails set read = $1 where id = $2;", true, mail.Id)
+	res, err := c.Conn.Query(context, "UPDATE overflow.mails set read = $1 where id = $2;", true, mail.Id)
 	if err == nil {
 		res.Close()
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,
-		}
+		}, err
 	} else {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
-		}
+		}, err
 	}
 }
 
 // Получить письмо по ID
-func (c *Database) GetMailInfoById(request *repository_proto.GetMailInfoByIdRequest) *repository_proto.ResponseMail {
+func (c *Database) GetMailInfoById(context context.Context, request *repository_proto.GetMailInfoByIdRequest) (*repository_proto.ResponseMail, error) {
 	var mail utils_proto.Mail
-	rows, err := c.Conn.Query(context.Background(), "Select * from overflow.mails where Id = $1", request.MailId)
+	rows, err := c.Conn.Query(context, "Select * from overflow.mails where Id = $1", request.MailId)
 	if err != nil {
 		return &repository_proto.ResponseMail{
 			Mail: &mail,
 			Response: &utils_proto.DatabaseResponse{
 				Status: utils_proto.DatabaseStatus_ERROR,
 			},
-		}
+		}, err
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -253,7 +253,7 @@ func (c *Database) GetMailInfoById(request *repository_proto.GetMailInfoByIdRequ
 				Response: &utils_proto.DatabaseResponse{
 					Status: utils_proto.DatabaseStatus_ERROR,
 				},
-			}
+			}, err
 		}
 		mail.Id = values[0].(int32)
 		mail.ClientId = values[1].(int32)
@@ -270,20 +270,20 @@ func (c *Database) GetMailInfoById(request *repository_proto.GetMailInfoByIdRequ
 		Response: &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,
 		},
-	}
+	}, nil
 }
 
 // Получить входящие сообщения пользователя
-func (c *Database) GetIncomeMails(request *repository_proto.GetIncomeMailsRequest) *repository_proto.ResponseMails {
+func (c *Database) GetIncomeMails(context context.Context, request *repository_proto.GetIncomeMailsRequest) (*repository_proto.ResponseMails, error) {
 	var results []*utils_proto.Mail
-	rows, err := c.Conn.Query(context.Background(), "Select * from getIncomeMails($1)", request.UserId)
+	rows, err := c.Conn.Query(context, "Select * from getIncomeMails($1)", request.UserId)
 	if err != nil {
 		return &repository_proto.ResponseMails{
 			Mails: results,
 			Response: &utils_proto.DatabaseResponse{
 				Status: utils_proto.DatabaseStatus_ERROR,
 			},
-		}
+		}, err
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -295,7 +295,7 @@ func (c *Database) GetIncomeMails(request *repository_proto.GetIncomeMailsReques
 				Response: &utils_proto.DatabaseResponse{
 					Status: utils_proto.DatabaseStatus_ERROR,
 				},
-			}
+			}, err
 		}
 		mail.Sender = values[0].(string)
 		mail.Theme = values[1].(string)
@@ -311,20 +311,20 @@ func (c *Database) GetIncomeMails(request *repository_proto.GetIncomeMailsReques
 		Response: &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,
 		},
-	}
+	}, nil
 }
 
 //Получить отправленные пользователем сообщения
-func (c *Database) GetOutcomeMails(request *repository_proto.GetOutcomeMailsRequest) *repository_proto.ResponseMails {
+func (c *Database) GetOutcomeMails(context context.Context, request *repository_proto.GetOutcomeMailsRequest) (*repository_proto.ResponseMails, error) {
 	var results []*utils_proto.Mail
-	rows, err := c.Conn.Query(context.Background(), "Select * from getOutcomeMails($1)", request.UserId)
+	rows, err := c.Conn.Query(context, "Select * from getOutcomeMails($1)", request.UserId)
 	if err != nil {
 		return &repository_proto.ResponseMails{
 			Mails: results,
 			Response: &utils_proto.DatabaseResponse{
 				Status: utils_proto.DatabaseStatus_ERROR,
 			},
-		}
+		}, err
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -336,7 +336,7 @@ func (c *Database) GetOutcomeMails(request *repository_proto.GetOutcomeMailsRequ
 				Response: &utils_proto.DatabaseResponse{
 					Status: utils_proto.DatabaseStatus_ERROR,
 				},
-			}
+			}, err
 		}
 		mail.Addressee = values[0].(string)
 		mail.Theme = values[1].(string)
@@ -351,5 +351,5 @@ func (c *Database) GetOutcomeMails(request *repository_proto.GetOutcomeMailsRequ
 		Response: &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,
 		},
-	}
+	}, nil
 }

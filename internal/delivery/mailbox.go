@@ -1,13 +1,17 @@
 package delivery
 
 import (
-	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/security/xss"
 	"OverflowBackend/internal/session"
 	"OverflowBackend/pkg"
+	"OverflowBackend/proto/mailbox_proto"
+	"OverflowBackend/proto/utils_proto"
+	"context"
 	"encoding/json"
 	"net/http"
 	"strconv"
+
+	"google.golang.org/protobuf/proto"
 )
 
 // Income godoc
@@ -21,21 +25,24 @@ import (
 func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodGet {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
-
 	data, e := session.Manager.GetData(r)
 	if e != nil {
-		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-	parsed, err := d.uc.Income(data)
-	if err != pkg.NO_ERR {
-		pkg.WriteJsonErrFull(w, err)
+	resp, err := d.mailbox.Income(context.Background(), data)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	w.Write(parsed)
+	if !proto.Equal(resp.Response, &pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, resp.Response)
+		return
+	}
+	w.Write(resp.Mails)
 }
 
 // Outcome godoc
@@ -49,21 +56,24 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodGet {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
-
 	data, e := session.Manager.GetData(r)
 	if e != nil {
-		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-	parsed, err := d.uc.Outcome(data)
-	if err != pkg.NO_ERR {
-		pkg.WriteJsonErrFull(w, err)
+	resp, err := d.mailbox.Outcome(context.Background(), data)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	w.Write(parsed)
+	if !proto.Equal(resp.Response, &pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, resp.Response)
+		return
+	}
+	w.Write(resp.Mails)
 }
 
 // GetMail godoc
@@ -78,28 +88,35 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 func (d *Delivery) GetMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodGet {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
 
 	data, e := session.Manager.GetData(r)
 	if e != nil {
-		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
 
 	mail_id, e := strconv.Atoi(r.URL.Query().Get("id"))
 	if e != nil {
-		pkg.WriteJsonErrFull(w, pkg.GET_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
 		return
 	}
-	parsed, err := d.uc.GetMail(data, int32(mail_id))
-	if err != pkg.NO_ERR {
-		pkg.WriteJsonErrFull(w, err)
+	resp, err := d.mailbox.GetMail(context.Background(), &mailbox_proto.GetMailRequest{
+		Data: data,
+		Id: int32(mail_id),
+	})
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
+		return
+	}
+	if !proto.Equal(resp.Response, &pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, resp.Response)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	w.Write(parsed)
+	w.Write(resp.Mail)
 }
 
 // DeleteMail godoc
@@ -115,26 +132,34 @@ func (d *Delivery) GetMail(w http.ResponseWriter, r *http.Request) {
 func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
 
 	data, err := session.Manager.GetData(r)
 	if err != nil {
-		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
 	idStr := r.URL.Query().Get("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		pkg.WriteJsonErrFull(w, pkg.GET_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
 		return
 	}
-	if err := d.uc.DeleteMail(data, int32(id)); err != pkg.NO_ERR {
-		pkg.WriteJsonErrFull(w, pkg.INTERNAL_ERR)
+	resp, err := d.mailbox.DeleteMail(context.Background(), &mailbox_proto.DeleteMailRequest{
+		Data: data,
+		Id: int32(id),
+	})
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+	if !proto.Equal(resp, &pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, resp)
+		return
+	}
+	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
 // @Router /mail/delete [get]
@@ -155,26 +180,34 @@ func DeleteMail() {}
 func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
 
 	data, err := session.Manager.GetData(r)
 	if err != nil {
-		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
 	idStr := r.URL.Query().Get("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		pkg.WriteJsonErrFull(w, pkg.GET_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
 		return
 	}
-	if err := d.uc.ReadMail(data, int32(id)); err != pkg.NO_ERR {
-		pkg.WriteJsonErrFull(w, err)
+	resp, err := d.mailbox.ReadMail(context.Background(), &mailbox_proto.ReadMailRequest{
+		Data: data,
+		Id: int32(id),
+	})
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+	if !proto.Equal(resp, &pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, resp)
+		return
+	}
+	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
 // @Router /mail/read [get]
@@ -195,20 +228,20 @@ func ReadMail() {}
 func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
 
 	data, err := session.Manager.GetData(r)
 	if err != nil {
-		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
 
-	var form models.MailForm
+	var form utils_proto.MailForm
 
 	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
-		pkg.WriteJsonErrFull(w, pkg.JSON_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
 
@@ -217,11 +250,19 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 	form.Text = xss.P.Sanitize(form.Text)
 	form.Theme = xss.P.Sanitize(form.Theme)
 
-	if err := d.uc.SendMail(data, form); err != pkg.NO_ERR {
-		pkg.WriteJsonErrFull(w, err)
+	resp, err := d.mailbox.SendMail(context.Background(), &mailbox_proto.SendMailRequest{
+		Data: data,
+		Form: &form,
+	})
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+	if !proto.Equal(resp, &pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, resp)
+		return
+	}
+	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
 // @Router /mail/send [get]
