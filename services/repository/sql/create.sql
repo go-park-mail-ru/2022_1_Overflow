@@ -17,7 +17,7 @@ CREATE TABLE overflow.mails (
     addressee varchar(234) not null ,
     date timestamp not null,
     theme varchar(30),
-    text text not null ,
+    text text not null,
     files varchar(30),
     read bool DEFAULT FALSE,
     foreign key (client_id) references overflow.users(id) on delete cascade
