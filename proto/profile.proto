@@ -12,12 +12,6 @@ service Profile {
     rpc SetAvatar(SetAvatarRequest) returns (utils.JsonResponse) {}
 }
 
-message SettingsForm {
-    string first_name = 1;
-    string last_name = 2;
-    string password = 3;
-}
-
 message Avatar {
     string name = 1;
     string username = 2;
@@ -31,7 +25,7 @@ message SetAvatarRequest {
 
 message SetInfoRequest {
     utils.Session data = 1;
-    SettingsForm form = 2;
+    utils.ProfileSettingsForm form = 2;
 }
 
 message GetInfoRequest {

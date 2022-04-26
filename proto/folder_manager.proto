@@ -1,0 +1,62 @@
+syntax = "proto3";
+package mailbox_proto;
+
+option go_package = "./folder_manager_proto";
+
+import "proto/utils.proto";
+
+service FolderManager {
+    rpc AddFolder(AddFolderRequest) returns (utils.JsonResponse) {}
+    rpc AddMailToFolder(AddMailToFolderRequest) returns (utils.JsonResponse) {}
+    rpc ChangeFolder(ChangeFolderRequest) returns (utils.JsonResponse) {}
+    rpc GetFolderByName(GetFolderByNameRequest) returns (ResponseFolder) {}
+    rpc GetFolderById(GetFolderByIdRequest) returns (ResponseFolder) {}
+    rpc DeleteFolder(DeleteFolderRequest) returns (utils.JsonResponse) {}
+    rpc ListFolders(ListFoldersRequest) returns (ResponseFolders) {}
+}
+
+message AddFolderRequest {
+    utils.Session data = 1;
+    string name = 2;
+}
+
+message AddMailToFolderRequest {
+    utils.Session data = 1;
+    string folder_name = 2;
+    utils.Mail mail = 3;
+}
+
+message ChangeFolderRequest {
+    utils.Session data = 1;
+    string name = 2;
+
+}
+
+message GetFolderByNameRequest {
+    utils.Session data = 1;
+    string name = 2;
+}
+
+message GetFolderByIdRequest {
+    utils.Session data = 1;
+    int32 id = 2;
+}
+
+message ResponseFolder {
+    utils.JsonResponse response = 1;
+    utils.Folder folder = 2;
+}
+
+message ResponseFolders {
+    utils.JsonResponse response = 1;
+    bytes names = 2;
+}
+
+message DeleteFolderRequest {
+    utils.Session data = 1;
+    string name = 2;
+}
+
+message ListFoldersRequest {
+    utils.Session data = 1;
+}

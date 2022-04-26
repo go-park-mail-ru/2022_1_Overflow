@@ -39,6 +39,13 @@ message Mail {
     google.protobuf.BoolValue read = 9 [json_name="read"];
 }
 
+message Folder {
+    string name = 1 [json_name="name"];
+    int32 id = 2 [json_name="id"];
+    string owner = 3 [json_name="owner"];
+    repeated utils.MailAdditional mails = 4 [json_name="mails"];
+}
+
 message MailAdditional {
     Mail mail = 1 [json_name="mail"];
     string avatar_url = 2 [json_name="avatar_url"];
@@ -52,7 +59,17 @@ message User {
     string password = 5 [json_name="password"];
 }
 
+message ProfileSettingsForm {
+    string first_name = 1 [json_name="first_name"]; 
+    string last_name = 2 [json_name="last_name"];
+    string password = 3 [json_name="password"];
+}
+
 message Session {
     string username = 1;
     google.protobuf.BoolValue authenticated = 2;
+}
+
+message FolderSettingsForm {
+    string new_name = 1 [json_name="new_name"];
 }
