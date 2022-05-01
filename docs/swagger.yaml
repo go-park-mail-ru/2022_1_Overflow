@@ -152,11 +152,11 @@ paths:
             $ref: '#/definitions/utils_proto.JsonResponse'
     post:
       parameters:
-      - description: Имя папки.
+      - description: ID папки.
         in: query
-        name: folder_name
+        name: folder_id
         required: true
-        type: string
+        type: integer
       - description: ID добавляемого письма.
         in: query
         name: mail_id
@@ -271,11 +271,11 @@ paths:
             $ref: '#/definitions/utils_proto.JsonResponse'
     post:
       parameters:
-      - description: Исходное имя папки.
+      - description: ID изменяемой папки.
         in: query
-        name: folder_name
+        name: folder_id
         required: true
-        type: string
+        type: integer
       - description: Новое имя папки.
         in: query
         name: new_folder_name

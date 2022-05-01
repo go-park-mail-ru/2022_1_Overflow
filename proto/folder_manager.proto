@@ -23,16 +23,17 @@ message AddFolderRequest {
 
 message AddMailToFolderRequest {
     utils.Session data = 1;
-    string folderName = 2;
+    int32 folderId = 2;
     int32 mailId = 3;
 }
 
 message ChangeFolderRequest {
     utils.Session data = 1;
-    string folderName = 2;
+    int32 folderId = 2;
     string folderNewName = 3;
 }
 
+/*
 message GetFolderByNameRequest {
     utils.Session data = 1;
     string name = 2;
@@ -47,6 +48,7 @@ message ResponseFolder {
     utils.JsonResponse response = 1;
     bytes folder = 2;
 }
+*/
 
 message ResponseFolders {
     utils.JsonResponse response = 1;
@@ -69,5 +71,5 @@ message ListFoldersRequest {
 
 message ListFolderRequest {
     utils.Session data = 1;
-    int32 id = 2;
+    int32 folderId = 2;
 }

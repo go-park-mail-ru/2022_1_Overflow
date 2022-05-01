@@ -60,7 +60,7 @@ func AddFolder() {}
 // AddMailToFolder godoc
 // @Summary Добавить письмо в папку с письмами
 // @Produce json
-// @Param folder_name query string true "Имя папки."
+// @Param folder_id query int true "ID папки."
 // @Param mail_id query int true "ID добавляемого письма."
 // @Success 200 {object} utils_proto.JsonResponse "OK"
 // @Failure 401 {object} utils_proto.JsonResponse "Сессия отсутствует или сессия не валидна."
@@ -79,8 +79,8 @@ func (d *Delivery) AddMailToFolder(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-	folderName := r.URL.Query().Get("folder_name")
-	if len(folderName) == 0 {
+	folderId, err := strconv.Atoi(r.URL.Query().Get("folder_id"))
+	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
 		return
 	}
@@ -91,7 +91,7 @@ func (d *Delivery) AddMailToFolder(w http.ResponseWriter, r *http.Request) {
 	}
 	resp, err := d.folderManager.AddMailToFolder(context.Background(), &folder_manager_proto.AddMailToFolderRequest{
 		Data:       data,
-		FolderName: folderName,
+		FolderId: int32(folderId),
 		MailId:     int32(mailId),
 	})
 	if err != nil {
@@ -113,7 +113,7 @@ func AddMailToFolder() {}
 // ChangeFolder godoc
 // @Summary Переименовать папку с письмами
 // @Produce json
-// @Param folder_name query string true "Исходное имя папки."
+// @Param folder_id query int true "ID изменяемой папки."
 // @Param new_folder_name query string true "Новое имя папки."
 // @Success 200 {object} utils_proto.JsonResponse "OK"
 // @Failure 401 {object} utils_proto.JsonResponse "Сессия отсутствует или сессия не валидна."
@@ -132,8 +132,8 @@ func (d *Delivery) ChangeFolder(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-	folderName := r.URL.Query().Get("folder_name")
-	if len(folderName) == 0 {
+	folderId, err := strconv.Atoi(r.URL.Query().Get("folder_id"))
+	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
 		return
 	}
@@ -144,7 +144,7 @@ func (d *Delivery) ChangeFolder(w http.ResponseWriter, r *http.Request) {
 	}
 	resp, err := d.folderManager.ChangeFolder(context.Background(), &folder_manager_proto.ChangeFolderRequest{
 		Data:          data,
-		FolderName:    folderName,
+		FolderId:    int32(folderId),
 		FolderNewName: folderNewName,
 	})
 	if err != nil {
@@ -238,7 +238,7 @@ func (d *Delivery) ListFolders(w http.ResponseWriter, r *http.Request) {
 		}
 		resp, err := d.folderManager.ListFolder(context.Background(), &folder_manager_proto.ListFolderRequest{
 			Data: data,
-			Id: int32(folderId),
+			FolderId: int32(folderId),
 		})
 		if err != nil {
 			pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)

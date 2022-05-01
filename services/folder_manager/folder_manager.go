@@ -58,7 +58,7 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 
 func (s *FolderManagerService) AddMailToFolder(context context.Context, request *folder_manager_proto.AddMailToFolderRequest) (*utils_proto.JsonResponse, error) {
 	username := request.Data.Username
-	log.Debug("Добавление письма в папку, folderName = ", request.FolderName, ", username = ", username)
+	log.Debug("Добавление письма в папку, folderId = ", request.FolderId, ", username = ", username)
 	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
 		Username: username,
 	})
@@ -72,27 +72,15 @@ func (s *FolderManagerService) AddMailToFolder(context context.Context, request 
 	if proto.Equal(resp.User, &utils_proto.User{}) {
 		return &pkg.NO_USER_EXIST, nil
 	}
-	resp2, err := s.db.GetFolderByName(context, &repository_proto.GetFolderByNameRequest{
-		UserId: resp.User.Id,
-		FolderName: request.FolderName,
-	})
-	if err != nil {
-		log.Error(err)
-		return &pkg.DB_ERR, err
-	}
-	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
-		return &pkg.DB_ERR, nil
-	}
-	folder := resp2.Folder
-	resp3, err := s.db.AddMailToFolder(context, &repository_proto.AddMailToFolderRequest{
-		FolderId: folder.Id,
+	resp2, err := s.db.AddMailToFolder(context, &repository_proto.AddMailToFolderRequest{
+		FolderId: request.FolderId,
 		MailId: request.MailId,
 	})
 	if err != nil {
 		log.Error(err)
 		return &pkg.DB_ERR, err
 	}
-	if resp3.Status != utils_proto.DatabaseStatus_OK {
+	if resp2.Status != utils_proto.DatabaseStatus_OK {
 		return &pkg.DB_ERR, nil
 	}
 	return &pkg.NO_ERR, nil
@@ -100,7 +88,7 @@ func (s *FolderManagerService) AddMailToFolder(context context.Context, request 
 
 func (s *FolderManagerService) ChangeFolder(context context.Context, request *folder_manager_proto.ChangeFolderRequest) (*utils_proto.JsonResponse, error) {
 	username := request.Data.Username
-	log.Debug("Изменение имени папки, username = ", username, ", folderName = ", request.FolderName, ", folderNewName", request.FolderNewName)
+	log.Debug("Изменение имени папки, username = ", username, ", folderid = ", request.FolderId, ", folderNewName", request.FolderNewName)
 	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
 		Username: username,
 	})
@@ -114,26 +102,15 @@ func (s *FolderManagerService) ChangeFolder(context context.Context, request *fo
 	if proto.Equal(resp.User, &utils_proto.User{}) {
 		return &pkg.NO_USER_EXIST, nil
 	}
-	resp2, err := s.db.GetFolderByName(context, &repository_proto.GetFolderByNameRequest{
-		UserId: resp.User.Id,
-		FolderName: request.FolderName,
-	})
-	if err != nil {
-		log.Error(err)
-		return &pkg.DB_ERR, err
-	}
-	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
-		return &pkg.DB_ERR, nil
-	}
-	resp3, err := s.db.ChangeFolderName(context, &repository_proto.ChangeFolderNameRequest{
-		FolderId: resp2.Folder.Id,
+	resp2, err := s.db.ChangeFolderName(context, &repository_proto.ChangeFolderNameRequest{
+		FolderId: request.FolderId,
 		NewName: request.FolderNewName,
 	})
 	if err != nil {
 		log.Error(err)
 		return &pkg.DB_ERR, err
 	}
-	if resp3.Status != utils_proto.DatabaseStatus_OK {
+	if resp2.Status != utils_proto.DatabaseStatus_OK {
 		return &pkg.DB_ERR, nil
 	}
 	return &pkg.NO_ERR, nil
@@ -232,7 +209,7 @@ func (s *FolderManagerService) ListFolders(context context.Context, request *fol
 }
 
 func (s *FolderManagerService) ListFolder(context context.Context, request *folder_manager_proto.ListFolderRequest) (*folder_manager_proto.ResponseMails, error) {
-	log.Debug("Получение списка писем из папки, username = ", request.Data.Username, ", id = ", request.Id)
+	log.Debug("Получение списка писем из папки, username = ", request.Data.Username, ", folderId = ", request.FolderId)
 	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
 		Username: request.Data.Username,
 	})
@@ -256,7 +233,7 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 		}, nil
 	}
 	resp2, err := s.db.GetFolderMail(context, &repository_proto.GetFolderMailRequest{
-		FolderId: request.Id,
+		FolderId: request.FolderId,
 	})
 	if err != nil {
 		log.Error(err)

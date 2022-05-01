@@ -109,9 +109,9 @@ const docTemplate = `{
                 "summary": "Добавить письмо в папку с письмами",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Имя папки.",
-                        "name": "folder_name",
+                        "type": "integer",
+                        "description": "ID папки.",
+                        "name": "folder_id",
                         "in": "query",
                         "required": true
                     },
@@ -290,9 +290,9 @@ const docTemplate = `{
                 "summary": "Переименовать папку с письмами",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Исходное имя папки.",
-                        "name": "folder_name",
+                        "type": "integer",
+                        "description": "ID изменяемой папки.",
+                        "name": "folder_id",
                         "in": "query",
                         "required": true
                     },
