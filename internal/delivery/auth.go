@@ -18,10 +18,10 @@ import (
 // SignIn godoc
 // @Summary Выполняет аутентификацию пользователя
 // @Summary Выполняет аутентификацию и выставляет сессионый cookie с названием OverflowMail
-// @Success 200 {object} pkg.JsonResponse "Успешная аутентификация пользователя."
-// @Failure 500 {object} pkg.JsonResponse "Пользователь не существует, ошибка БД или валидации формы."
+// @Success 200 {object} utils_proto.JsonResponse "Успешная аутентификация пользователя."
+// @Failure 500 {object} utils_proto.JsonResponse "Пользователь не существует, ошибка БД или валидации формы."
 // @Accept json
-// @Param SignInForm body models.SignInForm true "Форма входа пользователя"
+// @Param SignInForm body auth_proto.SignInForm true "Форма входа пользователя"
 // @Produce json
 // @Router /signin [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
@@ -70,17 +70,17 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /signin [get]
-// @Response 200 {object} pkg.JsonResponse
+// @Response 200 {object} utils_proto.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 func SignIn() {}
 
 // SignUp godoc
 // @Summary Выполняет регистрацию пользователя
 // @Description Выполняет регистрацию пользователя, НЕ выставляет сессионый cookie.
-// @Success 200 {object} pkg.JsonResponse "Вход уже выполнен, либо успешная регистрация пользователя."
-// @Failure 500 {object} pkg.JsonResponse "Ошибка валидации формы, БД или пользователь уже существует."
+// @Success 200 {object} utils_proto.JsonResponse "Вход уже выполнен, либо успешная регистрация пользователя."
+// @Failure 500 {object} utils_proto.JsonResponse "Ошибка валидации формы, БД или пользователь уже существует."
 // @Accept json
-// @Param SignUpForm body models.SignUpForm true "Форма регистрации пользователя"
+// @Param SignUpForm body auth_proto.SignUpForm true "Форма регистрации пользователя"
 // @Produce json
 // @Router /signup [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
@@ -130,15 +130,15 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /signup [get]
-// @Response 200 {object} pkg.JsonResponse
+// @Response 200 {object} utils_proto.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 func SignUp() {}
 
 // SignOut godoc
 // @Summary Завершение сессии пользователя
-// @Success 200 {object} pkg.JsonResponse "Успешное завершение сессии."
-// @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует, сессия не валидна."
-// @Failure 500 {object} pkg.JsonResponse
+// @Success 200 {object} utils_proto.JsonResponse "Успешное завершение сессии."
+// @Failure 401 {object} utils_proto.JsonResponse "Сессия отсутствует, сессия не валидна."
+// @Failure 500 {object} utils_proto.JsonResponse
 // @Produce json
 // @Router /logout [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
@@ -158,6 +158,6 @@ func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /logout [get]
-// @Response 200 {object} pkg.JsonResponse
+// @Response 200 {object} utils_proto.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 func SignOut() {}

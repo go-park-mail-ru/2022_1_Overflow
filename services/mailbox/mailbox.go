@@ -256,7 +256,3 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 	}
 	return &pkg.NO_ERR, nil
 }
-
-func (s *MailBoxService) AddFolder(context context.Context) {
-
-}

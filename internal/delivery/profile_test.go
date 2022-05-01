@@ -5,6 +5,7 @@ import (
 	"OverflowBackend/internal/models"
 	"OverflowBackend/mocks"
 	"OverflowBackend/pkg"
+	"OverflowBackend/proto/utils_proto"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -22,7 +23,7 @@ func TestGetInfo(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
-	
+
 	jar, _ := cookiejar.New(nil)
 
 	client := &http.Client{
@@ -43,11 +44,11 @@ func TestGetInfo(t *testing.T) {
 	}
 
 	info, _ := json.Marshal(models.User{
-		Id: 0,
+		Id:        0,
 		FirstName: "test",
-		LastName: "test",
-		Password: "test",
-		Username: "test",
+		LastName:  "test",
+		Password:  "test",
+		Username:  "test",
 	})
 
 	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
@@ -106,8 +107,8 @@ func TestSetInfo(t *testing.T) {
 
 	data := models.SettingsForm{
 		FirstName: "changed",
-		LastName: "changed",
-		Password: "changed",
+		LastName:  "changed",
+		Password:  "changed",
 	}
 
 	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
@@ -178,7 +179,7 @@ func TestGetAvatar(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	resp := pkg.JsonResponse{}
+	resp := utils_proto.JsonResponse{}
 	if err := json.NewDecoder(r.Body).Decode(&resp); err != nil {
 		t.Error(err)
 		return
@@ -221,22 +222,22 @@ func TestSetAvatar(t *testing.T) {
 	reqUrl := fmt.Sprintf("%s/profile/avatar/set", srv.URL)
 
 	avatar := models.Avatar{
-		Name: "avatar",
+		Name:      "avatar",
 		UserEmail: signinForm.Username,
-		Content: []byte{10, 10, 10, 10},
+		Content:   []byte{10, 10, 10, 10},
 	}
 
 	body := &bytes.Buffer{}
-    writer := multipart.NewWriter(body)
-    _, err := writer.CreateFormFile("file", avatar.Name)
+	writer := multipart.NewWriter(body)
+	_, err := writer.CreateFormFile("file", avatar.Name)
 
-    if err != nil {
-        t.Error(err)
+	if err != nil {
+		t.Error(err)
 		return
-    }
+	}
 
-    body.Write(avatar.Content)
-    writer.Close()
+	body.Write(avatar.Content)
+	writer.Close()
 
 	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
 	mockUC.EXPECT().SetAvatar(&models.Session{Username: "test", Authenticated: true}, &avatar).Return(pkg.NO_ERR)
@@ -259,7 +260,7 @@ func TestSetAvatar(t *testing.T) {
 		return
 	}
 
-	resp := pkg.JsonResponse{}
+	resp := utils_proto.JsonResponse{}
 	if err := json.NewDecoder(r.Body).Decode(&resp); err != nil {
 		t.Error(err)
 		return

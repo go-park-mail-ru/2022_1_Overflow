@@ -40,10 +40,11 @@ message Mail {
 }
 
 message Folder {
-    string name = 1 [json_name="name"];
-    int32 id = 2 [json_name="id"];
-    string owner = 3 [json_name="owner"];
-    repeated utils.MailAdditional mails = 4 [json_name="mails"];
+    int32 id = 1 [json_name="id"];
+    string name = 2 [json_name="name"];
+    int32 userId = 3 [json_name="user_id"];
+    google.protobuf.Timestamp createdAt = 4 [json_name="created_at"];
+    //repeated utils.MailAdditional mails = 4 [json_name="mails"];
 }
 
 message MailAdditional {

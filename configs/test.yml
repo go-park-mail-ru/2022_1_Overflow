@@ -23,14 +23,17 @@ server:
     mailbox:
       address: "localhost"
       port: 8083
-    database:
+    folder_manager:
       address: "localhost"
       port: 8084
+    database:
+      address: "localhost"
+      port: 8085
+  session_manager: "standard"
   
 database:
-  type: "mock"
   user: "postgres"
   password: "123"
   host: "localhost"
   port: 5432
-  dbname: "postgres"
+  dbname: "overflow"

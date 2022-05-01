@@ -60,14 +60,18 @@ type Config struct {
 				Address	string `yaml:"address"`
 				Port string `yaml:"port"`
 			} `yaml:"mailbox"`
+			FolderManager struct {
+				Address string `yaml:"address"`
+				Port string `yaml:"port"`
+			} `yaml:"folder_manager"`
 			Database struct {
 				Address	string `yaml:"address"`
 				Port string `yaml:"port"`
 			} `yaml:"database"`
 		}
+		SessionType string `yaml:"session_manager"`
 	} `yaml:"server"`
 	Database struct {
-		Type     string `yaml:"type"`
 		User     string `yaml:"user"`
 		Password string `yaml:"password"`
 		Host     string `yaml:"host"`

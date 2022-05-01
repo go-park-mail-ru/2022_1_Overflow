@@ -17,10 +17,10 @@ import (
 // GetInfo godoc
 // @Summary Получение данных пользователя
 // @Produce json
-// @Success 200 {object} models.User "Информация о пользователе"
-// @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует, сессия не валидна."
-// @Failure 405 {object} pkg.JsonResponse
-// @Failure 500 {object} pkg.JsonResponse "Ошибка БД, пользователь не найден, неверные данные сессии."
+// @Success 200 {object} utils_proto.User "Информация о пользователе"
+// @Failure 401 {object} utils_proto.JsonResponse "Сессия отсутствует, сессия не валидна."
+// @Failure 405 {object} utils_proto.JsonResponse
+// @Failure 500 {object} utils_proto.JsonResponse "Ошибка БД, пользователь не найден, неверные данные сессии."
 // @Router /profile [get]
 func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -50,11 +50,11 @@ func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 
 // SetInfo godoc
 // @Summary Изменение настроек пользователя
-// @Success 200 {object} pkg.JsonResponse "Успешное изменение настроек."
-// @Failure 405 {object} pkg.JsonResponse
-// @Failure 500 {object} pkg.JsonResponse "Ошибка валидации формы, БД или сессия не валидна."
+// @Success 200 {object} utils_proto.JsonResponse "Успешное изменение настроек."
+// @Failure 405 {object} utils_proto.JsonResponse
+// @Failure 500 {object} utils_proto.JsonResponse "Ошибка валидации формы, БД или сессия не валидна."
 // @Accept json
-// @Param SettingsForm body models.SettingsForm true "Форма настроек пользователя."
+// @Param SettingsForm body utils_proto.ProfileSettingsForm true "Форма настроек пользователя."
 // @Produce json
 // @Router /profile/set [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
@@ -98,15 +98,15 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /profile/set [get]
-// @Response 200 {object} pkg.JsonResponse
+// @Response 200 {object} utils_proto.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 func SetInfo() {}
 
 // SetAvatar godoc
 // @Summary Установка/смена аватарки пользователя
-// @Success 200 {object} pkg.JsonResponse "Успешное установка аватарки."
-// @Failure 405 {object} pkg.JsonResponse
-// @Failure 500 {object} pkg.JsonResponse "Ошибка валидации формы, БД или сессия не валидна."
+// @Success 200 {object} utils_proto.JsonResponse "Успешное установка аватарки."
+// @Failure 405 {object} utils_proto.JsonResponse
+// @Failure 500 {object} utils_proto.JsonResponse "Ошибка валидации формы, БД или сессия не валидна."
 // @Accept multipart/form-data
 // @Param file formData file true "Файл аватарки."
 // @Produce json
@@ -135,12 +135,12 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 	io.Copy(&buf, file)
 	avatar := profile_proto.Avatar{
-		Name:      header.Filename,
+		Name:     header.Filename,
 		Username: data.Username,
-		File:   buf.Bytes(),
+		File:     buf.Bytes(),
 	}
 	resp, err := d.profile.SetAvatar(context.Background(), &profile_proto.SetAvatarRequest{
-		Data: data,
+		Data:   data,
 		Avatar: &avatar,
 	})
 	if err != nil {
@@ -155,7 +155,7 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /profile/avatar/set [get]
-// @Response 200 {object} pkg.JsonResponse
+// @Response 200 {object} utils_proto.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 func SetAvatar() {}
 
@@ -163,9 +163,9 @@ func SetAvatar() {}
 // @Summary Получение ссылки на аватарку пользователя
 // @Description Получение ссылки на аватарку текущего пользователя или пользователя с конкретным логином (username).
 // @Param username query string false "Имя пользователя, соответствующее аватарке."
-// @Success 200 {object} pkg.JsonResponse "Ссылка на аватарку в формате /{static_dir}/{file}.{ext}."
-// @Failure 405 {object} pkg.JsonResponse
-// @Failure 500 {object} pkg.JsonResponse "Ошибка БД, пользователь не найден или сессия не валидна."
+// @Success 200 {object} utils_proto.JsonResponse "Ссылка на аватарку в формате /{static_dir}/{file}.{ext}."
+// @Failure 405 {object} utils_proto.JsonResponse
+// @Failure 500 {object} utils_proto.JsonResponse "Ошибка БД, пользователь не найден или сессия не валидна."
 // @Produce json
 // @Router /profile/avatar [get]
 func (d *Delivery) GetAvatar(w http.ResponseWriter, r *http.Request) {

@@ -5,6 +5,7 @@ import (
 	"OverflowBackend/internal/models"
 	"OverflowBackend/mocks"
 	"OverflowBackend/pkg"
+	"OverflowBackend/proto/utils_proto"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -239,7 +240,7 @@ func TestRead(t *testing.T) {
 		return
 	}
 
-	var resp pkg.JsonResponse
+	var resp utils_proto.JsonResponse
 
 	err = json.NewDecoder(r.Body).Decode(&resp)
 
@@ -357,7 +358,7 @@ func TestGetMail(t *testing.T) {
 		return
 	}
 
-	var resp pkg.JsonResponse
+	var resp utils_proto.JsonResponse
 
 	err = json.NewDecoder(r.Body).Decode(&resp)
 

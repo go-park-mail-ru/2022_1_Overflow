@@ -4,7 +4,6 @@ import (
 	"OverflowBackend/internal/config"
 	"OverflowBackend/proto/repository_proto"
 	"OverflowBackend/services/repository"
-	"OverflowBackend/services/repository/mock"
 	"OverflowBackend/services/repository/postgres"
 	"fmt"
 	log "github.com/sirupsen/logrus"
@@ -22,20 +21,14 @@ func StartRepositoryServer(config *config.Config) {
 	var dbUrl string
 	var repositoryService repository.DatabaseRepository
 	log.Info("Подключение к БД.")
-	if config.Database.Type == "postgres" {
-		dbUrl = fmt.Sprintf("postgres://%v:%v@%v:%v/%v",
-			config.Database.User,
-			config.Database.Password,
-			config.Database.Host,
-			config.Database.Port,
-			config.Database.Name,
-		)
-
-		repositoryService = &postgres.Database{}
-	} else {
-		dbUrl = "mock"
-		repositoryService = &mock.MockDB{}
-	}
+	dbUrl = fmt.Sprintf("postgres://%v:%v@%v:%v/%v",
+		config.Database.User,
+		config.Database.Password,
+		config.Database.Host,
+		config.Database.Port,
+		config.Database.Name,
+	)
+	repositoryService = &postgres.Database{}
 	err = repositoryService.Create(dbUrl)
 	if err != nil {
 		log.Fatal("Ошибка подключения к БД:", err)

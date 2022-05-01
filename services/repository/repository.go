@@ -24,14 +24,17 @@ type DatabaseRepository interface {
 	DeleteMail(context.Context, *repository_proto.DeleteMailRequest) (*utils_proto.DatabaseResponse, error)             // Удалить письмо
 	ReadMail(context.Context, *repository_proto.ReadMailRequest) (*utils_proto.DatabaseResponse, error)                 // Прочитать письмо
 	GetMailInfoById(context.Context, *repository_proto.GetMailInfoByIdRequest) (*repository_proto.ResponseMail, error)  // Получить информацию о письме по его id
+
+	FolderRepositoryInterface
 }
 
-type FolderRepositoryInteface interface {
-	GetFolderById(context.Context, *repository_proto.GetFolderByIdRequest)       // Получить объект папки по id папки
-	GetFolderByName(context.Context, *repository_proto.GetFolderByNameRequest)   // Получить объект папки по имени пользователя и названию папки
-	GetFolderMail(context.Context, *repository_proto.GetFolderMailRequest)       // Получить письма, содержащиеся в папке
-	DeleteFolder(context.Context, *repository_proto.DeleteFolderRequest)         // Удалить папку
-	AddFolder(context.Context, *repository_proto.AddFolderRequest)               // Добавить папку
-	ChangeFolderName(context.Context, *repository_proto.ChangeFolderNameRequest) // Изменить название папки
-	AddMailToFolder(context.Context, *repository_proto.AddMailToFolderRequest)   // Добавить письмо в папку
+type FolderRepositoryInterface interface {
+	GetFolderById(context.Context, *repository_proto.GetFolderByIdRequest) (*repository_proto.ResponseFolder, error)       // Получить объект папки по id папки
+	GetFolderByName(context.Context, *repository_proto.GetFolderByNameRequest) (*repository_proto.ResponseFolder, error)   // Получить объект папки по имени пользователя и названию папки
+	GetFoldersByUser(context.Context, *repository_proto.GetFoldersByUserRequest) (*repository_proto.ResponseFolders, error) // Получить папки, принадлежащие пользователю
+	GetFolderMail(context.Context, *repository_proto.GetFolderMailRequest) (*repository_proto.ResponseMails, error)     // Получить письма, содержащиеся в папке
+	DeleteFolder(context.Context, *repository_proto.DeleteFolderRequest) (*utils_proto.DatabaseResponse, error)         // Удалить папку
+	AddFolder(context.Context, *repository_proto.AddFolderRequest) (*utils_proto.DatabaseResponse, error)               // Добавить папку
+	ChangeFolderName(context.Context, *repository_proto.ChangeFolderNameRequest) (*utils_proto.DatabaseResponse, error) // Изменить название папки
+	AddMailToFolder(context.Context, *repository_proto.AddMailToFolderRequest) (*utils_proto.DatabaseResponse, error)   // Добавить письмо в папку
 }
