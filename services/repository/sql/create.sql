@@ -20,14 +20,28 @@ CREATE TABLE overflow.mails (
     text text not null,
     files varchar(100),
     read bool DEFAULT FALSE,
+    only_folder bool DEFAULT FALSE,
     foreign key (client_id) references overflow.users(id) on delete cascade
 );
 
 /* для папок */
 CREATE TABLE overflow.folders (
 	id serial not null primary key,
-	name varchar(30) not null,
+	name varchar(50) not null,
 	user_id int not null,
-	mail_ids int not null references overflow.mails(id),
-	constraint fk_user foreign key(user_id) references overflow.users(id)
+  created_at timestamp not null DEFAULT NOW(),
+	foreign key(user_id) references overflow.users(id) on delete cascade
 );
+
+/* связь многие ко многим вида папка-письмо */
+CREATE TABLE overflow.folder_to_mail (
+  id SERIAL not null PRIMARY KEY,
+  folder_id INTEGER NOT NULL,
+  mail_id INTEGER NOT NULL,
+  FOREIGN KEY ("folder_id") REFERENCES overflow.folders(id) on delete cascade,
+  FOREIGN KEY ("mail_id") REFERENCES overflow.mails(id)
+);
+
+CREATE UNIQUE INDEX "UI_folder_to_mail_mail_id_folder_id"
+  ON overflow.folder_to_mail
+  USING btree ("mail_id", "folder_id");

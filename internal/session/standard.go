@@ -8,6 +8,8 @@ import (
 
 	"github.com/gorilla/sessions"
 	"google.golang.org/protobuf/types/known/wrapperspb"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var session_name string = "OveflowMail"
@@ -27,12 +29,12 @@ func (s *StandardManager) Init(config *config.Config) (err error) {
 	)
 
 	s.store.Options = &sessions.Options{
-		MaxAge:   0,
+		MaxAge:   10*365*24*60*60,
 		HttpOnly: false,
 		Secure:   false,
 	}
 
-	gob.Register(utils_proto.Session{})
+	gob.Register(&utils_proto.Session{})
 	return
 }
 
@@ -78,6 +80,7 @@ func (s *StandardManager) IsLoggedIn(r *http.Request) bool {
 func (s *StandardManager) GetData(r *http.Request) (data *utils_proto.Session, err error) {
 	defer func() {
 		errRecover := recover()
+		log.Error(errRecover)
 		if errRecover != nil {
 			data, err = nil, errRecover.(error)
 		}

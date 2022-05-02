@@ -1,0 +1,84 @@
+syntax = "proto3";
+package folder_manager_proto;
+
+option go_package = "./folder_manager_proto";
+
+import "proto/utils.proto";
+
+service FolderManager {
+    rpc AddFolder(AddFolderRequest) returns (utils.JsonResponse) {}
+    rpc AddMailToFolder(AddMailToFolderRequest) returns (utils.JsonResponse) {}
+    rpc ChangeFolder(ChangeFolderRequest) returns (utils.JsonResponse) {}
+    //rpc GetFolderByName(GetFolderByNameRequest) returns (ResponseFolder) {}
+    //rpc GetFolderById(GetFolderByIdRequest) returns (ResponseFolder) {}
+    rpc DeleteFolder(DeleteFolderRequest) returns (utils.JsonResponse) {}
+    rpc ListFolders(ListFoldersRequest) returns (ResponseFolders) {}
+    rpc ListFolder(ListFolderRequest) returns (ResponseMails) {}
+    rpc DeleteFolderMail(DeleteFolderMailRequest) returns (utils.JsonResponse) {}
+}
+
+message AddFolderRequest {
+    utils.Session data = 1;
+    string name = 2;
+}
+
+message AddMailToFolderRequest {
+    utils.Session data = 1;
+    int32 folderId = 2;
+    int32 mailId = 3;
+    bool move = 4;
+}
+
+message ChangeFolderRequest {
+    utils.Session data = 1;
+    int32 folderId = 2;
+    string folderNewName = 3;
+}
+
+/*
+message GetFolderByNameRequest {
+    utils.Session data = 1;
+    string name = 2;
+}
+
+message GetFolderByIdRequest {
+    utils.Session data = 1;
+    int32 id = 2;
+}
+
+message ResponseFolder {
+    utils.JsonResponse response = 1;
+    bytes folder = 2;
+}
+*/
+
+message ResponseFolders {
+    utils.JsonResponse response = 1;
+    bytes folders = 2;
+}
+
+message ResponseMails {
+    utils.JsonResponse response = 1;
+    bytes mails = 2;
+}
+
+message DeleteFolderRequest {
+    utils.Session data = 1;
+    string name = 2;
+}
+
+message DeleteFolderMailRequest {
+    utils.Session data = 1;
+    int32 folderId = 2;
+    int32 mailId = 3;
+    bool restore = 4;
+}
+
+message ListFoldersRequest {
+    utils.Session data = 1;
+}
+
+message ListFolderRequest {
+    utils.Session data = 1;
+    int32 folderId = 2;
+}

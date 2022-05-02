@@ -26,7 +26,7 @@ message DeleteMailRequest {
 
 message SendMailRequest {
     utils.Session data = 1;
-    utils.MailForm form = 2;
+    bytes form = 2;
 }
 
 message ReadMailRequest {

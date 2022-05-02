@@ -2,6 +2,7 @@ package profile
 
 import (
 	"OverflowBackend/internal/config"
+	"OverflowBackend/internal/models"
 	"OverflowBackend/pkg"
 	"OverflowBackend/proto/profile_proto"
 	"OverflowBackend/proto/repository_proto"
@@ -11,7 +12,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"google.golang.org/protobuf/proto"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -27,19 +27,23 @@ func (s *ProfileService) Init(config *config.Config, db repository_proto.Databas
 
 // Получение информации о пользователе.
 func (s *ProfileService) GetInfo(context context.Context, request *profile_proto.GetInfoRequest) (*profile_proto.GetInfoResponse, error) {
-	user, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{Username: request.Data.Username})
+	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{Username: request.Data.Username})
 	log.Info("Получение информации о пользователе: ", request.Data.Username)
 	if err != nil {
 		log.Error(err)
-		return &profile_proto.GetInfoResponse{Response: &pkg.DB_ERR, Data: nil}, err
+		return &profile_proto.GetInfoResponse{
+			Response: &utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			},
+			Data: nil,
+		}, err
 	}
-
-	userJson, err := json.Marshal(user)
-	if err != nil {
-		log.Error(err)
-		return  &profile_proto.GetInfoResponse{Response: &pkg.JSON_ERR, Data: nil}, err
-	}
-	return &profile_proto.GetInfoResponse{Response: &pkg.NO_ERR, Data: userJson}, nil
+	return &profile_proto.GetInfoResponse{
+		Response: &utils_proto.JsonResponse{
+			Response: pkg.NO_ERR.Bytes(),
+		},
+		Data: resp.User,
+	}, nil
 }
 
 // Установка аватарки пользователя.
@@ -48,21 +52,34 @@ func (s *ProfileService) SetAvatar(context context.Context, request *profile_pro
 	// создание папки с файлами, если она не существует
 	if err := os.MkdirAll(s.config.Server.Static.Dir, os.ModePerm); err != nil {
 		log.Error(err)
-		return pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Ошибка создания папки."), err
+		return &utils_proto.JsonResponse{
+			Response: pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Ошибка создания папки.").Bytes(),
+		}, err
+	}
+	var avatar models.Avatar
+	err := json.Unmarshal(request.Avatar, &avatar)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.JSON_ERR.Bytes(),
+		}, err
 	}
 	// хеширование имени пользователя и имени аватара, приведение к соответствующему формату
 	hashedUser := pkg.HashString(request.Data.Username)
-	format := hashedUser + "_" + pkg.HashString(request.Avatar.Name) + filepath.Ext(request.Avatar.Name)
-	matches, e := filepath.Glob(filepath.Join(s.config.Server.Static.Dir, hashedUser+"_*"))
-	if e != nil {
-		log.Error(e)
-		return pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Ошибка поиска файла."), e
-	}
-	path := filepath.Join(s.config.Server.Static.Dir, format)
-	err := os.WriteFile(path, request.Avatar.File, 0644)
+	format := hashedUser + "_" + pkg.HashString(avatar.Name) + filepath.Ext(avatar.Name)
+	matches, err := filepath.Glob(filepath.Join(s.config.Server.Static.Dir, hashedUser+"_*"))
 	if err != nil {
 		log.Error(err)
-		return pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Ошибка записи в файл."), err
+		return &utils_proto.JsonResponse{
+			Response: pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Ошибка поиска файла.").Bytes(),
+		}, err
+	}
+	path := filepath.Join(s.config.Server.Static.Dir, format)
+	err = os.WriteFile(path, avatar.File, 0644)
+	if err != nil {
+		log.Error(err)
+		return &utils_proto.JsonResponse{
+			Response: pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Ошибка записи в файл.").Bytes(),
+		}, err
 	}
 	// если остались старые файлы (старые автарки), то удаляем их
 	if len(matches) > 0 {
@@ -70,51 +87,73 @@ func (s *ProfileService) SetAvatar(context context.Context, request *profile_pro
 			os.Remove(match)
 		}
 	}
-	return &pkg.NO_ERR, nil
+	return &utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil
 }
 
 // Установка настроек пользователя.
 func (s *ProfileService) SetInfo(context context.Context, request *profile_proto.SetInfoRequest) (*utils_proto.JsonResponse, error) {
 	data := request.Data
-	settings := request.Form
 	log.Debug("Установка настроек пользователя: ", data.Username)
-	if (proto.Equal(settings, &profile_proto.SettingsForm{})) {
-		return &pkg.NO_ERR, nil
+	var settings models.ProfileSettingsForm
+	err := json.Unmarshal(request.Form, &settings)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.JSON_ERR.Bytes(),
+		}, err
+	}
+	if (settings == models.ProfileSettingsForm{}) {
+		return &utils_proto.JsonResponse{
+			Response: pkg.NO_ERR.Bytes(),
+		}, nil
 	}
 	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{Username: data.Username})
 	if err != nil {
 		log.Error(err)
-		return &pkg.DB_ERR, err
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
 	}
 	if resp.Response.Status != utils_proto.DatabaseStatus_OK {
-		return &pkg.DB_ERR, err
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
 	}
 	user := resp.User
 	var resp2 *utils_proto.DatabaseResponse
-	if settings.FirstName != "" {
+	if settings.Firstname != "" {
 		resp2, err = s.db.ChangeUserFirstName(
 			context,
-			&repository_proto.ChangeForm{User: user, Data: settings.FirstName},
+			&repository_proto.ChangeForm{User: user, Data: settings.Firstname},
 		)
 		if err != nil {
 			log.Error(err)
-			return &pkg.DB_ERR, err
+			return &utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			}, err
 		}
 		if resp2.Status != utils_proto.DatabaseStatus_OK {
-			return &pkg.DB_ERR, nil
+			return &utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			}, nil
 		}
 	}
-	if settings.LastName != "" {
+	if settings.Lastname != "" {
 		resp2, err = s.db.ChangeUserLastName(
 			context,
-			&repository_proto.ChangeForm{User: user, Data: settings.LastName},
+			&repository_proto.ChangeForm{User: user, Data: settings.Lastname},
 		)
 		if err != nil {
 			log.Error(err)
-			return &pkg.DB_ERR, err
+			return &utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			}, err
 		}
 		if resp2.Status != utils_proto.DatabaseStatus_OK {
-			return &pkg.DB_ERR, nil
+			return &utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			}, nil
 		}
 	}
 	if settings.Password != "" {
@@ -124,13 +163,19 @@ func (s *ProfileService) SetInfo(context context.Context, request *profile_proto
 		)
 		if err != nil {
 			log.Error(err)
-			return &pkg.DB_ERR, err
+			return &utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			}, err
 		}
 		if resp2.Status != utils_proto.DatabaseStatus_OK {
-			return &pkg.DB_ERR, nil
+			return &utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			}, nil
 		}
 	}
-	return &pkg.NO_ERR, nil
+	return &utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil
 }
 
 // Получение ссылки на аватарку пользователя.
@@ -139,26 +184,34 @@ func (s *ProfileService) GetAvatar(context context.Context, request *profile_pro
 	if e != nil {
 		log.Error(e)
 		return &profile_proto.GetAvatarResponse{
-			Response: pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Ошибка поиска файла."),
+			Response: &utils_proto.JsonResponse{
+				Response: pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Ошибка поиска файла.").Bytes(),
+			},
 			Url: "",
 		}, e
 	}
 	if len(matches) == 0 {
 		avatarUrl := pkg.JoinURL(s.config.Server.Static.Handle, "dummy.png")
 		return &profile_proto.GetAvatarResponse{
-			Response: &pkg.NO_ERR,
+			Response: &utils_proto.JsonResponse{
+				Response: pkg.NO_ERR.Bytes(),
+			},
 			Url: avatarUrl,
 		}, nil
 	}
 	if len(matches) > 1 {
 		return &profile_proto.GetAvatarResponse{
-			Response: pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Найдены дубликаты файлов."),
+			Response: &utils_proto.JsonResponse{
+				Response: pkg.CreateJsonErr(pkg.STATUS_UNKNOWN, "Найдены дубликаты файлов.").Bytes(),
+			},
 			Url: "",
 		}, nil
 	}
 	avatarUrl := pkg.JoinURL(s.config.Server.Static.Handle, filepath.Base(matches[0]))
 	return &profile_proto.GetAvatarResponse{
-		Response: &pkg.NO_ERR,
+		Response: &utils_proto.JsonResponse{
+			Response: pkg.NO_ERR.Bytes(),
+		},
 		Url: avatarUrl,
 	}, nil
 }

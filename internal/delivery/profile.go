@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/security/xss"
 	"OverflowBackend/internal/session"
 	"OverflowBackend/pkg"
@@ -10,8 +11,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-
-	"google.golang.org/protobuf/proto"
 )
 
 // GetInfo godoc
@@ -41,8 +40,14 @@ func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp.Response, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp.Response)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	w.Write(resp.Data)
@@ -54,7 +59,7 @@ func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 // @Failure 405 {object} pkg.JsonResponse
 // @Failure 500 {object} pkg.JsonResponse "Ошибка валидации формы, БД или сессия не валидна."
 // @Accept json
-// @Param SettingsForm body models.SettingsForm true "Форма настроек пользователя."
+// @Param SettingsForm body models.ProfileSettingsForm true "Форма настроек пользователя."
 // @Produce json
 // @Router /profile/set [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
@@ -71,27 +76,34 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var form profile_proto.SettingsForm
+	var form models.ProfileSettingsForm
 
 	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
 
-	form.FirstName = xss.P.Sanitize(form.FirstName)
-	form.LastName = xss.P.Sanitize(form.LastName)
+	form.Firstname = xss.P.Sanitize(form.Firstname)
+	form.Lastname = xss.P.Sanitize(form.Lastname)
 	form.Password = xss.P.Sanitize(form.Password)
+	formBytes, _ := json.Marshal(form)
 
 	resp, err := d.profile.SetInfo(context.Background(), &profile_proto.SetInfoRequest{
 		Data: data,
-		Form: &form,
+		Form: formBytes,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
@@ -134,21 +146,28 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 	io.Copy(&buf, file)
-	avatar := profile_proto.Avatar{
-		Name:      header.Filename,
+	avatar := models.Avatar{
+		Name:     header.Filename,
 		Username: data.Username,
-		File:   buf.Bytes(),
+		File:     buf.Bytes(),
 	}
+	avatarBytes, _ := json.Marshal(avatar)
 	resp, err := d.profile.SetAvatar(context.Background(), &profile_proto.SetAvatarRequest{
-		Data: data,
-		Avatar: &avatar,
+		Data:   data,
+		Avatar: avatarBytes,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
@@ -192,8 +211,14 @@ func (d *Delivery) GetAvatar(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp.Response, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp.Response)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 

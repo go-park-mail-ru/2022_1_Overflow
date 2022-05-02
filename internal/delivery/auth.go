@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/security/xss"
 	"OverflowBackend/internal/session"
 	"OverflowBackend/pkg"
@@ -12,7 +13,6 @@ import (
 
 	"github.com/gorilla/csrf"
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/protobuf/proto"
 )
 
 // SignIn godoc
@@ -40,20 +40,28 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Info("SignIn: ", "checking data")
-	var data auth_proto.SignInForm
+	var data models.SignInForm
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-
-	resp, err := d.auth.SignIn(context.Background(), &data)
+	dataBytes, _ := json.Marshal(data)
+	resp, err := d.auth.SignIn(context.Background(), &auth_proto.SignInRequest{
+		Form: dataBytes,
+	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 
@@ -99,7 +107,7 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Info("SignUp: ", "checking data")
-	var data auth_proto.SignUpForm
+	var data models.SignUpForm
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
@@ -108,21 +116,30 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	log.Info("SignUp: ", "sanitizing data")
 	data.Username = xss.P.Sanitize(data.Username)
-	data.FirstName = xss.P.Sanitize(data.FirstName)
-	data.LastName = xss.P.Sanitize(data.LastName)
+	data.Firstname = xss.P.Sanitize(data.Firstname)
+	data.Lastname = xss.P.Sanitize(data.Lastname)
 	passSanitized := xss.P.Sanitize(data.Password)
 	if passSanitized != data.Password {
 		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, "Пароль содержит недопустимое содержимое.")
 		return
 	}
 
-	resp, err := d.auth.SignUp(context.Background(), &data)
+	dataBytes, _ := json.Marshal(data)
+	resp, err := d.auth.SignUp(context.Background(), &auth_proto.SignUpRequest{
+		Form: dataBytes,
+	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 

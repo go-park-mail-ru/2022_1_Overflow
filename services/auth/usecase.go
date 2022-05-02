@@ -10,6 +10,6 @@ import (
 
 type AuthServiceInterface interface {
 	Init(config *config.Config, db repository_proto.DatabaseRepositoryClient)
-	SignIn(context context.Context, data *auth_proto.SignInForm) (*utils_proto.JsonResponse, error)
-	SignUp(context context.Context, data *auth_proto.SignUpForm) (*utils_proto.JsonResponse, error)
+	SignIn(context context.Context, data *auth_proto.SignInRequest) (*utils_proto.JsonResponse, error)
+	SignUp(context context.Context, data *auth_proto.SignUpRequest) (*utils_proto.JsonResponse, error)
 }

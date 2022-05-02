@@ -1,20 +1,20 @@
 package validation
 
 import (
-	"OverflowBackend/proto/auth_proto"
+	"OverflowBackend/internal/models"
 	"errors"
 
 	"gopkg.in/validator.v2"
 )
 
-func SamePassword(data *auth_proto.SignUpForm) error {
+func SamePassword(data *models.SignUpForm) error {
 	if data.Password != data.PasswordConfirmation {
 		return errors.New("Пароли не совпадают.")
 	}
 	return nil
 }
 
-func CheckSignUp(data *auth_proto.SignUpForm) error {
+func CheckSignUp(data *models.SignUpForm) error {
 	if err := validator.Validate(data); err != nil {
 		return err
 	}
@@ -24,7 +24,7 @@ func CheckSignUp(data *auth_proto.SignUpForm) error {
 	return nil
 }
 
-func CheckSignIn(data *auth_proto.SignInForm) error {
+func CheckSignIn(data *models.SignInForm) error {
 	if err := validator.Validate(data); err != nil {
 		return err
 	}

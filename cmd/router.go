@@ -10,8 +10,6 @@ import (
 	"github.com/gorilla/mux"
 	"google.golang.org/grpc"
 
-	_ "OverflowBackend/docs"
-
 	"github.com/swaggo/http-swagger"
 )
 
@@ -20,9 +18,15 @@ type RouterManager struct {
 	config *config.Config
 }
 
-func (rm *RouterManager) Init(config *config.Config, authDial grpc.ClientConnInterface, profileDial grpc.ClientConnInterface, mailboxDial grpc.ClientConnInterface) {
+func (rm *RouterManager) Init(
+	config *config.Config,
+	authDial grpc.ClientConnInterface,
+	profileDial grpc.ClientConnInterface,
+	mailboxDial grpc.ClientConnInterface,
+	folderManagerDial grpc.ClientConnInterface,
+	) {
 	rm.d = &delivery.Delivery{}
-	rm.d.Init(config, authDial, profileDial, mailboxDial)
+	rm.d.Init(config, authDial, profileDial, mailboxDial, folderManagerDial)
 	rm.config = config
 }
 
@@ -45,6 +49,12 @@ func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 	router.HandleFunc("/mail/delete", rm.d.DeleteMail)
 	router.HandleFunc("/mail/read", rm.d.ReadMail)
 	router.HandleFunc("/mail/send", rm.d.SendMail)
+	router.HandleFunc("/folder/add", rm.d.AddFolder)
+	router.HandleFunc("/folder/mail/add", rm.d.AddMailToFolder)
+	router.HandleFunc("/folder/mail/delete", rm.d.DeleteFolderMail)
+	router.HandleFunc("/folder/rename", rm.d.ChangeFolder)
+	router.HandleFunc("/folder/delete", rm.d.DeleteFolder)
+	router.HandleFunc("/folder/list", rm.d.ListFolders)
 	router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
 		httpSwagger.URL("/swagger/doc.json"), //The url pointing to API definition
 		httpSwagger.DeepLinking(true),

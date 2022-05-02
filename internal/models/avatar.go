@@ -1,7 +1,7 @@
-package m
+package models
 
 type Avatar struct {
 	Name string
-	UserEmail string
-	Content []byte
+	Username string
+	File []byte
 }

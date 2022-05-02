@@ -8,6 +8,8 @@ import (
 	"fmt"
 
 	log "github.com/sirupsen/logrus"
+
+	_ "OverflowBackend/docs"
 )
 
 type Application struct{}
@@ -41,14 +43,22 @@ func (app *Application) Run(configPath string) {
 	if err != nil {
 		log.Fatal("Ошибка подключения к микросервису Auth:", err)
 	}
+	log.Info("Успешное подключение к микросервису Auth.")
 	profileDial, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.Profile.Address, config.Server.Services.Profile.Port))
 	if err != nil {
 		log.Fatal("Ошибка подключения к микросервису Profile:", err)
 	}
+	log.Info("Успешное подключение к микросервису Profile.")
 	mailboxDial, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.MailBox.Address, config.Server.Services.MailBox.Port))
 	if err != nil {
 		log.Fatal("Ошибка подключения к микросервису Mailbox:", err)
 	}
-	router.Init(config, authDial, profileDial, mailboxDial)
+	log.Info("Успешное подключение к микросервису Mailbox.")
+	folderManagerDial, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.FolderManager.Address, config.Server.Services.FolderManager.Port))
+	if err != nil {
+		log.Fatal("Ошибка подключения к микросервису FolderManager:", err)
+	}
+	log.Info("Успешное подключение к микросервису FolderManager.")
+	router.Init(config, authDial, profileDial, mailboxDial, folderManagerDial)
 	HandleServer(config, router)
 }

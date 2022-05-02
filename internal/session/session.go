@@ -17,7 +17,7 @@ type SessionManager interface {
 }
 
 func Init(config *config.Config) error {
-	if config.Database.Type == "postgres" {
+	if config.Server.SessionType == "postgres" {
 		Manager = &PostgresManager{}
 	} else {
 		Manager = &StandardManager{}

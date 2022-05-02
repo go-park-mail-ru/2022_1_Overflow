@@ -1,11 +1,9 @@
-package m
+package models
 
-// Пользователь
-// @Description Структура пользователя
 type User struct {
-	Id        int32
-	FirstName string
-	LastName  string
-	Password  string
-	Username  string
+	Id int32 `json:"id"`
+	Firstname string `json:"first_name"`
+	Lastname string `json:"last_name"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }

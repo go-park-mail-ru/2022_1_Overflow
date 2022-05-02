@@ -1,17 +1,15 @@
 package delivery
 
 import (
+	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/security/xss"
 	"OverflowBackend/internal/session"
 	"OverflowBackend/pkg"
 	"OverflowBackend/proto/mailbox_proto"
-	"OverflowBackend/proto/utils_proto"
 	"context"
 	"encoding/json"
 	"net/http"
 	"strconv"
-
-	"google.golang.org/protobuf/proto"
 )
 
 // Income godoc
@@ -38,8 +36,14 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp.Response, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp.Response)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	w.Write(resp.Mails)
@@ -69,8 +73,14 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp.Response, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp.Response)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	w.Write(resp.Mails)
@@ -105,14 +115,20 @@ func (d *Delivery) GetMail(w http.ResponseWriter, r *http.Request) {
 	}
 	resp, err := d.mailbox.GetMail(context.Background(), &mailbox_proto.GetMailRequest{
 		Data: data,
-		Id: int32(mail_id),
+		Id:   int32(mail_id),
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp.Response, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp.Response)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -149,14 +165,20 @@ func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 	}
 	resp, err := d.mailbox.DeleteMail(context.Background(), &mailbox_proto.DeleteMailRequest{
 		Data: data,
-		Id: int32(id),
+		Id:   int32(id),
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
@@ -197,14 +219,20 @@ func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 	}
 	resp, err := d.mailbox.ReadMail(context.Background(), &mailbox_proto.ReadMailRequest{
 		Data: data,
-		Id: int32(id),
+		Id:   int32(id),
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
@@ -238,7 +266,7 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var form utils_proto.MailForm
+	var form models.MailForm
 
 	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
@@ -249,17 +277,24 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 	form.Files = xss.P.Sanitize(form.Files)
 	form.Text = xss.P.Sanitize(form.Text)
 	form.Theme = xss.P.Sanitize(form.Theme)
+	formBytes, _ := json.Marshal(form)
 
 	resp, err := d.mailbox.SendMail(context.Background(), &mailbox_proto.SendMailRequest{
 		Data: data,
-		Form: &form,
+		Form: formBytes,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
