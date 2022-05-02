@@ -117,12 +117,17 @@ func (c *Database) GetUserInfoById(context context.Context, request *repository_
 }
 
 func (c *Database) UserConfig(context context.Context, user_id int32) error {
-	_, err := c.Conn.Query(context, "INSERT INTO overflow.folders(name, user_id) VALUES ($1, $2);", pkg.FOLDER_SPAM, user_id)
+	rows, err := c.Conn.Query(context, "INSERT INTO overflow.folders(name, user_id) VALUES ($1, $2);", pkg.FOLDER_SPAM, user_id)
 	if err != nil {
 		return err
 	}
-	_, err = c.Conn.Query(context, "INSERT INTO overflow.folders(name, user_id) VALUES ($1, $2);", pkg.FOLDER_DRAFTS, user_id)
-	return err
+	rows.Close()
+	rows, err = c.Conn.Query(context, "INSERT INTO overflow.folders(name, user_id) VALUES ($1, $2);", pkg.FOLDER_DRAFTS, user_id)
+	if err != nil {
+		return err
+	}
+	rows.Close()
+	return nil
 }
 
 // Добавить пользователя
@@ -630,12 +635,13 @@ func (c *Database) ChangeFolderName(context context.Context, request *repository
 
 func (c *Database) AddMailToFolder(context context.Context, request *repository_proto.AddMailToFolderRequest) (*utils_proto.DatabaseResponse, error) {
 	if request.Move {
-		_, err := c.Conn.Query(context, "UPDATE overflow.mails SET only_folder=$1 WHERE id=$2;", request.Move, request.MailId)
+		rowsUpdate, err := c.Conn.Query(context, "UPDATE overflow.mails SET only_folder=$1 WHERE id=$2;", request.Move, request.MailId)
 		if err != nil {
 			return &utils_proto.DatabaseResponse{
 				Status: utils_proto.DatabaseStatus_ERROR,
 			}, err
 		}
+		defer rowsUpdate.Close()
 	}
 	rows, err := c.Conn.Query(context, "INSERT INTO overflow.folder_to_mail(folder_id, mail_id) VALUES ($1, $2);", request.FolderId, request.MailId)
 	if err != nil {
@@ -651,12 +657,13 @@ func (c *Database) AddMailToFolder(context context.Context, request *repository_
 
 func (c *Database) DeleteFolderMail(context context.Context, request *repository_proto.DeleteFolderMailRequest) (*utils_proto.DatabaseResponse, error) {
 	if request.Restore {
-		_, err := c.Conn.Query(context, "UPDATE overflow.mails SET only_folder=$1 WHERE id=$2;", !request.Restore, request.FolderId)
+		rowsRestore, err := c.Conn.Query(context, "UPDATE overflow.mails SET only_folder=$1 WHERE id=$2;", !request.Restore, request.FolderId)
 		if err != nil {
 			return &utils_proto.DatabaseResponse{
 				Status: utils_proto.DatabaseStatus_ERROR,
 			}, err
 		}
+		defer rowsRestore.Close()
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,
 		}, nil

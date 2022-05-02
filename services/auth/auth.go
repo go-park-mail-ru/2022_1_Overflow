@@ -55,6 +55,11 @@ func (s *AuthService) SignIn(context context.Context, request *auth_proto.SignIn
 	var userFind models.User
 	userFindBytes := resp.User
 	err = json.Unmarshal(userFindBytes, &userFind)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.JSON_ERR.Bytes(),
+		}, nil
+	}
 	if (userFind == models.User{}) {
 		return &utils_proto.JsonResponse{
 			Response: pkg.WRONG_CREDS_ERR.Bytes(),

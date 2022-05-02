@@ -4,17 +4,17 @@ CREATE SCHEMA overflow
 
 CREATE TABLE overflow.users (
     id serial  not null primary key,
-    first_name varchar(30) not null,
-    last_name varchar(30) not null,
-    password varchar(30) not null,
-    username varchar(234) not null unique
+    first_name varchar(45) not null,
+    last_name varchar(45) not null,
+    password varchar(45) not null,
+    username varchar(45) not null unique
 );
 
 CREATE TABLE overflow.mails (
     id serial not null primary key,
     client_id serial not null,
-    sender varchar(234) not null ,
-    addressee varchar(234) not null ,
+    sender varchar(45) not null ,
+    addressee varchar(45) not null ,
     date timestamp not null,
     theme varchar(100),
     text text not null,
