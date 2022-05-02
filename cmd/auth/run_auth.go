@@ -29,6 +29,7 @@ func StartAuthServer(config *config.Config, db repository_proto.DatabaseReposito
 }
 
 func main() {
+	log.SetLevel(log.DebugLevel)
 	log.Info(SERVICE_PREFIX, "Запуск сервиса")
 	config, err := config.NewConfig("./configs/main.yml")
 	if err != nil {

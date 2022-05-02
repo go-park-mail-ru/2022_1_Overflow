@@ -41,6 +41,7 @@ func StartRepositoryServer(config *config.Config) {
 }
 
 func main() {
+	log.SetLevel(log.DebugLevel)
 	log.Info(SERVICE_PREFIX, "Запуск сервиса Repository")
 	config, err := config.NewConfig("./configs/main.yml")
 	if err != nil {

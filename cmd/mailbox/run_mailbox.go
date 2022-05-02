@@ -30,6 +30,7 @@ func StartMailBoxServer(config *config.Config, db repository_proto.DatabaseRepos
 }
 
 func main() {
+	log.SetLevel(log.DebugLevel)
 	log.Info(SERVICE_PREFIX, "Запуск сервиса Mailbox")
 	config, err := config.NewConfig("./configs/main.yml")
 	if err != nil {

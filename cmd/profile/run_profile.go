@@ -29,6 +29,7 @@ func StartProfileServer(config *config.Config, db repository_proto.DatabaseRepos
 }
 
 func main() {
+	log.SetLevel(log.DebugLevel)
 	log.Info("Запуск сервиса Profile")
 	config, err := config.NewConfig("./configs/main.yml")
 	if err != nil {
