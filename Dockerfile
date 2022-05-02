@@ -1,6 +1,6 @@
 ## We specify the base image we need for our
 ## go application
-FROM golang:1.12 AS build
+FROM golang:1.17 AS build
 ## We create an /app directory within our
 ## image that will hold our application source
 ## files
