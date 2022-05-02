@@ -113,9 +113,9 @@ func (s *AuthService) SignUp(context context.Context, request *auth_proto.SignUp
 			Response: pkg.JSON_ERR.Bytes(),
 		}, err
 	}
-	if (userFind == models.User{}) {
+	if (userFind != models.User{}) {
 		return &utils_proto.JsonResponse{
-			Response: pkg.WRONG_CREDS_ERR.Bytes(),
+			Response: pkg.CreateJsonErr(pkg.STATUS_USER_EXISTS, "Пользователь уже существует.").Bytes(),
 		}, nil
 	}
 	userBytes, _ := json.Marshal(user)
