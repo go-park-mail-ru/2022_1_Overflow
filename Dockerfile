@@ -4,6 +4,8 @@ FROM golang:1.12 AS build
 ## We create an /app directory within our
 ## image that will hold our application source
 ## files
+RUN apt update && apt install ca-certificates libgnutls30 -y
+
 RUN mkdir /app
 ## We copy everything in the root directory
 ## into our /app directory
