@@ -34,7 +34,7 @@ func (s *StandardManager) Init(config *config.Config) (err error) {
 		Secure:   false,
 	}
 
-	gob.Register(&utils_proto.Session{})
+	gob.Register(utils_proto.Session{})
 	return
 }
 
