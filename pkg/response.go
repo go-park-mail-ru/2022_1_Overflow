@@ -21,6 +21,7 @@ const (
 	STATUS_NOT_IMP 		  = iota // 12
 	STATUS_WRONG_CREDS 	  = iota // 13
 	STATUS_LOGGED_IN      = iota // 14
+	STATUS_OBJECT_EXISTS = iota  // 15
 )
 
 type JsonResponse struct {

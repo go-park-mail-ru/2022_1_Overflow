@@ -81,7 +81,7 @@ func (c *Database) GetUserInfoByUsername(context context.Context, request *repos
 func (c *Database) GetUserInfoById(context context.Context, request *repository_proto.GetUserInfoByIdRequest) (*repository_proto.ResponseUser, error) {
 	var user models.User
 	userBytes, _ := json.Marshal(user)
-	rows, err := c.Conn.Query(context, "Select * from overflow.users where id = $1;", request.UserId)
+	rows, err := c.Conn.Query(context, "Select * from overflow.users(id, first_name, last_name, password, username) where id = $1;", request.UserId)
 	if err != nil {
 		return &repository_proto.ResponseUser{
 			User: userBytes,
@@ -142,6 +142,20 @@ func (c *Database) AddUser(context context.Context, request *repository_proto.Ad
 	res, err := c.Conn.Query(context, "INSERT INTO overflow.users(first_name, last_name, password, username) VALUES ($1, $2, $3, $4);", user.Firstname, user.Lastname, user.Password, user.Username)
 	if err == nil {
 		res.Close()
+		resp, err := c.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
+			Username: user.Username,
+		})
+		if err != nil {
+			return &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			}, err
+		}
+		err = json.Unmarshal(resp.User, &user)
+		if err != nil{
+			return &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			}, err
+		}
 		c.UserConfig(context, user.Id) // конфигурация профиля пользователя
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,

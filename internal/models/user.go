@@ -5,5 +5,5 @@ type User struct {
 	Firstname string `json:"first_name" validate:"max=45"`
 	Lastname string `json:"last_name" validate:"max=45"`
 	Username string `json:"username" validate:"max=45"`
-	Password string `json:"password" validate:"max=45"`
+	Password string `json:"password"`
 }

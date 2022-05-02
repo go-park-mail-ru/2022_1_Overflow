@@ -55,7 +55,34 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 			Response: pkg.NO_USER_EXIST.Bytes(),
 		}, nil
 	}
-	resp2, err := s.db.AddFolder(context, &repository_proto.AddFolderRequest{
+	resp2, err := s.db.GetFolderByName(context, &repository_proto.GetFolderByNameRequest{
+		UserId: user.Id,
+		FolderName: request.Name,
+	})
+	if err != nil {
+		log.Error(err)
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
+	}
+	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
+	}
+	var folder models.Folder
+	err = json.Unmarshal(resp2.Folder, &folder)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.JSON_ERR.Bytes(),
+		}, err
+	}
+	if (folder != models.Folder{}) {
+		return &utils_proto.JsonResponse{
+			Response: pkg.CreateJsonErr(pkg.STATUS_OBJECT_EXISTS, "Такая папка уже существует.").Bytes(),
+		}, nil
+	}
+	resp3, err := s.db.AddFolder(context, &repository_proto.AddFolderRequest{
 		Name: request.Name,
 		UserId: user.Id,
 	})
@@ -65,7 +92,7 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 			Response: pkg.DB_ERR.Bytes(),
 		}, err
 	}
-	if resp2.Status != utils_proto.DatabaseStatus_OK {
+	if resp3.Status != utils_proto.DatabaseStatus_OK {
 		return &utils_proto.JsonResponse{
 			Response: pkg.DB_ERR.Bytes(),
 		}, nil

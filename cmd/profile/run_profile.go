@@ -16,8 +16,9 @@ import (
 var SERVICE_PREFIX = "Profile:"
 
 func StartProfileServer(config *config.Config, db repository_proto.DatabaseRepositoryClient) {
-	log.Info(SERVICE_PREFIX, "Запуск сервера")
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%v", config.Server.Services.Profile.Port))
+	address := fmt.Sprintf(":%v", config.Server.Services.Profile.Port)
+	log.Info(SERVICE_PREFIX, "Запуск сервера по адресу")
+	lis, err := net.Listen("tcp", address)
 	if err != nil {
 		log.Fatal(SERVICE_PREFIX, err)
 	}

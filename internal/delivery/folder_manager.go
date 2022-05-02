@@ -67,6 +67,7 @@ func AddFolder() {}
 // @Produce json
 // @Param folder_id query int true "ID папки."
 // @Param mail_id query int true "ID добавляемого письма."
+// @Param move query bool false "Следует ли переместить письмо в эту папку (с последующим удалением из источника)."
 // @Success 200 {object} pkg.JsonResponse "OK"
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
@@ -94,10 +95,12 @@ func (d *Delivery) AddMailToFolder(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
 		return
 	}
+	move := len(r.URL.Query().Get("move")) > 0
 	resp, err := d.folderManager.AddMailToFolder(context.Background(), &folder_manager_proto.AddMailToFolderRequest{
 		Data:       data,
 		FolderId: int32(folderId),
 		MailId:     int32(mailId),
+		Move: move,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
