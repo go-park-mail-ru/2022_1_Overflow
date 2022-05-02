@@ -1,6 +1,6 @@
 ## We specify the base image we need for our
 ## go application
-FROM golang:1.12.0-alpine3.9
+FROM golang:1.12 AS build
 ## We create an /app directory within our
 ## image that will hold our application source
 ## files
@@ -20,6 +20,11 @@ RUN go build -o mailbox ./cmd/mailbox/run_mailbox.go
 RUN go build -o profile ./cmd/profile/run_profile.go
 RUN go build -o repository ./cmd/repository/run_repository.go
 RUN go build -o main /cmd/app/main.go
+
+FROM alpine:latest AS runtime
+RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
+WORKDIR /app
+COPY --from=build /app ./
 ## Our start command which kicks off
 ## our newly created binary executable
 CMD (bash -C '/app/repository > repository.log' &) && \
