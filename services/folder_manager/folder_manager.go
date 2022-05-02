@@ -20,6 +20,24 @@ type FolderManagerService struct {
 	profile profile_proto.ProfileClient
 }
 
+func (s *FolderManagerService) IsOwner(context context.Context, data *utils_proto.Session, folderUserId int32) (bool, pkg.JsonResponse, error){
+	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
+		Username: data.Username,
+	})
+	if err != nil {
+		return false, pkg.INTERNAL_ERR, err
+	}
+	if (resp.Response.Status != utils_proto.DatabaseStatus_OK) {
+		return false, pkg.DB_ERR, nil
+	}
+	var user models.User
+	err = json.Unmarshal(resp.User, &user)
+	if err != nil {
+		return false, pkg.JSON_ERR, err
+	}
+	return user.Id == folderUserId, pkg.NO_ERR, nil
+}
+
 func (s *FolderManagerService) Init(config *config.Config, db repository_proto.DatabaseRepositoryClient, profile profile_proto.ProfileClient) {
 	s.config = config
 	s.db = db
@@ -131,6 +149,22 @@ func (s *FolderManagerService) AddMailToFolder(context context.Context, request 
 			Response: pkg.NO_USER_EXIST.Bytes(),
 		}, nil
 	}
+	isOwner, response, err := s.IsOwner(context, request.Data, request.FolderId)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.INTERNAL_ERR.Bytes(),
+		}, err
+	}
+	if response != pkg.NO_ERR {
+		return &utils_proto.JsonResponse{
+			Response: response.Bytes(),
+		}, nil
+	}
+	if !isOwner {
+		return &utils_proto.JsonResponse{
+			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
+		}, nil
+	}
 	resp2, err := s.db.AddMailToFolder(context, &repository_proto.AddMailToFolderRequest{
 		FolderId: request.FolderId,
 		MailId: request.MailId,
@@ -179,6 +213,22 @@ func (s *FolderManagerService) ChangeFolder(context context.Context, request *fo
 	if (user == models.User{}) {
 		return &utils_proto.JsonResponse{
 			Response: pkg.NO_USER_EXIST.Bytes(),
+		}, nil
+	}
+	isOwner, response, err := s.IsOwner(context, request.Data, request.FolderId)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.INTERNAL_ERR.Bytes(),
+		}, err
+	}
+	if response != pkg.NO_ERR {
+		return &utils_proto.JsonResponse{
+			Response: response.Bytes(),
+		}, nil
+	}
+	if !isOwner {
+		return &utils_proto.JsonResponse{
+			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
 		}, nil
 	}
 	resp2, err := s.db.GetFolderById(context, &repository_proto.GetFolderByIdRequest{
@@ -281,6 +331,22 @@ func (s *FolderManagerService) DeleteFolder(context context.Context, request *fo
 		return &utils_proto.JsonResponse{
 			Response: pkg.JSON_ERR.Bytes(),
 		}, err
+	}
+	isOwner, response, err := s.IsOwner(context, request.Data, folder.Id)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.INTERNAL_ERR.Bytes(),
+		}, err
+	}
+	if response != pkg.NO_ERR {
+		return &utils_proto.JsonResponse{
+			Response: response.Bytes(),
+		}, nil
+	}
+	if !isOwner {
+		return &utils_proto.JsonResponse{
+			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
+		}, nil
 	}
 	resp3, err := s.db.DeleteFolder(context, &repository_proto.DeleteFolderRequest{
 		FolderId: folder.Id,
@@ -417,6 +483,31 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 			Mails: nil,
 		}, nil
 	}
+	isOwner, response, err := s.IsOwner(context, request.Data, request.FolderId)
+	if err != nil {
+		return &folder_manager_proto.ResponseMails{
+			Response:&utils_proto.JsonResponse{
+				Response: pkg.INTERNAL_ERR.Bytes(),
+			},
+			Mails: nil,
+		}, err
+	}
+	if response != pkg.NO_ERR {
+		return &folder_manager_proto.ResponseMails{
+			Response:&utils_proto.JsonResponse{
+				Response: response.Bytes(),
+			},
+			Mails: nil,
+		}, nil
+	}
+	if !isOwner {
+		return &folder_manager_proto.ResponseMails{
+			Response:&utils_proto.JsonResponse{
+				Response: pkg.UNAUTHORIZED_ERR.Bytes(),
+			},
+			Mails: nil,
+		}, nil
+	}
 	resp2, err := s.db.GetFolderMail(context, &repository_proto.GetFolderMailRequest{
 		FolderId: request.FolderId,
 	})
@@ -528,6 +619,22 @@ func (s *FolderManagerService) DeleteFolderMail(context context.Context, request
 	if (user == models.User{}) {
 		return &utils_proto.JsonResponse{
 			Response: pkg.NO_USER_EXIST.Bytes(),
+		}, nil
+	}
+	isOwner, response, err := s.IsOwner(context, request.Data, request.FolderId)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.INTERNAL_ERR.Bytes(),
+		}, err
+	}
+	if response != pkg.NO_ERR {
+		return &utils_proto.JsonResponse{
+			Response: response.Bytes(),
+		}, nil
+	}
+	if !isOwner {
+		return &utils_proto.JsonResponse{
+			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
 		}, nil
 	}
 	resp2, err := s.db.DeleteFolderMail(context, &repository_proto.DeleteFolderMailRequest{
