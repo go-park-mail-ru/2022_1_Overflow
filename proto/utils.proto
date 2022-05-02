@@ -2,8 +2,6 @@ syntax = "proto3";
 package utils;
 
 option go_package = "./utils_proto";
-
-import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 
 enum DatabaseStatus {
@@ -15,62 +13,11 @@ message DatabaseResponse {
     DatabaseStatus status = 1;
 }
 
-message JsonResponse {
-    int32 status = 1 [json_name="status"];
-    string message = 2 [json_name="message"];
-}
-
-message MailForm {
-    string addressee = 1 [json_name="addressee"];
-    string theme = 2 [json_name="theme"];
-    string text = 3 [json_name="text"];
-    string files = 4 [json_name="files"];
-}
-
-message Mail {
-    int32 id = 1 [json_name="id"];
-    int32 client_id = 2 [json_name="client_id"];
-    string sender = 3 [json_name="sender"];
-    string addressee = 4 [json_name="addressee"];
-    string theme = 5 [json_name="theme"];
-    string text = 6 [json_name="text"];
-    string files = 7 [json_name="files"];
-    google.protobuf.Timestamp date = 8 [json_name="date"];
-    google.protobuf.BoolValue read = 9 [json_name="read"];
-}
-
-message Folder {
-    int32 id = 1 [json_name="id"];
-    string name = 2 [json_name="name"];
-    int32 userId = 3 [json_name="user_id"];
-    google.protobuf.Timestamp createdAt = 4 [json_name="created_at"];
-    //repeated utils.MailAdditional mails = 4 [json_name="mails"];
-}
-
-message MailAdditional {
-    Mail mail = 1 [json_name="mail"];
-    string avatar_url = 2 [json_name="avatar_url"];
-}
-
-message User {
-    int32 id = 1 [json_name="id"];
-    string first_name = 2 [json_name="first_name"];
-    string last_name = 3 [json_name="last_name"];
-    string username = 4 [json_name="username"];
-    string password = 5 [json_name="password"];
-}
-
-message ProfileSettingsForm {
-    string first_name = 1 [json_name="first_name"]; 
-    string last_name = 2 [json_name="last_name"];
-    string password = 3 [json_name="password"];
-}
-
 message Session {
     string username = 1;
     google.protobuf.BoolValue authenticated = 2;
 }
 
-message FolderSettingsForm {
-    string new_name = 1 [json_name="new_name"];
+message JsonResponse {
+    bytes response = 1;
 }

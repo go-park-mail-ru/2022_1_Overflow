@@ -12,20 +12,14 @@ service Profile {
     rpc SetAvatar(SetAvatarRequest) returns (utils.JsonResponse) {}
 }
 
-message Avatar {
-    string name = 1;
-    string username = 2;
-    bytes file = 3;
-}
-
 message SetAvatarRequest {
     utils.Session data = 1;
-    Avatar avatar = 2;
+    bytes avatar = 2;
 }
 
 message SetInfoRequest {
     utils.Session data = 1;
-    utils.ProfileSettingsForm form = 2;
+    bytes form = 2;
 }
 
 message GetInfoRequest {

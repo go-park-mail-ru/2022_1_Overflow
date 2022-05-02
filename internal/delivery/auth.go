@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/security/xss"
 	"OverflowBackend/internal/session"
 	"OverflowBackend/pkg"
@@ -12,16 +13,15 @@ import (
 
 	"github.com/gorilla/csrf"
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/protobuf/proto"
 )
 
 // SignIn godoc
 // @Summary Выполняет аутентификацию пользователя
 // @Summary Выполняет аутентификацию и выставляет сессионый cookie с названием OverflowMail
-// @Success 200 {object} utils_proto.JsonResponse "Успешная аутентификация пользователя."
-// @Failure 500 {object} utils_proto.JsonResponse "Пользователь не существует, ошибка БД или валидации формы."
+// @Success 200 {object} pkg.JsonResponse "Успешная аутентификация пользователя."
+// @Failure 500 {object} pkg.JsonResponse "Пользователь не существует, ошибка БД или валидации формы."
 // @Accept json
-// @Param SignInForm body auth_proto.SignInForm true "Форма входа пользователя"
+// @Param SignInForm body models.SignInForm true "Форма входа пользователя"
 // @Produce json
 // @Router /signin [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
@@ -40,20 +40,28 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Info("SignIn: ", "checking data")
-	var data auth_proto.SignInForm
+	var data models.SignInForm
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-
-	resp, err := d.auth.SignIn(context.Background(), &data)
+	dataBytes, _ := json.Marshal(data)
+	resp, err := d.auth.SignIn(context.Background(), &auth_proto.SignInRequest{
+		Form: dataBytes,
+	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 
@@ -70,17 +78,17 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /signin [get]
-// @Response 200 {object} utils_proto.JsonResponse
+// @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 func SignIn() {}
 
 // SignUp godoc
 // @Summary Выполняет регистрацию пользователя
 // @Description Выполняет регистрацию пользователя, НЕ выставляет сессионый cookie.
-// @Success 200 {object} utils_proto.JsonResponse "Вход уже выполнен, либо успешная регистрация пользователя."
-// @Failure 500 {object} utils_proto.JsonResponse "Ошибка валидации формы, БД или пользователь уже существует."
+// @Success 200 {object} pkg.JsonResponse "Вход уже выполнен, либо успешная регистрация пользователя."
+// @Failure 500 {object} pkg.JsonResponse "Ошибка валидации формы, БД или пользователь уже существует."
 // @Accept json
-// @Param SignUpForm body auth_proto.SignUpForm true "Форма регистрации пользователя"
+// @Param SignUpForm body models.SignUpForm true "Форма регистрации пользователя"
 // @Produce json
 // @Router /signup [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
@@ -99,7 +107,7 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Info("SignUp: ", "checking data")
-	var data auth_proto.SignUpForm
+	var data models.SignUpForm
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
@@ -108,21 +116,30 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 
 	log.Info("SignUp: ", "sanitizing data")
 	data.Username = xss.P.Sanitize(data.Username)
-	data.FirstName = xss.P.Sanitize(data.FirstName)
-	data.LastName = xss.P.Sanitize(data.LastName)
+	data.Firstname = xss.P.Sanitize(data.Firstname)
+	data.Lastname = xss.P.Sanitize(data.Lastname)
 	passSanitized := xss.P.Sanitize(data.Password)
 	if passSanitized != data.Password {
 		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, "Пароль содержит недопустимое содержимое.")
 		return
 	}
 
-	resp, err := d.auth.SignUp(context.Background(), &data)
+	dataBytes, _ := json.Marshal(data)
+	resp, err := d.auth.SignUp(context.Background(), &auth_proto.SignUpRequest{
+		Form: dataBytes,
+	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 
@@ -130,15 +147,15 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /signup [get]
-// @Response 200 {object} utils_proto.JsonResponse
+// @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 func SignUp() {}
 
 // SignOut godoc
 // @Summary Завершение сессии пользователя
-// @Success 200 {object} utils_proto.JsonResponse "Успешное завершение сессии."
-// @Failure 401 {object} utils_proto.JsonResponse "Сессия отсутствует, сессия не валидна."
-// @Failure 500 {object} utils_proto.JsonResponse
+// @Success 200 {object} pkg.JsonResponse "Успешное завершение сессии."
+// @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует, сессия не валидна."
+// @Failure 500 {object} pkg.JsonResponse
 // @Produce json
 // @Router /logout [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
@@ -158,6 +175,6 @@ func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /logout [get]
-// @Response 200 {object} utils_proto.JsonResponse
+// @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 func SignOut() {}

@@ -25,17 +25,16 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type SignInForm struct {
+type SignInRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
-	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	Form []byte `protobuf:"bytes,1,opt,name=form,proto3" json:"form,omitempty"`
 }
 
-func (x *SignInForm) Reset() {
-	*x = SignInForm{}
+func (x *SignInRequest) Reset() {
+	*x = SignInRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_proto_auth_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -43,13 +42,13 @@ func (x *SignInForm) Reset() {
 	}
 }
 
-func (x *SignInForm) String() string {
+func (x *SignInRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SignInForm) ProtoMessage() {}
+func (*SignInRequest) ProtoMessage() {}
 
-func (x *SignInForm) ProtoReflect() protoreflect.Message {
+func (x *SignInRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_auth_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -61,39 +60,28 @@ func (x *SignInForm) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SignInForm.ProtoReflect.Descriptor instead.
-func (*SignInForm) Descriptor() ([]byte, []int) {
+// Deprecated: Use SignInRequest.ProtoReflect.Descriptor instead.
+func (*SignInRequest) Descriptor() ([]byte, []int) {
 	return file_proto_auth_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *SignInForm) GetUsername() string {
+func (x *SignInRequest) GetForm() []byte {
 	if x != nil {
-		return x.Username
+		return x.Form
 	}
-	return ""
+	return nil
 }
 
-func (x *SignInForm) GetPassword() string {
-	if x != nil {
-		return x.Password
-	}
-	return ""
-}
-
-type SignUpForm struct {
+type SignUpRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	FirstName            string `protobuf:"bytes,1,opt,name=first_name,proto3" json:"first_name,omitempty"`
-	LastName             string `protobuf:"bytes,2,opt,name=last_name,proto3" json:"last_name,omitempty"`
-	Username             string `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`
-	Password             string `protobuf:"bytes,4,opt,name=password,proto3" json:"password,omitempty"`
-	PasswordConfirmation string `protobuf:"bytes,5,opt,name=password_confirmation,proto3" json:"password_confirmation,omitempty"`
+	Form []byte `protobuf:"bytes,1,opt,name=form,proto3" json:"form,omitempty"`
 }
 
-func (x *SignUpForm) Reset() {
-	*x = SignUpForm{}
+func (x *SignUpRequest) Reset() {
+	*x = SignUpRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_proto_auth_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -101,13 +89,13 @@ func (x *SignUpForm) Reset() {
 	}
 }
 
-func (x *SignUpForm) String() string {
+func (x *SignUpRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SignUpForm) ProtoMessage() {}
+func (*SignUpRequest) ProtoMessage() {}
 
-func (x *SignUpForm) ProtoReflect() protoreflect.Message {
+func (x *SignUpRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_auth_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -119,44 +107,16 @@ func (x *SignUpForm) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SignUpForm.ProtoReflect.Descriptor instead.
-func (*SignUpForm) Descriptor() ([]byte, []int) {
+// Deprecated: Use SignUpRequest.ProtoReflect.Descriptor instead.
+func (*SignUpRequest) Descriptor() ([]byte, []int) {
 	return file_proto_auth_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *SignUpForm) GetFirstName() string {
+func (x *SignUpRequest) GetForm() []byte {
 	if x != nil {
-		return x.FirstName
+		return x.Form
 	}
-	return ""
-}
-
-func (x *SignUpForm) GetLastName() string {
-	if x != nil {
-		return x.LastName
-	}
-	return ""
-}
-
-func (x *SignUpForm) GetUsername() string {
-	if x != nil {
-		return x.Username
-	}
-	return ""
-}
-
-func (x *SignUpForm) GetPassword() string {
-	if x != nil {
-		return x.Password
-	}
-	return ""
-}
-
-func (x *SignUpForm) GetPasswordConfirmation() string {
-	if x != nil {
-		return x.PasswordConfirmation
-	}
-	return ""
+	return nil
 }
 
 var File_proto_auth_proto protoreflect.FileDescriptor
@@ -165,32 +125,21 @@ var file_proto_auth_proto_rawDesc = []byte{
 	0x0a, 0x10, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x61, 0x75, 0x74, 0x68, 0x2e, 0x70, 0x72, 0x6f,
 	0x74, 0x6f, 0x12, 0x0a, 0x61, 0x75, 0x74, 0x68, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x11,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x75, 0x74, 0x69, 0x6c, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x22, 0x44, 0x0a, 0x0a, 0x53, 0x69, 0x67, 0x6e, 0x49, 0x6e, 0x46, 0x6f, 0x72, 0x6d, 0x12,
-	0x1a, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x70,
-	0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70,
-	0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x22, 0xb8, 0x01, 0x0a, 0x0a, 0x53, 0x69, 0x67, 0x6e,
-	0x55, 0x70, 0x46, 0x6f, 0x72, 0x6d, 0x12, 0x1e, 0x0a, 0x0a, 0x66, 0x69, 0x72, 0x73, 0x74, 0x5f,
-	0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x66, 0x69, 0x72, 0x73,
-	0x74, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x1c, 0x0a, 0x09, 0x6c, 0x61, 0x73, 0x74, 0x5f, 0x6e,
-	0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6c, 0x61, 0x73, 0x74, 0x5f,
-	0x6e, 0x61, 0x6d, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65,
-	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65,
-	0x12, 0x1a, 0x0a, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x18, 0x04, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x12, 0x34, 0x0a, 0x15,
-	0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x5f, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x72, 0x6d,
-	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x15, 0x70, 0x61, 0x73,
-	0x73, 0x77, 0x6f, 0x72, 0x64, 0x5f, 0x63, 0x6f, 0x6e, 0x66, 0x69, 0x72, 0x6d, 0x61, 0x74, 0x69,
-	0x6f, 0x6e, 0x32, 0x78, 0x0a, 0x04, 0x41, 0x75, 0x74, 0x68, 0x12, 0x37, 0x0a, 0x06, 0x53, 0x69,
-	0x67, 0x6e, 0x49, 0x6e, 0x12, 0x16, 0x2e, 0x61, 0x75, 0x74, 0x68, 0x5f, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x2e, 0x53, 0x69, 0x67, 0x6e, 0x49, 0x6e, 0x46, 0x6f, 0x72, 0x6d, 0x1a, 0x13, 0x2e, 0x75,
-	0x74, 0x69, 0x6c, 0x73, 0x2e, 0x4a, 0x73, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x22, 0x00, 0x12, 0x37, 0x0a, 0x06, 0x53, 0x69, 0x67, 0x6e, 0x55, 0x70, 0x12, 0x16, 0x2e,
-	0x61, 0x75, 0x74, 0x68, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x53, 0x69, 0x67, 0x6e, 0x55,
-	0x70, 0x46, 0x6f, 0x72, 0x6d, 0x1a, 0x13, 0x2e, 0x75, 0x74, 0x69, 0x6c, 0x73, 0x2e, 0x4a, 0x73,
-	0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x0e, 0x5a, 0x0c,
-	0x2e, 0x2f, 0x61, 0x75, 0x74, 0x68, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x33,
+	0x6f, 0x22, 0x23, 0x0a, 0x0d, 0x53, 0x69, 0x67, 0x6e, 0x49, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x66, 0x6f, 0x72, 0x6d, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c,
+	0x52, 0x04, 0x66, 0x6f, 0x72, 0x6d, 0x22, 0x23, 0x0a, 0x0d, 0x53, 0x69, 0x67, 0x6e, 0x55, 0x70,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x66, 0x6f, 0x72, 0x6d, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x66, 0x6f, 0x72, 0x6d, 0x32, 0x7e, 0x0a, 0x04, 0x41,
+	0x75, 0x74, 0x68, 0x12, 0x3a, 0x0a, 0x06, 0x53, 0x69, 0x67, 0x6e, 0x49, 0x6e, 0x12, 0x19, 0x2e,
+	0x61, 0x75, 0x74, 0x68, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x53, 0x69, 0x67, 0x6e, 0x49,
+	0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x13, 0x2e, 0x75, 0x74, 0x69, 0x6c, 0x73,
+	0x2e, 0x4a, 0x73, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12,
+	0x3a, 0x0a, 0x06, 0x53, 0x69, 0x67, 0x6e, 0x55, 0x70, 0x12, 0x19, 0x2e, 0x61, 0x75, 0x74, 0x68,
+	0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x53, 0x69, 0x67, 0x6e, 0x55, 0x70, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x13, 0x2e, 0x75, 0x74, 0x69, 0x6c, 0x73, 0x2e, 0x4a, 0x73, 0x6f,
+	0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x0e, 0x5a, 0x0c, 0x2e,
+	0x2f, 0x61, 0x75, 0x74, 0x68, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
 var (
@@ -207,13 +156,13 @@ func file_proto_auth_proto_rawDescGZIP() []byte {
 
 var file_proto_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_proto_auth_proto_goTypes = []interface{}{
-	(*SignInForm)(nil),               // 0: auth_proto.SignInForm
-	(*SignUpForm)(nil),               // 1: auth_proto.SignUpForm
+	(*SignInRequest)(nil),            // 0: auth_proto.SignInRequest
+	(*SignUpRequest)(nil),            // 1: auth_proto.SignUpRequest
 	(*utils_proto.JsonResponse)(nil), // 2: utils.JsonResponse
 }
 var file_proto_auth_proto_depIdxs = []int32{
-	0, // 0: auth_proto.Auth.SignIn:input_type -> auth_proto.SignInForm
-	1, // 1: auth_proto.Auth.SignUp:input_type -> auth_proto.SignUpForm
+	0, // 0: auth_proto.Auth.SignIn:input_type -> auth_proto.SignInRequest
+	1, // 1: auth_proto.Auth.SignUp:input_type -> auth_proto.SignUpRequest
 	2, // 2: auth_proto.Auth.SignIn:output_type -> utils.JsonResponse
 	2, // 3: auth_proto.Auth.SignUp:output_type -> utils.JsonResponse
 	2, // [2:4] is the sub-list for method output_type
@@ -230,7 +179,7 @@ func file_proto_auth_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_proto_auth_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SignInForm); i {
+			switch v := v.(*SignInRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -242,7 +191,7 @@ func file_proto_auth_proto_init() {
 			}
 		}
 		file_proto_auth_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SignUpForm); i {
+			switch v := v.(*SignUpRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -286,8 +235,8 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type AuthClient interface {
-	SignIn(ctx context.Context, in *SignInForm, opts ...grpc.CallOption) (*utils_proto.JsonResponse, error)
-	SignUp(ctx context.Context, in *SignUpForm, opts ...grpc.CallOption) (*utils_proto.JsonResponse, error)
+	SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*utils_proto.JsonResponse, error)
+	SignUp(ctx context.Context, in *SignUpRequest, opts ...grpc.CallOption) (*utils_proto.JsonResponse, error)
 }
 
 type authClient struct {
@@ -298,7 +247,7 @@ func NewAuthClient(cc grpc.ClientConnInterface) AuthClient {
 	return &authClient{cc}
 }
 
-func (c *authClient) SignIn(ctx context.Context, in *SignInForm, opts ...grpc.CallOption) (*utils_proto.JsonResponse, error) {
+func (c *authClient) SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*utils_proto.JsonResponse, error) {
 	out := new(utils_proto.JsonResponse)
 	err := c.cc.Invoke(ctx, "/auth_proto.Auth/SignIn", in, out, opts...)
 	if err != nil {
@@ -307,7 +256,7 @@ func (c *authClient) SignIn(ctx context.Context, in *SignInForm, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *authClient) SignUp(ctx context.Context, in *SignUpForm, opts ...grpc.CallOption) (*utils_proto.JsonResponse, error) {
+func (c *authClient) SignUp(ctx context.Context, in *SignUpRequest, opts ...grpc.CallOption) (*utils_proto.JsonResponse, error) {
 	out := new(utils_proto.JsonResponse)
 	err := c.cc.Invoke(ctx, "/auth_proto.Auth/SignUp", in, out, opts...)
 	if err != nil {
@@ -318,18 +267,18 @@ func (c *authClient) SignUp(ctx context.Context, in *SignUpForm, opts ...grpc.Ca
 
 // AuthServer is the server API for Auth service.
 type AuthServer interface {
-	SignIn(context.Context, *SignInForm) (*utils_proto.JsonResponse, error)
-	SignUp(context.Context, *SignUpForm) (*utils_proto.JsonResponse, error)
+	SignIn(context.Context, *SignInRequest) (*utils_proto.JsonResponse, error)
+	SignUp(context.Context, *SignUpRequest) (*utils_proto.JsonResponse, error)
 }
 
 // UnimplementedAuthServer can be embedded to have forward compatible implementations.
 type UnimplementedAuthServer struct {
 }
 
-func (*UnimplementedAuthServer) SignIn(context.Context, *SignInForm) (*utils_proto.JsonResponse, error) {
+func (*UnimplementedAuthServer) SignIn(context.Context, *SignInRequest) (*utils_proto.JsonResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignIn not implemented")
 }
-func (*UnimplementedAuthServer) SignUp(context.Context, *SignUpForm) (*utils_proto.JsonResponse, error) {
+func (*UnimplementedAuthServer) SignUp(context.Context, *SignUpRequest) (*utils_proto.JsonResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignUp not implemented")
 }
 
@@ -338,7 +287,7 @@ func RegisterAuthServer(s *grpc.Server, srv AuthServer) {
 }
 
 func _Auth_SignIn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SignInForm)
+	in := new(SignInRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -350,13 +299,13 @@ func _Auth_SignIn_Handler(srv interface{}, ctx context.Context, dec func(interfa
 		FullMethod: "/auth_proto.Auth/SignIn",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServer).SignIn(ctx, req.(*SignInForm))
+		return srv.(AuthServer).SignIn(ctx, req.(*SignInRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Auth_SignUp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SignUpForm)
+	in := new(SignUpRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -368,7 +317,7 @@ func _Auth_SignUp_Handler(srv interface{}, ctx context.Context, dec func(interfa
 		FullMethod: "/auth_proto.Auth/SignUp",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServer).SignUp(ctx, req.(*SignUpForm))
+		return srv.(AuthServer).SignUp(ctx, req.(*SignUpRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

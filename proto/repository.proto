@@ -30,6 +30,7 @@ service DatabaseRepository {
     rpc AddFolder(AddFolderRequest) returns (utils.DatabaseResponse) {}
     rpc ChangeFolderName(ChangeFolderNameRequest) returns (utils.DatabaseResponse) {}
     rpc AddMailToFolder(AddMailToFolderRequest) returns (utils.DatabaseResponse) {}
+    rpc DeleteFolderMail(DeleteFolderMailRequest) returns (utils.DatabaseResponse) {}
 }
 
 // ================ requests ================
@@ -43,11 +44,11 @@ message GetUserInfoByIdRequest {
 }
 
 message AddUserRequest {
-    utils.User user = 1;
+    bytes user = 1;
 }
 
 message ChangeForm {
-    utils.User user = 1;
+    bytes user = 1;
     string data = 2;
 }
 
@@ -60,16 +61,16 @@ message GetOutcomeMailsRequest {
 }
 
 message AddMailRequest {
-    utils.Mail mail = 1;
+    bytes mail = 1;
 }
 
 message DeleteMailRequest {
-    utils.Mail mail = 1;
+    bytes mail = 1;
     string username = 2;
 }
 
 message ReadMailRequest {
-    utils.Mail mail = 1;
+    bytes mail = 1;
 }
 
 message GetMailInfoByIdRequest {
@@ -110,31 +111,39 @@ message ChangeFolderNameRequest {
 message AddMailToFolderRequest {
     int32 folderId = 1;
     int32 mailId = 2;
+    bool move = 3;
+}
+
+message DeleteFolderMailRequest {
+    string username = 1;
+    int32 folderId = 2;
+    int32 mailId = 3;
+    bool restore = 4;
 }
 
 // ================= responses ==================
 
 message ResponseUser {
     utils.DatabaseResponse response = 1;
-    utils.User user = 2;
+    bytes user = 2;
 }
 
 message ResponseMail {
     utils.DatabaseResponse response = 1;
-    utils.Mail mail = 2;
+    bytes mail = 2;
 }
 
 message ResponseFolder {
     utils.DatabaseResponse response = 1;
-    utils.Folder folder = 2;
+    bytes folder = 2;
 }
 
 message ResponseFolders {
     utils.DatabaseResponse response = 1;
-    repeated utils.Folder folders = 2;
+    bytes folders = 2;
 }
 
 message ResponseMails {
     utils.DatabaseResponse response = 1;
-    repeated utils.Mail mails = 2;
+    bytes mails = 2;
 }

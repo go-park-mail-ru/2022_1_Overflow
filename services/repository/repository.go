@@ -37,4 +37,5 @@ type FolderRepositoryInterface interface {
 	AddFolder(context.Context, *repository_proto.AddFolderRequest) (*utils_proto.DatabaseResponse, error)               // Добавить папку
 	ChangeFolderName(context.Context, *repository_proto.ChangeFolderNameRequest) (*utils_proto.DatabaseResponse, error) // Изменить название папки
 	AddMailToFolder(context.Context, *repository_proto.AddMailToFolderRequest) (*utils_proto.DatabaseResponse, error)   // Добавить письмо в папку
+	DeleteFolderMail(context.Context, *repository_proto.DeleteFolderMailRequest) (*utils_proto.DatabaseResponse, error) // Удалить письмо из папки
 }

@@ -14,6 +14,7 @@ service FolderManager {
     rpc DeleteFolder(DeleteFolderRequest) returns (utils.JsonResponse) {}
     rpc ListFolders(ListFoldersRequest) returns (ResponseFolders) {}
     rpc ListFolder(ListFolderRequest) returns (ResponseMails) {}
+    rpc DeleteFolderMail(DeleteFolderMailRequest) returns (utils.JsonResponse) {}
 }
 
 message AddFolderRequest {
@@ -25,6 +26,7 @@ message AddMailToFolderRequest {
     utils.Session data = 1;
     int32 folderId = 2;
     int32 mailId = 3;
+    bool move = 4;
 }
 
 message ChangeFolderRequest {
@@ -63,6 +65,13 @@ message ResponseMails {
 message DeleteFolderRequest {
     utils.Session data = 1;
     string name = 2;
+}
+
+message DeleteFolderMailRequest {
+    utils.Session data = 1;
+    int32 folderId = 2;
+    int32 mailId = 3;
+    bool restore = 4;
 }
 
 message ListFoldersRequest {

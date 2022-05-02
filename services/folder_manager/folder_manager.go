@@ -2,6 +2,7 @@ package folder_manager
 
 import (
 	"OverflowBackend/internal/config"
+	"OverflowBackend/internal/models"
 	"OverflowBackend/pkg"
 	"OverflowBackend/proto/folder_manager_proto"
 	"OverflowBackend/proto/profile_proto"
@@ -11,7 +12,6 @@ import (
 	"encoding/json"
 
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/protobuf/proto"
 )
 
 type FolderManagerService struct {
@@ -34,56 +34,95 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 	})
 	if err != nil {
 		log.Error(err)
-		return &pkg.DB_ERR, err
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
 	}
 	if resp.Response.Status != utils_proto.DatabaseStatus_OK {
-		return &pkg.DB_ERR, nil
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
 	}
-	if proto.Equal(resp.User, &utils_proto.User{}) {
-		return &pkg.NO_USER_EXIST, nil
+	var user models.User
+	err = json.Unmarshal(resp.User, &user)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.JSON_ERR.Bytes(),
+		}, err
+	}
+	if (user == models.User{}) {
+		return &utils_proto.JsonResponse{
+			Response: pkg.NO_USER_EXIST.Bytes(),
+		}, nil
 	}
 	resp2, err := s.db.AddFolder(context, &repository_proto.AddFolderRequest{
 		Name: request.Name,
-		UserId: resp.User.Id,
+		UserId: user.Id,
 	})
 	if err != nil {
 		log.Error(err)
-		return &pkg.DB_ERR, err
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
 	}
 	if resp2.Status != utils_proto.DatabaseStatus_OK {
-		return &pkg.DB_ERR, nil
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
 	}
-	return &pkg.NO_ERR, nil
+	return &utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil
 }
 
 func (s *FolderManagerService) AddMailToFolder(context context.Context, request *folder_manager_proto.AddMailToFolderRequest) (*utils_proto.JsonResponse, error) {
 	username := request.Data.Username
-	log.Debug("Добавление письма в папку, folderId = ", request.FolderId, ", username = ", username)
+	log.Debug("Добавление письма в папку, folderId = ", request.FolderId, ", username = ", username, "move = ", request.Move)
 	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
 		Username: username,
 	})
 	if err != nil {
 		log.Error(err)
-		return &pkg.DB_ERR, err
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
 	}
 	if resp.Response.Status != utils_proto.DatabaseStatus_OK {
-		return &pkg.DB_ERR, nil
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
 	}
-	if proto.Equal(resp.User, &utils_proto.User{}) {
-		return &pkg.NO_USER_EXIST, nil
+	var user models.User
+	err = json.Unmarshal(resp.User, &user)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.JSON_ERR.Bytes(),
+		}, err
+	}
+	if (user == models.User{}) {
+		return &utils_proto.JsonResponse{
+			Response: pkg.NO_USER_EXIST.Bytes(),
+		}, nil
 	}
 	resp2, err := s.db.AddMailToFolder(context, &repository_proto.AddMailToFolderRequest{
 		FolderId: request.FolderId,
 		MailId: request.MailId,
+		Move: request.Move,
 	})
 	if err != nil {
 		log.Error(err)
-		return &pkg.DB_ERR, err
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
 	}
 	if resp2.Status != utils_proto.DatabaseStatus_OK {
-		return &pkg.DB_ERR, nil
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
 	}
-	return &pkg.NO_ERR, nil
+	return &utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil
 }
 
 func (s *FolderManagerService) ChangeFolder(context context.Context, request *folder_manager_proto.ChangeFolderRequest) (*utils_proto.JsonResponse, error) {
@@ -94,65 +133,145 @@ func (s *FolderManagerService) ChangeFolder(context context.Context, request *fo
 	})
 	if err != nil {
 		log.Error(err)
-		return &pkg.DB_ERR, err
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
 	}
 	if resp.Response.Status != utils_proto.DatabaseStatus_OK {
-		return &pkg.DB_ERR, nil
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
 	}
-	if proto.Equal(resp.User, &utils_proto.User{}) {
-		return &pkg.NO_USER_EXIST, nil
+	var user models.User
+	err = json.Unmarshal(resp.User, &user)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.JSON_ERR.Bytes(),
+		}, err
 	}
-	resp2, err := s.db.ChangeFolderName(context, &repository_proto.ChangeFolderNameRequest{
+	if (user == models.User{}) {
+		return &utils_proto.JsonResponse{
+			Response: pkg.NO_USER_EXIST.Bytes(),
+		}, nil
+	}
+	resp2, err := s.db.GetFolderById(context, &repository_proto.GetFolderByIdRequest{
+		FolderId: request.FolderId,
+	})
+	if err != nil {
+		log.Error(err)
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
+	}
+	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
+	}
+	var folder models.Folder
+	err = json.Unmarshal(resp2.Folder, &folder)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.JSON_ERR.Bytes(),
+		}, err
+	}
+	if pkg.IsFolderReserved(folder.Name) {
+		return &utils_proto.JsonResponse{
+			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
+		}, nil
+	}
+	resp3, err := s.db.ChangeFolderName(context, &repository_proto.ChangeFolderNameRequest{
 		FolderId: request.FolderId,
 		NewName: request.FolderNewName,
 	})
 	if err != nil {
 		log.Error(err)
-		return &pkg.DB_ERR, err
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
 	}
-	if resp2.Status != utils_proto.DatabaseStatus_OK {
-		return &pkg.DB_ERR, nil
+	if resp3.Status != utils_proto.DatabaseStatus_OK {
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
 	}
-	return &pkg.NO_ERR, nil
+	return &utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil
 }
 
 func (s *FolderManagerService) DeleteFolder(context context.Context, request *folder_manager_proto.DeleteFolderRequest) (*utils_proto.JsonResponse, error) {
 	log.Debug("Удаление папки, name = ", request.Name, ", username = ", request.Data.Username)
+	if pkg.IsFolderReserved(request.Name) {
+		return &utils_proto.JsonResponse{
+			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
+		}, nil
+	}
 	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
 		Username: request.Data.Username,
 	})
 	if err != nil {
 		log.Error(err)
-		return &pkg.DB_ERR, err
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
 	}
 	if resp.Response.Status != utils_proto.DatabaseStatus_OK {
-		return &pkg.DB_ERR, nil
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
 	}
-	if proto.Equal(resp.User, &utils_proto.User{}) {
-		return &pkg.NO_USER_EXIST, nil
+	var user models.User
+	err = json.Unmarshal(resp.User, &user)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.JSON_ERR.Bytes(),
+		}, err
+	}
+	if (user == models.User{}) {
+		return &utils_proto.JsonResponse{
+			Response: pkg.NO_USER_EXIST.Bytes(),
+		}, nil
 	}
 	resp2, err := s.db.GetFolderByName(context, &repository_proto.GetFolderByNameRequest{
-		UserId: resp.User.Id,
+		UserId: user.Id,
 		FolderName: request.Name,
 	})
 	if err != nil {
 		log.Error(err)
-		return &pkg.DB_ERR, err
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
 	}
 	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
-		return &pkg.DB_ERR, nil
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
+	}
+	var folder models.Folder
+	err = json.Unmarshal(resp2.Folder, &folder)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.JSON_ERR.Bytes(),
+		}, err
 	}
 	resp3, err := s.db.DeleteFolder(context, &repository_proto.DeleteFolderRequest{
-		FolderId: resp2.Folder.Id,
+		FolderId: folder.Id,
 	})
 	if err != nil {
 		log.Error(err)
-		return &pkg.DB_ERR, err
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
 	}
 	if resp3.Status != utils_proto.DatabaseStatus_OK {
-		return &pkg.DB_ERR, nil
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
 	}
-	return &pkg.NO_ERR, nil
+	return &utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil
 }
 
 func (s *FolderManagerService) ListFolders(context context.Context, request *folder_manager_proto.ListFoldersRequest) (*folder_manager_proto.ResponseFolders, error) {
@@ -163,48 +282,71 @@ func (s *FolderManagerService) ListFolders(context context.Context, request *fol
 	if err != nil {
 		log.Error(err)
 		return &folder_manager_proto.ResponseFolders{
-			Response: &pkg.DB_ERR,
+			Response:&utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			},
 			Folders: nil,
 		}, err
 	}
 	if resp.Response.Status != utils_proto.DatabaseStatus_OK {
 		return &folder_manager_proto.ResponseFolders{
-			Response: &pkg.DB_ERR,
+			Response:&utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			},
 			Folders: nil,
 		}, nil
 	}
-	if proto.Equal(resp.User, &utils_proto.User{}) {
+	var user models.User
+	err = json.Unmarshal(resp.User, &user)
+	if err != nil {
 		return &folder_manager_proto.ResponseFolders{
-			Response: &pkg.NO_USER_EXIST,
+			Response:&utils_proto.JsonResponse{
+				Response: pkg.JSON_ERR.Bytes(),
+			},
+			Folders: nil,
+		}, err
+	}
+	if (user == models.User{}) {
+		return &folder_manager_proto.ResponseFolders{
+			Response:&utils_proto.JsonResponse{
+				Response: pkg.NO_USER_EXIST.Bytes(),
+			},
 			Folders: nil,
 		}, nil
 	}
 	resp2, err := s.db.GetFoldersByUser(context, &repository_proto.GetFoldersByUserRequest{
-		UserId: resp.User.Id,
+		UserId: user.Id,
 	})
 	if err != nil {
 		log.Error(err)
 		return &folder_manager_proto.ResponseFolders{
-			Response: &pkg.DB_ERR,
+			Response:&utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			},
 			Folders: nil,
 		}, err
 	}
 	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
 		return &folder_manager_proto.ResponseFolders{
-			Response: &pkg.DB_ERR,
+			Response:&utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			},
 			Folders: nil,
 		}, nil
 	}
-	foldersBytes, err := json.Marshal(resp2.Folders)
 	if err != nil {
 		return &folder_manager_proto.ResponseFolders{
-			Response: &pkg.JSON_ERR,
+			Response:&utils_proto.JsonResponse{
+				Response: pkg.JSON_ERR.Bytes(),
+			},
 			Folders: nil,
-		}, nil
+		}, err
 	}
 	return &folder_manager_proto.ResponseFolders{
-		Response: &pkg.NO_ERR,
-		Folders: foldersBytes,
+		Response:&utils_proto.JsonResponse{
+			Response: pkg.NO_ERR.Bytes(),
+		},
+		Folders: resp2.Folders,
 	}, nil
 }
 
@@ -216,19 +358,35 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 	if err != nil {
 		log.Error(err)
 		return &folder_manager_proto.ResponseMails{
-			Response: &pkg.DB_ERR,
+			Response:&utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			},
 			Mails: nil,
 		}, err
 	}
 	if resp.Response.Status != utils_proto.DatabaseStatus_OK {
 		return &folder_manager_proto.ResponseMails{
-			Response: &pkg.DB_ERR,
+			Response:&utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			},
 			Mails: nil,
 		}, nil
 	}
-	if proto.Equal(resp.User, &utils_proto.User{}) {
+	var user models.User
+	err = json.Unmarshal(resp.User, &user)
+	if err != nil {
 		return &folder_manager_proto.ResponseMails{
-			Response: &pkg.NO_USER_EXIST,
+			Response:&utils_proto.JsonResponse{
+				Response: pkg.JSON_ERR.Bytes(),
+			},
+			Mails: nil,
+		}, err
+	}
+	if (user == models.User{}) {
+		return &folder_manager_proto.ResponseMails{
+			Response:&utils_proto.JsonResponse{
+				Response: pkg.NO_USER_EXIST.Bytes(),
+			},
 			Mails: nil,
 		}, nil
 	}
@@ -238,19 +396,33 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 	if err != nil {
 		log.Error(err)
 		return &folder_manager_proto.ResponseMails{
-			Response: &pkg.DB_ERR,
+			Response:&utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			},
 			Mails: nil,
 		}, err
 	}
 	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
 		return &folder_manager_proto.ResponseMails{
-			Response: &pkg.DB_ERR,
+			Response:&utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			},
 			Mails: nil,
 		}, nil
 	}
-	var mails_add []*utils_proto.MailAdditional
-	for _, mail := range resp2.Mails {
-		mail_add := utils_proto.MailAdditional{}
+	var mails []models.Mail
+	err = json.Unmarshal(resp2.Mails, &mails)
+	if err != nil {
+		return &folder_manager_proto.ResponseMails{
+			Response:&utils_proto.JsonResponse{
+				Response: pkg.JSON_ERR.Bytes(),
+			},
+			Mails: nil,
+		}, err
+	}
+	var mails_add []models.MailAdditional
+	for _, mail := range mails {
+		mail_add := models.MailAdditional{}
 		mail_add.Mail = mail
 		resp, err := s.profile.GetAvatar(
 			context,
@@ -258,29 +430,97 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 		)
 		if err != nil {
 			return &folder_manager_proto.ResponseMails{
-				Response: &pkg.DB_ERR,
+				Response:&utils_proto.JsonResponse{
+					Response: pkg.DB_ERR.Bytes(),
+				},
 				Mails: nil,
 			}, err
 		}
-		if !proto.Equal(resp.Response, &pkg.NO_ERR) {
+		var response pkg.JsonResponse
+		err = json.Unmarshal(resp.Response.Response, &response)
+		if err != nil {
 			return &folder_manager_proto.ResponseMails{
-				Response: &pkg.DB_ERR,
+				Response:&utils_proto.JsonResponse{
+					Response: pkg.JSON_ERR.Bytes(),
+				},
+				Mails: nil,
+			}, nil
+		}
+		if response != pkg.NO_ERR {
+			return &folder_manager_proto.ResponseMails{
+				Response:&utils_proto.JsonResponse{
+					Response: pkg.DB_ERR.Bytes(),
+				},
 				Mails: nil,
 			}, nil
 		}
 		mail_add.AvatarUrl = resp.Url
-		mails_add = append(mails_add, &mail_add)
+		mails_add = append(mails_add, mail_add)
 	}
 	parsed, err := json.Marshal(mails_add)
 	if err != nil {
 		log.Error(err)
 		return &folder_manager_proto.ResponseMails{
-			Response: &pkg.DB_ERR,
+			Response:&utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			},
 			Mails: nil,
 		}, err
 	}
 	return &folder_manager_proto.ResponseMails{
-		Response: &pkg.NO_ERR,
+		Response:&utils_proto.JsonResponse{
+			Response: pkg.NO_ERR.Bytes(),
+		},
 		Mails: parsed,
-	}, err
+	}, nil
+}
+
+func (s *FolderManagerService) DeleteFolderMail(context context.Context, request *folder_manager_proto.DeleteFolderMailRequest) (*utils_proto.JsonResponse, error) {
+	log.Debug("Удаление письма из папки, folderId = ", request.FolderId, ", mailId = ", request.MailId, ", username = ", request.Data.Username)
+	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
+		Username: request.Data.Username,
+	})
+	if err != nil {
+		log.Error(err)
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
+	}
+	if resp.Response.Status != utils_proto.DatabaseStatus_OK {
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
+	}
+	var user models.User
+	err = json.Unmarshal(resp.User, &user)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.JSON_ERR.Bytes(),
+		}, err
+	}
+	if (user == models.User{}) {
+		return &utils_proto.JsonResponse{
+			Response: pkg.NO_USER_EXIST.Bytes(),
+		}, nil
+	}
+	resp2, err := s.db.DeleteFolderMail(context, &repository_proto.DeleteFolderMailRequest{
+		Username: request.Data.Username,
+		FolderId: request.FolderId,
+		MailId: request.MailId,
+		Restore: request.Restore,
+	})
+	if err != nil {
+		log.Error(err)
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
+	}
+	if resp2.Status != utils_proto.DatabaseStatus_OK {
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
+	}
+	return &utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil
 }

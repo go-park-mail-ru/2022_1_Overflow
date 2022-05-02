@@ -1,33 +1,17 @@
 basePath: /
 definitions:
-  auth_proto.SignInForm:
+  models.Folder:
     properties:
-      password:
+      created_at:
         type: string
-      username:
+      id:
+        type: integer
+      name:
         type: string
-    type: object
-  auth_proto.SignUpForm:
-    properties:
-      first_name:
-        type: string
-      last_name:
-        type: string
-      password:
-        type: string
-      password_confirmation:
-        type: string
-      username:
-        type: string
-    type: object
-  utils_proto.JsonResponse:
-    properties:
-      message:
-        type: string
-      status:
+      user_id:
         type: integer
     type: object
-  utils_proto.Mail:
+  models.Mail:
     properties:
       addressee:
         type: string
@@ -48,14 +32,14 @@ definitions:
       theme:
         type: string
     type: object
-  utils_proto.MailAdditional:
+  models.MailAdditional:
     properties:
       avatar_url:
         type: string
       mail:
-        $ref: '#/definitions/utils_proto.Mail'
+        $ref: '#/definitions/models.Mail'
     type: object
-  utils_proto.MailForm:
+  models.MailForm:
     properties:
       addressee:
         type: string
@@ -66,7 +50,7 @@ definitions:
       theme:
         type: string
     type: object
-  utils_proto.ProfileSettingsForm:
+  models.ProfileSettingsForm:
     properties:
       first_name:
         type: string
@@ -75,7 +59,27 @@ definitions:
       password:
         type: string
     type: object
-  utils_proto.User:
+  models.SignInForm:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  models.SignUpForm:
+    properties:
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      password_confirmation:
+        type: string
+      username:
+        type: string
+    type: object
+  models.User:
     properties:
       first_name:
         type: string
@@ -87,6 +91,13 @@ definitions:
         type: string
       username:
         type: string
+    type: object
+  pkg.JsonResponse:
+    properties:
+      message:
+        type: string
+      status:
+        type: integer
     type: object
 info:
   contact:
@@ -106,7 +117,7 @@ paths:
               description: CSRF токен
               type: string
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       parameters:
       - description: Имя папки.
@@ -125,21 +136,21 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "401":
           description: Сессия отсутствует или сессия не валидна.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
           description: Method Not Allowed
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Ошибка БД, неверные GET параметры.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Добавить папку с письмами для пользователя
-  /folder/add_mail:
+  /folder/delete:
     get:
       responses:
         "200":
@@ -149,7 +160,80 @@ paths:
               description: CSRF токен
               type: string
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
+    post:
+      parameters:
+      - description: Имя папки.
+        in: query
+        name: folder_name
+        required: true
+        type: string
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка БД, неверные GET параметры.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Удалить папку с письмами
+  /folder/list:
+    get:
+      parameters:
+      - description: ID папки с письмами
+        in: query
+        name: folder_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список писем в папке.
+          schema:
+            items:
+              $ref: '#/definitions/models.MailAdditional'
+            type: array
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка БД, неверные GET параметры.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Получить список папок пользователя или список писем в определенной
+        папке
+  /folder/mail/add:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       parameters:
       - description: ID папки.
@@ -173,21 +257,21 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "401":
           description: Сессия отсутствует или сессия не валидна.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
           description: Method Not Allowed
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Ошибка БД, неверные GET параметры.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Добавить письмо в папку с письмами
-  /folder/delete:
+  /folder/mail/delete:
     get:
       responses:
         "200":
@@ -197,14 +281,23 @@ paths:
               description: CSRF токен
               type: string
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       parameters:
-      - description: Имя папки.
+      - description: ID папки
         in: query
-        name: folder_name
+        name: folder_id
         required: true
-        type: string
+        type: integer
+      - description: ID удаляемого письма
+        in: query
+        name: mail_id
+        required: true
+        type: integer
+      - description: Восстановить письмо (добавить обратно во входящие).
+        in: query
+        name: restore
+        type: boolean
       - description: CSRF токен
         in: header
         name: X-CSRF-Token
@@ -216,48 +309,20 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "401":
           description: Сессия отсутствует или сессия не валидна.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
           description: Method Not Allowed
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Ошибка БД, неверные GET параметры.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
-      summary: Удалить папку с письмами
-  /folder/list:
-    get:
-      parameters:
-      - description: ID папки с письмами
-        in: query
-        name: folder_id
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
-        "401":
-          description: Сессия отсутствует или сессия не валидна.
-          schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
-        "405":
-          description: Method Not Allowed
-          schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
-        "500":
-          description: Ошибка БД, неверные GET параметры.
-          schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
-      summary: Получить список папок пользователя или список писем в определенной
-        папке
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Удалить письмо из папки
   /folder/rename:
     get:
       responses:
@@ -268,7 +333,7 @@ paths:
               description: CSRF токен
               type: string
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       parameters:
       - description: ID изменяемой папки.
@@ -292,19 +357,19 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "401":
           description: Сессия отсутствует или сессия не валидна.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
           description: Method Not Allowed
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Ошибка БД, неверные GET параметры.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Переименовать папку с письмами
   /logout:
     get:
@@ -316,7 +381,7 @@ paths:
               description: CSRF токен
               type: string
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       parameters:
       - description: CSRF токен
@@ -330,15 +395,15 @@ paths:
         "200":
           description: Успешное завершение сессии.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "401":
           description: Сессия отсутствует, сессия не валидна.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Завершение сессии пользователя
   /mail/delete:
     get:
@@ -350,7 +415,7 @@ paths:
               description: CSRF токен
               type: string
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       parameters:
       - description: ID запрашиваемого письма.
@@ -369,20 +434,20 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "401":
           description: Сессия отсутствует или сессия не валидна.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
           description: Method Not Allowed
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Письмо не принадлежит пользователю, ошибка БД, неверные GET
             параметры.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Удалить письмо по его id
   /mail/get:
     get:
@@ -398,19 +463,19 @@ paths:
         "200":
           description: Объект письма.
           schema:
-            $ref: '#/definitions/utils_proto.Mail'
+            $ref: '#/definitions/models.Mail'
         "401":
           description: Сессия отсутствует или сессия не валидна.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
           description: Method Not Allowed
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Ошибка БД.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение сообщения по его id
   /mail/income:
     get:
@@ -421,20 +486,20 @@ paths:
           description: Список входящих писем
           schema:
             items:
-              $ref: '#/definitions/utils_proto.MailAdditional'
+              $ref: '#/definitions/models.MailAdditional'
             type: array
         "401":
           description: Сессия отсутствует или сессия не валидна.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
           description: Method Not Allowed
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Ошибка БД.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение входящих сообщений
   /mail/outcome:
     get:
@@ -445,20 +510,20 @@ paths:
           description: Список исходящих писем
           schema:
             items:
-              $ref: '#/definitions/utils_proto.MailAdditional'
+              $ref: '#/definitions/models.MailAdditional'
             type: array
         "401":
           description: Сессия отсутствует или сессия не валидна.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
           description: Method Not Allowed
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Ошибка БД.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение исходящих сообщений
   /mail/read:
     get:
@@ -470,7 +535,7 @@ paths:
               description: CSRF токен
               type: string
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       parameters:
       - description: ID запрашиваемого письма.
@@ -489,20 +554,20 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "401":
           description: Сессия отсутствует или сессия не валидна.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
           description: Method Not Allowed
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Письмо не принадлежит пользователю, ошибка БД, неверные GET
             параметры.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Прочитать письмо по его id
   /mail/send:
     get:
@@ -514,7 +579,7 @@ paths:
               description: CSRF токен
               type: string
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       consumes:
       - application/json
@@ -524,7 +589,7 @@ paths:
         name: MailForm
         required: true
         schema:
-          $ref: '#/definitions/utils_proto.MailForm'
+          $ref: '#/definitions/models.MailForm'
       - description: CSRF токен
         in: header
         name: X-CSRF-Token
@@ -536,15 +601,15 @@ paths:
         "200":
           description: Успешная отправка письма.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "401":
           description: Сессия отсутствует или сессия не валидна.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Получатель не существует, ошибка БД.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Выполняет отправку письма получателю
   /profile:
     get:
@@ -554,19 +619,19 @@ paths:
         "200":
           description: Информация о пользователе
           schema:
-            $ref: '#/definitions/utils_proto.User'
+            $ref: '#/definitions/models.User'
         "401":
           description: Сессия отсутствует, сессия не валидна.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
           description: Method Not Allowed
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Ошибка БД, пользователь не найден, неверные данные сессии.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение данных пользователя
   /profile/avatar:
     get:
@@ -583,15 +648,15 @@ paths:
         "200":
           description: Ссылка на аватарку в формате /{static_dir}/{file}.{ext}.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
           description: Method Not Allowed
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Ошибка БД, пользователь не найден или сессия не валидна.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение ссылки на аватарку пользователя
   /profile/avatar/set:
     get:
@@ -603,7 +668,7 @@ paths:
               description: CSRF токен
               type: string
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       consumes:
       - multipart/form-data
@@ -624,15 +689,15 @@ paths:
         "200":
           description: Успешное установка аватарки.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
           description: Method Not Allowed
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Ошибка валидации формы, БД или сессия не валидна.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Установка/смена аватарки пользователя
   /profile/set:
     get:
@@ -644,7 +709,7 @@ paths:
               description: CSRF токен
               type: string
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       consumes:
       - application/json
@@ -654,7 +719,7 @@ paths:
         name: SettingsForm
         required: true
         schema:
-          $ref: '#/definitions/utils_proto.ProfileSettingsForm'
+          $ref: '#/definitions/models.ProfileSettingsForm'
       - description: CSRF токен
         in: header
         name: X-CSRF-Token
@@ -666,15 +731,15 @@ paths:
         "200":
           description: Успешное изменение настроек.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "405":
           description: Method Not Allowed
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Ошибка валидации формы, БД или сессия не валидна.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Изменение настроек пользователя
   /signin:
     get:
@@ -686,7 +751,7 @@ paths:
               description: CSRF токен
               type: string
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       consumes:
       - application/json
@@ -696,7 +761,7 @@ paths:
         name: SignInForm
         required: true
         schema:
-          $ref: '#/definitions/auth_proto.SignInForm'
+          $ref: '#/definitions/models.SignInForm'
       - description: CSRF токен
         in: header
         name: X-CSRF-Token
@@ -708,11 +773,11 @@ paths:
         "200":
           description: Успешная аутентификация пользователя.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Пользователь не существует, ошибка БД или валидации формы.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Выполняет аутентификацию и выставляет сессионый cookie с названием
         OverflowMail
   /signup:
@@ -725,7 +790,7 @@ paths:
               description: CSRF токен
               type: string
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
     post:
       consumes:
       - application/json
@@ -736,7 +801,7 @@ paths:
         name: SignUpForm
         required: true
         schema:
-          $ref: '#/definitions/auth_proto.SignUpForm'
+          $ref: '#/definitions/models.SignUpForm'
       - description: CSRF токен
         in: header
         name: X-CSRF-Token
@@ -748,10 +813,10 @@ paths:
         "200":
           description: Вход уже выполнен, либо успешная регистрация пользователя.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
         "500":
           description: Ошибка валидации формы, БД или пользователь уже существует.
           schema:
-            $ref: '#/definitions/utils_proto.JsonResponse'
+            $ref: '#/definitions/pkg.JsonResponse'
       summary: Выполняет регистрацию пользователя
 swagger: "2.0"

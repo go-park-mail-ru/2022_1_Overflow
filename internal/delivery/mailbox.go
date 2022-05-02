@@ -1,26 +1,24 @@
 package delivery
 
 import (
+	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/security/xss"
 	"OverflowBackend/internal/session"
 	"OverflowBackend/pkg"
 	"OverflowBackend/proto/mailbox_proto"
-	"OverflowBackend/proto/utils_proto"
 	"context"
 	"encoding/json"
 	"net/http"
 	"strconv"
-
-	"google.golang.org/protobuf/proto"
 )
 
 // Income godoc
 // @Summary Получение входящих сообщений
 // @Produce json
-// @Success 200 {object} []utils_proto.MailAdditional "Список входящих писем"
-// @Failure 401 {object} utils_proto.JsonResponse"Сессия отсутствует или сессия не валидна."
-// @Failure 405 {object} utils_proto.JsonResponse
-// @Failure 500 {object} utils_proto.JsonResponse "Ошибка БД."
+// @Success 200 {object} []models.MailAdditional "Список входящих писем"
+// @Failure 401 {object} pkg.JsonResponse"Сессия отсутствует или сессия не валидна."
+// @Failure 405 {object} pkg.JsonResponse
+// @Failure 500 {object} pkg.JsonResponse "Ошибка БД."
 // @Router /mail/income [get]
 func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -38,8 +36,14 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp.Response, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp.Response)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	w.Write(resp.Mails)
@@ -48,10 +52,10 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 // Outcome godoc
 // @Summary Получение исходящих сообщений
 // @Produce json
-// @Success 200 {object} []utils_proto.MailAdditional "Список исходящих писем"
-// @Failure 401 {object} utils_proto.JsonResponse "Сессия отсутствует или сессия не валидна."
-// @Failure 405 {object} utils_proto.JsonResponse
-// @Failure 500 {object} utils_proto.JsonResponse "Ошибка БД."
+// @Success 200 {object} []models.MailAdditional "Список исходящих писем"
+// @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
+// @Failure 405 {object} pkg.JsonResponse
+// @Failure 500 {object} pkg.JsonResponse "Ошибка БД."
 // @Router /mail/outcome [get]
 func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -69,8 +73,14 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp.Response, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp.Response)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	w.Write(resp.Mails)
@@ -80,10 +90,10 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 // @Summary Получение сообщения по его id
 // @Produce json
 // @Param id query int true "ID запрашиваемого письма."
-// @Success 200 {object} utils_proto.Mail "Объект письма."
-// @Failure 401 {object} utils_proto.JsonResponse "Сессия отсутствует или сессия не валидна."
-// @Failure 405 {object} utils_proto.JsonResponse
-// @Failure 500 {object} utils_proto.JsonResponse "Ошибка БД."
+// @Success 200 {object} models.Mail "Объект письма."
+// @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
+// @Failure 405 {object} pkg.JsonResponse
+// @Failure 500 {object} pkg.JsonResponse "Ошибка БД."
 // @Router /mail/get [get]
 func (d *Delivery) GetMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -111,8 +121,14 @@ func (d *Delivery) GetMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp.Response, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp.Response)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
@@ -123,10 +139,10 @@ func (d *Delivery) GetMail(w http.ResponseWriter, r *http.Request) {
 // @Summary Удалить письмо по его id
 // @Produce json
 // @Param id query int true "ID запрашиваемого письма."
-// @Success 200 {object} utils_proto.JsonResponse "OK"
-// @Failure 401 {object} utils_proto.JsonResponse "Сессия отсутствует или сессия не валидна."
-// @Failure 405 {object} utils_proto.JsonResponse
-// @Failure 500 {object} utils_proto.JsonResponse "Письмо не принадлежит пользователю, ошибка БД, неверные GET параметры."
+// @Success 200 {object} pkg.JsonResponse "OK"
+// @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
+// @Failure 405 {object} pkg.JsonResponse
+// @Failure 500 {object} pkg.JsonResponse "Письмо не принадлежит пользователю, ошибка БД, неверные GET параметры."
 // @Router /mail/delete [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
@@ -155,15 +171,21 @@ func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
 // @Router /mail/delete [get]
-// @Response 200 {object} utils_proto.JsonResponse
+// @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 func DeleteMail() {}
 
@@ -171,10 +193,10 @@ func DeleteMail() {}
 // @Summary Прочитать письмо по его id
 // @Produce json
 // @Param id query string true "ID запрашиваемого письма."
-// @Success 200 {object} utils_proto.JsonResponse "OK"
-// @Failure 401 {object} utils_proto.JsonResponse"Сессия отсутствует или сессия не валидна."
-// @Failure 405 {object} utils_proto.JsonResponse
-// @Failure 500 {object} utils_proto.JsonResponse "Письмо не принадлежит пользователю, ошибка БД, неверные GET параметры."
+// @Success 200 {object} pkg.JsonResponse "OK"
+// @Failure 401 {object} pkg.JsonResponse"Сессия отсутствует или сессия не валидна."
+// @Failure 405 {object} pkg.JsonResponse
+// @Failure 500 {object} pkg.JsonResponse "Письмо не принадлежит пользователю, ошибка БД, неверные GET параметры."
 // @Router /mail/read [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
@@ -203,25 +225,31 @@ func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
 // @Router /mail/read [get]
-// @Response 200 {object} utils_proto.JsonResponse
+// @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 func ReadMail() {}
 
 // SendMail godoc
 // @Summary Выполняет отправку письма получателю
-// @Success 200 {object} utils_proto.JsonResponse "Успешная отправка письма."
-// @Failure 401 {object} utils_proto.JsonResponse "Сессия отсутствует или сессия не валидна."
-// @Failure 500 {object} utils_proto.JsonResponse "Получатель не существует, ошибка БД."
+// @Success 200 {object} pkg.JsonResponse "Успешная отправка письма."
+// @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
+// @Failure 500 {object} pkg.JsonResponse "Получатель не существует, ошибка БД."
 // @Accept json
-// @Param MailForm body utils_proto.MailForm true "Форма письма"
+// @Param MailForm body models.MailForm true "Форма письма"
 // @Produce json
 // @Router /mail/send [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
@@ -238,7 +266,7 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var form utils_proto.MailForm
+	var form models.MailForm
 
 	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
@@ -249,23 +277,30 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 	form.Files = xss.P.Sanitize(form.Files)
 	form.Text = xss.P.Sanitize(form.Text)
 	form.Theme = xss.P.Sanitize(form.Theme)
+	formBytes, _ := json.Marshal(form)
 
 	resp, err := d.mailbox.SendMail(context.Background(), &mailbox_proto.SendMailRequest{
 		Data: data,
-		Form: &form,
+		Form: formBytes,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	if !proto.Equal(resp, &pkg.NO_ERR) {
-		pkg.WriteJsonErrFull(w, resp)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
 // @Router /mail/send [get]
-// @Response 200 {object} utils_proto.JsonResponse
+// @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 func SendMail() {}
