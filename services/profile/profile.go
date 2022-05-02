@@ -38,11 +38,27 @@ func (s *ProfileService) GetInfo(context context.Context, request *profile_proto
 			Data: nil,
 		}, err
 	}
+	var user models.User
+	err = json.Unmarshal(resp.User, &user)
+	if err != nil {
+		return &profile_proto.GetInfoResponse{
+			Response: &utils_proto.JsonResponse{
+				Response: pkg.JSON_ERR.Bytes(),
+			},
+			Data: nil,
+		}, err
+	}
+	var info models.ProfileInfo
+	info.Id = user.Id
+	info.Firstname = user.Firstname
+	info.Lastname = user.Lastname
+	info.Username = user.Username
+	infoBytes, _ := json.Marshal(info)
 	return &profile_proto.GetInfoResponse{
 		Response: &utils_proto.JsonResponse{
 			Response: pkg.NO_ERR.Bytes(),
 		},
-		Data: resp.User,
+		Data: infoBytes,
 	}, nil
 }
 

@@ -16,7 +16,7 @@ import (
 // GetInfo godoc
 // @Summary Получение данных пользователя
 // @Produce json
-// @Success 200 {object} models.User "Информация о пользователе"
+// @Success 200 {object} models.ProfileInfo "Информация о пользователе"
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует, сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
 // @Failure 500 {object} pkg.JsonResponse "Ошибка БД, пользователь не найден, неверные данные сессии."

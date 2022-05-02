@@ -30,9 +30,9 @@ WORKDIR /app
 COPY --from=build /app ./
 ## Our start command which kicks off
 ## our newly created binary executable
-CMD (bash -C /app/repository > repository.log &) && \
-        (bash -C /app/profile > profile.log &) && \
-        (bash -C /app/mailbox > mailbox.log &) && \
-        (bash -C /app/folder_manager > folder_manager.log &) && \
-        (bash -C /app/auth > auth.log &) && \
+CMD (/app/repository > repository.log &) && \
+        (/app/profile > profile.log &) && \
+        (/app/mailbox > mailbox.log &) && \
+        (/app/folder_manager > folder_manager.log &) && \
+        (/app/auth > auth.log &) && \
         /app/main
