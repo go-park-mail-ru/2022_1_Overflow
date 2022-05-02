@@ -12,15 +12,17 @@ import (
 	"google.golang.org/grpc"
 )
 
+var SERVICE_PREFIX = "Repository:"
+
 func StartRepositoryServer(config *config.Config) {
-	log.Info("Запуск сервера")
+	log.Info(SERVICE_PREFIX, "Запуск сервера")
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%v", config.Server.Services.Database.Port))
 	if err != nil {
 		log.Fatal(err)
 	}
 	var dbUrl string
 	var repositoryService repository.DatabaseRepository
-	log.Info("Подключение к БД.")
+	log.Info(SERVICE_PREFIX, "Подключение к БД.")
 	dbUrl = fmt.Sprintf("postgres://%v:%v@%v:%v/%v",
 		config.Database.User,
 		config.Database.Password,
@@ -39,10 +41,10 @@ func StartRepositoryServer(config *config.Config) {
 }
 
 func main() {
-	log.Info("Запуск сервиса Repository")
+	log.Info(SERVICE_PREFIX, "Запуск сервиса Repository")
 	config, err := config.NewConfig("./configs/main.yml")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(SERVICE_PREFIX, err)
 	}
 	StartRepositoryServer(config)
 }

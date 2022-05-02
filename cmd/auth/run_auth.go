@@ -13,11 +13,13 @@ import (
 	"google.golang.org/grpc"
 )
 
+var SERVICE_PREFIX = "Auth:"
+
 func StartAuthServer(config *config.Config, db repository_proto.DatabaseRepositoryClient) {
-	log.Info("Запуск сервера")
+	log.Info(SERVICE_PREFIX, "Запуск сервера")
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%v", config.Server.Services.Auth.Port))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(SERVICE_PREFIX, err)
 	}
 	authServer := grpc.NewServer()
 	authService := auth.AuthService{}
@@ -27,14 +29,14 @@ func StartAuthServer(config *config.Config, db repository_proto.DatabaseReposito
 }
 
 func main() {
-	log.Info("Запуск сервиса Auth")
+	log.Info(SERVICE_PREFIX, "Запуск сервиса")
 	config, err := config.NewConfig("./configs/main.yml")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(SERVICE_PREFIX, err)
 	}
 	conn, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.Database.Address, config.Server.Services.Database.Port))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(SERVICE_PREFIX, err)
 	}
 	defer conn.Close()
 	db := repository_proto.NewDatabaseRepositoryClient(conn)

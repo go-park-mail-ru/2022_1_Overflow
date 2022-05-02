@@ -14,11 +14,13 @@ import (
 	"google.golang.org/grpc"
 )
 
+var SERVICE_PREFIX = "MailBox:"
+
 func StartMailBoxServer(config *config.Config, db repository_proto.DatabaseRepositoryClient, profile profile_proto.ProfileClient) {
-	log.Info("Запуск сервера")
+	log.Info(SERVICE_PREFIX, "Запуск сервера")
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%v", config.Server.Services.MailBox.Port))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(SERVICE_PREFIX, err)
 	}
 	mailboxServer := grpc.NewServer()
 	mailboxService := mailbox.MailBoxService{}
@@ -28,20 +30,20 @@ func StartMailBoxServer(config *config.Config, db repository_proto.DatabaseRepos
 }
 
 func main() {
-	log.Info("Запуск сервиса Mailbox")
+	log.Info(SERVICE_PREFIX, "Запуск сервиса Mailbox")
 	config, err := config.NewConfig("./configs/main.yml")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(SERVICE_PREFIX, err)
 	}
 	dbConn, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.Database.Address, config.Server.Services.Database.Port))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(SERVICE_PREFIX, err)
 	}
 	defer dbConn.Close()
 	db := repository_proto.NewDatabaseRepositoryClient(dbConn)
 	profileConn, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.Profile.Address, config.Server.Services.Profile.Port))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(SERVICE_PREFIX, err)
 	}
 	defer profileConn.Close()
 	profile := profile_proto.NewProfileClient(profileConn)

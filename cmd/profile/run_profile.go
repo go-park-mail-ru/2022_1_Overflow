@@ -13,11 +13,13 @@ import (
 	"google.golang.org/grpc"
 )
 
+var SERVICE_PREFIX = "Profile:"
+
 func StartProfileServer(config *config.Config, db repository_proto.DatabaseRepositoryClient) {
-	log.Info("Запуск сервера")
+	log.Info(SERVICE_PREFIX, "Запуск сервера")
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%v", config.Server.Services.Profile.Port))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(SERVICE_PREFIX, err)
 	}
 	profileServer := grpc.NewServer()
 	profileService := profile.ProfileService{}
