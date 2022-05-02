@@ -2,8 +2,8 @@ package models
 
 type User struct {
 	Id int32 `json:"id"`
-	Firstname string `json:"first_name"`
-	Lastname string `json:"last_name"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Firstname string `json:"first_name" validate:"max=45"`
+	Lastname string `json:"last_name" validate:"max=45"`
+	Username string `json:"username" validate:"max=45"`
+	Password string `json:"password" validate:"max=45"`
 }
