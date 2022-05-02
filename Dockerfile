@@ -21,7 +21,7 @@ RUN go build -o folder_manager ./cmd/folder_manager/run_folder_manager.go
 RUN go build -o mailbox ./cmd/mailbox/run_mailbox.go
 RUN go build -o profile ./cmd/profile/run_profile.go
 RUN go build -o repository ./cmd/repository/run_repository.go
-RUN go build -o main /cmd/app/main.go
+RUN go build -o main ./cmd/app/main.go
 
 FROM alpine:latest AS runtime
 RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
