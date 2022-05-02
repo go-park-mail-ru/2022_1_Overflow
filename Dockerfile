@@ -22,9 +22,9 @@ RUN go build -o repository ./cmd/repository/run_repository.go
 RUN go build -o main /cmd/app/main.go
 ## Our start command which kicks off
 ## our newly created binary executable
-CMD [   "(nohup /app/repository > repository.log)", "&&",
-        "(nohup /app/profile > profile.log)", "&&",
-        "(nohup /app/mailbox > mailbox.log)", "&&",
-        "(nohup /app/folder_manager > folder_manager.log)", "&&",
-        "(nohup /app/auth > auth.log)", "&&",
+CMD [   "(bash -C '/app/repository > repository.log' &)", "&&",
+        "(bash -C '/app/profile > profile.log' &)", "&&",
+        "(bash -C '/app/mailbox > mailbox.log' &)", "&&",
+        "(bash -C '/app/folder_manager > folder_manager.log' &)", "&&",
+        "(bash -C '/app/auth > auth.log' &)", "&&",
         "/app/main"]
