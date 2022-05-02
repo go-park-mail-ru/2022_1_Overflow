@@ -1,15 +1,18 @@
 package delivery
 
 import (
-	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/security/xss"
-	"OverflowBackend/internal/usecase/session"
+	"OverflowBackend/internal/session"
 	"OverflowBackend/pkg"
+	"OverflowBackend/proto/auth_proto"
+	"context"
+
 	"encoding/json"
 	"net/http"
 
 	"github.com/gorilla/csrf"
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/proto"
 )
 
 // SignIn godoc
@@ -26,26 +29,31 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	log.Info("SignIn: ", "checking method")
 	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
 
 	log.Info("SignIn: ", "checking session")
 	if session.Manager.IsLoggedIn(r) {
-		pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 		return
 	}
 
 	log.Info("SignIn: ", "checking data")
-	var data models.SignInForm
+	var data auth_proto.SignInForm
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		pkg.WriteJsonErrFull(w, pkg.JSON_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
 
-	if err := d.uc.SignIn(data); err != pkg.NO_ERR {
-		pkg.WriteJsonErrFull(w, err)
+	resp, err := d.auth.SignIn(context.Background(), &data)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
+		return
+	}
+	if !proto.Equal(resp, &pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, resp)
 		return
 	}
 
@@ -53,12 +61,12 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	err = session.Manager.CreateSession(w, r, data.Username)
 	if err != nil {
 		log.Errorf("SignIn: %v", err)
-		pkg.WriteJsonErrFull(w, pkg.INTERNAL_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
 	csrf.Secure(false) // возможно стоит убрать
 	w.Header().Set("X-CSRF-Token", csrf.Token(r))
-	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
 // @Router /signin [get]
@@ -80,21 +88,21 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	log.Info("SignUp: ", "checking method")
 	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
 
 	log.Info("SignUp: ", "checking session")
 	if session.Manager.IsLoggedIn(r) {
-		pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 		return
 	}
 
 	log.Info("SignUp: ", "checking data")
-	var data models.SignUpForm
+	var data auth_proto.SignUpForm
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		pkg.WriteJsonErrFull(w, pkg.JSON_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
 
@@ -108,12 +116,17 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := d.uc.SignUp(data); err != pkg.NO_ERR {
-		pkg.WriteJsonErrFull(w, err)
+	resp, err := d.auth.SignUp(context.Background(), &data)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
+		return
+	}
+	if !proto.Equal(resp, &pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, resp)
 		return
 	}
 
-	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
 // @Router /signup [get]
@@ -132,16 +145,16 @@ func SignUp() {}
 func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
 
 	err := session.Manager.DeleteSession(w, r)
 	if err != nil {
-		pkg.WriteJsonErrFull(w, pkg.INTERNAL_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
 // @Router /logout [get]

@@ -1,14 +1,17 @@
 package delivery
 
 import (
-	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/security/xss"
-	"OverflowBackend/internal/usecase/session"
+	"OverflowBackend/internal/session"
 	"OverflowBackend/pkg"
+	"OverflowBackend/proto/profile_proto"
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
+
+	"google.golang.org/protobuf/proto"
 )
 
 // GetInfo godoc
@@ -22,21 +25,27 @@ import (
 func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodGet {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
 
 	data, e := session.Manager.GetData(r)
 	if e != nil {
-		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-	userJson, err := d.uc.GetInfo(data)
-	if err != pkg.NO_ERR {
-		pkg.WriteJsonErrFull(w, err)
+	resp, err := d.profile.GetInfo(context.Background(), &profile_proto.GetInfoRequest{
+		Data: data,
+	})
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	w.Write(userJson)
+	if !proto.Equal(resp.Response, &pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, resp.Response)
+		return
+	}
+	w.Write(resp.Data)
 }
 
 // SetInfo godoc
@@ -52,20 +61,20 @@ func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
 
 	data, err := session.Manager.GetData(r)
 	if err != nil {
-		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
 
-	var form models.SettingsForm
+	var form profile_proto.SettingsForm
 
 	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
-		pkg.WriteJsonErrFull(w, pkg.JSON_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
 
@@ -73,11 +82,19 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 	form.LastName = xss.P.Sanitize(form.LastName)
 	form.Password = xss.P.Sanitize(form.Password)
 
-	if err := d.uc.SetInfo(data, &form); err != pkg.NO_ERR {
-		pkg.WriteJsonErrFull(w, err)
+	resp, err := d.profile.SetInfo(context.Background(), &profile_proto.SetInfoRequest{
+		Data: data,
+		Form: &form,
+	})
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+	if !proto.Equal(resp, &pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, resp)
+		return
+	}
+	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
 // @Router /profile/set [get]
@@ -98,13 +115,13 @@ func SetInfo() {}
 func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
 
 	data, err := session.Manager.GetData(r)
 	if err != nil {
-		pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
 
@@ -112,21 +129,29 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 
 	file, header, err := r.FormFile("file")
 	if err != nil {
-		pkg.WriteJsonErrFull(w, pkg.INTERNAL_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
 	defer file.Close()
 	io.Copy(&buf, file)
-	avatar := models.Avatar{
+	avatar := profile_proto.Avatar{
 		Name:      header.Filename,
-		UserEmail: data.Username,
-		Content:   buf.Bytes(),
+		Username: data.Username,
+		File:   buf.Bytes(),
 	}
-	if err := d.uc.SetAvatar(data, &avatar); err != pkg.NO_ERR {
-		pkg.WriteJsonErrFull(w, err)
+	resp, err := d.profile.SetAvatar(context.Background(), &profile_proto.SetAvatarRequest{
+		Data: data,
+		Avatar: &avatar,
+	})
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+	if !proto.Equal(resp, &pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, resp)
+		return
+	}
+	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
 // @Router /profile/avatar/set [get]
@@ -146,7 +171,7 @@ func SetAvatar() {}
 func (d *Delivery) GetAvatar(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodGet {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
 
@@ -154,17 +179,23 @@ func (d *Delivery) GetAvatar(w http.ResponseWriter, r *http.Request) {
 	if len(username) == 0 {
 		data, e := session.Manager.GetData(r)
 		if e != nil {
-			pkg.WriteJsonErrFull(w, pkg.SESSION_ERR)
+			pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 			return
 		}
 		username = data.Username
 	}
-	
-	url, err := d.uc.GetAvatar(username)
-	if err != pkg.NO_ERR {
-		pkg.WriteJsonErrFull(w, err)
+
+	resp, err := d.profile.GetAvatar(context.Background(), &profile_proto.GetAvatarRequest{
+		Username: username,
+	})
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
+		return
+	}
+	if !proto.Equal(resp.Response, &pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, resp.Response)
 		return
 	}
 
-	pkg.WriteJsonErr(w, pkg.STATUS_OK, url)
+	pkg.WriteJsonErr(w, pkg.STATUS_OK, resp.Url)
 }

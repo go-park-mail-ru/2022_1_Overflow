@@ -1,4 +1,4 @@
-package models
+package m
 
 // Структура сессии
 type Session struct {

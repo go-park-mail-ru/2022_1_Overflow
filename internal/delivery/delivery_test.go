@@ -5,8 +5,8 @@ import (
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/middlewares"
 	"OverflowBackend/internal/models"
+	"OverflowBackend/internal/session"
 	"OverflowBackend/internal/usecase"
-	"OverflowBackend/internal/usecase/session"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -25,7 +25,7 @@ func init() {
 func InitTestRouter(uc usecase.UseCaseInterface, d *delivery.Delivery, urls []string, handles []func(http.ResponseWriter, *http.Request)) http.Handler {
 	session.Init(DefConf)
 	middlewares.Init(DefConf)
-	
+
 	d.Init(uc, DefConf)
 	router := mux.NewRouter()
 	for i := range urls {

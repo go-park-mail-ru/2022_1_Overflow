@@ -4,12 +4,11 @@ import (
 	"OverflowBackend/internal/config"
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/middlewares"
-	"OverflowBackend/internal/repository"
-	"OverflowBackend/internal/usecase"
 
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"google.golang.org/grpc"
 
 	_ "OverflowBackend/docs"
 
@@ -18,15 +17,12 @@ import (
 
 type RouterManager struct {
 	d *delivery.Delivery
-	uc usecase.UseCaseInterface
 	config *config.Config
 }
 
-func (rm *RouterManager) Init(repo repository.DatabaseRepository, config *config.Config) {
+func (rm *RouterManager) Init(config *config.Config, authDial grpc.ClientConnInterface, profileDial grpc.ClientConnInterface, mailboxDial grpc.ClientConnInterface) {
 	rm.d = &delivery.Delivery{}
-	rm.uc = &usecase.UseCase{}
-	rm.uc.Init(repo, config)
-	rm.d.Init(rm.uc, config)
+	rm.d.Init(config, authDial, profileDial, mailboxDial)
 	rm.config = config
 }
 
