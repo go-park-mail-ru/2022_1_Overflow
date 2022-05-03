@@ -234,6 +234,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
+                        "type": "boolean",
+                        "description": "Следует ли переместить письмо в эту папку (с последующим удалением из источника).",
+                        "name": "move",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "CSRF токен",
                         "name": "X-CSRF-Token",
@@ -678,7 +684,7 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Прочитать письмо по его id",
+                "summary": "Отметить число прочитанным/непрочитанным по его id. При отсутствии параметра isread запрос отмечает письмо с заданным id прочитанным.",
                 "parameters": [
                     {
                         "type": "string",
@@ -686,6 +692,12 @@ const docTemplate = `{
                         "name": "id",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Задать конкретное значение поля вручную.",
+                        "name": "isread",
+                        "in": "query"
                     },
                     {
                         "type": "string",
@@ -798,7 +810,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Информация о пользователе",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.ProfileInfo"
                         }
                     },
                     "401": {
@@ -903,6 +915,71 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "Успешное установка аватарки.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка валидации формы, БД или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/profile/change_password": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Изменение пароля пользователя",
+                "parameters": [
+                    {
+                        "description": "Форма изменение пароля.",
+                        "name": "SettingsForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ChangePasswordForm"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешное изменение пароля.",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
                         }
@@ -1108,6 +1185,23 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.ChangePasswordForm": {
+            "type": "object",
+            "properties": {
+                "password_new": {
+                    "type": "string",
+                    "maxLength": 45
+                },
+                "password_new_confirmation": {
+                    "type": "string",
+                    "maxLength": 45
+                },
+                "password_old": {
+                    "type": "string",
+                    "maxLength": 45
+                }
+            }
+        },
         "models.Folder": {
             "type": "object",
             "properties": {
@@ -1129,7 +1223,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "addressee": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 45
                 },
                 "client_id": {
                     "type": "integer"
@@ -1147,7 +1242,8 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "sender": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 45
                 },
                 "text": {
                     "type": "string"
@@ -1172,7 +1268,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "addressee": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 45
                 },
                 "files": {
                     "type": "string"
@@ -1181,7 +1278,28 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "theme": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 45
+                }
+            }
+        },
+        "models.ProfileInfo": {
+            "type": "object",
+            "properties": {
+                "first_name": {
+                    "type": "string",
+                    "maxLength": 45
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "last_name": {
+                    "type": "string",
+                    "maxLength": 45
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 45
                 }
             }
         },
@@ -1189,13 +1307,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "first_name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 45
                 },
                 "last_name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 45
                 }
             }
         },
@@ -1203,10 +1320,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 45
                 },
                 "username": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 45
                 }
             }
         },
@@ -1214,39 +1333,24 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "first_name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 45
                 },
                 "last_name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 45
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 45
                 },
                 "password_confirmation": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 45
                 },
                 "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.User": {
-            "type": "object",
-            "properties": {
-                "first_name": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "last_name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 45
                 }
             }
         },

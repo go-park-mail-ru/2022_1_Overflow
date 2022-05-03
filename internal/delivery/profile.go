@@ -4,6 +4,7 @@ import (
 	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/security/xss"
 	"OverflowBackend/internal/session"
+	"OverflowBackend/internal/validation"
 	"OverflowBackend/pkg"
 	"OverflowBackend/proto/profile_proto"
 	"bytes"
@@ -83,9 +84,8 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	form.Firstname = xss.P.Sanitize(form.Firstname)
-	form.Lastname = xss.P.Sanitize(form.Lastname)
-	form.Password = xss.P.Sanitize(form.Password)
+	form.Firstname = xss.EscapeInput(form.Firstname)
+	form.Lastname = xss.EscapeInput(form.Lastname)
 	formBytes, _ := json.Marshal(form)
 
 	resp, err := d.profile.SetInfo(context.Background(), &profile_proto.SetInfoRequest{
@@ -113,6 +113,67 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 // @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 func SetInfo() {}
+
+// ChangePassword godoc
+// @Summary Изменение пароля пользователя
+// @Success 200 {object} pkg.JsonResponse "Успешное изменение пароля."
+// @Failure 405 {object} pkg.JsonResponse
+// @Failure 500 {object} pkg.JsonResponse "Ошибка валидации формы, БД или сессия не валидна."
+// @Accept json
+// @Param SettingsForm body models.ChangePasswordForm true "Форма изменение пароля."
+// @Produce json
+// @Router /profile/change_password [post]
+// @Param X-CSRF-Token header string true "CSRF токен"
+func (d *Delivery) ChangePassword(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodPost {
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
+		return
+	}
+	data, err := session.Manager.GetData(r)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
+		return
+	}
+	var form models.ChangePasswordForm
+	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if !validation.SameFields(form.NewPassword, form.NewPasswordConf) {
+		pkg.WriteJsonErrFull(w, pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, "Новый пароль и его подтверждение не совпадают."))
+		return
+	}
+	if !validation.SameFields(form.NewPassword, form.OldPassword) {
+		pkg.WriteJsonErrFull(w, pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, "Старый и новый пароли совпадают."))
+		return
+	}
+	resp, err := d.profile.ChangePassword(context.Background(), &profile_proto.ChangePasswordRequest{
+		Data: data,
+		PasswordOld: form.OldPassword,
+		PasswordNew: form.NewPassword,
+	})
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
+		return
+	}
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
+		return
+	}
+	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
+}
+
+// @Router /profile/change_password [get]
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
+func ChangePassword() {}
 
 // SetAvatar godoc
 // @Summary Установка/смена аватарки пользователя

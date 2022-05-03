@@ -14,6 +14,10 @@ func SamePassword(data *models.SignUpForm) error {
 	return nil
 }
 
+func SameFields(field1 string, field2 string) bool {
+	return field1 == field2
+}
+
 func CheckSignUp(data *models.SignUpForm) error {
 	if err := validator.Validate(data); err != nil {
 		return err

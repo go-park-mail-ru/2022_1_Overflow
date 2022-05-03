@@ -172,23 +172,6 @@ func (s *ProfileService) SetInfo(context context.Context, request *profile_proto
 			}, nil
 		}
 	}
-	if settings.Password != "" {
-		resp2, err = s.db.ChangeUserPassword(
-			context,
-			&repository_proto.ChangeForm{User: user, Data: pkg.HashPassword(settings.Password)},
-		)
-		if err != nil {
-			log.Error(err)
-			return &utils_proto.JsonResponse{
-				Response: pkg.DB_ERR.Bytes(),
-			}, err
-		}
-		if resp2.Status != utils_proto.DatabaseStatus_OK {
-			return &utils_proto.JsonResponse{
-				Response: pkg.DB_ERR.Bytes(),
-			}, nil
-		}
-	}
 	return &utils_proto.JsonResponse{
 		Response: pkg.NO_ERR.Bytes(),
 	}, nil
@@ -229,5 +212,51 @@ func (s *ProfileService) GetAvatar(context context.Context, request *profile_pro
 			Response: pkg.NO_ERR.Bytes(),
 		},
 		Url: avatarUrl,
+	}, nil
+}
+
+func (s *ProfileService) ChangePassword(context context.Context, request *profile_proto.ChangePasswordRequest) (*utils_proto.JsonResponse, error) {
+	log.Debug("Изменение пароля ползователя, username = ", request.Data.Username, ", password_old = ", request.PasswordOld, ", password_new = ", request.PasswordNew)
+	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{Username: request.Data.Username})
+	if err != nil {
+		log.Error(err)
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
+	}
+	if resp.Response.Status != utils_proto.DatabaseStatus_OK {
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
+	}
+	userBytes := resp.User
+	var user models.User
+	err = json.Unmarshal(userBytes, &user)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.JSON_ERR.Bytes(),
+		}, err
+	}
+	if user.Password != pkg.HashPassword(request.PasswordOld) {
+		return &utils_proto.JsonResponse{
+			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
+		}, nil
+	}
+	resp3, err := s.db.ChangeUserPassword(context, &repository_proto.ChangeForm{
+		User: userBytes,
+		Data: pkg.HashPassword(request.PasswordNew),
+	})
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
+	}
+	if resp3.Status != utils_proto.DatabaseStatus_OK {
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
+	}
+	return &utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
 	}, nil
 }

@@ -279,10 +279,10 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	form.Addressee = xss.P.Sanitize(form.Addressee)
-	form.Files = xss.P.Sanitize(form.Files)
-	form.Text = xss.P.Sanitize(form.Text)
-	form.Theme = xss.P.Sanitize(form.Theme)
+	form.Addressee = xss.EscapeInput(form.Addressee)
+	form.Files = xss.EscapeInput(form.Files)
+	form.Text = xss.EscapeInput(form.Text)
+	form.Theme = xss.EscapeInput(form.Theme)
 	formBytes, _ := json.Marshal(form)
 
 	resp, err := d.mailbox.SendMail(context.Background(), &mailbox_proto.SendMailRequest{

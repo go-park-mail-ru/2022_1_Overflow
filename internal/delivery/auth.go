@@ -46,6 +46,9 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
+	log.Info("SignIn: ", "XSS handling")
+	data.Username = xss.EscapeInput(data.Username)
+	
 	dataBytes, _ := json.Marshal(data)
 	resp, err := d.auth.SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: dataBytes,
@@ -114,15 +117,17 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Info("SignUp: ", "sanitizing data")
-	data.Username = xss.P.Sanitize(data.Username)
-	data.Firstname = xss.P.Sanitize(data.Firstname)
-	data.Lastname = xss.P.Sanitize(data.Lastname)
-	passSanitized := xss.P.Sanitize(data.Password)
-	if passSanitized != data.Password {
+	log.Info("SignUp: ", "XSS handling")
+	data.Username = xss.EscapeInput(data.Username)
+	data.Firstname = xss.EscapeInput(data.Firstname)
+	data.Lastname = xss.EscapeInput(data.Lastname)
+	/*
+	passSafe := xss.EscapeInput(data.Password)
+	if passSafe != data.Password {
 		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, "Пароль содержит недопустимое содержимое.")
 		return
 	}
+	*/
 
 	dataBytes, _ := json.Marshal(data)
 	resp, err := d.auth.SignUp(context.Background(), &auth_proto.SignUpRequest{

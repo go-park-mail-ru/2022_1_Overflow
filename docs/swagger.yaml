@@ -1,5 +1,17 @@
 basePath: /
 definitions:
+  models.ChangePasswordForm:
+    properties:
+      password_new:
+        maxLength: 45
+        type: string
+      password_new_confirmation:
+        maxLength: 45
+        type: string
+      password_old:
+        maxLength: 45
+        type: string
+    type: object
   models.Folder:
     properties:
       created_at:
@@ -14,6 +26,7 @@ definitions:
   models.Mail:
     properties:
       addressee:
+        maxLength: 45
         type: string
       client_id:
         type: integer
@@ -26,6 +39,7 @@ definitions:
       read:
         type: boolean
       sender:
+        maxLength: 45
         type: string
       text:
         type: string
@@ -42,54 +56,64 @@ definitions:
   models.MailForm:
     properties:
       addressee:
+        maxLength: 45
         type: string
       files:
         type: string
       text:
         type: string
       theme:
+        maxLength: 45
+        type: string
+    type: object
+  models.ProfileInfo:
+    properties:
+      first_name:
+        maxLength: 45
+        type: string
+      id:
+        type: integer
+      last_name:
+        maxLength: 45
+        type: string
+      username:
+        maxLength: 45
         type: string
     type: object
   models.ProfileSettingsForm:
     properties:
       first_name:
+        maxLength: 45
         type: string
       last_name:
-        type: string
-      password:
+        maxLength: 45
         type: string
     type: object
   models.SignInForm:
     properties:
       password:
+        maxLength: 45
         type: string
       username:
+        maxLength: 45
         type: string
     type: object
   models.SignUpForm:
     properties:
       first_name:
+        maxLength: 45
         type: string
       last_name:
+        maxLength: 45
         type: string
       password:
+        maxLength: 45
         type: string
       password_confirmation:
+        maxLength: 45
         type: string
       username:
-        type: string
-    type: object
-  models.User:
-    properties:
-      first_name:
-        type: string
-      id:
-        type: integer
-      last_name:
-        type: string
-      password:
-        type: string
-      username:
+        maxLength: 45
         type: string
     type: object
   pkg.JsonResponse:
@@ -246,6 +270,11 @@ paths:
         name: mail_id
         required: true
         type: integer
+      - description: Следует ли переместить письмо в эту папку (с последующим удалением
+          из источника).
+        in: query
+        name: move
+        type: boolean
       - description: CSRF токен
         in: header
         name: X-CSRF-Token
@@ -543,6 +572,10 @@ paths:
         name: id
         required: true
         type: string
+      - description: Задать конкретное значение поля вручную.
+        in: query
+        name: isread
+        type: boolean
       - description: CSRF токен
         in: header
         name: X-CSRF-Token
@@ -568,7 +601,8 @@ paths:
             параметры.
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
-      summary: Прочитать письмо по его id
+      summary: Отметить число прочитанным/непрочитанным по его id. При отсутствии
+        параметра isread запрос отмечает письмо с заданным id прочитанным.
   /mail/send:
     get:
       responses:
@@ -619,7 +653,7 @@ paths:
         "200":
           description: Информация о пользователе
           schema:
-            $ref: '#/definitions/models.User'
+            $ref: '#/definitions/models.ProfileInfo'
         "401":
           description: Сессия отсутствует, сессия не валидна.
           schema:
@@ -699,6 +733,48 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Установка/смена аватарки пользователя
+  /profile/change_password:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Форма изменение пароля.
+        in: body
+        name: SettingsForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.ChangePasswordForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное изменение пароля.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка валидации формы, БД или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Изменение пароля пользователя
   /profile/set:
     get:
       responses:

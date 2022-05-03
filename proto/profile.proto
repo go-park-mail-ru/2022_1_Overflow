@@ -10,6 +10,7 @@ service Profile {
     rpc SetInfo(SetInfoRequest) returns (utils.JsonResponse) {}
     rpc GetAvatar(GetAvatarRequest) returns (GetAvatarResponse) {}
     rpc SetAvatar(SetAvatarRequest) returns (utils.JsonResponse) {}
+    rpc ChangePassword(ChangePasswordRequest) returns (utils.JsonResponse) {}
 }
 
 message SetAvatarRequest {
@@ -28,6 +29,12 @@ message GetInfoRequest {
 
 message GetAvatarRequest {
     string username = 1;
+}
+
+message ChangePasswordRequest {
+    utils.Session data = 1;
+    string passwordOld = 2;
+    string passwordNew = 3;
 }
 
 message GetInfoResponse {

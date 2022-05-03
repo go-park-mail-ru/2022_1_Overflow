@@ -23,5 +23,10 @@ type MailForm struct {
 type ProfileSettingsForm struct {
 	Firstname string `json:"first_name" validate:"max=45"`
 	Lastname string `json:"last_name" validate:"max=45"`
-	Password string `json:"password" validate:"max=45"`
+}
+
+type ChangePasswordForm struct {
+	OldPassword string `json:"password_old" validate:"max=45"`
+	NewPassword string `json:"password_new" validate:"max=45"`
+	NewPasswordConf string `json:"password_new_confirmation" validate:"max=45"`
 }
