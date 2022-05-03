@@ -637,6 +637,20 @@ const docTemplate = `{
                     "mailbox"
                 ],
                 "summary": "Получение входящих сообщений",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Ограничение на количество писем",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Смещение в списке писем",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Список входящих писем",
@@ -677,6 +691,20 @@ const docTemplate = `{
                     "mailbox"
                 ],
                 "summary": "Получение исходящих сообщений",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Ограничение на количество писем",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Смещение в списке писем",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Список исходящих писем",

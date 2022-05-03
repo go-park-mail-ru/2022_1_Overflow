@@ -569,6 +569,15 @@ paths:
       - mailbox
   /mail/income:
     get:
+      parameters:
+      - description: Ограничение на количество писем
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение в списке писем
+        in: query
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:
@@ -595,6 +604,15 @@ paths:
       - mailbox
   /mail/outcome:
     get:
+      parameters:
+      - description: Ограничение на количество писем
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение в списке писем
+        in: query
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:
