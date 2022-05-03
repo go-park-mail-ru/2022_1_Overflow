@@ -15,7 +15,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var SERVICE_PREFIX = "FolderManager:"
+var SERVICE_PREFIX = "FolderManager: "
 
 func StartFolderManagerServer(config *config.Config, db repository_proto.DatabaseRepositoryClient, profile profile_proto.ProfileClient) {
 	address := fmt.Sprintf(":%v", config.Server.Services.FolderManager.Port)

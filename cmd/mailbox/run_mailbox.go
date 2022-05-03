@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var SERVICE_PREFIX = "MailBox:"
+var SERVICE_PREFIX = "MailBox: "
 
 func StartMailBoxServer(config *config.Config, db repository_proto.DatabaseRepositoryClient, profile profile_proto.ProfileClient) {
 	address := fmt.Sprintf(":%v", config.Server.Services.MailBox.Port)

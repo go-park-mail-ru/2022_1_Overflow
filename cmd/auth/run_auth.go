@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var SERVICE_PREFIX = "Auth:"
+var SERVICE_PREFIX = "Auth: "
 
 func StartAuthServer(config *config.Config, db repository_proto.DatabaseRepositoryClient) {
 	address := fmt.Sprintf(":%v", config.Server.Services.Auth.Port)

@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var SERVICE_PREFIX = "Profile:"
+var SERVICE_PREFIX = "Profile: "
 
 func StartProfileServer(config *config.Config, db repository_proto.DatabaseRepositoryClient) {
 	address := fmt.Sprintf(":%v", config.Server.Services.Profile.Port)
