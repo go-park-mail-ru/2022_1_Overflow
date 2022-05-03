@@ -36,13 +36,17 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 	}
 	limit, e := strconv.Atoi(r.URL.Query().Get("limit"))
 	if e != nil {
-		limit := 100
+		limit = 100
 	}
 	offset, e := strconv.Atoi(r.URL.Query().Get("offset"))
 	if e != nil {
-		offset := 0
+		offset = 0
 	}
-	resp, err := d.mailbox.Income(context.Background(), data)
+	resp, err := d.mailbox.Income(context.Background(), &mailbox_proto.IncomeRequest{
+		Data: data,
+		Limit: int32(limit),
+		Offset: int32(offset),
+	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
@@ -84,13 +88,17 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 	}
 	limit, e := strconv.Atoi(r.URL.Query().Get("limit"))
 	if e != nil {
-		limit := 100
+		limit = 100
 	}
 	offset, e := strconv.Atoi(r.URL.Query().Get("offset"))
 	if e != nil {
-		offset := 0
+		offset = 0
 	}
-	resp, err := d.mailbox.Outcome(context.Background(), data)
+	resp, err := d.mailbox.Outcome(context.Background(), &mailbox_proto.OutcomeRequest{
+		Data: data,
+		Limit: int32(limit),
+		Offset: int32(offset),
+	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
