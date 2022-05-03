@@ -237,7 +237,8 @@ const docTemplate = `{
                         "type": "boolean",
                         "description": "Следует ли переместить письмо в эту папку (с последующим удалением из источника).",
                         "name": "move",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     },
                     {
                         "type": "string",
@@ -316,7 +317,8 @@ const docTemplate = `{
                         "type": "boolean",
                         "description": "Восстановить письмо (добавить обратно во входящие).",
                         "name": "restore",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     },
                     {
                         "type": "string",

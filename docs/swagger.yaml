@@ -274,6 +274,7 @@ paths:
           из источника).
         in: query
         name: move
+        required: true
         type: boolean
       - description: CSRF токен
         in: header
@@ -326,6 +327,7 @@ paths:
       - description: Восстановить письмо (добавить обратно во входящие).
         in: query
         name: restore
+        required: true
         type: boolean
       - description: CSRF токен
         in: header

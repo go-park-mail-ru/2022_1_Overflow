@@ -67,7 +67,7 @@ func AddFolder() {}
 // @Produce json
 // @Param folder_id query int true "ID папки."
 // @Param mail_id query int true "ID добавляемого письма."
-// @Param move query bool false "Следует ли переместить письмо в эту папку (с последующим удалением из источника)."
+// @Param move query bool true "Следует ли переместить письмо в эту папку (с последующим удалением из источника)."
 // @Success 200 {object} pkg.JsonResponse "OK"
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
@@ -244,7 +244,7 @@ func DeleteFolder() {}
 // @Produce json
 // @Param folder_id query int true "ID папки"
 // @Param mail_id query int true "ID удаляемого письма"
-// @Param restore query bool false "Восстановить письмо (добавить обратно во входящие)."
+// @Param restore query bool true "Восстановить письмо (добавить обратно во входящие)."
 // @Success 200 {object} pkg.JsonResponse "OK"
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
