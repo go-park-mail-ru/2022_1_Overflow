@@ -14,7 +14,7 @@ import (
 // @Summary Добавить папку с письмами для пользователя
 // @Produce json
 // @Param folder_name query string true "Имя папки."
-// @Success 200 {object} pkg.JsonResponse "OK"
+// @Success 200 {object} models.Folder "OK"
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
 // @Failure 500 {object} pkg.JsonResponse "Ошибка БД, неверные GET параметры."
@@ -46,7 +46,7 @@ func (d *Delivery) AddFolder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response, &response)
+	err = json.Unmarshal(resp.Response.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
@@ -55,7 +55,7 @@ func (d *Delivery) AddFolder(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
-	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
+	w.Write(resp.Folder)
 }
 
 // @Router /folder/add [get]

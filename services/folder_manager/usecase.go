@@ -7,7 +7,7 @@ import (
 )
 
 type FolderManagerServiceInterface interface {
-	AddFolder(context context.Context, request *folder_manager_proto.AddFolderRequest) (*utils_proto.JsonResponse, error)
+	AddFolder(context context.Context, request *folder_manager_proto.AddFolderRequest) (*folder_manager_proto.ResponseFolder, error)
 	AddMailToFolder(context context.Context, request *folder_manager_proto.AddMailToFolderRequest) (*utils_proto.JsonResponse, error)
 	ChangeFolder(context context.Context, request *folder_manager_proto.ChangeFolderRequest) (*utils_proto.JsonResponse, error)
 	//GetFolderByName(context context.Context, request *folder_manager_proto.GetFolderByNameRequest) (*folder_manager_proto.ResponseFolder, error)

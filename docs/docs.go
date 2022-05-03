@@ -67,7 +67,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
+                            "$ref": "#/definitions/models.Folder"
                         }
                     },
                     "401": {

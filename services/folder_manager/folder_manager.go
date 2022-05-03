@@ -44,7 +44,7 @@ func (s *FolderManagerService) Init(config *config.Config, db repository_proto.D
 	s.profile = profile
 }
 
-func (s *FolderManagerService) AddFolder(context context.Context, request *folder_manager_proto.AddFolderRequest) (*utils_proto.JsonResponse, error) {
+func (s *FolderManagerService) AddFolder(context context.Context, request *folder_manager_proto.AddFolderRequest) (*folder_manager_proto.ResponseFolder, error) {
 	username := request.Data.Username
 	log.Debug("Добавление папки, name = ", request.Name, ", username = ", username)
 	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
@@ -52,25 +52,33 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 	})
 	if err != nil {
 		log.Error(err)
-		return &utils_proto.JsonResponse{
-			Response: pkg.DB_ERR.Bytes(),
+		return &folder_manager_proto.ResponseFolder{
+			Response: &utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			},
 		}, err
 	}
 	if resp.Response.Status != utils_proto.DatabaseStatus_OK {
-		return &utils_proto.JsonResponse{
-			Response: pkg.DB_ERR.Bytes(),
+		return &folder_manager_proto.ResponseFolder{
+			Response: &utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			},
 		}, nil
 	}
 	var user models.User
 	err = json.Unmarshal(resp.User, &user)
 	if err != nil {
-		return &utils_proto.JsonResponse{
-			Response: pkg.JSON_ERR.Bytes(),
+		return &folder_manager_proto.ResponseFolder{
+			Response: &utils_proto.JsonResponse{
+				Response: pkg.JSON_ERR.Bytes(),
+			},
 		}, err
 	}
 	if (user == models.User{}) {
-		return &utils_proto.JsonResponse{
-			Response: pkg.NO_USER_EXIST.Bytes(),
+		return &folder_manager_proto.ResponseFolder{
+			Response: &utils_proto.JsonResponse{
+				Response: pkg.NO_USER_EXIST.Bytes(),
+			},
 		}, nil
 	}
 	resp2, err := s.db.GetFolderByName(context, &repository_proto.GetFolderByNameRequest{
@@ -79,26 +87,34 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 	})
 	if err != nil {
 		log.Error(err)
-		return &utils_proto.JsonResponse{
-			Response: pkg.DB_ERR.Bytes(),
+		return &folder_manager_proto.ResponseFolder{
+			Response: &utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			},
 		}, err
 	}
 	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
-		return &utils_proto.JsonResponse{
-			Response: pkg.DB_ERR.Bytes(),
+		return &folder_manager_proto.ResponseFolder{
+			Response: &utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			},
 		}, nil
 	}
 	var folder models.Folder
 	err = json.Unmarshal(resp2.Folder, &folder)
 	if err != nil {
-		return &utils_proto.JsonResponse{
-			Response: pkg.JSON_ERR.Bytes(),
+		return &folder_manager_proto.ResponseFolder{
+			Response: &utils_proto.JsonResponse{
+				Response: pkg.JSON_ERR.Bytes(),
+			},
 		}, err
 	}
 	if (folder != models.Folder{}) {
-		return &utils_proto.JsonResponse{
-			Response: pkg.CreateJsonErr(pkg.STATUS_OBJECT_EXISTS, "Такая папка уже существует.").Bytes(),
-		}, nil
+		return &folder_manager_proto.ResponseFolder{
+			Response: &utils_proto.JsonResponse{
+				Response: pkg.CreateJsonErr(pkg.STATUS_OBJECT_EXISTS, "Такая папка уже существует.").Bytes(),
+			},
+		}, err
 	}
 	resp3, err := s.db.AddFolder(context, &repository_proto.AddFolderRequest{
 		Name: request.Name,
@@ -106,17 +122,43 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 	})
 	if err != nil {
 		log.Error(err)
-		return &utils_proto.JsonResponse{
-			Response: pkg.DB_ERR.Bytes(),
+		return &folder_manager_proto.ResponseFolder{
+			Response: &utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			},
 		}, err
 	}
 	if resp3.Status != utils_proto.DatabaseStatus_OK {
-		return &utils_proto.JsonResponse{
-			Response: pkg.DB_ERR.Bytes(),
+		return &folder_manager_proto.ResponseFolder{
+			Response: &utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			},
 		}, nil
 	}
-	return &utils_proto.JsonResponse{
-		Response: pkg.NO_ERR.Bytes(),
+	resp4, err := s.db.GetFolderByName(context, &repository_proto.GetFolderByNameRequest{
+		UserId: user.Id,
+		FolderName: request.Name,
+	})
+	if err != nil {
+		log.Error(err)
+		return &folder_manager_proto.ResponseFolder{
+			Response: &utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			},
+		}, err
+	}
+	if resp4.Response.Status != utils_proto.DatabaseStatus_OK {
+		return &folder_manager_proto.ResponseFolder{
+			Response: &utils_proto.JsonResponse{
+				Response: pkg.DB_ERR.Bytes(),
+			},
+		}, nil
+	}
+	return &folder_manager_proto.ResponseFolder{
+		Response: &utils_proto.JsonResponse{
+			Response: pkg.NO_ERR.Bytes(),
+		},
+		Folder: resp4.Folder,
 	}, nil
 }
 

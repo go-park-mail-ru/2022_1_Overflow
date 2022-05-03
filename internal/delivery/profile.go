@@ -148,7 +148,7 @@ func (d *Delivery) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, "Новый пароль и его подтверждение не совпадают."))
 		return
 	}
-	if !validation.SameFields(form.NewPassword, form.OldPassword) {
+	if validation.SameFields(form.NewPassword, form.OldPassword) {
 		pkg.WriteJsonErrFull(w, pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, "Старый и новый пароли совпадают."))
 		return
 	}
