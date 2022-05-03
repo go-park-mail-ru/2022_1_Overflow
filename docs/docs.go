@@ -319,25 +319,13 @@ const docTemplate = `{
                 "summary": "Удалить письмо из папки",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "ID папки",
-                        "name": "folder_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "ID удаляемого письма",
-                        "name": "mail_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Восстановить письмо (добавить обратно во входящие).",
-                        "name": "restore",
-                        "in": "query",
-                        "required": true
+                        "description": "Форма запроса",
+                        "name": "DeleteFolderMailForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DeleteFolderMailForm"
+                        }
                     },
                     {
                         "type": "string",
@@ -1357,6 +1345,20 @@ const docTemplate = `{
             "properties": {
                 "folder_name": {
                     "type": "string"
+                }
+            }
+        },
+        "models.DeleteFolderMailForm": {
+            "type": "object",
+            "properties": {
+                "folder_id": {
+                    "type": "integer"
+                },
+                "mail_id": {
+                    "type": "integer"
+                },
+                "restore": {
+                    "type": "boolean"
                 }
             }
         },

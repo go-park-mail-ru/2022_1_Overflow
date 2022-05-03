@@ -38,6 +38,15 @@ definitions:
       folder_name:
         type: string
     type: object
+  models.DeleteFolderMailForm:
+    properties:
+      folder_id:
+        type: integer
+      mail_id:
+        type: integer
+      restore:
+        type: boolean
+    type: object
   models.DeleteMailForm:
     properties:
       id:
@@ -360,21 +369,12 @@ paths:
       - folder_manager
     post:
       parameters:
-      - description: ID папки
-        in: query
-        name: folder_id
+      - description: Форма запроса
+        in: body
+        name: DeleteFolderMailForm
         required: true
-        type: integer
-      - description: ID удаляемого письма
-        in: query
-        name: mail_id
-        required: true
-        type: integer
-      - description: Восстановить письмо (добавить обратно во входящие).
-        in: query
-        name: restore
-        required: true
-        type: boolean
+        schema:
+          $ref: '#/definitions/models.DeleteFolderMailForm'
       - description: CSRF токен
         in: header
         name: X-CSRF-Token

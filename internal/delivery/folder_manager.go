@@ -233,9 +233,7 @@ func DeleteFolder() {}
 // DeleteFolderMail godoc
 // @Summary Удалить письмо из папки
 // @Produce json
-// @Param folder_id query int true "ID папки"
-// @Param mail_id query int true "ID удаляемого письма"
-// @Param restore query bool true "Восстановить письмо (добавить обратно во входящие)."
+// @Param DeleteFolderMailForm body models.DeleteFolderMailForm true "Форма запроса"
 // @Success 200 {object} pkg.JsonResponse "OK"
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
