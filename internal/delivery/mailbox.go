@@ -20,6 +20,7 @@ import (
 // @Failure 405 {object} pkg.JsonResponse
 // @Failure 500 {object} pkg.JsonResponse "Ошибка БД."
 // @Router /mail/income [get]
+// @Tags mailbox
 func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodGet {
@@ -57,6 +58,7 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 // @Failure 405 {object} pkg.JsonResponse
 // @Failure 500 {object} pkg.JsonResponse "Ошибка БД."
 // @Router /mail/outcome [get]
+// @Tags mailbox
 func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodGet {
@@ -95,6 +97,7 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 // @Failure 405 {object} pkg.JsonResponse
 // @Failure 500 {object} pkg.JsonResponse "Ошибка БД."
 // @Router /mail/get [get]
+// @Tags mailbox
 func (d *Delivery) GetMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodGet {
@@ -145,6 +148,7 @@ func (d *Delivery) GetMail(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} pkg.JsonResponse "Письмо не принадлежит пользователю, ошибка БД, неверные GET параметры."
 // @Router /mail/delete [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
+// @Tags mailbox
 func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
@@ -187,6 +191,7 @@ func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 // @Router /mail/delete [get]
 // @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
+// @Tags mailbox
 func DeleteMail() {}
 
 // ReadMail godoc
@@ -200,6 +205,7 @@ func DeleteMail() {}
 // @Failure 500 {object} pkg.JsonResponse "Письмо не принадлежит пользователю, ошибка БД, неверные GET параметры."
 // @Router /mail/read [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
+// @Tags mailbox
 func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
@@ -247,6 +253,7 @@ func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 // @Router /mail/read [get]
 // @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
+// @Tags mailbox
 func ReadMail() {}
 
 // SendMail godoc
@@ -259,6 +266,7 @@ func ReadMail() {}
 // @Produce json
 // @Router /mail/send [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
+// @Tags mailbox
 func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
@@ -309,4 +317,5 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 // @Router /mail/send [get]
 // @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
+// @Tags mailbox
 func SendMail() {}

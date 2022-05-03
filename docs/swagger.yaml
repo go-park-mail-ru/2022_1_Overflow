@@ -142,6 +142,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - folder_manager
     post:
       parameters:
       - description: Имя папки.
@@ -174,6 +176,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Добавить папку с письмами для пользователя
+      tags:
+      - folder_manager
   /folder/delete:
     get:
       responses:
@@ -185,6 +189,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - folder_manager
     post:
       parameters:
       - description: Имя папки.
@@ -217,6 +223,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Удалить папку с письмами
+      tags:
+      - folder_manager
   /folder/list:
     get:
       parameters:
@@ -247,6 +255,8 @@ paths:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Получить список папок пользователя или список писем в определенной
         папке
+      tags:
+      - folder_manager
   /folder/mail/add:
     get:
       responses:
@@ -258,6 +268,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - folder_manager
     post:
       parameters:
       - description: ID папки.
@@ -301,6 +313,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Добавить письмо в папку с письмами
+      tags:
+      - folder_manager
   /folder/mail/delete:
     get:
       responses:
@@ -312,6 +326,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - folder_manager
     post:
       parameters:
       - description: ID папки
@@ -354,6 +370,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Удалить письмо из папки
+      tags:
+      - folder_manager
   /folder/rename:
     get:
       responses:
@@ -365,6 +383,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - folder_manager
     post:
       parameters:
       - description: ID изменяемой папки.
@@ -402,6 +422,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Переименовать папку с письмами
+      tags:
+      - folder_manager
   /logout:
     get:
       responses:
@@ -413,6 +435,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - auth
     post:
       parameters:
       - description: CSRF токен
@@ -436,6 +460,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Завершение сессии пользователя
+      tags:
+      - auth
   /mail/delete:
     get:
       responses:
@@ -447,6 +473,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - mailbox
     post:
       parameters:
       - description: ID запрашиваемого письма.
@@ -480,6 +508,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Удалить письмо по его id
+      tags:
+      - mailbox
   /mail/get:
     get:
       parameters:
@@ -508,6 +538,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение сообщения по его id
+      tags:
+      - mailbox
   /mail/income:
     get:
       produces:
@@ -532,6 +564,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение входящих сообщений
+      tags:
+      - mailbox
   /mail/outcome:
     get:
       produces:
@@ -556,6 +590,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение исходящих сообщений
+      tags:
+      - mailbox
   /mail/read:
     get:
       responses:
@@ -567,6 +603,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - mailbox
     post:
       parameters:
       - description: ID запрашиваемого письма.
@@ -605,6 +643,8 @@ paths:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Отметить число прочитанным/непрочитанным по его id. При отсутствии
         параметра isread запрос отмечает письмо с заданным id прочитанным.
+      tags:
+      - mailbox
   /mail/send:
     get:
       responses:
@@ -616,6 +656,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - mailbox
     post:
       consumes:
       - application/json
@@ -647,6 +689,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Выполняет отправку письма получателю
+      tags:
+      - mailbox
   /profile:
     get:
       produces:
@@ -669,6 +713,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение данных пользователя
+      tags:
+      - profile
   /profile/avatar:
     get:
       description: Получение ссылки на аватарку текущего пользователя или пользователя
@@ -694,6 +740,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение ссылки на аватарку пользователя
+      tags:
+      - profile
   /profile/avatar/set:
     get:
       responses:
@@ -705,6 +753,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - profile
     post:
       consumes:
       - multipart/form-data
@@ -735,6 +785,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Установка/смена аватарки пользователя
+      tags:
+      - profile
   /profile/change_password:
     get:
       responses:
@@ -746,6 +798,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - profile
     post:
       consumes:
       - application/json
@@ -777,6 +831,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Изменение пароля пользователя
+      tags:
+      - profile
   /profile/set:
     get:
       responses:
@@ -788,6 +844,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - profile
     post:
       consumes:
       - application/json
@@ -819,6 +877,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Изменение настроек пользователя
+      tags:
+      - profile
   /signin:
     get:
       responses:
@@ -830,6 +890,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - auth
     post:
       consumes:
       - application/json
@@ -858,6 +920,8 @@ paths:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Выполняет аутентификацию и выставляет сессионый cookie с названием
         OverflowMail
+      tags:
+      - auth
   /signup:
     get:
       responses:
@@ -869,6 +933,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - auth
     post:
       consumes:
       - application/json
@@ -897,4 +963,6 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Выполняет регистрацию пользователя
+      tags:
+      - auth
 swagger: "2.0"

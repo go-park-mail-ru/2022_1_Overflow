@@ -22,6 +22,7 @@ import (
 // @Failure 405 {object} pkg.JsonResponse
 // @Failure 500 {object} pkg.JsonResponse "Ошибка БД, пользователь не найден, неверные данные сессии."
 // @Router /profile [get]
+// @Tags profile
 func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodGet {
@@ -63,6 +64,7 @@ func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 // @Param SettingsForm body models.ProfileSettingsForm true "Форма настроек пользователя."
 // @Produce json
 // @Router /profile/set [post]
+// @Tags profile
 // @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -110,6 +112,7 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /profile/set [get]
+// @Tags profile
 // @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 func SetInfo() {}
@@ -123,6 +126,7 @@ func SetInfo() {}
 // @Param SettingsForm body models.ChangePasswordForm true "Форма изменение пароля."
 // @Produce json
 // @Router /profile/change_password [post]
+// @Tags profile
 // @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -171,6 +175,7 @@ func (d *Delivery) ChangePassword(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /profile/change_password [get]
+// @Tags profile
 // @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 func ChangePassword() {}
@@ -184,6 +189,7 @@ func ChangePassword() {}
 // @Param file formData file true "Файл аватарки."
 // @Produce json
 // @Router /profile/avatar/set [post]
+// @Tags profile
 // @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -235,6 +241,7 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 }
 
 // @Router /profile/avatar/set [get]
+// @Tags profile
 // @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 func SetAvatar() {}
@@ -248,6 +255,7 @@ func SetAvatar() {}
 // @Failure 500 {object} pkg.JsonResponse "Ошибка БД, пользователь не найден или сессия не валидна."
 // @Produce json
 // @Router /profile/avatar [get]
+// @Tags profile
 func (d *Delivery) GetAvatar(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodGet {

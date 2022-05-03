@@ -20,6 +20,7 @@ import (
 // @Failure 500 {object} pkg.JsonResponse "Ошибка БД, неверные GET параметры."
 // @Router /folder/add [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
+// @Tags folder_manager
 func (d *Delivery) AddFolder(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
@@ -60,6 +61,7 @@ func (d *Delivery) AddFolder(w http.ResponseWriter, r *http.Request) {
 // @Router /folder/add [get]
 // @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
+// @Tags folder_manager
 func AddFolder() {}
 
 // AddMailToFolder godoc
@@ -74,6 +76,7 @@ func AddFolder() {}
 // @Failure 500 {object} pkg.JsonResponse "Ошибка БД, неверные GET параметры."
 // @Router /folder/mail/add [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
+// @Tags folder_manager
 func (d *Delivery) AddMailToFolder(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
@@ -126,6 +129,7 @@ func (d *Delivery) AddMailToFolder(w http.ResponseWriter, r *http.Request) {
 // @Router /folder/mail/add [get]
 // @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
+// @Tags folder_manager
 func AddMailToFolder() {}
 
 // ChangeFolder godoc
@@ -139,6 +143,7 @@ func AddMailToFolder() {}
 // @Failure 500 {object} pkg.JsonResponse "Ошибка БД, неверные GET параметры."
 // @Router /folder/rename [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
+// @Tags folder_manager
 func (d *Delivery) ChangeFolder(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
@@ -185,6 +190,7 @@ func (d *Delivery) ChangeFolder(w http.ResponseWriter, r *http.Request) {
 // @Router /folder/rename [get]
 // @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
+// @Tags folder_manager
 func ChangeFolder() {}
 
 // DeleteFolder godoc
@@ -197,6 +203,7 @@ func ChangeFolder() {}
 // @Failure 500 {object} pkg.JsonResponse "Ошибка БД, неверные GET параметры."
 // @Router /folder/delete [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
+// @Tags folder_manager
 func (d *Delivery) DeleteFolder(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
@@ -237,6 +244,7 @@ func (d *Delivery) DeleteFolder(w http.ResponseWriter, r *http.Request) {
 // @Router /folder/delete [get]
 // @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
+// @Tags folder_manager
 func DeleteFolder() {}
 
 // DeleteFolderMail godoc
@@ -251,6 +259,7 @@ func DeleteFolder() {}
 // @Failure 500 {object} pkg.JsonResponse "Ошибка БД, неверные GET параметры."
 // @Router /folder/mail/delete [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
+// @Tags folder_manager
 func (d *Delivery) DeleteFolderMail(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
@@ -303,6 +312,7 @@ func (d *Delivery) DeleteFolderMail(w http.ResponseWriter, r *http.Request) {
 // @Router /folder/mail/delete [get]
 // @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
+// @Tags folder_manager
 func DeleteFolderMail() {}
 
 // ListFolders godoc
@@ -315,6 +325,7 @@ func DeleteFolderMail() {}
 // @Failure 405 {object} pkg.JsonResponse
 // @Failure 500 {object} pkg.JsonResponse "Ошибка БД, неверные GET параметры."
 // @Router /folder/list [get]
+// @Tags folder_manager
 func (d *Delivery) ListFolders(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodGet {

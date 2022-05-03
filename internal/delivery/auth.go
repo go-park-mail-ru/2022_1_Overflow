@@ -25,6 +25,7 @@ import (
 // @Produce json
 // @Router /signin [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
+// @Tags auth
 func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	log.Info("SignIn: ", "checking method")
@@ -48,7 +49,7 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Info("SignIn: ", "XSS handling")
 	data.Username = xss.EscapeInput(data.Username)
-	
+
 	dataBytes, _ := json.Marshal(data)
 	resp, err := d.auth.SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: dataBytes,
@@ -83,6 +84,7 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 // @Router /signin [get]
 // @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
+// @Tags auth
 func SignIn() {}
 
 // SignUp godoc
@@ -95,6 +97,7 @@ func SignIn() {}
 // @Produce json
 // @Router /signup [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
+// @Tags auth
 func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	log.Info("SignUp: ", "checking method")
@@ -154,6 +157,7 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 // @Router /signup [get]
 // @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
+// @Tags auth
 func SignUp() {}
 
 // SignOut godoc
@@ -164,6 +168,7 @@ func SignUp() {}
 // @Produce json
 // @Router /logout [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
+// @Tags auth
 func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
@@ -182,4 +187,5 @@ func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 // @Router /logout [get]
 // @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
+// @Tags auth
 func SignOut() {}

@@ -21,6 +21,9 @@ const docTemplate = `{
     "paths": {
         "/folder/add": {
             "get": {
+                "tags": [
+                    "folder_manager"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -39,6 +42,9 @@ const docTemplate = `{
             "post": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "folder_manager"
                 ],
                 "summary": "Добавить папку с письмами для пользователя",
                 "parameters": [
@@ -87,6 +93,9 @@ const docTemplate = `{
         },
         "/folder/delete": {
             "get": {
+                "tags": [
+                    "folder_manager"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -105,6 +114,9 @@ const docTemplate = `{
             "post": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "folder_manager"
                 ],
                 "summary": "Удалить папку с письмами",
                 "parameters": [
@@ -156,6 +168,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "folder_manager"
+                ],
                 "summary": "Получить список папок пользователя или список писем в определенной папке",
                 "parameters": [
                     {
@@ -198,6 +213,9 @@ const docTemplate = `{
         },
         "/folder/mail/add": {
             "get": {
+                "tags": [
+                    "folder_manager"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -216,6 +234,9 @@ const docTemplate = `{
             "post": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "folder_manager"
                 ],
                 "summary": "Добавить письмо в папку с письмами",
                 "parameters": [
@@ -278,6 +299,9 @@ const docTemplate = `{
         },
         "/folder/mail/delete": {
             "get": {
+                "tags": [
+                    "folder_manager"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -296,6 +320,9 @@ const docTemplate = `{
             "post": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "folder_manager"
                 ],
                 "summary": "Удалить письмо из папки",
                 "parameters": [
@@ -358,6 +385,9 @@ const docTemplate = `{
         },
         "/folder/rename": {
             "get": {
+                "tags": [
+                    "folder_manager"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -376,6 +406,9 @@ const docTemplate = `{
             "post": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "folder_manager"
                 ],
                 "summary": "Переименовать папку с письмами",
                 "parameters": [
@@ -431,6 +464,9 @@ const docTemplate = `{
         },
         "/logout": {
             "get": {
+                "tags": [
+                    "auth"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -449,6 +485,9 @@ const docTemplate = `{
             "post": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "auth"
                 ],
                 "summary": "Завершение сессии пользователя",
                 "parameters": [
@@ -484,6 +523,9 @@ const docTemplate = `{
         },
         "/mail/delete": {
             "get": {
+                "tags": [
+                    "mailbox"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -502,6 +544,9 @@ const docTemplate = `{
             "post": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "mailbox"
                 ],
                 "summary": "Удалить письмо по его id",
                 "parameters": [
@@ -553,6 +598,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "mailbox"
+                ],
                 "summary": "Получение сообщения по его id",
                 "parameters": [
                     {
@@ -596,6 +644,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "mailbox"
+                ],
                 "summary": "Получение входящих сообщений",
                 "responses": {
                     "200": {
@@ -633,6 +684,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "mailbox"
+                ],
                 "summary": "Получение исходящих сообщений",
                 "responses": {
                     "200": {
@@ -667,6 +721,9 @@ const docTemplate = `{
         },
         "/mail/read": {
             "get": {
+                "tags": [
+                    "mailbox"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -685,6 +742,9 @@ const docTemplate = `{
             "post": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "mailbox"
                 ],
                 "summary": "Отметить число прочитанным/непрочитанным по его id. При отсутствии параметра isread запрос отмечает письмо с заданным id прочитанным.",
                 "parameters": [
@@ -739,6 +799,9 @@ const docTemplate = `{
         },
         "/mail/send": {
             "get": {
+                "tags": [
+                    "mailbox"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -760,6 +823,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "mailbox"
                 ],
                 "summary": "Выполняет отправку письма получателю",
                 "parameters": [
@@ -807,6 +873,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "profile"
+                ],
                 "summary": "Получение данных пользователя",
                 "responses": {
                     "200": {
@@ -842,6 +911,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "profile"
+                ],
                 "summary": "Получение ссылки на аватарку пользователя",
                 "parameters": [
                     {
@@ -875,6 +947,9 @@ const docTemplate = `{
         },
         "/profile/avatar/set": {
             "get": {
+                "tags": [
+                    "profile"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -896,6 +971,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "profile"
                 ],
                 "summary": "Установка/смена аватарки пользователя",
                 "parameters": [
@@ -938,6 +1016,9 @@ const docTemplate = `{
         },
         "/profile/change_password": {
             "get": {
+                "tags": [
+                    "profile"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -959,6 +1040,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "profile"
                 ],
                 "summary": "Изменение пароля пользователя",
                 "parameters": [
@@ -1003,6 +1087,9 @@ const docTemplate = `{
         },
         "/profile/set": {
             "get": {
+                "tags": [
+                    "profile"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1024,6 +1111,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "profile"
                 ],
                 "summary": "Изменение настроек пользователя",
                 "parameters": [
@@ -1068,6 +1158,9 @@ const docTemplate = `{
         },
         "/signin": {
             "get": {
+                "tags": [
+                    "auth"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1089,6 +1182,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "auth"
                 ],
                 "summary": "Выполняет аутентификацию и выставляет сессионый cookie с названием OverflowMail",
                 "parameters": [
@@ -1127,6 +1223,9 @@ const docTemplate = `{
         },
         "/signup": {
             "get": {
+                "tags": [
+                    "auth"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1149,6 +1248,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "auth"
                 ],
                 "summary": "Выполняет регистрацию пользователя",
                 "parameters": [
