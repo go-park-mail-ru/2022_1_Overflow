@@ -126,7 +126,7 @@ func (c *Database) GetFoldersByUser(context context.Context, request *repository
 func (c *Database) GetFolderMail(context context.Context, request *repository_proto.GetFolderMailRequest) (*repository_proto.ResponseMails, error) {
 	var mails []models.Mail
 	mailsBytes, _ := json.Marshal(mails)
-	rows, err := c.Conn.Query(context, "SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id=$1;", request.FolderId)
+	rows, err := c.Conn.Query(context, "SELECT * FROM overflow.mails WHERE id IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id=$1) ORDER BY date DESC;", request.FolderId)
 	if err != nil {
 		return &repository_proto.ResponseMails{
 			Response: &utils_proto.DatabaseResponse{
@@ -137,6 +137,7 @@ func (c *Database) GetFolderMail(context context.Context, request *repository_pr
 	}
 	defer rows.Close()
 	for rows.Next() {
+		var mail models.Mail
 		values, err := rows.Values()
 		if err != nil {
 			return &repository_proto.ResponseMails{
@@ -146,28 +147,13 @@ func (c *Database) GetFolderMail(context context.Context, request *repository_pr
 				Mails: mailsBytes,
 			}, err
 		}
-		mailId := values[0].(int32)
-		resp, err := c.GetMailInfoById(context, &repository_proto.GetMailInfoByIdRequest{
-			MailId: mailId,
-		})
-		if err != nil || resp.Response.Status != utils_proto.DatabaseStatus_OK {
-			return &repository_proto.ResponseMails{
-				Response: &utils_proto.DatabaseResponse{
-					Status: utils_proto.DatabaseStatus_ERROR,
-				},
-				Mails: mailsBytes,
-			}, err
-		}
-		var mail models.Mail
-		err = json.Unmarshal(resp.Mail, &mail)
-		if err != nil {
-			return &repository_proto.ResponseMails{
-				Response: &utils_proto.DatabaseResponse{
-					Status: utils_proto.DatabaseStatus_ERROR,
-				},
-				Mails: mailsBytes,
-			}, err
-		}
+		mail.Sender = values[0].(string)
+		mail.Theme = values[1].(string)
+		mail.Text = values[2].(string)
+		mail.Files = values[3].(string)
+		mail.Date = values[4].(time.Time)
+		mail.Read = values[5].(bool)
+		mail.Id = values[6].(int32)
 		mails = append(mails, mail)
 	}
 	mailsBytes, _ = json.Marshal(mails)
