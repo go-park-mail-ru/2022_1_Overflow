@@ -273,20 +273,16 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
-
 	data, err := session.Manager.GetData(r)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-
 	var form models.MailForm
-
 	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-
 	form.Addressee = xss.EscapeInput(form.Addressee)
 	form.Files = xss.EscapeInput(form.Files)
 	form.Text = xss.EscapeInput(form.Text)

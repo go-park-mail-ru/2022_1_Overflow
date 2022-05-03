@@ -12,11 +12,12 @@ import (
 	"google.golang.org/grpc"
 )
 
-var SERVICE_PREFIX = "Repository:"
+var SERVICE_PREFIX = "Repository: "
 
 func StartRepositoryServer(config *config.Config) {
-	log.Info(SERVICE_PREFIX, "Запуск сервера")
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%v", config.Server.Services.Database.Port))
+	address := fmt.Sprintf(":%v", config.Server.Services.Database.Port)
+	log.Info(SERVICE_PREFIX, "Запуск сервера по адресу ", address)
+	lis, err := net.Listen("tcp", address)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,7 +34,7 @@ func StartRepositoryServer(config *config.Config) {
 	repositoryService = &postgres.Database{}
 	err = repositoryService.Create(dbUrl)
 	if err != nil {
-		log.Fatal("Ошибка подключения к БД:", err)
+		log.Fatal(SERVICE_PREFIX, "Ошибка подключения к БД - ", err)
 	}
 	repositoryServer := grpc.NewServer()
 	repository_proto.RegisterDatabaseRepositoryServer(repositoryServer, repositoryService)
@@ -42,7 +43,7 @@ func StartRepositoryServer(config *config.Config) {
 
 func main() {
 	log.SetLevel(log.DebugLevel)
-	log.Info(SERVICE_PREFIX, "Запуск сервиса Repository")
+	log.Info(SERVICE_PREFIX, "Запуск сервиса")
 	config, err := config.NewConfig("./configs/main.yml")
 	if err != nil {
 		log.Fatal(SERVICE_PREFIX, err)

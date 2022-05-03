@@ -33,13 +33,11 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
-
 	log.Info("SignIn: ", "checking session")
 	if session.Manager.IsLoggedIn(r) {
 		pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 		return
 	}
-
 	log.Info("SignIn: ", "checking data")
 	var data models.SignInForm
 	err := json.NewDecoder(r.Body).Decode(&data)
@@ -49,7 +47,6 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Info("SignIn: ", "XSS handling")
 	data.Username = xss.EscapeInput(data.Username)
-
 	dataBytes, _ := json.Marshal(data)
 	resp, err := d.auth.SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: dataBytes,
@@ -68,7 +65,6 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
-
 	log.Info("SignIn: ", "creating session")
 	err = session.Manager.CreateSession(w, r, data.Username)
 	if err != nil {
@@ -105,13 +101,11 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
-
 	log.Info("SignUp: ", "checking session")
 	if session.Manager.IsLoggedIn(r) {
 		pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 		return
 	}
-
 	log.Info("SignUp: ", "checking data")
 	var data models.SignUpForm
 	err := json.NewDecoder(r.Body).Decode(&data)
@@ -119,7 +113,6 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-
 	log.Info("SignUp: ", "XSS handling")
 	data.Username = xss.EscapeInput(data.Username)
 	data.Firstname = xss.EscapeInput(data.Firstname)
@@ -131,7 +124,6 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	*/
-
 	dataBytes, _ := json.Marshal(data)
 	resp, err := d.auth.SignUp(context.Background(), &auth_proto.SignUpRequest{
 		Form: dataBytes,
@@ -150,7 +142,6 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
-
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
@@ -175,7 +166,6 @@ func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
-
 	err := session.Manager.DeleteSession(w, r)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)

@@ -17,7 +17,7 @@ var SERVICE_PREFIX = "Profile:"
 
 func StartProfileServer(config *config.Config, db repository_proto.DatabaseRepositoryClient) {
 	address := fmt.Sprintf(":%v", config.Server.Services.Profile.Port)
-	log.Info(SERVICE_PREFIX, "Запуск сервера по адресу")
+	log.Info(SERVICE_PREFIX, "Запуск сервера по адресу ", address)
 	lis, err := net.Listen("tcp", address)
 	if err != nil {
 		log.Fatal(SERVICE_PREFIX, err)
@@ -31,14 +31,14 @@ func StartProfileServer(config *config.Config, db repository_proto.DatabaseRepos
 
 func main() {
 	log.SetLevel(log.DebugLevel)
-	log.Info("Запуск сервиса Profile")
+	log.Info(SERVICE_PREFIX, "Запуск сервиса")
 	config, err := config.NewConfig("./configs/main.yml")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(SERVICE_PREFIX, err)
 	}
 	conn, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.Database.Address, config.Server.Services.Database.Port))
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(SERVICE_PREFIX, err)
 	}
 	defer conn.Close()
 	db := repository_proto.NewDatabaseRepositoryClient(conn)

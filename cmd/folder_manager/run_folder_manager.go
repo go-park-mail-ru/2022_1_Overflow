@@ -18,8 +18,9 @@ import (
 var SERVICE_PREFIX = "FolderManager:"
 
 func StartFolderManagerServer(config *config.Config, db repository_proto.DatabaseRepositoryClient, profile profile_proto.ProfileClient) {
-	log.Info(SERVICE_PREFIX, "Запуск сервера")
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%v", config.Server.Services.FolderManager.Port))
+	address := fmt.Sprintf(":%v", config.Server.Services.FolderManager.Port)
+	log.Info(SERVICE_PREFIX, "Запуск сервера по адресу ", address)
+	lis, err := net.Listen("tcp", address)
 	if err != nil {
 		log.Fatal(SERVICE_PREFIX, err)
 	}

@@ -29,7 +29,6 @@ func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
-
 	data, e := session.Manager.GetData(r)
 	if e != nil {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
@@ -72,24 +71,19 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
-
 	data, err := session.Manager.GetData(r)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-
 	var form models.ProfileSettingsForm
-
 	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-
 	form.Firstname = xss.EscapeInput(form.Firstname)
 	form.Lastname = xss.EscapeInput(form.Lastname)
 	formBytes, _ := json.Marshal(form)
-
 	resp, err := d.profile.SetInfo(context.Background(), &profile_proto.SetInfoRequest{
 		Data: data,
 		Form: formBytes,

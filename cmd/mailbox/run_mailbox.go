@@ -17,8 +17,9 @@ import (
 var SERVICE_PREFIX = "MailBox:"
 
 func StartMailBoxServer(config *config.Config, db repository_proto.DatabaseRepositoryClient, profile profile_proto.ProfileClient) {
-	log.Info(SERVICE_PREFIX, "Запуск сервера")
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%v", config.Server.Services.MailBox.Port))
+	address := fmt.Sprintf(":%v", config.Server.Services.MailBox.Port)
+	log.Info(SERVICE_PREFIX, "Запуск сервера по адресу ", address)
+	lis, err := net.Listen("tcp", address)
 	if err != nil {
 		log.Fatal(SERVICE_PREFIX, err)
 	}
@@ -31,7 +32,7 @@ func StartMailBoxServer(config *config.Config, db repository_proto.DatabaseRepos
 
 func main() {
 	log.SetLevel(log.DebugLevel)
-	log.Info(SERVICE_PREFIX, "Запуск сервиса Mailbox")
+	log.Info(SERVICE_PREFIX, "Запуск сервиса")
 	config, err := config.NewConfig("./configs/main.yml")
 	if err != nil {
 		log.Fatal(SERVICE_PREFIX, err)
