@@ -15,6 +15,8 @@ import (
 // Income godoc
 // @Summary Получение входящих сообщений
 // @Produce json
+// @Param limit query int false "Ограничение на количество писем"
+// @Param offset query int false "Смещение в списке писем"
 // @Success 200 {object} []models.MailAdditional "Список входящих писем"
 // @Failure 401 {object} pkg.JsonResponse"Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
@@ -31,6 +33,14 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 	if e != nil {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
+	}
+	limit, e := strconv.Atoi(r.URL.Query().Get("limit"))
+	if e != nil {
+		limit := 100
+	}
+	offset, e := strconv.Atoi(r.URL.Query().Get("offset"))
+	if e != nil {
+		offset := 0
 	}
 	resp, err := d.mailbox.Income(context.Background(), data)
 	if err != nil {
@@ -53,6 +63,8 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 // Outcome godoc
 // @Summary Получение исходящих сообщений
 // @Produce json
+// @Param limit query int false "Ограничение на количество писем"
+// @Param offset query int false "Смещение в списке писем"
 // @Success 200 {object} []models.MailAdditional "Список исходящих писем"
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
@@ -69,6 +81,14 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 	if e != nil {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
+	}
+	limit, e := strconv.Atoi(r.URL.Query().Get("limit"))
+	if e != nil {
+		limit := 100
+	}
+	offset, e := strconv.Atoi(r.URL.Query().Get("offset"))
+	if e != nil {
+		offset := 0
 	}
 	resp, err := d.mailbox.Outcome(context.Background(), data)
 	if err != nil {

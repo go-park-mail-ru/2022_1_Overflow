@@ -27,9 +27,9 @@ func (s *MailBoxService) Init(config *config.Config, db repository_proto.Databas
 	s.profile = profile
 }
 
-func (s *MailBoxService) Income(context context.Context, data *utils_proto.Session) (*mailbox_proto.ResponseMails, error) {
-	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{Username: data.Username})
-	log.Debug("Получение входящих писем, username = ", data.Username)
+func (s *MailBoxService) Income(context context.Context, request *mailbox_proto.IncomeRequest) (*mailbox_proto.ResponseMails, error) {
+	log.Debug("Получение входящих писем, username = ", request.Data.Username, ", limit = ", request.Limit, ", offset = ", request.Offset)
+	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{Username: request.Data.Username})
 	if err != nil {
 		log.Error(err)
 		return &mailbox_proto.ResponseMails{
@@ -54,7 +54,7 @@ func (s *MailBoxService) Income(context context.Context, data *utils_proto.Sessi
 			}, Mails: nil,
 		}, err
 	}
-	resp2, err := s.db.GetIncomeMails(context, &repository_proto.GetIncomeMailsRequest{UserId: user.Id})
+	resp2, err := s.db.GetIncomeMails(context, &repository_proto.GetIncomeMailsRequest{UserId: user.Id, Limit: request.Limit, Offset: request.Offset})
 	if err != nil {
 		log.Error(err)
 		return &mailbox_proto.ResponseMails{
@@ -125,9 +125,9 @@ func (s *MailBoxService) Income(context context.Context, data *utils_proto.Sessi
 	}, nil
 }
 
-func (s *MailBoxService) Outcome(context context.Context, data *utils_proto.Session) (*mailbox_proto.ResponseMails, error) {
-	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{Username: data.Username})
-	log.Debug("Получение исходящих писем, username = ", data.Username)
+func (s *MailBoxService) Outcome(context context.Context, request *mailbox_proto.OutcomeRequest) (*mailbox_proto.ResponseMails, error) {
+	log.Debug("Получение входящих писем, username = ", request.Data.Username, ", limit = ", request.Limit, ", offset = ", request.Offset)
+	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{Username: request.Data.Username})
 	if err != nil {
 		log.Error(err)
 		return &mailbox_proto.ResponseMails{
@@ -152,7 +152,7 @@ func (s *MailBoxService) Outcome(context context.Context, data *utils_proto.Sess
 			}, Mails: nil,
 		}, err
 	}
-	resp2, err := s.db.GetOutcomeMails(context, &repository_proto.GetOutcomeMailsRequest{UserId: user.Id})
+	resp2, err := s.db.GetOutcomeMails(context, &repository_proto.GetOutcomeMailsRequest{UserId: user.Id, Limit: request.Limit, Offset: request.Offset})
 	if err != nil {
 		log.Error(err)
 		return &mailbox_proto.ResponseMails{

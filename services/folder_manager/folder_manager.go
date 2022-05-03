@@ -164,7 +164,7 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 
 func (s *FolderManagerService) AddMailToFolder(context context.Context, request *folder_manager_proto.AddMailToFolderRequest) (*utils_proto.JsonResponse, error) {
 	username := request.Data.Username
-	log.Debug("Добавление письма в папку, folderId = ", request.FolderId, ", username = ", username, "move = ", request.Move)
+	log.Debug("Добавление письма в папку, folderId = ", request.FolderId, ", username = ", username, ", move = ", request.Move)
 	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
 		Username: username,
 	})

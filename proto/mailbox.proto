@@ -6,12 +6,24 @@ option go_package = "./mailbox_proto";
 import "proto/utils.proto";
 
 service Mailbox {
-    rpc Income(utils.Session) returns (ResponseMails) {}
-    rpc Outcome(utils.Session) returns (ResponseMails) {}
+    rpc Income(IncomeRequest) returns (ResponseMails) {}
+    rpc Outcome(OutcomeRequest) returns (ResponseMails) {}
     rpc GetMail(GetMailRequest) returns (ResponseMail) {}
     rpc DeleteMail(DeleteMailRequest) returns (utils.JsonResponse) {}
     rpc ReadMail(ReadMailRequest) returns (utils.JsonResponse) {}
     rpc SendMail(SendMailRequest) returns (utils.JsonResponse) {}
+}
+
+message IncomeRequest {
+    utils.Session data = 1;
+    int32 limit = 2;
+    int32 offset = 3;
+}
+
+message OutcomeRequest {
+    utils.Session data = 1;
+    int32 limit = 2;
+    int32 offset = 3;
 }
 
 message GetMailRequest {

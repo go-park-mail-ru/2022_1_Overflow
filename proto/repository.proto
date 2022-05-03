@@ -54,10 +54,14 @@ message ChangeForm {
 
 message GetIncomeMailsRequest {
     int32 userId = 1;
+    int32 limit = 2;
+    int32 offset = 3;
 }
 
 message GetOutcomeMailsRequest {
     int32 userId = 1;
+    int32 limit = 2;
+    int32 offset = 3;
 }
 
 message AddMailRequest {
