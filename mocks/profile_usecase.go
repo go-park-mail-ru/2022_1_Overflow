@@ -9,6 +9,7 @@ import (
 	profile_proto "OverflowBackend/proto/profile_proto"
 	repository_proto "OverflowBackend/proto/repository_proto"
 	utils_proto "OverflowBackend/proto/utils_proto"
+	context "context"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -37,32 +38,49 @@ func (m *MockProfileServiceInterface) EXPECT() *MockProfileServiceInterfaceMockR
 	return m.recorder
 }
 
-// GetAvatar mocks base method.
-func (m *MockProfileServiceInterface) GetAvatar(arg0 *profile_proto.GetAvatarRequest) *profile_proto.GetAvatarResponse {
+// ChangePassword mocks base method.
+func (m *MockProfileServiceInterface) ChangePassword(arg0 context.Context, arg1 *profile_proto.ChangePasswordRequest) (*utils_proto.JsonResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAvatar", arg0)
+	ret := m.ctrl.Call(m, "ChangePassword", arg0, arg1)
+	ret0, _ := ret[0].(*utils_proto.JsonResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ChangePassword indicates an expected call of ChangePassword.
+func (mr *MockProfileServiceInterfaceMockRecorder) ChangePassword(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangePassword", reflect.TypeOf((*MockProfileServiceInterface)(nil).ChangePassword), arg0, arg1)
+}
+
+// GetAvatar mocks base method.
+func (m *MockProfileServiceInterface) GetAvatar(arg0 context.Context, arg1 *profile_proto.GetAvatarRequest) (*profile_proto.GetAvatarResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAvatar", arg0, arg1)
 	ret0, _ := ret[0].(*profile_proto.GetAvatarResponse)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // GetAvatar indicates an expected call of GetAvatar.
-func (mr *MockProfileServiceInterfaceMockRecorder) GetAvatar(arg0 interface{}) *gomock.Call {
+func (mr *MockProfileServiceInterfaceMockRecorder) GetAvatar(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAvatar", reflect.TypeOf((*MockProfileServiceInterface)(nil).GetAvatar), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAvatar", reflect.TypeOf((*MockProfileServiceInterface)(nil).GetAvatar), arg0, arg1)
 }
 
 // GetInfo mocks base method.
-func (m *MockProfileServiceInterface) GetInfo(arg0 *utils_proto.Session) *profile_proto.GetInfoResponse {
+func (m *MockProfileServiceInterface) GetInfo(arg0 context.Context, arg1 *profile_proto.GetInfoRequest) (*profile_proto.GetInfoResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetInfo", arg0)
+	ret := m.ctrl.Call(m, "GetInfo", arg0, arg1)
 	ret0, _ := ret[0].(*profile_proto.GetInfoResponse)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // GetInfo indicates an expected call of GetInfo.
-func (mr *MockProfileServiceInterfaceMockRecorder) GetInfo(arg0 interface{}) *gomock.Call {
+func (mr *MockProfileServiceInterfaceMockRecorder) GetInfo(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetInfo", reflect.TypeOf((*MockProfileServiceInterface)(nil).GetInfo), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetInfo", reflect.TypeOf((*MockProfileServiceInterface)(nil).GetInfo), arg0, arg1)
 }
 
 // Init mocks base method.
@@ -78,29 +96,31 @@ func (mr *MockProfileServiceInterfaceMockRecorder) Init(arg0, arg1 interface{}) 
 }
 
 // SetAvatar mocks base method.
-func (m *MockProfileServiceInterface) SetAvatar(arg0 *profile_proto.SetAvatarRequest) *utils_proto.JsonResponse {
+func (m *MockProfileServiceInterface) SetAvatar(arg0 context.Context, arg1 *profile_proto.SetAvatarRequest) (*utils_proto.JsonResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetAvatar", arg0)
+	ret := m.ctrl.Call(m, "SetAvatar", arg0, arg1)
 	ret0, _ := ret[0].(*utils_proto.JsonResponse)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // SetAvatar indicates an expected call of SetAvatar.
-func (mr *MockProfileServiceInterfaceMockRecorder) SetAvatar(arg0 interface{}) *gomock.Call {
+func (mr *MockProfileServiceInterfaceMockRecorder) SetAvatar(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetAvatar", reflect.TypeOf((*MockProfileServiceInterface)(nil).SetAvatar), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetAvatar", reflect.TypeOf((*MockProfileServiceInterface)(nil).SetAvatar), arg0, arg1)
 }
 
 // SetInfo mocks base method.
-func (m *MockProfileServiceInterface) SetInfo(arg0 *profile_proto.SetInfoRequest) *utils_proto.JsonResponse {
+func (m *MockProfileServiceInterface) SetInfo(arg0 context.Context, arg1 *profile_proto.SetInfoRequest) (*utils_proto.JsonResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SetInfo", arg0)
+	ret := m.ctrl.Call(m, "SetInfo", arg0, arg1)
 	ret0, _ := ret[0].(*utils_proto.JsonResponse)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // SetInfo indicates an expected call of SetInfo.
-func (mr *MockProfileServiceInterfaceMockRecorder) SetInfo(arg0 interface{}) *gomock.Call {
+func (mr *MockProfileServiceInterfaceMockRecorder) SetInfo(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetInfo", reflect.TypeOf((*MockProfileServiceInterface)(nil).SetInfo), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetInfo", reflect.TypeOf((*MockProfileServiceInterface)(nil).SetInfo), arg0, arg1)
 }

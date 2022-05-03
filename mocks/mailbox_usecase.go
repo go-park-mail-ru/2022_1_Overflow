@@ -10,6 +10,7 @@ import (
 	profile_proto "OverflowBackend/proto/profile_proto"
 	repository_proto "OverflowBackend/proto/repository_proto"
 	utils_proto "OverflowBackend/proto/utils_proto"
+	context "context"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -39,45 +40,48 @@ func (m *MockMailBoxServiceInterface) EXPECT() *MockMailBoxServiceInterfaceMockR
 }
 
 // DeleteMail mocks base method.
-func (m *MockMailBoxServiceInterface) DeleteMail(arg0 *mailbox_proto.DeleteMailRequest) *utils_proto.JsonResponse {
+func (m *MockMailBoxServiceInterface) DeleteMail(arg0 context.Context, arg1 *mailbox_proto.DeleteMailRequest) (*utils_proto.JsonResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteMail", arg0)
+	ret := m.ctrl.Call(m, "DeleteMail", arg0, arg1)
 	ret0, _ := ret[0].(*utils_proto.JsonResponse)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // DeleteMail indicates an expected call of DeleteMail.
-func (mr *MockMailBoxServiceInterfaceMockRecorder) DeleteMail(arg0 interface{}) *gomock.Call {
+func (mr *MockMailBoxServiceInterfaceMockRecorder) DeleteMail(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMail", reflect.TypeOf((*MockMailBoxServiceInterface)(nil).DeleteMail), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteMail", reflect.TypeOf((*MockMailBoxServiceInterface)(nil).DeleteMail), arg0, arg1)
 }
 
 // GetMail mocks base method.
-func (m *MockMailBoxServiceInterface) GetMail(arg0 *mailbox_proto.GetMailRequest) *mailbox_proto.ResponseMail {
+func (m *MockMailBoxServiceInterface) GetMail(arg0 context.Context, arg1 *mailbox_proto.GetMailRequest) (*mailbox_proto.ResponseMail, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetMail", arg0)
+	ret := m.ctrl.Call(m, "GetMail", arg0, arg1)
 	ret0, _ := ret[0].(*mailbox_proto.ResponseMail)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // GetMail indicates an expected call of GetMail.
-func (mr *MockMailBoxServiceInterfaceMockRecorder) GetMail(arg0 interface{}) *gomock.Call {
+func (mr *MockMailBoxServiceInterfaceMockRecorder) GetMail(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMail", reflect.TypeOf((*MockMailBoxServiceInterface)(nil).GetMail), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetMail", reflect.TypeOf((*MockMailBoxServiceInterface)(nil).GetMail), arg0, arg1)
 }
 
 // Income mocks base method.
-func (m *MockMailBoxServiceInterface) Income(arg0 *utils_proto.Session) *mailbox_proto.ResponseMails {
+func (m *MockMailBoxServiceInterface) Income(arg0 context.Context, arg1 *mailbox_proto.IncomeRequest) (*mailbox_proto.ResponseMails, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Income", arg0)
+	ret := m.ctrl.Call(m, "Income", arg0, arg1)
 	ret0, _ := ret[0].(*mailbox_proto.ResponseMails)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Income indicates an expected call of Income.
-func (mr *MockMailBoxServiceInterfaceMockRecorder) Income(arg0 interface{}) *gomock.Call {
+func (mr *MockMailBoxServiceInterfaceMockRecorder) Income(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Income", reflect.TypeOf((*MockMailBoxServiceInterface)(nil).Income), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Income", reflect.TypeOf((*MockMailBoxServiceInterface)(nil).Income), arg0, arg1)
 }
 
 // Init mocks base method.
@@ -93,43 +97,46 @@ func (mr *MockMailBoxServiceInterfaceMockRecorder) Init(arg0, arg1, arg2 interfa
 }
 
 // Outcome mocks base method.
-func (m *MockMailBoxServiceInterface) Outcome(arg0 *utils_proto.Session) *mailbox_proto.ResponseMails {
+func (m *MockMailBoxServiceInterface) Outcome(arg0 context.Context, arg1 *mailbox_proto.OutcomeRequest) (*mailbox_proto.ResponseMails, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Outcome", arg0)
+	ret := m.ctrl.Call(m, "Outcome", arg0, arg1)
 	ret0, _ := ret[0].(*mailbox_proto.ResponseMails)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // Outcome indicates an expected call of Outcome.
-func (mr *MockMailBoxServiceInterfaceMockRecorder) Outcome(arg0 interface{}) *gomock.Call {
+func (mr *MockMailBoxServiceInterfaceMockRecorder) Outcome(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Outcome", reflect.TypeOf((*MockMailBoxServiceInterface)(nil).Outcome), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Outcome", reflect.TypeOf((*MockMailBoxServiceInterface)(nil).Outcome), arg0, arg1)
 }
 
 // ReadMail mocks base method.
-func (m *MockMailBoxServiceInterface) ReadMail(arg0 *mailbox_proto.ReadMailRequest) *utils_proto.JsonResponse {
+func (m *MockMailBoxServiceInterface) ReadMail(arg0 context.Context, arg1 *mailbox_proto.ReadMailRequest) (*utils_proto.JsonResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ReadMail", arg0)
+	ret := m.ctrl.Call(m, "ReadMail", arg0, arg1)
 	ret0, _ := ret[0].(*utils_proto.JsonResponse)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // ReadMail indicates an expected call of ReadMail.
-func (mr *MockMailBoxServiceInterfaceMockRecorder) ReadMail(arg0 interface{}) *gomock.Call {
+func (mr *MockMailBoxServiceInterfaceMockRecorder) ReadMail(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadMail", reflect.TypeOf((*MockMailBoxServiceInterface)(nil).ReadMail), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadMail", reflect.TypeOf((*MockMailBoxServiceInterface)(nil).ReadMail), arg0, arg1)
 }
 
 // SendMail mocks base method.
-func (m *MockMailBoxServiceInterface) SendMail(arg0 *mailbox_proto.SendMailRequest) *utils_proto.JsonResponse {
+func (m *MockMailBoxServiceInterface) SendMail(arg0 context.Context, arg1 *mailbox_proto.SendMailRequest) (*utils_proto.JsonResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SendMail", arg0)
+	ret := m.ctrl.Call(m, "SendMail", arg0, arg1)
 	ret0, _ := ret[0].(*utils_proto.JsonResponse)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // SendMail indicates an expected call of SendMail.
-func (mr *MockMailBoxServiceInterfaceMockRecorder) SendMail(arg0 interface{}) *gomock.Call {
+func (mr *MockMailBoxServiceInterfaceMockRecorder) SendMail(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMail", reflect.TypeOf((*MockMailBoxServiceInterface)(nil).SendMail), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMail", reflect.TypeOf((*MockMailBoxServiceInterface)(nil).SendMail), arg0, arg1)
 }

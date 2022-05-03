@@ -185,6 +185,21 @@ func (mr *MockDatabaseRepositoryMockRecorder) DeleteFolder(arg0, arg1 interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFolder", reflect.TypeOf((*MockDatabaseRepository)(nil).DeleteFolder), arg0, arg1)
 }
 
+// DeleteFolderMail mocks base method.
+func (m *MockDatabaseRepository) DeleteFolderMail(arg0 context.Context, arg1 *repository_proto.DeleteFolderMailRequest) (*utils_proto.DatabaseResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteFolderMail", arg0, arg1)
+	ret0, _ := ret[0].(*utils_proto.DatabaseResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteFolderMail indicates an expected call of DeleteFolderMail.
+func (mr *MockDatabaseRepositoryMockRecorder) DeleteFolderMail(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFolderMail", reflect.TypeOf((*MockDatabaseRepository)(nil).DeleteFolderMail), arg0, arg1)
+}
+
 // DeleteMail mocks base method.
 func (m *MockDatabaseRepository) DeleteMail(arg0 context.Context, arg1 *repository_proto.DeleteMailRequest) (*utils_proto.DatabaseResponse, error) {
 	m.ctrl.T.Helper()

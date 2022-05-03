@@ -37,10 +37,10 @@ func (m *MockFolderManagerServiceInterface) EXPECT() *MockFolderManagerServiceIn
 }
 
 // AddFolder mocks base method.
-func (m *MockFolderManagerServiceInterface) AddFolder(arg0 context.Context, arg1 *folder_manager_proto.AddFolderRequest) (*utils_proto.JsonResponse, error) {
+func (m *MockFolderManagerServiceInterface) AddFolder(arg0 context.Context, arg1 *folder_manager_proto.AddFolderRequest) (*folder_manager_proto.ResponseFolder, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddFolder", arg0, arg1)
-	ret0, _ := ret[0].(*utils_proto.JsonResponse)
+	ret0, _ := ret[0].(*folder_manager_proto.ResponseFolder)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -94,6 +94,36 @@ func (m *MockFolderManagerServiceInterface) DeleteFolder(arg0 context.Context, a
 func (mr *MockFolderManagerServiceInterfaceMockRecorder) DeleteFolder(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFolder", reflect.TypeOf((*MockFolderManagerServiceInterface)(nil).DeleteFolder), arg0, arg1)
+}
+
+// DeleteFolderMail mocks base method.
+func (m *MockFolderManagerServiceInterface) DeleteFolderMail(arg0 context.Context, arg1 *folder_manager_proto.DeleteFolderMailRequest) (*utils_proto.JsonResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteFolderMail", arg0, arg1)
+	ret0, _ := ret[0].(*utils_proto.JsonResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteFolderMail indicates an expected call of DeleteFolderMail.
+func (mr *MockFolderManagerServiceInterfaceMockRecorder) DeleteFolderMail(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteFolderMail", reflect.TypeOf((*MockFolderManagerServiceInterface)(nil).DeleteFolderMail), arg0, arg1)
+}
+
+// ListFolder mocks base method.
+func (m *MockFolderManagerServiceInterface) ListFolder(arg0 context.Context, arg1 *folder_manager_proto.ListFolderRequest) (*folder_manager_proto.ListFolderRequest, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListFolder", arg0, arg1)
+	ret0, _ := ret[0].(*folder_manager_proto.ListFolderRequest)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListFolder indicates an expected call of ListFolder.
+func (mr *MockFolderManagerServiceInterfaceMockRecorder) ListFolder(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFolder", reflect.TypeOf((*MockFolderManagerServiceInterface)(nil).ListFolder), arg0, arg1)
 }
 
 // ListFolders mocks base method.
