@@ -356,6 +356,7 @@ func (s *MailBoxService) ReadMail(context context.Context, request *mailbox_prot
 	}
 	resp2, err := s.db.ReadMail(context, &repository_proto.ReadMailRequest{
 		Mail: resp.Mail,
+		Read: request.Read,
 	})
 	if err != nil {
 		log.Error(err)

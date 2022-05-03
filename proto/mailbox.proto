@@ -32,6 +32,7 @@ message SendMailRequest {
 message ReadMailRequest {
     utils.Session data = 1;
     int32 id = 2;
+    bool read = 3;
 }
 
 message ResponseMail {

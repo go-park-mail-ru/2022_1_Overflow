@@ -71,6 +71,7 @@ message DeleteMailRequest {
 
 message ReadMailRequest {
     bytes mail = 1;
+    bool read = 2;
 }
 
 message GetMailInfoByIdRequest {

@@ -190,9 +190,10 @@ func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 func DeleteMail() {}
 
 // ReadMail godoc
-// @Summary Прочитать письмо по его id
+// @Summary Отметить число прочитанным/непрочитанным по его id. При отсутствии параметра isread запрос отмечает письмо с заданным id прочитанным.
 // @Produce json
 // @Param id query string true "ID запрашиваемого письма."
+// @Param isread query bool false "Задать конкретное значение поля вручную."
 // @Success 200 {object} pkg.JsonResponse "OK"
 // @Failure 401 {object} pkg.JsonResponse"Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
@@ -217,9 +218,14 @@ func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
 		return
 	}
+	read, err  := strconv.ParseBool(r.URL.Query().Get("isread"))
+	if err != nil {
+		read = true
+	}
 	resp, err := d.mailbox.ReadMail(context.Background(), &mailbox_proto.ReadMailRequest{
 		Data: data,
 		Id:   int32(id),
+		Read: read,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)

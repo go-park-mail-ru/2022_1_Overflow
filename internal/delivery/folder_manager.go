@@ -95,7 +95,11 @@ func (d *Delivery) AddMailToFolder(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
 		return
 	}
-	move := len(r.URL.Query().Get("move")) > 0
+	move, err  := strconv.ParseBool(r.URL.Query().Get("move"))
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
+		return
+	}
 	resp, err := d.folderManager.AddMailToFolder(context.Background(), &folder_manager_proto.AddMailToFolderRequest{
 		Data:       data,
 		FolderId: int32(folderId),
@@ -268,7 +272,11 @@ func (d *Delivery) DeleteFolderMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
 		return
 	}
-	restore := len(r.URL.Query().Get("restore")) > 0
+	restore, err  := strconv.ParseBool(r.URL.Query().Get("restore"))
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
+		return
+	}
 	resp, err := d.folderManager.DeleteFolderMail(context.Background(), &folder_manager_proto.DeleteFolderMailRequest{
 		Data: data,
 		FolderId: int32(folderId),
