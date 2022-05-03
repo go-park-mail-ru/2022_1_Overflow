@@ -30,3 +30,37 @@ type ChangePasswordForm struct {
 	NewPassword string `json:"password_new" validate:"max=45"`
 	NewPasswordConf string `json:"password_new_confirmation" validate:"max=45"`
 }
+
+type ReadMailForm struct {
+	Id int32 `json:"id"`
+	IsRead bool `json:"isread"`
+}
+
+type DeleteMailForm struct {
+	Id int32 `json:"id"`
+}
+
+type AddFolderForm struct {
+	FolderName string `json:"folder_name"`
+}
+
+type AddMailToFolderForm struct {
+	FolderId int32 `json:"folder_id"`
+	MailId int32 `json:"mail_id"`
+	Move bool `json:"move"`
+}
+
+type ChangeFolderForm struct {
+	FolderId int32 `json:"folder_id"`
+	NewFolderName string `json:"new_folder_name"`
+}
+
+type DeleteFolderForm struct {
+	FolderName string `json:"folder_name"`
+}
+
+type DeleteFolderMailForm struct {
+	FolderId int32 `json:"folder_id"`
+	MailId int32 `json:"mail_id"`
+	Restore bool `json:"restore"`
+}

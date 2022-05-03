@@ -1,5 +1,26 @@
 basePath: /
 definitions:
+  models.AddFolderForm:
+    properties:
+      folder_name:
+        type: string
+    type: object
+  models.AddMailToFolderForm:
+    properties:
+      folder_id:
+        type: integer
+      mail_id:
+        type: integer
+      move:
+        type: boolean
+    type: object
+  models.ChangeFolderForm:
+    properties:
+      folder_id:
+        type: integer
+      new_folder_name:
+        type: string
+    type: object
   models.ChangePasswordForm:
     properties:
       password_new:
@@ -11,6 +32,16 @@ definitions:
       password_old:
         maxLength: 45
         type: string
+    type: object
+  models.DeleteFolderForm:
+    properties:
+      folder_name:
+        type: string
+    type: object
+  models.DeleteMailForm:
+    properties:
+      id:
+        type: integer
     type: object
   models.Folder:
     properties:
@@ -89,6 +120,13 @@ definitions:
         maxLength: 45
         type: string
     type: object
+  models.ReadMailForm:
+    properties:
+      id:
+        type: integer
+      isread:
+        type: boolean
+    type: object
   models.SignInForm:
     properties:
       password:
@@ -146,11 +184,12 @@ paths:
       - folder_manager
     post:
       parameters:
-      - description: Имя папки.
-        in: query
-        name: folder_name
+      - description: Форма запроса
+        in: body
+        name: AddFolderForm
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/models.AddFolderForm'
       - description: CSRF токен
         in: header
         name: X-CSRF-Token
@@ -193,11 +232,12 @@ paths:
       - folder_manager
     post:
       parameters:
-      - description: Имя папки.
-        in: query
-        name: folder_name
+      - description: Форма запроса
+        in: body
+        name: DeleteFolderForm
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/models.DeleteFolderForm'
       - description: CSRF токен
         in: header
         name: X-CSRF-Token
@@ -272,22 +312,12 @@ paths:
       - folder_manager
     post:
       parameters:
-      - description: ID папки.
-        in: query
-        name: folder_id
+      - description: Форма запроса
+        in: body
+        name: AddMailToFolderForm
         required: true
-        type: integer
-      - description: ID добавляемого письма.
-        in: query
-        name: mail_id
-        required: true
-        type: integer
-      - description: Следует ли переместить письмо в эту папку (с последующим удалением
-          из источника).
-        in: query
-        name: move
-        required: true
-        type: boolean
+        schema:
+          $ref: '#/definitions/models.AddMailToFolderForm'
       - description: CSRF токен
         in: header
         name: X-CSRF-Token
@@ -387,16 +417,12 @@ paths:
       - folder_manager
     post:
       parameters:
-      - description: ID изменяемой папки.
-        in: query
-        name: folder_id
+      - description: Форма запроса
+        in: body
+        name: ChangeFolderForm
         required: true
-        type: integer
-      - description: Новое имя папки.
-        in: query
-        name: new_folder_name
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/models.ChangeFolderForm'
       - description: CSRF токен
         in: header
         name: X-CSRF-Token
@@ -477,11 +503,12 @@ paths:
       - mailbox
     post:
       parameters:
-      - description: ID запрашиваемого письма.
-        in: query
-        name: id
+      - description: Форма запроса
+        in: body
+        name: DeleteMailForm
         required: true
-        type: integer
+        schema:
+          $ref: '#/definitions/models.DeleteMailForm'
       - description: CSRF токен
         in: header
         name: X-CSRF-Token
@@ -607,15 +634,12 @@ paths:
       - mailbox
     post:
       parameters:
-      - description: ID запрашиваемого письма.
-        in: query
-        name: id
+      - description: Форма запроса
+        in: body
+        name: ReadMailForm
         required: true
-        type: string
-      - description: Задать конкретное значение поля вручную.
-        in: query
-        name: isread
-        type: boolean
+        schema:
+          $ref: '#/definitions/models.ReadMailForm'
       - description: CSRF токен
         in: header
         name: X-CSRF-Token

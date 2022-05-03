@@ -12,6 +12,8 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+
+	"gopkg.in/validator.v2"
 )
 
 // GetInfo godoc
@@ -146,6 +148,10 @@ func (d *Delivery) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, "Старый и новый пароли совпадают."))
 		return
 	}
+	if err := validator.Validate(form); err != nil {
+		pkg.WriteJsonErrFull(w, pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, err.Error()))
+		return
+	}
 	resp, err := d.profile.ChangePassword(context.Background(), &profile_proto.ChangePasswordRequest{
 		Data: data,
 		PasswordOld: form.OldPassword,
@@ -191,15 +197,12 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
-
 	data, err := session.Manager.GetData(r)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-
 	var buf bytes.Buffer
-
 	file, header, err := r.FormFile("file")
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
@@ -256,7 +259,6 @@ func (d *Delivery) GetAvatar(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
-
 	username := r.URL.Query().Get("username")
 	if len(username) == 0 {
 		data, e := session.Manager.GetData(r)
@@ -266,7 +268,6 @@ func (d *Delivery) GetAvatar(w http.ResponseWriter, r *http.Request) {
 		}
 		username = data.Username
 	}
-
 	resp, err := d.profile.GetAvatar(context.Background(), &profile_proto.GetAvatarRequest{
 		Username: username,
 	})
@@ -284,6 +285,5 @@ func (d *Delivery) GetAvatar(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
-
 	pkg.WriteJsonErr(w, pkg.STATUS_OK, resp.Url)
 }

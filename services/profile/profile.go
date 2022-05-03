@@ -239,7 +239,7 @@ func (s *ProfileService) ChangePassword(context context.Context, request *profil
 	}
 	if user.Password != pkg.HashPassword(request.PasswordOld) {
 		return &utils_proto.JsonResponse{
-			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
+			Response: pkg.CreateJsonErr(pkg.STATUS_WRONG_CREDS, "Неверный пароль.").Bytes(),
 		}, nil
 	}
 	resp3, err := s.db.ChangeUserPassword(context, &repository_proto.ChangeForm{

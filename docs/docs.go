@@ -49,11 +49,13 @@ const docTemplate = `{
                 "summary": "Добавить папку с письмами для пользователя",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Имя папки.",
-                        "name": "folder_name",
-                        "in": "query",
-                        "required": true
+                        "description": "Форма запроса",
+                        "name": "AddFolderForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AddFolderForm"
+                        }
                     },
                     {
                         "type": "string",
@@ -121,11 +123,13 @@ const docTemplate = `{
                 "summary": "Удалить папку с письмами",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Имя папки.",
-                        "name": "folder_name",
-                        "in": "query",
-                        "required": true
+                        "description": "Форма запроса",
+                        "name": "DeleteFolderForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DeleteFolderForm"
+                        }
                     },
                     {
                         "type": "string",
@@ -241,25 +245,13 @@ const docTemplate = `{
                 "summary": "Добавить письмо в папку с письмами",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "ID папки.",
-                        "name": "folder_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "ID добавляемого письма.",
-                        "name": "mail_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Следует ли переместить письмо в эту папку (с последующим удалением из источника).",
-                        "name": "move",
-                        "in": "query",
-                        "required": true
+                        "description": "Форма запроса",
+                        "name": "AddMailToFolderForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AddMailToFolderForm"
+                        }
                     },
                     {
                         "type": "string",
@@ -413,18 +405,13 @@ const docTemplate = `{
                 "summary": "Переименовать папку с письмами",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "ID изменяемой папки.",
-                        "name": "folder_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Новое имя папки.",
-                        "name": "new_folder_name",
-                        "in": "query",
-                        "required": true
+                        "description": "Форма запроса",
+                        "name": "ChangeFolderForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ChangeFolderForm"
+                        }
                     },
                     {
                         "type": "string",
@@ -551,11 +538,13 @@ const docTemplate = `{
                 "summary": "Удалить письмо по его id",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "ID запрашиваемого письма.",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
+                        "description": "Форма запроса",
+                        "name": "DeleteMailForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DeleteMailForm"
+                        }
                     },
                     {
                         "type": "string",
@@ -749,17 +738,13 @@ const docTemplate = `{
                 "summary": "Отметить число прочитанным/непрочитанным по его id. При отсутствии параметра isread запрос отмечает письмо с заданным id прочитанным.",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "ID запрашиваемого письма.",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Задать конкретное значение поля вручную.",
-                        "name": "isread",
-                        "in": "query"
+                        "description": "Форма запроса",
+                        "name": "ReadMailForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ReadMailForm"
+                        }
                     },
                     {
                         "type": "string",
@@ -1289,6 +1274,39 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.AddFolderForm": {
+            "type": "object",
+            "properties": {
+                "folder_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.AddMailToFolderForm": {
+            "type": "object",
+            "properties": {
+                "folder_id": {
+                    "type": "integer"
+                },
+                "mail_id": {
+                    "type": "integer"
+                },
+                "move": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.ChangeFolderForm": {
+            "type": "object",
+            "properties": {
+                "folder_id": {
+                    "type": "integer"
+                },
+                "new_folder_name": {
+                    "type": "string"
+                }
+            }
+        },
         "models.ChangePasswordForm": {
             "type": "object",
             "properties": {
@@ -1303,6 +1321,22 @@ const docTemplate = `{
                 "password_old": {
                     "type": "string",
                     "maxLength": 45
+                }
+            }
+        },
+        "models.DeleteFolderForm": {
+            "type": "object",
+            "properties": {
+                "folder_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.DeleteMailForm": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
                 }
             }
         },
@@ -1417,6 +1451,17 @@ const docTemplate = `{
                 "last_name": {
                     "type": "string",
                     "maxLength": 45
+                }
+            }
+        },
+        "models.ReadMailForm": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "isread": {
+                    "type": "boolean"
                 }
             }
         },

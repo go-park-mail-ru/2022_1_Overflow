@@ -1,6 +1,7 @@
 package delivery
 
 import (
+	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/session"
 	"OverflowBackend/pkg"
 	"OverflowBackend/proto/folder_manager_proto"
@@ -13,7 +14,7 @@ import (
 // AddFolder godoc
 // @Summary Добавить папку с письмами для пользователя
 // @Produce json
-// @Param folder_name query string true "Имя папки."
+// @Param AddFolderForm body models.AddFolderForm true "Форма запроса"
 // @Success 200 {object} models.Folder "OK"
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
@@ -32,14 +33,14 @@ func (d *Delivery) AddFolder(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-	folderName := r.URL.Query().Get("folder_name")
-	if len(folderName) == 0 {
-		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
+	var form models.AddFolderForm
+	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
 	resp, err := d.folderManager.AddFolder(context.Background(), &folder_manager_proto.AddFolderRequest{
 		Data: data,
-		Name: folderName,
+		Name: form.FolderName,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
@@ -67,9 +68,7 @@ func AddFolder() {}
 // AddMailToFolder godoc
 // @Summary Добавить письмо в папку с письмами
 // @Produce json
-// @Param folder_id query int true "ID папки."
-// @Param mail_id query int true "ID добавляемого письма."
-// @Param move query bool true "Следует ли переместить письмо в эту папку (с последующим удалением из источника)."
+// @Param AddMailToFolderForm body models.AddMailToFolderForm true "Форма запроса"
 // @Success 200 {object} pkg.JsonResponse "OK"
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
@@ -88,26 +87,16 @@ func (d *Delivery) AddMailToFolder(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-	folderId, err := strconv.Atoi(r.URL.Query().Get("folder_id"))
-	if err != nil {
-		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
-		return
-	}
-	mailId, err := strconv.Atoi(r.URL.Query().Get("mail_id"))
-	if err != nil {
-		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
-		return
-	}
-	move, err  := strconv.ParseBool(r.URL.Query().Get("move"))
-	if err != nil {
-		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
+	var form models.AddMailToFolderForm
+	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
 	resp, err := d.folderManager.AddMailToFolder(context.Background(), &folder_manager_proto.AddMailToFolderRequest{
 		Data:       data,
-		FolderId: int32(folderId),
-		MailId:     int32(mailId),
-		Move: move,
+		FolderId: form.FolderId,
+		MailId:     form.MailId,
+		Move: form.Move,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
@@ -135,8 +124,7 @@ func AddMailToFolder() {}
 // ChangeFolder godoc
 // @Summary Переименовать папку с письмами
 // @Produce json
-// @Param folder_id query int true "ID изменяемой папки."
-// @Param new_folder_name query string true "Новое имя папки."
+// @Param ChangeFolderForm body models.ChangeFolderForm true "Форма запроса"
 // @Success 200 {object} pkg.JsonResponse "OK"
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
@@ -155,20 +143,15 @@ func (d *Delivery) ChangeFolder(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-	folderId, err := strconv.Atoi(r.URL.Query().Get("folder_id"))
-	if err != nil {
-		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
-		return
-	}
-	folderNewName := r.URL.Query().Get("new_folder_name")
-	if len(folderNewName) == 0 {
-		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
+	var form models.ChangeFolderForm
+	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
 	resp, err := d.folderManager.ChangeFolder(context.Background(), &folder_manager_proto.ChangeFolderRequest{
 		Data:          data,
-		FolderId:    int32(folderId),
-		FolderNewName: folderNewName,
+		FolderId:    form.FolderId,
+		FolderNewName: form.NewFolderName,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
@@ -196,7 +179,7 @@ func ChangeFolder() {}
 // DeleteFolder godoc
 // @Summary Удалить папку с письмами
 // @Produce json
-// @Param folder_name query string true "Имя папки."
+// @Param DeleteFolderForm body models.DeleteFolderForm true "Форма запроса"
 // @Success 200 {object} pkg.JsonResponse "OK"
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
@@ -215,14 +198,14 @@ func (d *Delivery) DeleteFolder(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-	folderName := r.URL.Query().Get("folder_name")
-	if len(folderName) == 0 {
-		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
+	var form models.DeleteFolderForm
+	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
 	resp, err := d.folderManager.DeleteFolder(context.Background(), &folder_manager_proto.DeleteFolderRequest{
 		Data: data,
-		Name: folderName,
+		Name: form.FolderName,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
@@ -271,26 +254,16 @@ func (d *Delivery) DeleteFolderMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-	folderId, err := strconv.Atoi(r.URL.Query().Get("folder_id"))
-	if err != nil {
-		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
-		return
-	}
-	mailId, err := strconv.Atoi(r.URL.Query().Get("mail_id"))
-	if err != nil {
-		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
-		return
-	}
-	restore, err  := strconv.ParseBool(r.URL.Query().Get("restore"))
-	if err != nil {
-		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
+	var form models.DeleteFolderMailForm
+	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
 	resp, err := d.folderManager.DeleteFolderMail(context.Background(), &folder_manager_proto.DeleteFolderMailRequest{
 		Data: data,
-		FolderId: int32(folderId),
-		MailId: int32(mailId),
-		Restore: restore,
+		FolderId: form.FolderId,
+		MailId: form.MailId,
+		Restore: form.Restore,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)

@@ -104,13 +104,11 @@ func (d *Delivery) GetMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
-
 	data, e := session.Manager.GetData(r)
 	if e != nil {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-
 	mail_id, e := strconv.Atoi(r.URL.Query().Get("id"))
 	if e != nil {
 		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
@@ -141,7 +139,7 @@ func (d *Delivery) GetMail(w http.ResponseWriter, r *http.Request) {
 // DeleteMail godoc
 // @Summary Удалить письмо по его id
 // @Produce json
-// @Param id query int true "ID запрашиваемого письма."
+// @Param DeleteMailForm body models.DeleteMailForm true "Форма запроса"
 // @Success 200 {object} pkg.JsonResponse "OK"
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
@@ -155,21 +153,19 @@ func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
-
 	data, err := session.Manager.GetData(r)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-	idStr := r.URL.Query().Get("id")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
+	var form models.DeleteMailForm
+	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
 	resp, err := d.mailbox.DeleteMail(context.Background(), &mailbox_proto.DeleteMailRequest{
 		Data: data,
-		Id:   int32(id),
+		Id:   form.Id,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
@@ -197,8 +193,7 @@ func DeleteMail() {}
 // ReadMail godoc
 // @Summary Отметить число прочитанным/непрочитанным по его id. При отсутствии параметра isread запрос отмечает письмо с заданным id прочитанным.
 // @Produce json
-// @Param id query string true "ID запрашиваемого письма."
-// @Param isread query bool false "Задать конкретное значение поля вручную."
+// @Param ReadMailForm body models.ReadMailForm true "Форма запроса"
 // @Success 200 {object} pkg.JsonResponse "OK"
 // @Failure 401 {object} pkg.JsonResponse"Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
@@ -212,26 +207,20 @@ func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
-
 	data, err := session.Manager.GetData(r)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-	idStr := r.URL.Query().Get("id")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
+	var form models.ReadMailForm
+	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
-	}
-	read, err  := strconv.ParseBool(r.URL.Query().Get("isread"))
-	if err != nil {
-		read = true
 	}
 	resp, err := d.mailbox.ReadMail(context.Background(), &mailbox_proto.ReadMailRequest{
 		Data: data,
-		Id:   int32(id),
-		Read: read,
+		Id:   form.Id,
+		Read: form.IsRead,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
@@ -288,7 +277,6 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 	form.Text = xss.EscapeInput(form.Text)
 	form.Theme = xss.EscapeInput(form.Theme)
 	formBytes, _ := json.Marshal(form)
-
 	resp, err := d.mailbox.SendMail(context.Background(), &mailbox_proto.SendMailRequest{
 		Data: data,
 		Form: formBytes,
