@@ -87,7 +87,7 @@ func (c *Database) GetFolderByName(context context.Context, request *repository_
 func (c *Database) GetFoldersByUser(context context.Context, request *repository_proto.GetFoldersByUserRequest) (*repository_proto.ResponseFolders, error) {
 	var folders []models.Folder
 	foldersBytes, _ := json.Marshal(folders)
-	rows, err := c.Conn.Query(context, "SELECT * FROM overflow.folders WHERE user_id=$1;", request.UserId)
+	rows, err := c.Conn.Query(context, "SELECT * FROM overflow.folders WHERE user_id=$1 ORDER BY created_at DESC;", request.UserId)
 	if err != nil {
 		return &repository_proto.ResponseFolders{
 			Response: &utils_proto.DatabaseResponse{
