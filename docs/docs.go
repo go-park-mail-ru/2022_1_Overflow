@@ -1343,8 +1343,8 @@ const docTemplate = `{
         "models.DeleteFolderForm": {
             "type": "object",
             "properties": {
-                "folder_name": {
-                    "type": "string"
+                "id": {
+                    "type": "integer"
                 }
             }
         },
