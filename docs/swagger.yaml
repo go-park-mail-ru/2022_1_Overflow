@@ -51,8 +51,6 @@ definitions:
         type: string
       mail_id:
         type: integer
-      restore:
-        type: boolean
     type: object
   models.DeleteMailForm:
     properties:

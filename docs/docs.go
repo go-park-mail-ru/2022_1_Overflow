@@ -1515,9 +1515,6 @@ const docTemplate = `{
                 },
                 "mail_id": {
                     "type": "integer"
-                },
-                "restore": {
-                    "type": "boolean"
                 }
             }
         },

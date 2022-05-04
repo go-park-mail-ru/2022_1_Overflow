@@ -73,5 +73,4 @@ type DeleteFolderForm struct {
 type DeleteFolderMailForm struct {
 	FolderName string `json:"folder_name" validate:"nonzero"`
 	MailId int32 `json:"mail_id" validate:"nonzero"`
-	Restore bool `json:"restore"`
 }
