@@ -5,7 +5,7 @@ definitions:
       folder_name:
         type: string
     type: object
-  models.AddMailToFolderForm:
+  models.AddMailToFolderByIdForm:
     properties:
       folder_name:
         type: string
@@ -13,6 +13,13 @@ definitions:
         type: integer
       move:
         type: boolean
+    type: object
+  models.AddMailToFolderByObjectForm:
+    properties:
+      folder_name:
+        type: string
+      form:
+        $ref: '#/definitions/models.MailForm'
     type: object
   models.ChangeFolderForm:
     properties:
@@ -68,8 +75,6 @@ definitions:
       addressee:
         maxLength: 45
         type: string
-      client_id:
-        type: integer
       date:
         type: string
       files:
@@ -105,6 +110,15 @@ definitions:
       theme:
         maxLength: 45
         type: string
+    type: object
+  models.MoveFolderMailForm:
+    properties:
+      folder_name_dest:
+        type: string
+      folder_name_src:
+        type: string
+      mail_id:
+        type: integer
     type: object
   models.ProfileInfo:
     properties:
@@ -323,10 +337,10 @@ paths:
       parameters:
       - description: Форма запроса
         in: body
-        name: AddMailToFolderForm
+        name: AddMailToFolderByIdForm
         required: true
         schema:
-          $ref: '#/definitions/models.AddMailToFolderForm'
+          $ref: '#/definitions/models.AddMailToFolderByIdForm'
       - description: CSRF токен
         in: header
         name: X-CSRF-Token
@@ -351,7 +365,55 @@ paths:
           description: Ошибка БД, неверные GET параметры.
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
-      summary: Добавить письмо в папку с письмами
+      summary: Добавить письмо в папку с письмами по его id
+      tags:
+      - folder_manager
+  /folder/mail/add_form:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - folder_manager
+    post:
+      parameters:
+      - description: Форма запроса
+        in: body
+        name: AddMailToFolderByObjectForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddMailToFolderByObjectForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка БД, неверные GET параметры.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Добавить письмо в папку с письмами по форме
       tags:
       - folder_manager
   /folder/mail/delete:
@@ -400,6 +462,54 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Удалить письмо из папки
+      tags:
+      - folder_manager
+  /folder/mail/move:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - folder_manager
+    post:
+      parameters:
+      - description: Форма запроса
+        in: body
+        name: MoveFolderMailForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.MoveFolderMailForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка БД, неверные GET параметры.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Добавить письмо в папку с письмами по форме
       tags:
       - folder_manager
   /folder/rename:

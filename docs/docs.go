@@ -242,15 +242,89 @@ const docTemplate = `{
                 "tags": [
                     "folder_manager"
                 ],
-                "summary": "Добавить письмо в папку с письмами",
+                "summary": "Добавить письмо в папку с письмами по его id",
                 "parameters": [
                     {
                         "description": "Форма запроса",
-                        "name": "AddMailToFolderForm",
+                        "name": "AddMailToFolderByIdForm",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.AddMailToFolderForm"
+                            "$ref": "#/definitions/models.AddMailToFolderByIdForm"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка БД, неверные GET параметры.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/folder/mail/add_form": {
+            "get": {
+                "tags": [
+                    "folder_manager"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "folder_manager"
+                ],
+                "summary": "Добавить письмо в папку с письмами по форме",
+                "parameters": [
+                    {
+                        "description": "Форма запроса",
+                        "name": "AddMailToFolderByObjectForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AddMailToFolderByObjectForm"
                         }
                     },
                     {
@@ -325,6 +399,80 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/models.DeleteFolderMailForm"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка БД, неверные GET параметры.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/folder/mail/move": {
+            "get": {
+                "tags": [
+                    "folder_manager"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "folder_manager"
+                ],
+                "summary": "Добавить письмо в папку с письмами по форме",
+                "parameters": [
+                    {
+                        "description": "Форма запроса",
+                        "name": "MoveFolderMailForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.MoveFolderMailForm"
                         }
                     },
                     {
@@ -1298,7 +1446,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.AddMailToFolderForm": {
+        "models.AddMailToFolderByIdForm": {
             "type": "object",
             "properties": {
                 "folder_name": {
@@ -1309,6 +1457,17 @@ const docTemplate = `{
                 },
                 "move": {
                     "type": "boolean"
+                }
+            }
+        },
+        "models.AddMailToFolderByObjectForm": {
+            "type": "object",
+            "properties": {
+                "folder_name": {
+                    "type": "string"
+                },
+                "form": {
+                    "$ref": "#/definitions/models.MailForm"
                 }
             }
         },
@@ -1394,9 +1553,6 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 45
                 },
-                "client_id": {
-                    "type": "integer"
-                },
                 "date": {
                     "type": "string"
                 },
@@ -1448,6 +1604,20 @@ const docTemplate = `{
                 "theme": {
                     "type": "string",
                     "maxLength": 45
+                }
+            }
+        },
+        "models.MoveFolderMailForm": {
+            "type": "object",
+            "properties": {
+                "folder_name_dest": {
+                    "type": "string"
+                },
+                "folder_name_src": {
+                    "type": "string"
+                },
+                "mail_id": {
+                    "type": "integer"
                 }
             }
         },

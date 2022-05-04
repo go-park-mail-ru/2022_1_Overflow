@@ -74,7 +74,7 @@ func AddFolder() {}
 // AddMailToFolderById godoc
 // @Summary Добавить письмо в папку с письмами по его id
 // @Produce json
-// @Param AddMailToFolderForm body models.AddMailToFolderForm true "Форма запроса"
+// @Param AddMailToFolderByIdForm body models.AddMailToFolderByIdForm true "Форма запроса"
 // @Success 200 {object} pkg.JsonResponse "OK"
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
@@ -134,7 +134,7 @@ func AddMailToFolder() {}
 // AddMailToFolderByObject godoc
 // @Summary Добавить письмо в папку с письмами по форме
 // @Produce json
-// @Param AddMailToFolderByObjectForm body models.AddMailToFolderByObject true "Форма запроса"
+// @Param AddMailToFolderByObjectForm body models.AddMailToFolderByObjectForm true "Форма запроса"
 // @Success 200 {object} pkg.JsonResponse "OK"
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
