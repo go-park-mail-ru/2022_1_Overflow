@@ -14,53 +14,53 @@ type SignUpForm struct {
 }
 
 type MailForm struct {
-	Addressee string `json:"addressee" validate:"max=45"`
-	Theme     string `json:"theme" validate:"max=45"`
-	Text      string `json:"text"`
+	Addressee string `json:"addressee" validate:"nonzero,max=45"`
+	Theme     string `json:"theme" validate:"nonzero,max=45"`
+	Text      string `json:"text" validate:"nonzero"`
 	Files     string `json:"files"`
 }
 
 type ProfileSettingsForm struct {
-	Firstname string `json:"first_name" validate:"max=45"`
-	Lastname string `json:"last_name" validate:"max=45"`
+	Firstname string `json:"first_name" validate:"nonzero,max=45"`
+	Lastname string `json:"last_name" validate:"nonzero,max=45"`
 }
 
 type ChangePasswordForm struct {
-	OldPassword string `json:"password_old" validate:"max=45"`
-	NewPassword string `json:"password_new" validate:"max=45"`
-	NewPasswordConf string `json:"password_new_confirmation" validate:"max=45"`
+	OldPassword string `json:"password_old" validate:"nonzero,max=45"`
+	NewPassword string `json:"password_new" validate:"nonzero,max=45"`
+	NewPasswordConf string `json:"password_new_confirmation" validate:"nonzero,max=45"`
 }
 
 type ReadMailForm struct {
-	Id int32 `json:"id"`
+	Id int32 `json:"id" validate:"nonzero"`
 	IsRead bool `json:"isread"`
 }
 
 type DeleteMailForm struct {
-	Id int32 `json:"id"`
+	Id int32 `json:"id" validate:"nonzero"`
 }
 
 type AddFolderForm struct {
-	FolderName string `json:"folder_name"`
+	FolderName string `json:"folder_name" validate:"nonzero"`
 }
 
 type AddMailToFolderForm struct {
-	FolderName string `json:"folder_name"`
-	MailId int32 `json:"mail_id"`
+	FolderName string `json:"folder_name" validate:"nonzero"`
+	MailId int32 `json:"mail_id" validate:"nonzero"`
 	Move bool `json:"move"`
 }
 
 type ChangeFolderForm struct {
-	FolderName string `json:"folder_name"`
-	NewFolderName string `json:"new_folder_name"`
+	FolderName string `json:"folder_name" validate:"nonzero"`
+	NewFolderName string `json:"new_folder_name" validate:"nonzero"`
 }
 
 type DeleteFolderForm struct {
-	FolderName string `json:"folder_name"`
+	FolderName string `json:"folder_name" validate:"nonzero"`
 }
 
 type DeleteFolderMailForm struct {
-	FolderName string `json:"folder_name"`
-	MailId int32 `json:"mail_id"`
+	FolderName string `json:"folder_name" validate:"nonzero"`
+	MailId int32 `json:"mail_id" validate:"nonzero"`
 	Restore bool `json:"restore"`
 }

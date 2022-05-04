@@ -85,6 +85,10 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 	}
 	form.Firstname = xss.EscapeInput(form.Firstname)
 	form.Lastname = xss.EscapeInput(form.Lastname)
+	if err := validator.Validate(form); err != nil {
+		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
+		return
+	}
 	formBytes, _ := json.Marshal(form)
 	resp, err := d.profile.SetInfo(context.Background(), &profile_proto.SetInfoRequest{
 		Data: data,

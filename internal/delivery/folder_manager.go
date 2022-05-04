@@ -8,6 +8,8 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+
+	"gopkg.in/validator.v2"
 )
 
 // AddFolder godoc
@@ -35,6 +37,10 @@ func (d *Delivery) AddFolder(w http.ResponseWriter, r *http.Request) {
 	var form models.AddFolderForm
 	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if err := validator.Validate(form); err != nil {
+		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
 		return
 	}
 	resp, err := d.folderManager.AddFolder(context.Background(), &folder_manager_proto.AddFolderRequest{
@@ -89,6 +95,10 @@ func (d *Delivery) AddMailToFolder(w http.ResponseWriter, r *http.Request) {
 	var form models.AddMailToFolderForm
 	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if err := validator.Validate(form); err != nil {
+		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
 		return
 	}
 	resp, err := d.folderManager.AddMailToFolder(context.Background(), &folder_manager_proto.AddMailToFolderRequest{
@@ -147,6 +157,10 @@ func (d *Delivery) ChangeFolder(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
+	if err := validator.Validate(form); err != nil {
+		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
+		return
+	}
 	resp, err := d.folderManager.ChangeFolder(context.Background(), &folder_manager_proto.ChangeFolderRequest{
 		Data:          data,
 		FolderName:    form.FolderName,
@@ -202,6 +216,10 @@ func (d *Delivery) DeleteFolder(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
+	if err := validator.Validate(form); err != nil {
+		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
+		return
+	}
 	resp, err := d.folderManager.DeleteFolder(context.Background(), &folder_manager_proto.DeleteFolderRequest{
 		Data: data,
 		FolderName: form.FolderName,
@@ -254,6 +272,10 @@ func (d *Delivery) DeleteFolderMail(w http.ResponseWriter, r *http.Request) {
 	var form models.DeleteFolderMailForm
 	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if err := validator.Validate(form); err != nil {
+		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
 		return
 	}
 	resp, err := d.folderManager.DeleteFolderMail(context.Background(), &folder_manager_proto.DeleteFolderMailRequest{

@@ -10,6 +10,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+
+	"gopkg.in/validator.v2"
 )
 
 // Income godoc
@@ -191,6 +193,10 @@ func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
+	if err := validator.Validate(form); err != nil {
+		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
+		return
+	}
 	resp, err := d.mailbox.DeleteMail(context.Background(), &mailbox_proto.DeleteMailRequest{
 		Data: data,
 		Id:   form.Id,
@@ -243,6 +249,10 @@ func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 	var form models.ReadMailForm
 	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if err := validator.Validate(form); err != nil {
+		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
 		return
 	}
 	resp, err := d.mailbox.ReadMail(context.Background(), &mailbox_proto.ReadMailRequest{
@@ -305,6 +315,10 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 	form.Text = xss.EscapeInput(form.Text)
 	form.Theme = xss.EscapeInput(form.Theme)
 	formBytes, _ := json.Marshal(form)
+	if err := validator.Validate(form); err != nil {
+		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
+		return
+	}
 	resp, err := d.mailbox.SendMail(context.Background(), &mailbox_proto.SendMailRequest{
 		Data: data,
 		Form: formBytes,
