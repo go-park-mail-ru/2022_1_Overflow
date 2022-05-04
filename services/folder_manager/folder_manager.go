@@ -320,12 +320,7 @@ func (s *FolderManagerService) ChangeFolder(context context.Context, request *fo
 }
 
 func (s *FolderManagerService) DeleteFolder(context context.Context, request *folder_manager_proto.DeleteFolderRequest) (*utils_proto.JsonResponse, error) {
-	log.Debug("Удаление папки, name = ", request.Name, ", username = ", request.Data.Username)
-	if pkg.IsFolderReserved(request.Name) {
-		return &utils_proto.JsonResponse{
-			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
-		}, nil
-	}
+	log.Debug("Удаление папки, folderId = ", request.FolderId, ", username = ", request.Data.Username)
 	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
 		Username: request.Data.Username,
 	})
@@ -352,9 +347,8 @@ func (s *FolderManagerService) DeleteFolder(context context.Context, request *fo
 			Response: pkg.NO_USER_EXIST.Bytes(),
 		}, nil
 	}
-	resp2, err := s.db.GetFolderByName(context, &repository_proto.GetFolderByNameRequest{
-		UserId: user.Id,
-		FolderName: request.Name,
+	resp2, err := s.db.GetFolderById(context, &repository_proto.GetFolderByIdRequest{
+		FolderId: request.FolderId,
 	})
 	if err != nil {
 		log.Error(err)
@@ -386,6 +380,11 @@ func (s *FolderManagerService) DeleteFolder(context context.Context, request *fo
 		}, nil
 	}
 	if !isOwner {
+		return &utils_proto.JsonResponse{
+			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
+		}, nil
+	}
+	if pkg.IsFolderReserved(folder.Name) {
 		return &utils_proto.JsonResponse{
 			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
 		}, nil

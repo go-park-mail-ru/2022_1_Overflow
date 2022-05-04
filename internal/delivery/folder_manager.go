@@ -205,7 +205,7 @@ func (d *Delivery) DeleteFolder(w http.ResponseWriter, r *http.Request) {
 	}
 	resp, err := d.folderManager.DeleteFolder(context.Background(), &folder_manager_proto.DeleteFolderRequest{
 		Data: data,
-		Name: form.FolderName,
+		FolderId: form.FolderId,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)

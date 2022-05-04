@@ -69,7 +69,7 @@ message ResponseMails {
 
 message DeleteFolderRequest {
     utils.Session data = 1;
-    string name = 2;
+    int32 folderId = 2;
 }
 
 message DeleteFolderMailRequest {

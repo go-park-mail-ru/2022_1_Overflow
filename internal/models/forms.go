@@ -56,7 +56,7 @@ type ChangeFolderForm struct {
 }
 
 type DeleteFolderForm struct {
-	FolderName string `json:"folder_name"`
+	FolderId int32 `json:"id"`
 }
 
 type DeleteFolderMailForm struct {
