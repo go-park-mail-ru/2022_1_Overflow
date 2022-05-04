@@ -178,9 +178,9 @@ const docTemplate = `{
                 "summary": "Получить список папок пользователя или список писем в определенной папке",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "ID папки с письмами",
-                        "name": "folder_id",
+                        "type": "string",
+                        "description": "Имя папки с письмами",
+                        "name": "folder_name",
                         "in": "query"
                     }
                 ],
@@ -1301,8 +1301,8 @@ const docTemplate = `{
         "models.AddMailToFolderForm": {
             "type": "object",
             "properties": {
-                "folder_id": {
-                    "type": "integer"
+                "folder_name": {
+                    "type": "string"
                 },
                 "mail_id": {
                     "type": "integer"
@@ -1315,8 +1315,8 @@ const docTemplate = `{
         "models.ChangeFolderForm": {
             "type": "object",
             "properties": {
-                "folder_id": {
-                    "type": "integer"
+                "folder_name": {
+                    "type": "string"
                 },
                 "new_folder_name": {
                     "type": "string"
@@ -1343,16 +1343,16 @@ const docTemplate = `{
         "models.DeleteFolderForm": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer"
+                "folder_name": {
+                    "type": "string"
                 }
             }
         },
         "models.DeleteFolderMailForm": {
             "type": "object",
             "properties": {
-                "folder_id": {
-                    "type": "integer"
+                "folder_name": {
+                    "type": "string"
                 },
                 "mail_id": {
                     "type": "integer"

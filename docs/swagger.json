@@ -170,9 +170,9 @@
                 "summary": "Получить список папок пользователя или список писем в определенной папке",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "ID папки с письмами",
-                        "name": "folder_id",
+                        "type": "string",
+                        "description": "Имя папки с письмами",
+                        "name": "folder_name",
                         "in": "query"
                     }
                 ],
@@ -1293,8 +1293,8 @@
         "models.AddMailToFolderForm": {
             "type": "object",
             "properties": {
-                "folder_id": {
-                    "type": "integer"
+                "folder_name": {
+                    "type": "string"
                 },
                 "mail_id": {
                     "type": "integer"
@@ -1307,8 +1307,8 @@
         "models.ChangeFolderForm": {
             "type": "object",
             "properties": {
-                "folder_id": {
-                    "type": "integer"
+                "folder_name": {
+                    "type": "string"
                 },
                 "new_folder_name": {
                     "type": "string"
@@ -1335,16 +1335,16 @@
         "models.DeleteFolderForm": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "integer"
+                "folder_name": {
+                    "type": "string"
                 }
             }
         },
         "models.DeleteFolderMailForm": {
             "type": "object",
             "properties": {
-                "folder_id": {
-                    "type": "integer"
+                "folder_name": {
+                    "type": "string"
                 },
                 "mail_id": {
                     "type": "integer"

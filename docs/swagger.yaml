@@ -7,8 +7,8 @@ definitions:
     type: object
   models.AddMailToFolderForm:
     properties:
-      folder_id:
-        type: integer
+      folder_name:
+        type: string
       mail_id:
         type: integer
       move:
@@ -16,8 +16,8 @@ definitions:
     type: object
   models.ChangeFolderForm:
     properties:
-      folder_id:
-        type: integer
+      folder_name:
+        type: string
       new_folder_name:
         type: string
     type: object
@@ -35,13 +35,13 @@ definitions:
     type: object
   models.DeleteFolderForm:
     properties:
-      id:
-        type: integer
+      folder_name:
+        type: string
     type: object
   models.DeleteFolderMailForm:
     properties:
-      folder_id:
-        type: integer
+      folder_name:
+        type: string
       mail_id:
         type: integer
       restore:
@@ -277,10 +277,10 @@ paths:
   /folder/list:
     get:
       parameters:
-      - description: ID папки с письмами
+      - description: Имя папки с письмами
         in: query
-        name: folder_id
-        type: integer
+        name: folder_name
+        type: string
       produces:
       - application/json
       responses:
