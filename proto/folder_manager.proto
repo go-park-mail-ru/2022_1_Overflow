@@ -24,14 +24,14 @@ message AddFolderRequest {
 
 message AddMailToFolderRequest {
     utils.Session data = 1;
-    int32 folderId = 2;
+    string folderName = 2;
     int32 mailId = 3;
     bool move = 4;
 }
 
 message ChangeFolderRequest {
     utils.Session data = 1;
-    int32 folderId = 2;
+    string folderName = 2;
     string folderNewName = 3;
 }
 
@@ -69,12 +69,12 @@ message ResponseMails {
 
 message DeleteFolderRequest {
     utils.Session data = 1;
-    int32 folderId = 2;
+    string folderName = 2;
 }
 
 message DeleteFolderMailRequest {
     utils.Session data = 1;
-    int32 folderId = 2;
+    string folderName = 2;
     int32 mailId = 3;
     bool restore = 4;
 }
@@ -85,5 +85,5 @@ message ListFoldersRequest {
 
 message ListFolderRequest {
     utils.Session data = 1;
-    int32 folderId = 2;
+    string folderName = 2;
 }

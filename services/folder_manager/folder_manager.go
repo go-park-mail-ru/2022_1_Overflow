@@ -20,38 +20,6 @@ type FolderManagerService struct {
 	profile profile_proto.ProfileClient
 }
 
-func (s *FolderManagerService) IsOwner(context context.Context, data *utils_proto.Session, folderId int32) (bool, pkg.JsonResponse, error){
-	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
-		Username: data.Username,
-	})
-	if err != nil {
-		return false, pkg.INTERNAL_ERR, err
-	}
-	if (resp.Response.Status != utils_proto.DatabaseStatus_OK) {
-		return false, pkg.DB_ERR, nil
-	}
-	var user models.User
-	err = json.Unmarshal(resp.User, &user)
-	if err != nil {
-		return false, pkg.JSON_ERR, err
-	}
-	resp2, err := s.db.GetFolderById(context, &repository_proto.GetFolderByIdRequest{
-		FolderId: folderId,
-	})
-	if err != nil {
-		return false, pkg.DB_ERR, err
-	}
-	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
-		return false, pkg.DB_ERR, nil
-	}
-	var folder models.Folder
-	err = json.Unmarshal(resp2.Folder, &folder)
-	if err != nil {
-		return false, pkg.JSON_ERR, err
-	}
-	return user.Id == folder.UserId, pkg.NO_ERR, nil
-}
-
 func (s *FolderManagerService) FolderExists(context context.Context, userId int32, folderName string) (bool) {
 	resp, err := s.db.GetFolderByName(context, &repository_proto.GetFolderByNameRequest{
 		UserId: userId,
@@ -194,7 +162,7 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 
 func (s *FolderManagerService) AddMailToFolder(context context.Context, request *folder_manager_proto.AddMailToFolderRequest) (*utils_proto.JsonResponse, error) {
 	username := request.Data.Username
-	log.Debug("Добавление письма в папку, folderId = ", request.FolderId, ", username = ", username, ", move = ", request.Move)
+	log.Debug("Добавление письма в папку, folderName = ", request.FolderName, ", username = ", username, ", move = ", request.Move)
 	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
 		Username: username,
 	})
@@ -221,24 +189,9 @@ func (s *FolderManagerService) AddMailToFolder(context context.Context, request 
 			Response: pkg.NO_USER_EXIST.Bytes(),
 		}, nil
 	}
-	isOwner, response, err := s.IsOwner(context, request.Data, request.FolderId)
-	if err != nil {
-		return &utils_proto.JsonResponse{
-			Response: pkg.INTERNAL_ERR.Bytes(),
-		}, err
-	}
-	if response != pkg.NO_ERR {
-		return &utils_proto.JsonResponse{
-			Response: response.Bytes(),
-		}, nil
-	}
-	if !isOwner {
-		return &utils_proto.JsonResponse{
-			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
-		}, nil
-	}
 	resp2, err := s.db.AddMailToFolder(context, &repository_proto.AddMailToFolderRequest{
-		FolderId: request.FolderId,
+		UserId: user.Id,
+		FolderName: request.FolderName,
 		MailId: request.MailId,
 		Move: request.Move,
 	})
@@ -260,7 +213,7 @@ func (s *FolderManagerService) AddMailToFolder(context context.Context, request 
 
 func (s *FolderManagerService) ChangeFolder(context context.Context, request *folder_manager_proto.ChangeFolderRequest) (*utils_proto.JsonResponse, error) {
 	username := request.Data.Username
-	log.Debug("Изменение имени папки, username = ", username, ", folderid = ", request.FolderId, ", folderNewName", request.FolderNewName)
+	log.Debug("Изменение имени папки, username = ", username, ", folderName = ", request.FolderName, ", folderNewName", request.FolderNewName)
 	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
 		Username: username,
 	})
@@ -287,44 +240,7 @@ func (s *FolderManagerService) ChangeFolder(context context.Context, request *fo
 			Response: pkg.NO_USER_EXIST.Bytes(),
 		}, nil
 	}
-	isOwner, response, err := s.IsOwner(context, request.Data, request.FolderId)
-	if err != nil {
-		return &utils_proto.JsonResponse{
-			Response: pkg.INTERNAL_ERR.Bytes(),
-		}, err
-	}
-	if response != pkg.NO_ERR {
-		return &utils_proto.JsonResponse{
-			Response: response.Bytes(),
-		}, nil
-	}
-	if !isOwner {
-		return &utils_proto.JsonResponse{
-			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
-		}, nil
-	}
-	resp2, err := s.db.GetFolderById(context, &repository_proto.GetFolderByIdRequest{
-		FolderId: request.FolderId,
-	})
-	if err != nil {
-		log.Error(err)
-		return &utils_proto.JsonResponse{
-			Response: pkg.DB_ERR.Bytes(),
-		}, err
-	}
-	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
-		return &utils_proto.JsonResponse{
-			Response: pkg.DB_ERR.Bytes(),
-		}, nil
-	}
-	var folder models.Folder
-	err = json.Unmarshal(resp2.Folder, &folder)
-	if err != nil {
-		return &utils_proto.JsonResponse{
-			Response: pkg.JSON_ERR.Bytes(),
-		}, err
-	}
-	if pkg.IsFolderReserved(folder.Name) {
+	if pkg.IsFolderReserved(request.FolderName) {
 		return &utils_proto.JsonResponse{
 			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
 		}, nil
@@ -335,7 +251,8 @@ func (s *FolderManagerService) ChangeFolder(context context.Context, request *fo
 		}, nil
 	}
 	resp3, err := s.db.ChangeFolderName(context, &repository_proto.ChangeFolderNameRequest{
-		FolderId: request.FolderId,
+		UserId: user.Id,
+		FolderName: request.FolderName,
 		NewName: request.FolderNewName,
 	})
 	if err != nil {
@@ -355,7 +272,7 @@ func (s *FolderManagerService) ChangeFolder(context context.Context, request *fo
 }
 
 func (s *FolderManagerService) DeleteFolder(context context.Context, request *folder_manager_proto.DeleteFolderRequest) (*utils_proto.JsonResponse, error) {
-	log.Debug("Удаление папки, folderId = ", request.FolderId, ", username = ", request.Data.Username)
+	log.Debug("Удаление папки, folderName = ", request.FolderName, ", username = ", request.Data.Username)
 	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
 		Username: request.Data.Username,
 	})
@@ -382,50 +299,14 @@ func (s *FolderManagerService) DeleteFolder(context context.Context, request *fo
 			Response: pkg.NO_USER_EXIST.Bytes(),
 		}, nil
 	}
-	resp2, err := s.db.GetFolderById(context, &repository_proto.GetFolderByIdRequest{
-		FolderId: request.FolderId,
-	})
-	if err != nil {
-		log.Error(err)
-		return &utils_proto.JsonResponse{
-			Response: pkg.DB_ERR.Bytes(),
-		}, err
-	}
-	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
-		return &utils_proto.JsonResponse{
-			Response: pkg.DB_ERR.Bytes(),
-		}, nil
-	}
-	var folder models.Folder
-	err = json.Unmarshal(resp2.Folder, &folder)
-	if err != nil {
-		return &utils_proto.JsonResponse{
-			Response: pkg.JSON_ERR.Bytes(),
-		}, err
-	}
-	isOwner, response, err := s.IsOwner(context, request.Data, folder.Id)
-	if err != nil {
-		return &utils_proto.JsonResponse{
-			Response: pkg.INTERNAL_ERR.Bytes(),
-		}, err
-	}
-	if response != pkg.NO_ERR {
-		return &utils_proto.JsonResponse{
-			Response: response.Bytes(),
-		}, nil
-	}
-	if !isOwner {
-		return &utils_proto.JsonResponse{
-			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
-		}, nil
-	}
-	if pkg.IsFolderReserved(folder.Name) {
+	if pkg.IsFolderReserved(request.FolderName) {
 		return &utils_proto.JsonResponse{
 			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
 		}, nil
 	}
 	resp3, err := s.db.DeleteFolder(context, &repository_proto.DeleteFolderRequest{
-		FolderId: folder.Id,
+		UserId: user.Id,
+		FolderName: request.FolderName,
 	})
 	if err != nil {
 		log.Error(err)
@@ -520,7 +401,7 @@ func (s *FolderManagerService) ListFolders(context context.Context, request *fol
 }
 
 func (s *FolderManagerService) ListFolder(context context.Context, request *folder_manager_proto.ListFolderRequest) (*folder_manager_proto.ResponseMails, error) {
-	log.Debug("Получение списка писем из папки, username = ", request.Data.Username, ", folderId = ", request.FolderId)
+	log.Debug("Получение списка писем из папки, username = ", request.Data.Username, ", folderName = ", request.FolderName)
 	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
 		Username: request.Data.Username,
 	})
@@ -559,33 +440,9 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 			Mails: nil,
 		}, nil
 	}
-	isOwner, response, err := s.IsOwner(context, request.Data, request.FolderId)
-	if err != nil {
-		return &folder_manager_proto.ResponseMails{
-			Response:&utils_proto.JsonResponse{
-				Response: pkg.INTERNAL_ERR.Bytes(),
-			},
-			Mails: nil,
-		}, err
-	}
-	if response != pkg.NO_ERR {
-		return &folder_manager_proto.ResponseMails{
-			Response:&utils_proto.JsonResponse{
-				Response: response.Bytes(),
-			},
-			Mails: nil,
-		}, nil
-	}
-	if !isOwner {
-		return &folder_manager_proto.ResponseMails{
-			Response:&utils_proto.JsonResponse{
-				Response: pkg.UNAUTHORIZED_ERR.Bytes(),
-			},
-			Mails: nil,
-		}, nil
-	}
 	resp2, err := s.db.GetFolderMail(context, &repository_proto.GetFolderMailRequest{
-		FolderId: request.FolderId,
+		UserId: user.Id,
+		FolderName: request.FolderName,
 	})
 	if err != nil {
 		log.Error(err)
@@ -670,7 +527,7 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 }
 
 func (s *FolderManagerService) DeleteFolderMail(context context.Context, request *folder_manager_proto.DeleteFolderMailRequest) (*utils_proto.JsonResponse, error) {
-	log.Debug("Удаление письма из папки, folderId = ", request.FolderId, ", mailId = ", request.MailId, ", username = ", request.Data.Username)
+	log.Debug("Удаление письма из папки, folderName = ", request.FolderName, ", mailId = ", request.MailId, ", username = ", request.Data.Username)
 	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
 		Username: request.Data.Username,
 	})
@@ -697,25 +554,9 @@ func (s *FolderManagerService) DeleteFolderMail(context context.Context, request
 			Response: pkg.NO_USER_EXIST.Bytes(),
 		}, nil
 	}
-	isOwner, response, err := s.IsOwner(context, request.Data, request.FolderId)
-	if err != nil {
-		return &utils_proto.JsonResponse{
-			Response: pkg.INTERNAL_ERR.Bytes(),
-		}, err
-	}
-	if response != pkg.NO_ERR {
-		return &utils_proto.JsonResponse{
-			Response: response.Bytes(),
-		}, nil
-	}
-	if !isOwner {
-		return &utils_proto.JsonResponse{
-			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
-		}, nil
-	}
 	resp2, err := s.db.DeleteFolderMail(context, &repository_proto.DeleteFolderMailRequest{
-		Username: request.Data.Username,
-		FolderId: request.FolderId,
+		UserId: user.Id,
+		FolderName: request.FolderName,
 		MailId: request.MailId,
 		Restore: request.Restore,
 	})

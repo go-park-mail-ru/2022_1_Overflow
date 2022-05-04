@@ -70,7 +70,7 @@ message AddMailRequest {
 
 message DeleteMailRequest {
     bytes mail = 1;
-    string username = 2;
+    int32 user_id = 2;
 }
 
 message ReadMailRequest {
@@ -96,11 +96,13 @@ message GetFoldersByUserRequest {
 }
 
 message GetFolderMailRequest {
-    int32 folderId = 1;
+    int32 userId = 1;
+    string folderName = 2;
 }
 
 message DeleteFolderRequest {
-    int32 folderId = 1;
+    int32 userId = 1;
+    string folderName = 2;
 }
 
 message AddFolderRequest {
@@ -109,19 +111,21 @@ message AddFolderRequest {
 }
 
 message ChangeFolderNameRequest {
-    int32 folderId = 1;
-    string newName = 2;
+    int32 userId = 1;
+    string folderName = 2;
+    string newName = 3;
 }
 
 message AddMailToFolderRequest {
-    int32 folderId = 1;
-    int32 mailId = 2;
-    bool move = 3;
+    int32 userId = 1;
+    string folderName = 2;
+    int32 mailId = 3;
+    bool move = 4;
 }
 
 message DeleteFolderMailRequest {
-    string username = 1;
-    int32 folderId = 2;
+    int32 userId = 1;
+    string folderName = 2;
     int32 mailId = 3;
     bool restore = 4;
 }

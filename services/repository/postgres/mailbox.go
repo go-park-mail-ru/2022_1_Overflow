@@ -43,15 +43,15 @@ func (c *Database) DeleteMail(context context.Context, request *repository_proto
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err
 	}
-	username := request.Username
-	res, err := c.Conn.Query(context, "UPDATE overflow.mails SET sender = 'null' WHERE id = $1 AND sender = $2;", mail.Id, username)
+	userId := request.UserId
+	res, err := c.Conn.Query(context, "UPDATE overflow.mails SET sender = 'null' WHERE id = $1 AND sender IN (SELECT username FROM overflow.users WHERE id=$2);", mail.Id, userId)
 	if err != nil {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err
 	}
 	res.Close()
-	res, err = c.Conn.Query(context, "UPDATE overflow.mails SET addressee = 'null' WHERE id = $1 AND addressee = $2;", mail.Id, username)
+	res, err = c.Conn.Query(context, "UPDATE overflow.mails SET addressee = 'null' WHERE id = $1 AND addressee IN (SELECT username FROM overflow.users WHERE id=$2);", mail.Id, userId)
 	if err != nil {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,

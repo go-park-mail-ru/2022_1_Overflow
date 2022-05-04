@@ -305,9 +305,29 @@ func (s *MailBoxService) DeleteMail(context context.Context, request *mailbox_pr
 			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
 		}, nil
 	}
+	respUser, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
+		Username: data.Username,
+	})
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
+	}
+	if respUser.Response.Status != utils_proto.DatabaseStatus_OK {
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
+	}
+	var user models.User
+	err = json.Unmarshal(respUser.User, &user)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.JSON_ERR.Bytes(),
+		}, err
+	}
 	resp2, err := s.db.DeleteMail(context, &repository_proto.DeleteMailRequest{
 		Mail:     resp.Mail,
-		Username: data.Username,
+		UserId:	  user.Id,
 	})
 	if err != nil {
 		log.Error(err)

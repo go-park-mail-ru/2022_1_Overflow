@@ -8,7 +8,6 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"strconv"
 )
 
 // AddFolder godoc
@@ -94,7 +93,7 @@ func (d *Delivery) AddMailToFolder(w http.ResponseWriter, r *http.Request) {
 	}
 	resp, err := d.folderManager.AddMailToFolder(context.Background(), &folder_manager_proto.AddMailToFolderRequest{
 		Data:       data,
-		FolderId: form.FolderId,
+		FolderName: form.FolderName,
 		MailId:     form.MailId,
 		Move: form.Move,
 	})
@@ -150,7 +149,7 @@ func (d *Delivery) ChangeFolder(w http.ResponseWriter, r *http.Request) {
 	}
 	resp, err := d.folderManager.ChangeFolder(context.Background(), &folder_manager_proto.ChangeFolderRequest{
 		Data:          data,
-		FolderId:    form.FolderId,
+		FolderName:    form.FolderName,
 		FolderNewName: form.NewFolderName,
 	})
 	if err != nil {
@@ -205,7 +204,7 @@ func (d *Delivery) DeleteFolder(w http.ResponseWriter, r *http.Request) {
 	}
 	resp, err := d.folderManager.DeleteFolder(context.Background(), &folder_manager_proto.DeleteFolderRequest{
 		Data: data,
-		FolderId: form.FolderId,
+		FolderName: form.FolderName,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
@@ -259,7 +258,7 @@ func (d *Delivery) DeleteFolderMail(w http.ResponseWriter, r *http.Request) {
 	}
 	resp, err := d.folderManager.DeleteFolderMail(context.Background(), &folder_manager_proto.DeleteFolderMailRequest{
 		Data: data,
-		FolderId: form.FolderId,
+		FolderName: form.FolderName,
 		MailId: form.MailId,
 		Restore: form.Restore,
 	})
@@ -308,16 +307,11 @@ func (d *Delivery) ListFolders(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-	folderIdStr := r.URL.Query().Get("folder_id")
-	if len(folderIdStr) > 0 {
-		folderId, err := strconv.Atoi(folderIdStr)
-		if err != nil {
-			pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
-			return
-		}
+	folderName := r.URL.Query().Get("folder_name")
+	if len(folderName) > 0 {
 		resp, err := d.folderManager.ListFolder(context.Background(), &folder_manager_proto.ListFolderRequest{
 			Data: data,
-			FolderId: int32(folderId),
+			FolderName: folderName,
 		})
 		if err != nil {
 			pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
