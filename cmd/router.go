@@ -4,6 +4,10 @@ import (
 	"OverflowBackend/internal/config"
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/middlewares"
+	"OverflowBackend/proto/auth_proto"
+	"OverflowBackend/proto/folder_manager_proto"
+	"OverflowBackend/proto/mailbox_proto"
+	"OverflowBackend/proto/profile_proto"
 
 	"net/http"
 
@@ -26,7 +30,7 @@ func (rm *RouterManager) Init(
 	folderManagerDial grpc.ClientConnInterface,
 	) {
 	rm.d = &delivery.Delivery{}
-	rm.d.Init(config, authDial, profileDial, mailboxDial, folderManagerDial)
+	rm.d.Init(config, auth_proto.NewAuthClient(authDial), profile_proto.NewProfileClient(profileDial), mailbox_proto.NewMailboxClient(mailboxDial), folder_manager_proto.NewFolderManagerClient(folderManagerDial))
 	rm.config = config
 }
 

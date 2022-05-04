@@ -1,5 +1,6 @@
 package delivery_test
 
+/*
 import (
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/models"
@@ -372,3 +373,4 @@ func TestGetMail(t *testing.T) {
 		return
 	}
 }
+*/

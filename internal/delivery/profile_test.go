@@ -1,5 +1,6 @@
 package delivery_test
 
+/*
 import (
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/models"
@@ -271,3 +272,4 @@ func TestSetAvatar(t *testing.T) {
 		return
 	}
 }
+*/
