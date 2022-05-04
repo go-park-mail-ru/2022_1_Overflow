@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"OverflowBackend/internal/models"
+	"OverflowBackend/pkg"
 	"OverflowBackend/proto/repository_proto"
 	"OverflowBackend/proto/utils_proto"
 	"context"
@@ -87,7 +88,7 @@ func (c *Database) GetFolderByName(context context.Context, request *repository_
 func (c *Database) GetFoldersByUser(context context.Context, request *repository_proto.GetFoldersByUserRequest) (*repository_proto.ResponseFolders, error) {
 	var folders []models.Folder
 	foldersBytes, _ := json.Marshal(folders)
-	rows, err := c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE user_id=$1 ORDER BY created_at DESC;", request.UserId)
+	rows, err := c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE user_id=$1 AND name NOT IN ($1, $2) ORDER BY created_at DESC;", request.UserId, pkg.FOLDER_SPAM, pkg.FOLDER_DRAFTS)
 	if err != nil {
 		return &repository_proto.ResponseFolders{
 			Response: &utils_proto.DatabaseResponse{
