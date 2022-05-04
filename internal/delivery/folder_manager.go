@@ -190,7 +190,7 @@ func (d *Delivery) AddMailToFolderByObject(w http.ResponseWriter, r *http.Reques
 }
 
 // MoveFolderMail godoc
-// @Summary Добавить письмо в папку с письмами по форме
+// @Summary Переместить письмо из одной папки в другую
 // @Produce json
 // @Param MoveFolderMailForm body models.MoveFolderMailForm true "Форма запроса"
 // @Success 200 {object} pkg.JsonResponse "OK"
@@ -224,6 +224,7 @@ func (d *Delivery) MoveFolderMail(w http.ResponseWriter, r *http.Request) {
 		Data: data,
 		FolderNameSrc: form.FolderNameSrc,
 		FolderNameDest: form.FolderNameDest,
+		MailId: form.MailId,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)

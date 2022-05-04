@@ -248,7 +248,7 @@ func (c *Database) AddMailToFolderByObject(context context.Context, request *rep
 		}, err
 	}
 	var mailId int32 
-	c.Conn.QueryRow(context, "INSERT INTO overflow.mails(addressee, date, files, sender, text, theme) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id;", mail.Addressee, mail.Date, mail.Files, mail.Sender, mail.Text, mail.Theme).Scan(&mailId)
+	c.Conn.QueryRow(context, "INSERT INTO overflow.mails(addressee, date, files, sender, text, theme) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;", mail.Addressee, mail.Date, mail.Files, mail.Sender, mail.Text, mail.Theme).Scan(&mailId)
 	_, err = c.Conn.Exec(context, "INSERT INTO overflow.folder_to_mail(folder_id, mail_id, only_folder) SELECT id, $3, true FROM overflow.folders WHERE user_id=$1 AND name=$2;", request.UserId, request.FolderName, mailId)
 	if err != nil {
 		return &utils_proto.DatabaseResponse{
@@ -278,7 +278,7 @@ func (c *Database) MoveFolderMail(context context.Context, request *repository_p
 	var folderIdDest int32
 	c.Conn.QueryRow(context, "SELECT id FROM overflow.folders WHERE user_id=$1 AND name=$2;", request.UserId, request.FolderNameSrc).Scan(&folderIdSrc)
 	c.Conn.QueryRow(context, "SELECT id FROM overflow.folders WHERE user_id=$1 AND name=$2;", request.UserId, request.FolderNameDest).Scan(&folderIdDest)
-	_, err := c.Conn.Exec(context, "UPDATE overflow.folder_to_mail SET folder_id=$2 WHERE folder_id=$1", folderIdSrc, folderIdSrc)
+	_, err := c.Conn.Exec(context, "UPDATE overflow.folder_to_mail SET folder_id=$2 WHERE folder_id=$1 AND mail_id=$3", folderIdSrc, folderIdDest, request.MailId)
 	if err != nil {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,

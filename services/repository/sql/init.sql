@@ -19,8 +19,8 @@ CREATE TABLE overflow.mails (
     text text DEFAULT null,
     files varchar(100) DEFAULT null,
     read bool DEFAULT FALSE,
-    foreign key (sender) references overflow.users(id) on delete set null
-    foreign key (addressee) references overflow.users(id) on delete set null
+    foreign key (sender) references overflow.users(username) on delete set null,
+    foreign key (addressee) references overflow.users(username) on delete set null
 );
 
 /* для папок */
