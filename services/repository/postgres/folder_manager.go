@@ -13,7 +13,7 @@ import (
 func (c *Database) GetFolderById(context context.Context, request *repository_proto.GetFolderByIdRequest) (*repository_proto.ResponseFolder, error) {
 	var folder models.Folder
 	folderBytes, _ := json.Marshal(folder)
-	rows, err := c.Conn.Query(context, "SELECT * FROM overflow.folders WHERE id = $1;", request.FolderId)
+	rows, err := c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE id = $1;", request.FolderId)
 	if err != nil {
 		return &repository_proto.ResponseFolder{
 			Response: &utils_proto.DatabaseResponse{
@@ -50,7 +50,7 @@ func (c *Database) GetFolderById(context context.Context, request *repository_pr
 func (c *Database) GetFolderByName(context context.Context, request *repository_proto.GetFolderByNameRequest) (*repository_proto.ResponseFolder, error) {
 	var folder models.Folder
 	folderBytes, _ := json.Marshal(folder)
-	rows, err := c.Conn.Query(context, "SELECT * FROM overflow.folders WHERE name = $1 AND user_id = $2;", request.FolderName, request.UserId)
+	rows, err := c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE name = $1 AND user_id = $2;", request.FolderName, request.UserId)
 	if err != nil {
 		return &repository_proto.ResponseFolder{
 			Response: &utils_proto.DatabaseResponse{
@@ -87,7 +87,7 @@ func (c *Database) GetFolderByName(context context.Context, request *repository_
 func (c *Database) GetFoldersByUser(context context.Context, request *repository_proto.GetFoldersByUserRequest) (*repository_proto.ResponseFolders, error) {
 	var folders []models.Folder
 	foldersBytes, _ := json.Marshal(folders)
-	rows, err := c.Conn.Query(context, "SELECT * FROM overflow.folders WHERE user_id=$1 ORDER BY created_at DESC;", request.UserId)
+	rows, err := c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE user_id=$1 ORDER BY created_at DESC;", request.UserId)
 	if err != nil {
 		return &repository_proto.ResponseFolders{
 			Response: &utils_proto.DatabaseResponse{
@@ -126,7 +126,7 @@ func (c *Database) GetFoldersByUser(context context.Context, request *repository
 func (c *Database) GetFolderMail(context context.Context, request *repository_proto.GetFolderMailRequest) (*repository_proto.ResponseMails, error) {
 	var mails []models.Mail
 	mailsBytes, _ := json.Marshal(mails)
-	rows, err := c.Conn.Query(context, "SELECT * FROM overflow.mails WHERE id IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id in (SELECT id FROM overflow.folders WHERE user_id=$1 AND name=$2)) ORDER BY date DESC;", request.UserId, request.FolderName)
+	rows, err := c.Conn.Query(context, "SELECT addressee, sender, theme, text, files, date, read, id FROM overflow.mails WHERE id IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id in (SELECT id FROM overflow.folders WHERE user_id=$1 AND name=$2)) ORDER BY date DESC;", request.UserId, request.FolderName)
 	if err != nil {
 		return &repository_proto.ResponseMails{
 			Response: &utils_proto.DatabaseResponse{
@@ -147,13 +147,14 @@ func (c *Database) GetFolderMail(context context.Context, request *repository_pr
 				Mails: mailsBytes,
 			}, err
 		}
-		mail.Sender = values[0].(string)
-		mail.Theme = values[1].(string)
-		mail.Text = values[2].(string)
-		mail.Files = values[3].(string)
-		mail.Date = values[4].(time.Time)
-		mail.Read = values[5].(bool)
-		mail.Id = values[6].(int32)
+		mail.Addressee = values[0].(string)
+		mail.Sender = values[1].(string)
+		mail.Theme = values[2].(string)
+		mail.Text = values[3].(string)
+		mail.Files = values[4].(string)
+		mail.Date = values[5].(time.Time)
+		mail.Read = values[6].(bool)
+		mail.Id = values[7].(int32)
 		mails = append(mails, mail)
 	}
 	mailsBytes, _ = json.Marshal(mails)

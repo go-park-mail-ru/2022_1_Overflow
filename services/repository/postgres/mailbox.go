@@ -97,7 +97,7 @@ func (c *Database) ReadMail(context context.Context, request *repository_proto.R
 func (c *Database) GetMailInfoById(context context.Context, request *repository_proto.GetMailInfoByIdRequest) (*repository_proto.ResponseMail, error) {
 	var mail models.Mail
 	mailBytes, _ := json.Marshal(mail)
-	rows, err := c.Conn.Query(context, "SELECT * FROM overflow.mails WHERE Id = $1;", request.MailId)
+	rows, err := c.Conn.Query(context, "SELECT id, client_id, sender, addressee, date, theme, text, files, read FROM overflow.mails WHERE Id = $1;", request.MailId)
 	if err != nil {
 		return &repository_proto.ResponseMail{
 			Mail: mailBytes,

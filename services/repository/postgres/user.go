@@ -14,7 +14,7 @@ import (
 func (c *Database) GetUserInfoByUsername(context context.Context, request *repository_proto.GetUserInfoByUsernameRequest) (*repository_proto.ResponseUser, error) {
 	var user models.User
 	userBytes, _ := json.Marshal(user)
-	rows, err := c.Conn.Query(context, "Select * from overflow.users where username = $1;", request.Username)
+	rows, err := c.Conn.Query(context, "Select id, first_name, last_name, password, username from overflow.users where username = $1;", request.Username)
 	if err != nil {
 		return &repository_proto.ResponseUser{
 			User: userBytes,
@@ -53,7 +53,7 @@ func (c *Database) GetUserInfoByUsername(context context.Context, request *repos
 func (c *Database) GetUserInfoById(context context.Context, request *repository_proto.GetUserInfoByIdRequest) (*repository_proto.ResponseUser, error) {
 	var user models.User
 	userBytes, _ := json.Marshal(user)
-	rows, err := c.Conn.Query(context, "Select * from overflow.users(id, first_name, last_name, password, username) where id = $1;", request.UserId)
+	rows, err := c.Conn.Query(context, "Select id, first_name, last_name, password, username from overflow.users(id, first_name, last_name, password, username) where id = $1;", request.UserId)
 	if err != nil {
 		return &repository_proto.ResponseUser{
 			User: userBytes,
