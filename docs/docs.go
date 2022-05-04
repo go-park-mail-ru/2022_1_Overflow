@@ -464,7 +464,7 @@ const docTemplate = `{
                 "tags": [
                     "folder_manager"
                 ],
-                "summary": "Добавить письмо в папку с письмами по форме",
+                "summary": "Переместить письмо из одной папки в другую",
                 "parameters": [
                     {
                         "description": "Форма запроса",

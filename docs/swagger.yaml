@@ -509,7 +509,7 @@ paths:
           description: Ошибка БД, неверные GET параметры.
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
-      summary: Добавить письмо в папку с письмами по форме
+      summary: Переместить письмо из одной папки в другую
       tags:
       - folder_manager
   /folder/rename:
