@@ -58,7 +58,9 @@ func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 	router.HandleFunc("/mail/send", rm.d.SendMail)
 	// ======================================================================
 	router.HandleFunc("/folder/add", rm.d.AddFolder)
-	router.HandleFunc("/folder/mail/add", rm.d.AddMailToFolder)
+	router.HandleFunc("/folder/mail/add", rm.d.AddMailToFolderById)
+	router.HandleFunc("/folder/mail/add_form", rm.d.AddMailToFolderByObject)
+	router.HandleFunc("/folder/mail/move", rm.d.MoveFolderMail)
 	router.HandleFunc("/folder/mail/delete", rm.d.DeleteFolderMail)
 	router.HandleFunc("/folder/rename", rm.d.ChangeFolder)
 	router.HandleFunc("/folder/delete", rm.d.DeleteFolder)

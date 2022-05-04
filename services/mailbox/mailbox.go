@@ -322,8 +322,8 @@ func (s *MailBoxService) DeleteMail(context context.Context, request *mailbox_pr
 	err = json.Unmarshal(respUser.User, &user)
 	if err != nil {
 		return &utils_proto.JsonResponse{
-			Response: pkg.JSON_ERR.Bytes(),
-		}, err
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
 	}
 	resp2, err := s.db.DeleteMail(context, &repository_proto.DeleteMailRequest{
 		Mail:     resp.Mail,
@@ -457,7 +457,6 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 		}, nil
 	}
 	mail := models.Mail{
-		ClientId:  user.Id,
 		Sender:    data.Username,
 		Addressee: form.Addressee,
 		Theme:     form.Theme,

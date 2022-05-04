@@ -7,7 +7,8 @@ import "proto/utils.proto";
 
 service FolderManager {
     rpc AddFolder(AddFolderRequest) returns (ResponseFolder) {}
-    rpc AddMailToFolder(AddMailToFolderRequest) returns (utils.JsonResponse) {}
+    rpc AddMailToFolderById(AddMailToFolderByIdRequest) returns (utils.JsonResponse) {}
+    rpc AddMailToFolderByObject(AddMailToFolderByObjectRequest) returns (utils.JsonResponse) {}
     rpc ChangeFolder(ChangeFolderRequest) returns (utils.JsonResponse) {}
     //rpc GetFolderByName(GetFolderByNameRequest) returns (ResponseFolder) {}
     //rpc GetFolderById(GetFolderByIdRequest) returns (ResponseFolder) {}
@@ -15,6 +16,14 @@ service FolderManager {
     rpc ListFolders(ListFoldersRequest) returns (ResponseFolders) {}
     rpc ListFolder(ListFolderRequest) returns (ResponseMails) {}
     rpc DeleteFolderMail(DeleteFolderMailRequest) returns (utils.JsonResponse) {}
+    rpc MoveFolderMail(MoveFolderMailRequest) returns (utils.JsonResponse) {}
+}
+
+message MoveFolderMailRequest {
+    utils.Session data = 1;
+    string folderNameSrc = 2;
+    string folderNameDest = 3;
+    int32 mailId = 4;
 }
 
 message AddFolderRequest {
@@ -22,11 +31,17 @@ message AddFolderRequest {
     string name = 2;
 }
 
-message AddMailToFolderRequest {
+message AddMailToFolderByIdRequest {
     utils.Session data = 1;
     string folderName = 2;
     int32 mailId = 3;
     bool move = 4;
+}
+
+message AddMailToFolderByObjectRequest {
+    utils.Session data = 1;
+    string folderName = 2;
+    bytes form = 3;
 }
 
 message ChangeFolderRequest {
@@ -76,7 +91,6 @@ message DeleteFolderMailRequest {
     utils.Session data = 1;
     string folderName = 2;
     int32 mailId = 3;
-    bool restore = 4;
 }
 
 message ListFoldersRequest {

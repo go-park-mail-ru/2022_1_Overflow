@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"OverflowBackend/internal/models"
+	"OverflowBackend/internal/security/xss"
 	"OverflowBackend/internal/session"
 	"OverflowBackend/pkg"
 	"OverflowBackend/proto/folder_manager_proto"
@@ -70,8 +71,8 @@ func (d *Delivery) AddFolder(w http.ResponseWriter, r *http.Request) {
 // @Tags folder_manager
 func AddFolder() {}
 
-// AddMailToFolder godoc
-// @Summary Добавить письмо в папку с письмами
+// AddMailToFolderById godoc
+// @Summary Добавить письмо в папку с письмами по его id
 // @Produce json
 // @Param AddMailToFolderForm body models.AddMailToFolderForm true "Форма запроса"
 // @Success 200 {object} pkg.JsonResponse "OK"
@@ -81,7 +82,7 @@ func AddFolder() {}
 // @Router /folder/mail/add [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
 // @Tags folder_manager
-func (d *Delivery) AddMailToFolder(w http.ResponseWriter, r *http.Request) {
+func (d *Delivery) AddMailToFolderById(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
 		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
@@ -92,7 +93,7 @@ func (d *Delivery) AddMailToFolder(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-	var form models.AddMailToFolderForm
+	var form models.AddMailToFolderByIdForm
 	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
@@ -101,7 +102,7 @@ func (d *Delivery) AddMailToFolder(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
 		return
 	}
-	resp, err := d.folderManager.AddMailToFolder(context.Background(), &folder_manager_proto.AddMailToFolderRequest{
+	resp, err := d.folderManager.AddMailToFolderById(context.Background(), &folder_manager_proto.AddMailToFolderByIdRequest{
 		Data:       data,
 		FolderName: form.FolderName,
 		MailId:     form.MailId,
@@ -129,6 +130,129 @@ func (d *Delivery) AddMailToFolder(w http.ResponseWriter, r *http.Request) {
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 // @Tags folder_manager
 func AddMailToFolder() {}
+
+// AddMailToFolderByObject godoc
+// @Summary Добавить письмо в папку с письмами по форме
+// @Produce json
+// @Param AddMailToFolderByObjectForm body models.AddMailToFolderByObject true "Форма запроса"
+// @Success 200 {object} pkg.JsonResponse "OK"
+// @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
+// @Failure 405 {object} pkg.JsonResponse
+// @Failure 500 {object} pkg.JsonResponse "Ошибка БД, неверные GET параметры."
+// @Router /folder/mail/add_form [post]
+// @Param X-CSRF-Token header string true "CSRF токен"
+// @Tags folder_manager
+func (d *Delivery) AddMailToFolderByObject(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodPost {
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
+		return
+	}
+	data, e := session.Manager.GetData(r)
+	if e != nil {
+		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
+		return
+	}
+	var form models.AddMailToFolderByObjectForm
+	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	form.Mail.Addressee = xss.EscapeInput(form.Mail.Addressee)
+	form.Mail.Files = xss.EscapeInput(form.Mail.Files)
+	form.Mail.Text = xss.EscapeInput(form.Mail.Text)
+	form.Mail.Theme = xss.EscapeInput(form.Mail.Theme)
+	formBytes, _ := json.Marshal(form.Mail)
+	if err := validator.Validate(form); err != nil {
+		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
+		return
+	}
+	resp, err := d.folderManager.AddMailToFolderByObject(context.Background(), &folder_manager_proto.AddMailToFolderByObjectRequest{
+		Data:       data,
+		FolderName: form.FolderName,
+		Form:     formBytes,
+	})
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
+		return
+	}
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
+		return
+	}
+	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
+}
+
+// MoveFolderMail godoc
+// @Summary Добавить письмо в папку с письмами по форме
+// @Produce json
+// @Param MoveFolderMailForm body models.MoveFolderMailForm true "Форма запроса"
+// @Success 200 {object} pkg.JsonResponse "OK"
+// @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
+// @Failure 405 {object} pkg.JsonResponse
+// @Failure 500 {object} pkg.JsonResponse "Ошибка БД, неверные GET параметры."
+// @Router /folder/mail/move [post]
+// @Param X-CSRF-Token header string true "CSRF токен"
+// @Tags folder_manager
+func (d *Delivery) MoveFolderMail(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodPost {
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
+		return
+	}
+	data, e := session.Manager.GetData(r)
+	if e != nil {
+		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
+		return
+	}
+	var form models.MoveFolderMailForm
+	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if err := validator.Validate(form); err != nil {
+		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
+		return
+	}
+	resp, err := d.folderManager.MoveFolderMail(context.Background(), &folder_manager_proto.MoveFolderMailRequest{
+		Data: data,
+		FolderNameSrc: form.FolderNameSrc,
+		FolderNameDest: form.FolderNameDest,
+	})
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
+		return
+	}
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
+		return
+	}
+	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
+}
+
+// @Router /folder/mail/move [get]
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
+// @Tags folder_manager
+func MoveFolderMail() {}
+
+// @Router /folder/mail/add_form [get]
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
+// @Tags folder_manager
+func AddMailToFolderByObject() {}
 
 // ChangeFolder godoc
 // @Summary Переименовать папку с письмами
@@ -282,7 +406,6 @@ func (d *Delivery) DeleteFolderMail(w http.ResponseWriter, r *http.Request) {
 		Data: data,
 		FolderName: form.FolderName,
 		MailId: form.MailId,
-		Restore: form.Restore,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)

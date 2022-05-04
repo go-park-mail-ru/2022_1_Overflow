@@ -29,11 +29,20 @@ service DatabaseRepository {
     rpc DeleteFolder(DeleteFolderRequest) returns (utils.DatabaseResponse) {}
     rpc AddFolder(AddFolderRequest) returns (utils.DatabaseResponse) {}
     rpc ChangeFolderName(ChangeFolderNameRequest) returns (utils.DatabaseResponse) {}
-    rpc AddMailToFolder(AddMailToFolderRequest) returns (utils.DatabaseResponse) {}
+    rpc AddMailToFolderById(AddMailToFolderByIdRequest) returns (utils.DatabaseResponse) {}
+    rpc AddMailToFolderByObject(AddMailToFolderByObjectRequest) returns (utils.DatabaseResponse) {}
     rpc DeleteFolderMail(DeleteFolderMailRequest) returns (utils.DatabaseResponse) {}
+    rpc MoveFolderMail(MoveFolderMailRequest) returns (utils.DatabaseResponse) {}
 }
 
 // ================ requests ================
+
+message MoveFolderMailRequest {
+    int32 userId = 1;
+    string folderNameSrc = 2;
+    string folderNameDest = 3;
+    int32 mailId = 4;
+}
 
 message GetUserInfoByUsernameRequest {
     string username = 1;
@@ -116,18 +125,22 @@ message ChangeFolderNameRequest {
     string newName = 3;
 }
 
-message AddMailToFolderRequest {
+message AddMailToFolderByIdRequest {
     int32 userId = 1;
     string folderName = 2;
     int32 mailId = 3;
     bool move = 4;
 }
 
-message DeleteFolderMailRequest {
+message AddMailToFolderByObjectRequest {
     int32 userId = 1;
     string folderName = 2;
-    int32 mailId = 3;
-    bool restore = 4;
+    bytes mail = 3;
+}
+
+message DeleteFolderMailRequest {
+    int32 userId = 1;
+    int32 mailId = 2;
 }
 
 // ================= responses ==================

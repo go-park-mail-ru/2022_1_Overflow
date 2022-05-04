@@ -21,7 +21,7 @@ func (c *Database) AddMail(context context.Context, request *repository_proto.Ad
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err
 	}
-	res, err := c.Conn.Query(context, "INSERT INTO overflow.mails(client_id, sender, addressee, theme, text, files, date) VALUES ($1, $2, $3, $4, $5, $6, $7);", mail.ClientId, mail.Sender, mail.Addressee, mail.Theme, mail.Text, mail.Files, mail.Date)
+	res, err := c.Conn.Query(context, "INSERT INTO overflow.mails(sender, addressee, theme, text, files, date) VALUES ($1, $2, $3, $4, $5, $6);", mail.Sender, mail.Addressee, mail.Theme, mail.Text, mail.Files, mail.Date)
 	if err == nil {
 		res.Close()
 		return &utils_proto.DatabaseResponse{
@@ -44,21 +44,21 @@ func (c *Database) DeleteMail(context context.Context, request *repository_proto
 		}, err
 	}
 	userId := request.UserId
-	res, err := c.Conn.Query(context, "UPDATE overflow.mails SET sender = 'null' WHERE id = $1 AND sender IN (SELECT username FROM overflow.users WHERE id=$2);", mail.Id, userId)
+	res, err := c.Conn.Query(context, "UPDATE overflow.mails SET sender = NULL WHERE id = $1 AND sender IN (SELECT username FROM overflow.users WHERE id=$2);", mail.Id, userId)
 	if err != nil {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err
 	}
 	res.Close()
-	res, err = c.Conn.Query(context, "UPDATE overflow.mails SET addressee = 'null' WHERE id = $1 AND addressee IN (SELECT username FROM overflow.users WHERE id=$2);", mail.Id, userId)
+	res, err = c.Conn.Query(context, "UPDATE overflow.mails SET addressee = NULL WHERE id = $1 AND addressee IN (SELECT username FROM overflow.users WHERE id=$2);", mail.Id, userId)
 	if err != nil {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err
 	}
 	res.Close()
-	res, err = c.Conn.Query(context, "DELETE FROM overflow.mails WHERE sender like 'null' and addressee like 'null';")
+	res, err = c.Conn.Query(context, "DELETE FROM overflow.mails WHERE sender is NULL and addressee is NULL;")
 	if err == nil {
 		res.Close()
 		return &utils_proto.DatabaseResponse{
@@ -97,7 +97,7 @@ func (c *Database) ReadMail(context context.Context, request *repository_proto.R
 func (c *Database) GetMailInfoById(context context.Context, request *repository_proto.GetMailInfoByIdRequest) (*repository_proto.ResponseMail, error) {
 	var mail models.Mail
 	mailBytes, _ := json.Marshal(mail)
-	rows, err := c.Conn.Query(context, "SELECT id, client_id, sender, addressee, date, theme, text, files, read FROM overflow.mails WHERE Id = $1;", request.MailId)
+	rows, err := c.Conn.Query(context, "SELECT id, sender, addressee, date, theme, text, files, read FROM overflow.mails WHERE Id = $1;", request.MailId)
 	if err != nil {
 		return &repository_proto.ResponseMail{
 			Mail: mailBytes,
@@ -118,14 +118,13 @@ func (c *Database) GetMailInfoById(context context.Context, request *repository_
 			}, err
 		}
 		mail.Id = values[0].(int32)
-		mail.ClientId = values[1].(int32)
-		mail.Sender = values[2].(string)
-		mail.Addressee = values[3].(string)
-		mail.Date = values[4].(time.Time)
-		mail.Theme = values[5].(string)
-		mail.Text = values[6].(string)
-		mail.Files = values[7].(string)
-		mail.Read = values[8].(bool)
+		mail.Sender = values[1].(string)
+		mail.Addressee = values[2].(string)
+		mail.Date = values[3].(time.Time)
+		mail.Theme = values[4].(string)
+		mail.Text = values[5].(string)
+		mail.Files = values[6].(string)
+		mail.Read = values[7].(bool)
 	}
 	mailBytes, _ = json.Marshal(mail)
 	return &repository_proto.ResponseMail{

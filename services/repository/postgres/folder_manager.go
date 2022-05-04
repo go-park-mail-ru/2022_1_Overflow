@@ -11,6 +11,20 @@ import (
 	//log "github.com/sirupsen/logrus"
 )
 
+// Находится ли письмо в какой либо папке
+func (c *Database) IsMailInAnyFolder(context context.Context, mailId int32) bool {
+	var counter int
+	c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.folder_to_mail WHERE mail_id=$1", mailId).Scan(&counter)
+	return counter > 0
+}
+
+// Является ли письмо перемещенным в какую либо папку
+func (c *Database) IsMailMoved(context context.Context, mailId int32) bool {
+	var counter int
+	c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.folder_to_mail WHERE mail_id=$1 AND only_folder=true", mailId).Scan(&counter)
+	return counter > 0
+}
+
 func (c *Database) GetFolderById(context context.Context, request *repository_proto.GetFolderByIdRequest) (*repository_proto.ResponseFolder, error) {
 	var folder models.Folder
 	folderBytes, _ := json.Marshal(folder)
@@ -206,17 +220,14 @@ func (c *Database) ChangeFolderName(context context.Context, request *repository
 	}, nil
 }
 
-func (c *Database) AddMailToFolder(context context.Context, request *repository_proto.AddMailToFolderRequest) (*utils_proto.DatabaseResponse, error) {
-	if request.Move {
-		rowsUpdate, err := c.Conn.Query(context, "UPDATE overflow.mails SET only_folder=$1 WHERE id=$2;", request.Move, request.MailId)
-		if err != nil {
-			return &utils_proto.DatabaseResponse{
-				Status: utils_proto.DatabaseStatus_ERROR,
-			}, err
-		}
-		defer rowsUpdate.Close()
+// Добавить письмо в папку
+func (c *Database) AddMailToFolderById(context context.Context, request *repository_proto.AddMailToFolderByIdRequest) (*utils_proto.DatabaseResponse, error) {
+	if c.IsMailMoved(context, request.MailId) {
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}, nil
 	}
-	rows, err := c.Conn.Query(context, "INSERT INTO overflow.folder_to_mail(folder_id, mail_id) SELECT id, $3 FROM overflow.folders WHERE user_id=$1 AND name=$2;", request.UserId, request.FolderName, request.MailId)
+	rows, err := c.Conn.Query(context, "INSERT INTO overflow.folder_to_mail(folder_id, mail_id, only_folder) SELECT id, $3, $4 FROM overflow.folders WHERE user_id=$1 AND name=$2;", request.UserId, request.FolderName, request.MailId, request.Move)
 	if err != nil {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
@@ -228,35 +239,52 @@ func (c *Database) AddMailToFolder(context context.Context, request *repository_
 	}, nil
 }
 
-func (c *Database) DeleteFolderMail(context context.Context, request *repository_proto.DeleteFolderMailRequest) (*utils_proto.DatabaseResponse, error) {
-	if request.Restore {
-		rowsRestore, err := c.Conn.Query(context, "UPDATE overflow.mails SET only_folder=$1 WHERE id=$2;", !request.Restore, request.MailId)
-		if err != nil {
-			return &utils_proto.DatabaseResponse{
-				Status: utils_proto.DatabaseStatus_ERROR,
-			}, err
-		}
-		rowsRestore.Close()
-		rows, err := c.Conn.Query(context, "DELETE FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND mail_id=$2;", request.UserId, request.MailId)
-		if err != nil {
-			return &utils_proto.DatabaseResponse{
-				Status: utils_proto.DatabaseStatus_ERROR,
-			}, err
-		}
-		rows.Close()
+func (c *Database) AddMailToFolderByObject(context context.Context, request *repository_proto.AddMailToFolderByObjectRequest) (*utils_proto.DatabaseResponse, error) {
+	var mail models.Mail
+	err := json.Unmarshal(request.Mail, &mail)
+	if err != nil {
 		return &utils_proto.DatabaseResponse{
-			Status: utils_proto.DatabaseStatus_OK,
-		}, nil
-	} else {
-		resp, err := c.GetMailInfoById(context, &repository_proto.GetMailInfoByIdRequest{
-			MailId: request.MailId,
-		})
-		if err != nil {
-			return resp.Response, err
-		}
-		return c.DeleteMail(context, &repository_proto.DeleteMailRequest{
-			Mail: resp.Mail,
-			UserId: request.UserId,
-		})
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}, err
 	}
+	var mailId int32 
+	c.Conn.QueryRow(context, "INSERT INTO overflow.mails(addressee, date, files, sender, text, theme) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id;", mail.Addressee, mail.Date, mail.Files, mail.Sender, mail.Text, mail.Theme).Scan(&mailId)
+	_, err = c.Conn.Exec(context, "INSERT INTO overflow.folder_to_mail(folder_id, mail_id, only_folder) SELECT id, $3, true FROM overflow.folders WHERE user_id=$1 AND name=$2;", request.UserId, request.FolderName, mailId)
+	if err != nil {
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}, err
+	}
+	return &utils_proto.DatabaseResponse{
+		Status: utils_proto.DatabaseStatus_OK,
+	}, nil
+}
+
+// Удалить письмо из папки
+func (c *Database) DeleteFolderMail(context context.Context, request *repository_proto.DeleteFolderMailRequest) (*utils_proto.DatabaseResponse, error) {
+	_, err := c.Conn.Exec(context, "DELETE FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND mail_id=$2;", request.UserId, request.MailId)
+	if err != nil {
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}, err
+	}
+	return &utils_proto.DatabaseResponse{
+		Status: utils_proto.DatabaseStatus_OK,
+	}, nil
+}
+
+func (c *Database) MoveFolderMail(context context.Context, request *repository_proto.MoveFolderMailRequest) (*utils_proto.DatabaseResponse, error) {
+	var folderIdSrc int32
+	var folderIdDest int32
+	c.Conn.QueryRow(context, "SELECT id FROM overflow.folders WHERE user_id=$1 AND name=$2;", request.UserId, request.FolderNameSrc).Scan(&folderIdSrc)
+	c.Conn.QueryRow(context, "SELECT id FROM overflow.folders WHERE user_id=$1 AND name=$2;", request.UserId, request.FolderNameDest).Scan(&folderIdDest)
+	_, err := c.Conn.Exec(context, "UPDATE overflow.folder_to_mail SET folder_id=$2 WHERE folder_id=$1", folderIdSrc, folderIdSrc)
+	if err != nil {
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}, err
+	}
+	return &utils_proto.DatabaseResponse{
+		Status: utils_proto.DatabaseStatus_OK,
+	}, nil
 }

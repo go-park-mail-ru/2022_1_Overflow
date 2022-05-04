@@ -44,10 +44,21 @@ type AddFolderForm struct {
 	FolderName string `json:"folder_name" validate:"nonzero"`
 }
 
-type AddMailToFolderForm struct {
+type AddMailToFolderByIdForm struct {
 	FolderName string `json:"folder_name" validate:"nonzero"`
 	MailId int32 `json:"mail_id" validate:"nonzero"`
 	Move bool `json:"move"`
+}
+
+type AddMailToFolderByObjectForm struct {
+	FolderName string `json:"folder_name" validate:"nonzero"`
+	Mail MailForm `json:"form"`
+}
+
+type MoveFolderMailForm struct {
+	FolderNameSrc string `json:"folder_name_src" validate:"nonzero"`
+	FolderNameDest string `json:"folder_name_dest" validate:"nonzero"`
+	MailId int32 `json:"mail_id" validate:"nonzero"`
 }
 
 type ChangeFolderForm struct {

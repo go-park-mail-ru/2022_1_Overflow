@@ -76,24 +76,44 @@ func (mr *MockDatabaseRepositoryClientMockRecorder) AddMail(ctx, in interface{},
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMail", reflect.TypeOf((*MockDatabaseRepositoryClient)(nil).AddMail), varargs...)
 }
 
-// AddMailToFolder mocks base method.
-func (m *MockDatabaseRepositoryClient) AddMailToFolder(ctx context.Context, in *AddMailToFolderRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error) {
+// AddMailToFolderById mocks base method.
+func (m *MockDatabaseRepositoryClient) AddMailToFolderById(ctx context.Context, in *AddMailToFolderByIdRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "AddMailToFolder", varargs...)
+	ret := m.ctrl.Call(m, "AddMailToFolderById", varargs...)
 	ret0, _ := ret[0].(*utils_proto.DatabaseResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// AddMailToFolder indicates an expected call of AddMailToFolder.
-func (mr *MockDatabaseRepositoryClientMockRecorder) AddMailToFolder(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+// AddMailToFolderById indicates an expected call of AddMailToFolderById.
+func (mr *MockDatabaseRepositoryClientMockRecorder) AddMailToFolderById(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMailToFolder", reflect.TypeOf((*MockDatabaseRepositoryClient)(nil).AddMailToFolder), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMailToFolderById", reflect.TypeOf((*MockDatabaseRepositoryClient)(nil).AddMailToFolderById), varargs...)
+}
+
+// AddMailToFolderByObject mocks base method.
+func (m *MockDatabaseRepositoryClient) AddMailToFolderByObject(ctx context.Context, in *AddMailToFolderByObjectRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "AddMailToFolderByObject", varargs...)
+	ret0, _ := ret[0].(*utils_proto.DatabaseResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddMailToFolderByObject indicates an expected call of AddMailToFolderByObject.
+func (mr *MockDatabaseRepositoryClientMockRecorder) AddMailToFolderByObject(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMailToFolderByObject", reflect.TypeOf((*MockDatabaseRepositoryClient)(nil).AddMailToFolderByObject), varargs...)
 }
 
 // AddUser mocks base method.
@@ -436,6 +456,26 @@ func (mr *MockDatabaseRepositoryClientMockRecorder) GetUserInfoByUsername(ctx, i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserInfoByUsername", reflect.TypeOf((*MockDatabaseRepositoryClient)(nil).GetUserInfoByUsername), varargs...)
 }
 
+// MoveFolderMail mocks base method.
+func (m *MockDatabaseRepositoryClient) MoveFolderMail(ctx context.Context, in *MoveFolderMailRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "MoveFolderMail", varargs...)
+	ret0, _ := ret[0].(*utils_proto.DatabaseResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// MoveFolderMail indicates an expected call of MoveFolderMail.
+func (mr *MockDatabaseRepositoryClientMockRecorder) MoveFolderMail(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MoveFolderMail", reflect.TypeOf((*MockDatabaseRepositoryClient)(nil).MoveFolderMail), varargs...)
+}
+
 // ReadMail mocks base method.
 func (m *MockDatabaseRepositoryClient) ReadMail(ctx context.Context, in *ReadMailRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error) {
 	m.ctrl.T.Helper()
@@ -509,19 +549,34 @@ func (mr *MockDatabaseRepositoryServerMockRecorder) AddMail(arg0, arg1 interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMail", reflect.TypeOf((*MockDatabaseRepositoryServer)(nil).AddMail), arg0, arg1)
 }
 
-// AddMailToFolder mocks base method.
-func (m *MockDatabaseRepositoryServer) AddMailToFolder(arg0 context.Context, arg1 *AddMailToFolderRequest) (*utils_proto.DatabaseResponse, error) {
+// AddMailToFolderById mocks base method.
+func (m *MockDatabaseRepositoryServer) AddMailToFolderById(arg0 context.Context, arg1 *AddMailToFolderByIdRequest) (*utils_proto.DatabaseResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddMailToFolder", arg0, arg1)
+	ret := m.ctrl.Call(m, "AddMailToFolderById", arg0, arg1)
 	ret0, _ := ret[0].(*utils_proto.DatabaseResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// AddMailToFolder indicates an expected call of AddMailToFolder.
-func (mr *MockDatabaseRepositoryServerMockRecorder) AddMailToFolder(arg0, arg1 interface{}) *gomock.Call {
+// AddMailToFolderById indicates an expected call of AddMailToFolderById.
+func (mr *MockDatabaseRepositoryServerMockRecorder) AddMailToFolderById(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMailToFolder", reflect.TypeOf((*MockDatabaseRepositoryServer)(nil).AddMailToFolder), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMailToFolderById", reflect.TypeOf((*MockDatabaseRepositoryServer)(nil).AddMailToFolderById), arg0, arg1)
+}
+
+// AddMailToFolderByObject mocks base method.
+func (m *MockDatabaseRepositoryServer) AddMailToFolderByObject(arg0 context.Context, arg1 *AddMailToFolderByObjectRequest) (*utils_proto.DatabaseResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddMailToFolderByObject", arg0, arg1)
+	ret0, _ := ret[0].(*utils_proto.DatabaseResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddMailToFolderByObject indicates an expected call of AddMailToFolderByObject.
+func (mr *MockDatabaseRepositoryServerMockRecorder) AddMailToFolderByObject(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddMailToFolderByObject", reflect.TypeOf((*MockDatabaseRepositoryServer)(nil).AddMailToFolderByObject), arg0, arg1)
 }
 
 // AddUser mocks base method.
@@ -777,6 +832,21 @@ func (m *MockDatabaseRepositoryServer) GetUserInfoByUsername(arg0 context.Contex
 func (mr *MockDatabaseRepositoryServerMockRecorder) GetUserInfoByUsername(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserInfoByUsername", reflect.TypeOf((*MockDatabaseRepositoryServer)(nil).GetUserInfoByUsername), arg0, arg1)
+}
+
+// MoveFolderMail mocks base method.
+func (m *MockDatabaseRepositoryServer) MoveFolderMail(arg0 context.Context, arg1 *MoveFolderMailRequest) (*utils_proto.DatabaseResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "MoveFolderMail", arg0, arg1)
+	ret0, _ := ret[0].(*utils_proto.DatabaseResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// MoveFolderMail indicates an expected call of MoveFolderMail.
+func (mr *MockDatabaseRepositoryServerMockRecorder) MoveFolderMail(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MoveFolderMail", reflect.TypeOf((*MockDatabaseRepositoryServer)(nil).MoveFolderMail), arg0, arg1)
 }
 
 // ReadMail mocks base method.

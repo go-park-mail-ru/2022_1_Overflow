@@ -25,6 +25,77 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type MoveFolderMailRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	UserId         int32  `protobuf:"varint,1,opt,name=userId,proto3" json:"userId,omitempty"`
+	FolderNameSrc  string `protobuf:"bytes,2,opt,name=folderNameSrc,proto3" json:"folderNameSrc,omitempty"`
+	FolderNameDest string `protobuf:"bytes,3,opt,name=folderNameDest,proto3" json:"folderNameDest,omitempty"`
+	MailId         int32  `protobuf:"varint,4,opt,name=mailId,proto3" json:"mailId,omitempty"`
+}
+
+func (x *MoveFolderMailRequest) Reset() {
+	*x = MoveFolderMailRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_repository_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MoveFolderMailRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MoveFolderMailRequest) ProtoMessage() {}
+
+func (x *MoveFolderMailRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_repository_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MoveFolderMailRequest.ProtoReflect.Descriptor instead.
+func (*MoveFolderMailRequest) Descriptor() ([]byte, []int) {
+	return file_proto_repository_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *MoveFolderMailRequest) GetUserId() int32 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *MoveFolderMailRequest) GetFolderNameSrc() string {
+	if x != nil {
+		return x.FolderNameSrc
+	}
+	return ""
+}
+
+func (x *MoveFolderMailRequest) GetFolderNameDest() string {
+	if x != nil {
+		return x.FolderNameDest
+	}
+	return ""
+}
+
+func (x *MoveFolderMailRequest) GetMailId() int32 {
+	if x != nil {
+		return x.MailId
+	}
+	return 0
+}
+
 type GetUserInfoByUsernameRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -36,7 +107,7 @@ type GetUserInfoByUsernameRequest struct {
 func (x *GetUserInfoByUsernameRequest) Reset() {
 	*x = GetUserInfoByUsernameRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[0]
+		mi := &file_proto_repository_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -49,7 +120,7 @@ func (x *GetUserInfoByUsernameRequest) String() string {
 func (*GetUserInfoByUsernameRequest) ProtoMessage() {}
 
 func (x *GetUserInfoByUsernameRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[0]
+	mi := &file_proto_repository_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -62,7 +133,7 @@ func (x *GetUserInfoByUsernameRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserInfoByUsernameRequest.ProtoReflect.Descriptor instead.
 func (*GetUserInfoByUsernameRequest) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{0}
+	return file_proto_repository_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetUserInfoByUsernameRequest) GetUsername() string {
@@ -83,7 +154,7 @@ type GetUserInfoByIdRequest struct {
 func (x *GetUserInfoByIdRequest) Reset() {
 	*x = GetUserInfoByIdRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[1]
+		mi := &file_proto_repository_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -96,7 +167,7 @@ func (x *GetUserInfoByIdRequest) String() string {
 func (*GetUserInfoByIdRequest) ProtoMessage() {}
 
 func (x *GetUserInfoByIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[1]
+	mi := &file_proto_repository_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -109,7 +180,7 @@ func (x *GetUserInfoByIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserInfoByIdRequest.ProtoReflect.Descriptor instead.
 func (*GetUserInfoByIdRequest) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{1}
+	return file_proto_repository_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GetUserInfoByIdRequest) GetUserId() int32 {
@@ -130,7 +201,7 @@ type AddUserRequest struct {
 func (x *AddUserRequest) Reset() {
 	*x = AddUserRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[2]
+		mi := &file_proto_repository_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -143,7 +214,7 @@ func (x *AddUserRequest) String() string {
 func (*AddUserRequest) ProtoMessage() {}
 
 func (x *AddUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[2]
+	mi := &file_proto_repository_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -156,7 +227,7 @@ func (x *AddUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddUserRequest.ProtoReflect.Descriptor instead.
 func (*AddUserRequest) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{2}
+	return file_proto_repository_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *AddUserRequest) GetUser() []byte {
@@ -178,7 +249,7 @@ type ChangeForm struct {
 func (x *ChangeForm) Reset() {
 	*x = ChangeForm{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[3]
+		mi := &file_proto_repository_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -191,7 +262,7 @@ func (x *ChangeForm) String() string {
 func (*ChangeForm) ProtoMessage() {}
 
 func (x *ChangeForm) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[3]
+	mi := &file_proto_repository_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -204,7 +275,7 @@ func (x *ChangeForm) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChangeForm.ProtoReflect.Descriptor instead.
 func (*ChangeForm) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{3}
+	return file_proto_repository_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ChangeForm) GetUser() []byte {
@@ -234,7 +305,7 @@ type GetIncomeMailsRequest struct {
 func (x *GetIncomeMailsRequest) Reset() {
 	*x = GetIncomeMailsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[4]
+		mi := &file_proto_repository_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -247,7 +318,7 @@ func (x *GetIncomeMailsRequest) String() string {
 func (*GetIncomeMailsRequest) ProtoMessage() {}
 
 func (x *GetIncomeMailsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[4]
+	mi := &file_proto_repository_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -260,7 +331,7 @@ func (x *GetIncomeMailsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetIncomeMailsRequest.ProtoReflect.Descriptor instead.
 func (*GetIncomeMailsRequest) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{4}
+	return file_proto_repository_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetIncomeMailsRequest) GetUserId() int32 {
@@ -297,7 +368,7 @@ type GetOutcomeMailsRequest struct {
 func (x *GetOutcomeMailsRequest) Reset() {
 	*x = GetOutcomeMailsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[5]
+		mi := &file_proto_repository_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -310,7 +381,7 @@ func (x *GetOutcomeMailsRequest) String() string {
 func (*GetOutcomeMailsRequest) ProtoMessage() {}
 
 func (x *GetOutcomeMailsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[5]
+	mi := &file_proto_repository_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -323,7 +394,7 @@ func (x *GetOutcomeMailsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetOutcomeMailsRequest.ProtoReflect.Descriptor instead.
 func (*GetOutcomeMailsRequest) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{5}
+	return file_proto_repository_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetOutcomeMailsRequest) GetUserId() int32 {
@@ -358,7 +429,7 @@ type AddMailRequest struct {
 func (x *AddMailRequest) Reset() {
 	*x = AddMailRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[6]
+		mi := &file_proto_repository_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -371,7 +442,7 @@ func (x *AddMailRequest) String() string {
 func (*AddMailRequest) ProtoMessage() {}
 
 func (x *AddMailRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[6]
+	mi := &file_proto_repository_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -384,7 +455,7 @@ func (x *AddMailRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddMailRequest.ProtoReflect.Descriptor instead.
 func (*AddMailRequest) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{6}
+	return file_proto_repository_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *AddMailRequest) GetMail() []byte {
@@ -406,7 +477,7 @@ type DeleteMailRequest struct {
 func (x *DeleteMailRequest) Reset() {
 	*x = DeleteMailRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[7]
+		mi := &file_proto_repository_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -419,7 +490,7 @@ func (x *DeleteMailRequest) String() string {
 func (*DeleteMailRequest) ProtoMessage() {}
 
 func (x *DeleteMailRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[7]
+	mi := &file_proto_repository_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -432,7 +503,7 @@ func (x *DeleteMailRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteMailRequest.ProtoReflect.Descriptor instead.
 func (*DeleteMailRequest) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{7}
+	return file_proto_repository_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *DeleteMailRequest) GetMail() []byte {
@@ -461,7 +532,7 @@ type ReadMailRequest struct {
 func (x *ReadMailRequest) Reset() {
 	*x = ReadMailRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[8]
+		mi := &file_proto_repository_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -474,7 +545,7 @@ func (x *ReadMailRequest) String() string {
 func (*ReadMailRequest) ProtoMessage() {}
 
 func (x *ReadMailRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[8]
+	mi := &file_proto_repository_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -487,7 +558,7 @@ func (x *ReadMailRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReadMailRequest.ProtoReflect.Descriptor instead.
 func (*ReadMailRequest) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{8}
+	return file_proto_repository_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ReadMailRequest) GetMail() []byte {
@@ -515,7 +586,7 @@ type GetMailInfoByIdRequest struct {
 func (x *GetMailInfoByIdRequest) Reset() {
 	*x = GetMailInfoByIdRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[9]
+		mi := &file_proto_repository_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -528,7 +599,7 @@ func (x *GetMailInfoByIdRequest) String() string {
 func (*GetMailInfoByIdRequest) ProtoMessage() {}
 
 func (x *GetMailInfoByIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[9]
+	mi := &file_proto_repository_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -541,7 +612,7 @@ func (x *GetMailInfoByIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMailInfoByIdRequest.ProtoReflect.Descriptor instead.
 func (*GetMailInfoByIdRequest) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{9}
+	return file_proto_repository_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *GetMailInfoByIdRequest) GetMailId() int32 {
@@ -562,7 +633,7 @@ type GetFolderByIdRequest struct {
 func (x *GetFolderByIdRequest) Reset() {
 	*x = GetFolderByIdRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[10]
+		mi := &file_proto_repository_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -575,7 +646,7 @@ func (x *GetFolderByIdRequest) String() string {
 func (*GetFolderByIdRequest) ProtoMessage() {}
 
 func (x *GetFolderByIdRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[10]
+	mi := &file_proto_repository_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -588,7 +659,7 @@ func (x *GetFolderByIdRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFolderByIdRequest.ProtoReflect.Descriptor instead.
 func (*GetFolderByIdRequest) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{10}
+	return file_proto_repository_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *GetFolderByIdRequest) GetFolderId() int32 {
@@ -610,7 +681,7 @@ type GetFolderByNameRequest struct {
 func (x *GetFolderByNameRequest) Reset() {
 	*x = GetFolderByNameRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[11]
+		mi := &file_proto_repository_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -623,7 +694,7 @@ func (x *GetFolderByNameRequest) String() string {
 func (*GetFolderByNameRequest) ProtoMessage() {}
 
 func (x *GetFolderByNameRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[11]
+	mi := &file_proto_repository_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -636,7 +707,7 @@ func (x *GetFolderByNameRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFolderByNameRequest.ProtoReflect.Descriptor instead.
 func (*GetFolderByNameRequest) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{11}
+	return file_proto_repository_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *GetFolderByNameRequest) GetUserId() int32 {
@@ -664,7 +735,7 @@ type GetFoldersByUserRequest struct {
 func (x *GetFoldersByUserRequest) Reset() {
 	*x = GetFoldersByUserRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[12]
+		mi := &file_proto_repository_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -677,7 +748,7 @@ func (x *GetFoldersByUserRequest) String() string {
 func (*GetFoldersByUserRequest) ProtoMessage() {}
 
 func (x *GetFoldersByUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[12]
+	mi := &file_proto_repository_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -690,7 +761,7 @@ func (x *GetFoldersByUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFoldersByUserRequest.ProtoReflect.Descriptor instead.
 func (*GetFoldersByUserRequest) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{12}
+	return file_proto_repository_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *GetFoldersByUserRequest) GetUserId() int32 {
@@ -712,7 +783,7 @@ type GetFolderMailRequest struct {
 func (x *GetFolderMailRequest) Reset() {
 	*x = GetFolderMailRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[13]
+		mi := &file_proto_repository_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -725,7 +796,7 @@ func (x *GetFolderMailRequest) String() string {
 func (*GetFolderMailRequest) ProtoMessage() {}
 
 func (x *GetFolderMailRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[13]
+	mi := &file_proto_repository_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -738,7 +809,7 @@ func (x *GetFolderMailRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetFolderMailRequest.ProtoReflect.Descriptor instead.
 func (*GetFolderMailRequest) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{13}
+	return file_proto_repository_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *GetFolderMailRequest) GetUserId() int32 {
@@ -767,7 +838,7 @@ type DeleteFolderRequest struct {
 func (x *DeleteFolderRequest) Reset() {
 	*x = DeleteFolderRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[14]
+		mi := &file_proto_repository_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -780,7 +851,7 @@ func (x *DeleteFolderRequest) String() string {
 func (*DeleteFolderRequest) ProtoMessage() {}
 
 func (x *DeleteFolderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[14]
+	mi := &file_proto_repository_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -793,7 +864,7 @@ func (x *DeleteFolderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFolderRequest.ProtoReflect.Descriptor instead.
 func (*DeleteFolderRequest) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{14}
+	return file_proto_repository_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *DeleteFolderRequest) GetUserId() int32 {
@@ -822,7 +893,7 @@ type AddFolderRequest struct {
 func (x *AddFolderRequest) Reset() {
 	*x = AddFolderRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[15]
+		mi := &file_proto_repository_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -835,7 +906,7 @@ func (x *AddFolderRequest) String() string {
 func (*AddFolderRequest) ProtoMessage() {}
 
 func (x *AddFolderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[15]
+	mi := &file_proto_repository_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -848,7 +919,7 @@ func (x *AddFolderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddFolderRequest.ProtoReflect.Descriptor instead.
 func (*AddFolderRequest) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{15}
+	return file_proto_repository_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *AddFolderRequest) GetName() string {
@@ -878,7 +949,7 @@ type ChangeFolderNameRequest struct {
 func (x *ChangeFolderNameRequest) Reset() {
 	*x = ChangeFolderNameRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[16]
+		mi := &file_proto_repository_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -891,7 +962,7 @@ func (x *ChangeFolderNameRequest) String() string {
 func (*ChangeFolderNameRequest) ProtoMessage() {}
 
 func (x *ChangeFolderNameRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[16]
+	mi := &file_proto_repository_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -904,7 +975,7 @@ func (x *ChangeFolderNameRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChangeFolderNameRequest.ProtoReflect.Descriptor instead.
 func (*ChangeFolderNameRequest) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{16}
+	return file_proto_repository_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *ChangeFolderNameRequest) GetUserId() int32 {
@@ -928,7 +999,7 @@ func (x *ChangeFolderNameRequest) GetNewName() string {
 	return ""
 }
 
-type AddMailToFolderRequest struct {
+type AddMailToFolderByIdRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -939,23 +1010,23 @@ type AddMailToFolderRequest struct {
 	Move       bool   `protobuf:"varint,4,opt,name=move,proto3" json:"move,omitempty"`
 }
 
-func (x *AddMailToFolderRequest) Reset() {
-	*x = AddMailToFolderRequest{}
+func (x *AddMailToFolderByIdRequest) Reset() {
+	*x = AddMailToFolderByIdRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[17]
+		mi := &file_proto_repository_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *AddMailToFolderRequest) String() string {
+func (x *AddMailToFolderByIdRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*AddMailToFolderRequest) ProtoMessage() {}
+func (*AddMailToFolderByIdRequest) ProtoMessage() {}
 
-func (x *AddMailToFolderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[17]
+func (x *AddMailToFolderByIdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_repository_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -966,37 +1037,100 @@ func (x *AddMailToFolderRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use AddMailToFolderRequest.ProtoReflect.Descriptor instead.
-func (*AddMailToFolderRequest) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{17}
+// Deprecated: Use AddMailToFolderByIdRequest.ProtoReflect.Descriptor instead.
+func (*AddMailToFolderByIdRequest) Descriptor() ([]byte, []int) {
+	return file_proto_repository_proto_rawDescGZIP(), []int{18}
 }
 
-func (x *AddMailToFolderRequest) GetUserId() int32 {
+func (x *AddMailToFolderByIdRequest) GetUserId() int32 {
 	if x != nil {
 		return x.UserId
 	}
 	return 0
 }
 
-func (x *AddMailToFolderRequest) GetFolderName() string {
+func (x *AddMailToFolderByIdRequest) GetFolderName() string {
 	if x != nil {
 		return x.FolderName
 	}
 	return ""
 }
 
-func (x *AddMailToFolderRequest) GetMailId() int32 {
+func (x *AddMailToFolderByIdRequest) GetMailId() int32 {
 	if x != nil {
 		return x.MailId
 	}
 	return 0
 }
 
-func (x *AddMailToFolderRequest) GetMove() bool {
+func (x *AddMailToFolderByIdRequest) GetMove() bool {
 	if x != nil {
 		return x.Move
 	}
 	return false
+}
+
+type AddMailToFolderByObjectRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	UserId     int32  `protobuf:"varint,1,opt,name=userId,proto3" json:"userId,omitempty"`
+	FolderName string `protobuf:"bytes,2,opt,name=folderName,proto3" json:"folderName,omitempty"`
+	Mail       []byte `protobuf:"bytes,3,opt,name=mail,proto3" json:"mail,omitempty"`
+}
+
+func (x *AddMailToFolderByObjectRequest) Reset() {
+	*x = AddMailToFolderByObjectRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_repository_proto_msgTypes[19]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AddMailToFolderByObjectRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddMailToFolderByObjectRequest) ProtoMessage() {}
+
+func (x *AddMailToFolderByObjectRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_repository_proto_msgTypes[19]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddMailToFolderByObjectRequest.ProtoReflect.Descriptor instead.
+func (*AddMailToFolderByObjectRequest) Descriptor() ([]byte, []int) {
+	return file_proto_repository_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *AddMailToFolderByObjectRequest) GetUserId() int32 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *AddMailToFolderByObjectRequest) GetFolderName() string {
+	if x != nil {
+		return x.FolderName
+	}
+	return ""
+}
+
+func (x *AddMailToFolderByObjectRequest) GetMail() []byte {
+	if x != nil {
+		return x.Mail
+	}
+	return nil
 }
 
 type DeleteFolderMailRequest struct {
@@ -1004,16 +1138,14 @@ type DeleteFolderMailRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	UserId     int32  `protobuf:"varint,1,opt,name=userId,proto3" json:"userId,omitempty"`
-	FolderName string `protobuf:"bytes,2,opt,name=folderName,proto3" json:"folderName,omitempty"`
-	MailId     int32  `protobuf:"varint,3,opt,name=mailId,proto3" json:"mailId,omitempty"`
-	Restore    bool   `protobuf:"varint,4,opt,name=restore,proto3" json:"restore,omitempty"`
+	UserId int32 `protobuf:"varint,1,opt,name=userId,proto3" json:"userId,omitempty"`
+	MailId int32 `protobuf:"varint,2,opt,name=mailId,proto3" json:"mailId,omitempty"`
 }
 
 func (x *DeleteFolderMailRequest) Reset() {
 	*x = DeleteFolderMailRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[18]
+		mi := &file_proto_repository_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1026,7 +1158,7 @@ func (x *DeleteFolderMailRequest) String() string {
 func (*DeleteFolderMailRequest) ProtoMessage() {}
 
 func (x *DeleteFolderMailRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[18]
+	mi := &file_proto_repository_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1039,7 +1171,7 @@ func (x *DeleteFolderMailRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFolderMailRequest.ProtoReflect.Descriptor instead.
 func (*DeleteFolderMailRequest) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{18}
+	return file_proto_repository_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *DeleteFolderMailRequest) GetUserId() int32 {
@@ -1049,25 +1181,11 @@ func (x *DeleteFolderMailRequest) GetUserId() int32 {
 	return 0
 }
 
-func (x *DeleteFolderMailRequest) GetFolderName() string {
-	if x != nil {
-		return x.FolderName
-	}
-	return ""
-}
-
 func (x *DeleteFolderMailRequest) GetMailId() int32 {
 	if x != nil {
 		return x.MailId
 	}
 	return 0
-}
-
-func (x *DeleteFolderMailRequest) GetRestore() bool {
-	if x != nil {
-		return x.Restore
-	}
-	return false
 }
 
 type ResponseUser struct {
@@ -1082,7 +1200,7 @@ type ResponseUser struct {
 func (x *ResponseUser) Reset() {
 	*x = ResponseUser{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[19]
+		mi := &file_proto_repository_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1095,7 +1213,7 @@ func (x *ResponseUser) String() string {
 func (*ResponseUser) ProtoMessage() {}
 
 func (x *ResponseUser) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[19]
+	mi := &file_proto_repository_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1108,7 +1226,7 @@ func (x *ResponseUser) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResponseUser.ProtoReflect.Descriptor instead.
 func (*ResponseUser) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{19}
+	return file_proto_repository_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *ResponseUser) GetResponse() *utils_proto.DatabaseResponse {
@@ -1137,7 +1255,7 @@ type ResponseMail struct {
 func (x *ResponseMail) Reset() {
 	*x = ResponseMail{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[20]
+		mi := &file_proto_repository_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1150,7 +1268,7 @@ func (x *ResponseMail) String() string {
 func (*ResponseMail) ProtoMessage() {}
 
 func (x *ResponseMail) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[20]
+	mi := &file_proto_repository_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1163,7 +1281,7 @@ func (x *ResponseMail) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResponseMail.ProtoReflect.Descriptor instead.
 func (*ResponseMail) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{20}
+	return file_proto_repository_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *ResponseMail) GetResponse() *utils_proto.DatabaseResponse {
@@ -1192,7 +1310,7 @@ type ResponseFolder struct {
 func (x *ResponseFolder) Reset() {
 	*x = ResponseFolder{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[21]
+		mi := &file_proto_repository_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1205,7 +1323,7 @@ func (x *ResponseFolder) String() string {
 func (*ResponseFolder) ProtoMessage() {}
 
 func (x *ResponseFolder) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[21]
+	mi := &file_proto_repository_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1218,7 +1336,7 @@ func (x *ResponseFolder) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResponseFolder.ProtoReflect.Descriptor instead.
 func (*ResponseFolder) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{21}
+	return file_proto_repository_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *ResponseFolder) GetResponse() *utils_proto.DatabaseResponse {
@@ -1247,7 +1365,7 @@ type ResponseFolders struct {
 func (x *ResponseFolders) Reset() {
 	*x = ResponseFolders{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[22]
+		mi := &file_proto_repository_proto_msgTypes[24]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1260,7 +1378,7 @@ func (x *ResponseFolders) String() string {
 func (*ResponseFolders) ProtoMessage() {}
 
 func (x *ResponseFolders) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[22]
+	mi := &file_proto_repository_proto_msgTypes[24]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1273,7 +1391,7 @@ func (x *ResponseFolders) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResponseFolders.ProtoReflect.Descriptor instead.
 func (*ResponseFolders) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{22}
+	return file_proto_repository_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *ResponseFolders) GetResponse() *utils_proto.DatabaseResponse {
@@ -1302,7 +1420,7 @@ type ResponseMails struct {
 func (x *ResponseMails) Reset() {
 	*x = ResponseMails{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_repository_proto_msgTypes[23]
+		mi := &file_proto_repository_proto_msgTypes[25]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1315,7 +1433,7 @@ func (x *ResponseMails) String() string {
 func (*ResponseMails) ProtoMessage() {}
 
 func (x *ResponseMails) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_repository_proto_msgTypes[23]
+	mi := &file_proto_repository_proto_msgTypes[25]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1328,7 +1446,7 @@ func (x *ResponseMails) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResponseMails.ProtoReflect.Descriptor instead.
 func (*ResponseMails) Descriptor() ([]byte, []int) {
-	return file_proto_repository_proto_rawDescGZIP(), []int{23}
+	return file_proto_repository_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *ResponseMails) GetResponse() *utils_proto.DatabaseResponse {
@@ -1351,94 +1469,107 @@ var file_proto_repository_proto_rawDesc = []byte{
 	0x0a, 0x16, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x72, 0x65, 0x70, 0x6f, 0x73, 0x69, 0x74, 0x6f,
 	0x72, 0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x10, 0x72, 0x65, 0x70, 0x6f, 0x73, 0x69,
 	0x74, 0x6f, 0x72, 0x79, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x11, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x2f, 0x75, 0x74, 0x69, 0x6c, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x3a, 0x0a,
-	0x1c, 0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x49, 0x6e, 0x66, 0x6f, 0x42, 0x79, 0x55, 0x73,
-	0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1a, 0x0a,
-	0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x30, 0x0a, 0x16, 0x47, 0x65, 0x74,
-	0x55, 0x73, 0x65, 0x72, 0x49, 0x6e, 0x66, 0x6f, 0x42, 0x79, 0x49, 0x64, 0x52, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x22, 0x24, 0x0a, 0x0e, 0x41,
-	0x64, 0x64, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a,
-	0x04, 0x75, 0x73, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x75, 0x73, 0x65,
-	0x72, 0x22, 0x34, 0x0a, 0x0a, 0x43, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x46, 0x6f, 0x72, 0x6d, 0x12,
-	0x12, 0x0a, 0x04, 0x75, 0x73, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x75,
-	0x73, 0x65, 0x72, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x22, 0x5d, 0x0a, 0x15, 0x47, 0x65, 0x74, 0x49, 0x6e,
-	0x63, 0x6f, 0x6d, 0x65, 0x4d, 0x61, 0x69, 0x6c, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
-	0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05,
-	0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x6c, 0x69, 0x6d, 0x69,
-	0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x12, 0x16,
-	0x0a, 0x06, 0x6f, 0x66, 0x66, 0x73, 0x65, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06,
-	0x6f, 0x66, 0x66, 0x73, 0x65, 0x74, 0x22, 0x5e, 0x0a, 0x16, 0x47, 0x65, 0x74, 0x4f, 0x75, 0x74,
-	0x63, 0x6f, 0x6d, 0x65, 0x4d, 0x61, 0x69, 0x6c, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
-	0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05,
-	0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x6c, 0x69, 0x6d, 0x69,
-	0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x05, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x12, 0x16,
-	0x0a, 0x06, 0x6f, 0x66, 0x66, 0x73, 0x65, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06,
-	0x6f, 0x66, 0x66, 0x73, 0x65, 0x74, 0x22, 0x24, 0x0a, 0x0e, 0x41, 0x64, 0x64, 0x4d, 0x61, 0x69,
-	0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6d, 0x61, 0x69, 0x6c,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x6d, 0x61, 0x69, 0x6c, 0x22, 0x40, 0x0a, 0x11,
-	0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x4d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x12, 0x12, 0x0a, 0x04, 0x6d, 0x61, 0x69, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52,
-	0x04, 0x6d, 0x61, 0x69, 0x6c, 0x12, 0x17, 0x0a, 0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x22, 0x39,
-	0x0a, 0x0f, 0x52, 0x65, 0x61, 0x64, 0x4d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x12, 0x12, 0x0a, 0x04, 0x6d, 0x61, 0x69, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52,
-	0x04, 0x6d, 0x61, 0x69, 0x6c, 0x12, 0x12, 0x0a, 0x04, 0x72, 0x65, 0x61, 0x64, 0x18, 0x02, 0x20,
-	0x01, 0x28, 0x08, 0x52, 0x04, 0x72, 0x65, 0x61, 0x64, 0x22, 0x30, 0x0a, 0x16, 0x47, 0x65, 0x74,
-	0x4d, 0x61, 0x69, 0x6c, 0x49, 0x6e, 0x66, 0x6f, 0x42, 0x79, 0x49, 0x64, 0x52, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x6d, 0x61, 0x69, 0x6c, 0x49, 0x64, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x05, 0x52, 0x06, 0x6d, 0x61, 0x69, 0x6c, 0x49, 0x64, 0x22, 0x32, 0x0a, 0x14, 0x47,
-	0x65, 0x74, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x42, 0x79, 0x49, 0x64, 0x52, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x49, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x08, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x49, 0x64, 0x22,
-	0x50, 0x0a, 0x16, 0x47, 0x65, 0x74, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x42, 0x79, 0x4e, 0x61,
-	0x6d, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65,
-	0x72, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49,
-	0x64, 0x12, 0x1e, 0x0a, 0x0a, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x18,
-	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d,
-	0x65, 0x22, 0x31, 0x0a, 0x17, 0x47, 0x65, 0x74, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x73, 0x42,
-	0x79, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06,
-	0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73,
-	0x65, 0x72, 0x49, 0x64, 0x22, 0x4e, 0x0a, 0x14, 0x47, 0x65, 0x74, 0x46, 0x6f, 0x6c, 0x64, 0x65,
-	0x72, 0x4d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06,
-	0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73,
-	0x65, 0x72, 0x49, 0x64, 0x12, 0x1e, 0x0a, 0x0a, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61,
-	0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72,
-	0x4e, 0x61, 0x6d, 0x65, 0x22, 0x4d, 0x0a, 0x13, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x46, 0x6f,
-	0x6c, 0x64, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x75,
+	0x6f, 0x2f, 0x75, 0x74, 0x69, 0x6c, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x95, 0x01,
+	0x0a, 0x15, 0x4d, 0x6f, 0x76, 0x65, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4d, 0x61, 0x69, 0x6c,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12,
+	0x24, 0x0a, 0x0d, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x53, 0x72, 0x63,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61,
+	0x6d, 0x65, 0x53, 0x72, 0x63, 0x12, 0x26, 0x0a, 0x0e, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e,
+	0x61, 0x6d, 0x65, 0x44, 0x65, 0x73, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x66,
+	0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x44, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a,
+	0x06, 0x6d, 0x61, 0x69, 0x6c, 0x49, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x6d,
+	0x61, 0x69, 0x6c, 0x49, 0x64, 0x22, 0x3a, 0x0a, 0x1c, 0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72,
+	0x49, 0x6e, 0x66, 0x6f, 0x42, 0x79, 0x55, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d,
+	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d,
+	0x65, 0x22, 0x30, 0x0a, 0x16, 0x47, 0x65, 0x74, 0x55, 0x73, 0x65, 0x72, 0x49, 0x6e, 0x66, 0x6f,
+	0x42, 0x79, 0x49, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x75,
 	0x73, 0x65, 0x72, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73, 0x65,
-	0x72, 0x49, 0x64, 0x12, 0x1e, 0x0a, 0x0a, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d,
-	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e,
-	0x61, 0x6d, 0x65, 0x22, 0x3e, 0x0a, 0x10, 0x41, 0x64, 0x64, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x75,
-	0x73, 0x65, 0x72, 0x49, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73, 0x65,
-	0x72, 0x49, 0x64, 0x22, 0x6b, 0x0a, 0x17, 0x43, 0x68, 0x61, 0x6e, 0x67, 0x65, 0x46, 0x6f, 0x6c,
-	0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16,
-	0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06,
-	0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x1e, 0x0a, 0x0a, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72,
-	0x4e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x66, 0x6f, 0x6c, 0x64,
-	0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x6e, 0x65, 0x77, 0x4e, 0x61, 0x6d,
-	0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6e, 0x65, 0x77, 0x4e, 0x61, 0x6d, 0x65,
-	0x22, 0x7c, 0x0a, 0x16, 0x41, 0x64, 0x64, 0x4d, 0x61, 0x69, 0x6c, 0x54, 0x6f, 0x46, 0x6f, 0x6c,
-	0x64, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73,
-	0x65, 0x72, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72,
-	0x49, 0x64, 0x12, 0x1e, 0x0a, 0x0a, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61,
-	0x6d, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x6d, 0x61, 0x69, 0x6c, 0x49, 0x64, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x05, 0x52, 0x06, 0x6d, 0x61, 0x69, 0x6c, 0x49, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6d, 0x6f,
-	0x76, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x08, 0x52, 0x04, 0x6d, 0x6f, 0x76, 0x65, 0x22, 0x83,
-	0x01, 0x0a, 0x17, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4d,
-	0x61, 0x69, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73,
-	0x65, 0x72, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72,
-	0x49, 0x64, 0x12, 0x1e, 0x0a, 0x0a, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61,
-	0x6d, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x6d, 0x61, 0x69, 0x6c, 0x49, 0x64, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x05, 0x52, 0x06, 0x6d, 0x61, 0x69, 0x6c, 0x49, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x72, 0x65,
-	0x73, 0x74, 0x6f, 0x72, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x72, 0x65, 0x73,
-	0x74, 0x6f, 0x72, 0x65, 0x22, 0x57, 0x0a, 0x0c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x72, 0x49, 0x64, 0x22, 0x24, 0x0a, 0x0e, 0x41, 0x64, 0x64, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x75, 0x73, 0x65, 0x72, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0c, 0x52, 0x04, 0x75, 0x73, 0x65, 0x72, 0x22, 0x34, 0x0a, 0x0a, 0x43, 0x68, 0x61,
+	0x6e, 0x67, 0x65, 0x46, 0x6f, 0x72, 0x6d, 0x12, 0x12, 0x0a, 0x04, 0x75, 0x73, 0x65, 0x72, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x75, 0x73, 0x65, 0x72, 0x12, 0x12, 0x0a, 0x04, 0x64,
+	0x61, 0x74, 0x61, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x22,
+	0x5d, 0x0a, 0x15, 0x47, 0x65, 0x74, 0x49, 0x6e, 0x63, 0x6f, 0x6d, 0x65, 0x4d, 0x61, 0x69, 0x6c,
+	0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72,
+	0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64,
+	0x12, 0x14, 0x0a, 0x05, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52,
+	0x05, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x6f, 0x66, 0x66, 0x73, 0x65, 0x74,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x6f, 0x66, 0x66, 0x73, 0x65, 0x74, 0x22, 0x5e,
+	0x0a, 0x16, 0x47, 0x65, 0x74, 0x4f, 0x75, 0x74, 0x63, 0x6f, 0x6d, 0x65, 0x4d, 0x61, 0x69, 0x6c,
+	0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72,
+	0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64,
+	0x12, 0x14, 0x0a, 0x05, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52,
+	0x05, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x6f, 0x66, 0x66, 0x73, 0x65, 0x74,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x6f, 0x66, 0x66, 0x73, 0x65, 0x74, 0x22, 0x24,
+	0x0a, 0x0e, 0x41, 0x64, 0x64, 0x4d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x12, 0x0a, 0x04, 0x6d, 0x61, 0x69, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04,
+	0x6d, 0x61, 0x69, 0x6c, 0x22, 0x40, 0x0a, 0x11, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x4d, 0x61,
+	0x69, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6d, 0x61, 0x69,
+	0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x6d, 0x61, 0x69, 0x6c, 0x12, 0x17, 0x0a,
+	0x07, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06,
+	0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x22, 0x39, 0x0a, 0x0f, 0x52, 0x65, 0x61, 0x64, 0x4d, 0x61,
+	0x69, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6d, 0x61, 0x69,
+	0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x04, 0x6d, 0x61, 0x69, 0x6c, 0x12, 0x12, 0x0a,
+	0x04, 0x72, 0x65, 0x61, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x04, 0x72, 0x65, 0x61,
+	0x64, 0x22, 0x30, 0x0a, 0x16, 0x47, 0x65, 0x74, 0x4d, 0x61, 0x69, 0x6c, 0x49, 0x6e, 0x66, 0x6f,
+	0x42, 0x79, 0x49, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x6d,
+	0x61, 0x69, 0x6c, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x6d, 0x61, 0x69,
+	0x6c, 0x49, 0x64, 0x22, 0x32, 0x0a, 0x14, 0x47, 0x65, 0x74, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72,
+	0x42, 0x79, 0x49, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x66,
+	0x6f, 0x6c, 0x64, 0x65, 0x72, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x08, 0x66,
+	0x6f, 0x6c, 0x64, 0x65, 0x72, 0x49, 0x64, 0x22, 0x50, 0x0a, 0x16, 0x47, 0x65, 0x74, 0x46, 0x6f,
+	0x6c, 0x64, 0x65, 0x72, 0x42, 0x79, 0x4e, 0x61, 0x6d, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x05, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x1e, 0x0a, 0x0a, 0x66, 0x6f, 0x6c,
+	0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x66,
+	0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x22, 0x31, 0x0a, 0x17, 0x47, 0x65, 0x74,
+	0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x73, 0x42, 0x79, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x22, 0x4e, 0x0a, 0x14,
+	0x47, 0x65, 0x74, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x1e, 0x0a, 0x0a,
+	0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x0a, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x22, 0x4d, 0x0a, 0x13,
+	0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x1e, 0x0a, 0x0a, 0x66,
+	0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0a, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x22, 0x3e, 0x0a, 0x10, 0x41,
+	0x64, 0x64, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
+	0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e,
+	0x61, 0x6d, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x22, 0x6b, 0x0a, 0x17, 0x43,
+	0x68, 0x61, 0x6e, 0x67, 0x65, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x1e,
+	0x0a, 0x0a, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x0a, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x18,
+	0x0a, 0x07, 0x6e, 0x65, 0x77, 0x4e, 0x61, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x07, 0x6e, 0x65, 0x77, 0x4e, 0x61, 0x6d, 0x65, 0x22, 0x80, 0x01, 0x0a, 0x1a, 0x41, 0x64, 0x64,
+	0x4d, 0x61, 0x69, 0x6c, 0x54, 0x6f, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x42, 0x79, 0x49, 0x64,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12,
+	0x1e, 0x0a, 0x0a, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x0a, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x12,
+	0x16, 0x0a, 0x06, 0x6d, 0x61, 0x69, 0x6c, 0x49, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52,
+	0x06, 0x6d, 0x61, 0x69, 0x6c, 0x49, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6d, 0x6f, 0x76, 0x65, 0x18,
+	0x04, 0x20, 0x01, 0x28, 0x08, 0x52, 0x04, 0x6d, 0x6f, 0x76, 0x65, 0x22, 0x6c, 0x0a, 0x1e, 0x41,
+	0x64, 0x64, 0x4d, 0x61, 0x69, 0x6c, 0x54, 0x6f, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x42, 0x79,
+	0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a,
+	0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75,
+	0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x1e, 0x0a, 0x0a, 0x66, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e,
+	0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x66, 0x6f, 0x6c, 0x64, 0x65,
+	0x72, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x6d, 0x61, 0x69, 0x6c, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x0c, 0x52, 0x04, 0x6d, 0x61, 0x69, 0x6c, 0x22, 0x49, 0x0a, 0x17, 0x44, 0x65, 0x6c,
+	0x65, 0x74, 0x65, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x75, 0x73, 0x65, 0x72, 0x49, 0x64, 0x12, 0x16, 0x0a, 0x06,
+	0x6d, 0x61, 0x69, 0x6c, 0x49, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x6d, 0x61,
+	0x69, 0x6c, 0x49, 0x64, 0x22, 0x57, 0x0a, 0x0c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
 	0x55, 0x73, 0x65, 0x72, 0x12, 0x33, 0x0a, 0x08, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x17, 0x2e, 0x75, 0x74, 0x69, 0x6c, 0x73, 0x2e, 0x44,
 	0x61, 0x74, 0x61, 0x62, 0x61, 0x73, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x52,
@@ -1467,7 +1598,7 @@ var file_proto_repository_proto_rawDesc = []byte{
 	0x6c, 0x73, 0x2e, 0x44, 0x61, 0x74, 0x61, 0x62, 0x61, 0x73, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f,
 	0x6e, 0x73, 0x65, 0x52, 0x08, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x14, 0x0a,
 	0x05, 0x6d, 0x61, 0x69, 0x6c, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x05, 0x6d, 0x61,
-	0x69, 0x6c, 0x73, 0x32, 0xb9, 0x0e, 0x0a, 0x12, 0x44, 0x61, 0x74, 0x61, 0x62, 0x61, 0x73, 0x65,
+	0x69, 0x6c, 0x73, 0x32, 0xff, 0x0f, 0x0a, 0x12, 0x44, 0x61, 0x74, 0x61, 0x62, 0x61, 0x73, 0x65,
 	0x52, 0x65, 0x70, 0x6f, 0x73, 0x69, 0x74, 0x6f, 0x72, 0x79, 0x12, 0x69, 0x0a, 0x15, 0x47, 0x65,
 	0x74, 0x55, 0x73, 0x65, 0x72, 0x49, 0x6e, 0x66, 0x6f, 0x42, 0x79, 0x55, 0x73, 0x65, 0x72, 0x6e,
 	0x61, 0x6d, 0x65, 0x12, 0x2e, 0x2e, 0x72, 0x65, 0x70, 0x6f, 0x73, 0x69, 0x74, 0x6f, 0x72, 0x79,
@@ -1571,20 +1702,33 @@ var file_proto_repository_proto_rawDesc = []byte{
 	0x74, 0x6f, 0x72, 0x79, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x43, 0x68, 0x61, 0x6e, 0x67,
 	0x65, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65,
 	0x73, 0x74, 0x1a, 0x17, 0x2e, 0x75, 0x74, 0x69, 0x6c, 0x73, 0x2e, 0x44, 0x61, 0x74, 0x61, 0x62,
-	0x61, 0x73, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x56, 0x0a,
-	0x0f, 0x41, 0x64, 0x64, 0x4d, 0x61, 0x69, 0x6c, 0x54, 0x6f, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72,
-	0x12, 0x28, 0x2e, 0x72, 0x65, 0x70, 0x6f, 0x73, 0x69, 0x74, 0x6f, 0x72, 0x79, 0x5f, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x2e, 0x41, 0x64, 0x64, 0x4d, 0x61, 0x69, 0x6c, 0x54, 0x6f, 0x46, 0x6f, 0x6c,
-	0x64, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x17, 0x2e, 0x75, 0x74, 0x69,
+	0x61, 0x73, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x5e, 0x0a,
+	0x13, 0x41, 0x64, 0x64, 0x4d, 0x61, 0x69, 0x6c, 0x54, 0x6f, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72,
+	0x42, 0x79, 0x49, 0x64, 0x12, 0x2c, 0x2e, 0x72, 0x65, 0x70, 0x6f, 0x73, 0x69, 0x74, 0x6f, 0x72,
+	0x79, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x41, 0x64, 0x64, 0x4d, 0x61, 0x69, 0x6c, 0x54,
+	0x6f, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x42, 0x79, 0x49, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x1a, 0x17, 0x2e, 0x75, 0x74, 0x69, 0x6c, 0x73, 0x2e, 0x44, 0x61, 0x74, 0x61, 0x62,
+	0x61, 0x73, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x66, 0x0a,
+	0x17, 0x41, 0x64, 0x64, 0x4d, 0x61, 0x69, 0x6c, 0x54, 0x6f, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72,
+	0x42, 0x79, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x12, 0x30, 0x2e, 0x72, 0x65, 0x70, 0x6f, 0x73,
+	0x69, 0x74, 0x6f, 0x72, 0x79, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x41, 0x64, 0x64, 0x4d,
+	0x61, 0x69, 0x6c, 0x54, 0x6f, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x42, 0x79, 0x4f, 0x62, 0x6a,
+	0x65, 0x63, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x17, 0x2e, 0x75, 0x74, 0x69,
 	0x6c, 0x73, 0x2e, 0x44, 0x61, 0x74, 0x61, 0x62, 0x61, 0x73, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f,
 	0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x58, 0x0a, 0x10, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x46,
 	0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4d, 0x61, 0x69, 0x6c, 0x12, 0x29, 0x2e, 0x72, 0x65, 0x70, 0x6f,
 	0x73, 0x69, 0x74, 0x6f, 0x72, 0x79, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x44, 0x65, 0x6c,
 	0x65, 0x74, 0x65, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4d, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71,
 	0x75, 0x65, 0x73, 0x74, 0x1a, 0x17, 0x2e, 0x75, 0x74, 0x69, 0x6c, 0x73, 0x2e, 0x44, 0x61, 0x74,
-	0x61, 0x62, 0x61, 0x73, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42,
-	0x14, 0x5a, 0x12, 0x2e, 0x2f, 0x72, 0x65, 0x70, 0x6f, 0x73, 0x69, 0x74, 0x6f, 0x72, 0x79, 0x5f,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x61, 0x62, 0x61, 0x73, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12,
+	0x54, 0x0a, 0x0e, 0x4d, 0x6f, 0x76, 0x65, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4d, 0x61, 0x69,
+	0x6c, 0x12, 0x27, 0x2e, 0x72, 0x65, 0x70, 0x6f, 0x73, 0x69, 0x74, 0x6f, 0x72, 0x79, 0x5f, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x2e, 0x4d, 0x6f, 0x76, 0x65, 0x46, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x4d,
+	0x61, 0x69, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x17, 0x2e, 0x75, 0x74, 0x69,
+	0x6c, 0x73, 0x2e, 0x44, 0x61, 0x74, 0x61, 0x62, 0x61, 0x73, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x14, 0x5a, 0x12, 0x2e, 0x2f, 0x72, 0x65, 0x70, 0x6f, 0x73,
+	0x69, 0x74, 0x6f, 0x72, 0x79, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1599,84 +1743,90 @@ func file_proto_repository_proto_rawDescGZIP() []byte {
 	return file_proto_repository_proto_rawDescData
 }
 
-var file_proto_repository_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
+var file_proto_repository_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
 var file_proto_repository_proto_goTypes = []interface{}{
-	(*GetUserInfoByUsernameRequest)(nil), // 0: repository_proto.GetUserInfoByUsernameRequest
-	(*GetUserInfoByIdRequest)(nil),       // 1: repository_proto.GetUserInfoByIdRequest
-	(*AddUserRequest)(nil),               // 2: repository_proto.AddUserRequest
-	(*ChangeForm)(nil),                   // 3: repository_proto.ChangeForm
-	(*GetIncomeMailsRequest)(nil),        // 4: repository_proto.GetIncomeMailsRequest
-	(*GetOutcomeMailsRequest)(nil),       // 5: repository_proto.GetOutcomeMailsRequest
-	(*AddMailRequest)(nil),               // 6: repository_proto.AddMailRequest
-	(*DeleteMailRequest)(nil),            // 7: repository_proto.DeleteMailRequest
-	(*ReadMailRequest)(nil),              // 8: repository_proto.ReadMailRequest
-	(*GetMailInfoByIdRequest)(nil),       // 9: repository_proto.GetMailInfoByIdRequest
-	(*GetFolderByIdRequest)(nil),         // 10: repository_proto.GetFolderByIdRequest
-	(*GetFolderByNameRequest)(nil),       // 11: repository_proto.GetFolderByNameRequest
-	(*GetFoldersByUserRequest)(nil),      // 12: repository_proto.GetFoldersByUserRequest
-	(*GetFolderMailRequest)(nil),         // 13: repository_proto.GetFolderMailRequest
-	(*DeleteFolderRequest)(nil),          // 14: repository_proto.DeleteFolderRequest
-	(*AddFolderRequest)(nil),             // 15: repository_proto.AddFolderRequest
-	(*ChangeFolderNameRequest)(nil),      // 16: repository_proto.ChangeFolderNameRequest
-	(*AddMailToFolderRequest)(nil),       // 17: repository_proto.AddMailToFolderRequest
-	(*DeleteFolderMailRequest)(nil),      // 18: repository_proto.DeleteFolderMailRequest
-	(*ResponseUser)(nil),                 // 19: repository_proto.ResponseUser
-	(*ResponseMail)(nil),                 // 20: repository_proto.ResponseMail
-	(*ResponseFolder)(nil),               // 21: repository_proto.ResponseFolder
-	(*ResponseFolders)(nil),              // 22: repository_proto.ResponseFolders
-	(*ResponseMails)(nil),                // 23: repository_proto.ResponseMails
-	(*utils_proto.DatabaseResponse)(nil), // 24: utils.DatabaseResponse
+	(*MoveFolderMailRequest)(nil),          // 0: repository_proto.MoveFolderMailRequest
+	(*GetUserInfoByUsernameRequest)(nil),   // 1: repository_proto.GetUserInfoByUsernameRequest
+	(*GetUserInfoByIdRequest)(nil),         // 2: repository_proto.GetUserInfoByIdRequest
+	(*AddUserRequest)(nil),                 // 3: repository_proto.AddUserRequest
+	(*ChangeForm)(nil),                     // 4: repository_proto.ChangeForm
+	(*GetIncomeMailsRequest)(nil),          // 5: repository_proto.GetIncomeMailsRequest
+	(*GetOutcomeMailsRequest)(nil),         // 6: repository_proto.GetOutcomeMailsRequest
+	(*AddMailRequest)(nil),                 // 7: repository_proto.AddMailRequest
+	(*DeleteMailRequest)(nil),              // 8: repository_proto.DeleteMailRequest
+	(*ReadMailRequest)(nil),                // 9: repository_proto.ReadMailRequest
+	(*GetMailInfoByIdRequest)(nil),         // 10: repository_proto.GetMailInfoByIdRequest
+	(*GetFolderByIdRequest)(nil),           // 11: repository_proto.GetFolderByIdRequest
+	(*GetFolderByNameRequest)(nil),         // 12: repository_proto.GetFolderByNameRequest
+	(*GetFoldersByUserRequest)(nil),        // 13: repository_proto.GetFoldersByUserRequest
+	(*GetFolderMailRequest)(nil),           // 14: repository_proto.GetFolderMailRequest
+	(*DeleteFolderRequest)(nil),            // 15: repository_proto.DeleteFolderRequest
+	(*AddFolderRequest)(nil),               // 16: repository_proto.AddFolderRequest
+	(*ChangeFolderNameRequest)(nil),        // 17: repository_proto.ChangeFolderNameRequest
+	(*AddMailToFolderByIdRequest)(nil),     // 18: repository_proto.AddMailToFolderByIdRequest
+	(*AddMailToFolderByObjectRequest)(nil), // 19: repository_proto.AddMailToFolderByObjectRequest
+	(*DeleteFolderMailRequest)(nil),        // 20: repository_proto.DeleteFolderMailRequest
+	(*ResponseUser)(nil),                   // 21: repository_proto.ResponseUser
+	(*ResponseMail)(nil),                   // 22: repository_proto.ResponseMail
+	(*ResponseFolder)(nil),                 // 23: repository_proto.ResponseFolder
+	(*ResponseFolders)(nil),                // 24: repository_proto.ResponseFolders
+	(*ResponseMails)(nil),                  // 25: repository_proto.ResponseMails
+	(*utils_proto.DatabaseResponse)(nil),   // 26: utils.DatabaseResponse
 }
 var file_proto_repository_proto_depIdxs = []int32{
-	24, // 0: repository_proto.ResponseUser.response:type_name -> utils.DatabaseResponse
-	24, // 1: repository_proto.ResponseMail.response:type_name -> utils.DatabaseResponse
-	24, // 2: repository_proto.ResponseFolder.response:type_name -> utils.DatabaseResponse
-	24, // 3: repository_proto.ResponseFolders.response:type_name -> utils.DatabaseResponse
-	24, // 4: repository_proto.ResponseMails.response:type_name -> utils.DatabaseResponse
-	0,  // 5: repository_proto.DatabaseRepository.GetUserInfoByUsername:input_type -> repository_proto.GetUserInfoByUsernameRequest
-	1,  // 6: repository_proto.DatabaseRepository.GetUserInfoById:input_type -> repository_proto.GetUserInfoByIdRequest
-	2,  // 7: repository_proto.DatabaseRepository.AddUser:input_type -> repository_proto.AddUserRequest
-	3,  // 8: repository_proto.DatabaseRepository.ChangeUserPassword:input_type -> repository_proto.ChangeForm
-	3,  // 9: repository_proto.DatabaseRepository.ChangeUserFirstName:input_type -> repository_proto.ChangeForm
-	3,  // 10: repository_proto.DatabaseRepository.ChangeUserLastName:input_type -> repository_proto.ChangeForm
-	4,  // 11: repository_proto.DatabaseRepository.GetIncomeMails:input_type -> repository_proto.GetIncomeMailsRequest
-	5,  // 12: repository_proto.DatabaseRepository.GetOutcomeMails:input_type -> repository_proto.GetOutcomeMailsRequest
-	6,  // 13: repository_proto.DatabaseRepository.AddMail:input_type -> repository_proto.AddMailRequest
-	7,  // 14: repository_proto.DatabaseRepository.DeleteMail:input_type -> repository_proto.DeleteMailRequest
-	8,  // 15: repository_proto.DatabaseRepository.ReadMail:input_type -> repository_proto.ReadMailRequest
-	9,  // 16: repository_proto.DatabaseRepository.GetMailInfoById:input_type -> repository_proto.GetMailInfoByIdRequest
-	10, // 17: repository_proto.DatabaseRepository.GetFolderById:input_type -> repository_proto.GetFolderByIdRequest
-	11, // 18: repository_proto.DatabaseRepository.GetFolderByName:input_type -> repository_proto.GetFolderByNameRequest
-	12, // 19: repository_proto.DatabaseRepository.GetFoldersByUser:input_type -> repository_proto.GetFoldersByUserRequest
-	13, // 20: repository_proto.DatabaseRepository.GetFolderMail:input_type -> repository_proto.GetFolderMailRequest
-	14, // 21: repository_proto.DatabaseRepository.DeleteFolder:input_type -> repository_proto.DeleteFolderRequest
-	15, // 22: repository_proto.DatabaseRepository.AddFolder:input_type -> repository_proto.AddFolderRequest
-	16, // 23: repository_proto.DatabaseRepository.ChangeFolderName:input_type -> repository_proto.ChangeFolderNameRequest
-	17, // 24: repository_proto.DatabaseRepository.AddMailToFolder:input_type -> repository_proto.AddMailToFolderRequest
-	18, // 25: repository_proto.DatabaseRepository.DeleteFolderMail:input_type -> repository_proto.DeleteFolderMailRequest
-	19, // 26: repository_proto.DatabaseRepository.GetUserInfoByUsername:output_type -> repository_proto.ResponseUser
-	19, // 27: repository_proto.DatabaseRepository.GetUserInfoById:output_type -> repository_proto.ResponseUser
-	24, // 28: repository_proto.DatabaseRepository.AddUser:output_type -> utils.DatabaseResponse
-	24, // 29: repository_proto.DatabaseRepository.ChangeUserPassword:output_type -> utils.DatabaseResponse
-	24, // 30: repository_proto.DatabaseRepository.ChangeUserFirstName:output_type -> utils.DatabaseResponse
-	24, // 31: repository_proto.DatabaseRepository.ChangeUserLastName:output_type -> utils.DatabaseResponse
-	23, // 32: repository_proto.DatabaseRepository.GetIncomeMails:output_type -> repository_proto.ResponseMails
-	23, // 33: repository_proto.DatabaseRepository.GetOutcomeMails:output_type -> repository_proto.ResponseMails
-	24, // 34: repository_proto.DatabaseRepository.AddMail:output_type -> utils.DatabaseResponse
-	24, // 35: repository_proto.DatabaseRepository.DeleteMail:output_type -> utils.DatabaseResponse
-	24, // 36: repository_proto.DatabaseRepository.ReadMail:output_type -> utils.DatabaseResponse
-	20, // 37: repository_proto.DatabaseRepository.GetMailInfoById:output_type -> repository_proto.ResponseMail
-	21, // 38: repository_proto.DatabaseRepository.GetFolderById:output_type -> repository_proto.ResponseFolder
-	21, // 39: repository_proto.DatabaseRepository.GetFolderByName:output_type -> repository_proto.ResponseFolder
-	22, // 40: repository_proto.DatabaseRepository.GetFoldersByUser:output_type -> repository_proto.ResponseFolders
-	23, // 41: repository_proto.DatabaseRepository.GetFolderMail:output_type -> repository_proto.ResponseMails
-	24, // 42: repository_proto.DatabaseRepository.DeleteFolder:output_type -> utils.DatabaseResponse
-	24, // 43: repository_proto.DatabaseRepository.AddFolder:output_type -> utils.DatabaseResponse
-	24, // 44: repository_proto.DatabaseRepository.ChangeFolderName:output_type -> utils.DatabaseResponse
-	24, // 45: repository_proto.DatabaseRepository.AddMailToFolder:output_type -> utils.DatabaseResponse
-	24, // 46: repository_proto.DatabaseRepository.DeleteFolderMail:output_type -> utils.DatabaseResponse
-	26, // [26:47] is the sub-list for method output_type
-	5,  // [5:26] is the sub-list for method input_type
+	26, // 0: repository_proto.ResponseUser.response:type_name -> utils.DatabaseResponse
+	26, // 1: repository_proto.ResponseMail.response:type_name -> utils.DatabaseResponse
+	26, // 2: repository_proto.ResponseFolder.response:type_name -> utils.DatabaseResponse
+	26, // 3: repository_proto.ResponseFolders.response:type_name -> utils.DatabaseResponse
+	26, // 4: repository_proto.ResponseMails.response:type_name -> utils.DatabaseResponse
+	1,  // 5: repository_proto.DatabaseRepository.GetUserInfoByUsername:input_type -> repository_proto.GetUserInfoByUsernameRequest
+	2,  // 6: repository_proto.DatabaseRepository.GetUserInfoById:input_type -> repository_proto.GetUserInfoByIdRequest
+	3,  // 7: repository_proto.DatabaseRepository.AddUser:input_type -> repository_proto.AddUserRequest
+	4,  // 8: repository_proto.DatabaseRepository.ChangeUserPassword:input_type -> repository_proto.ChangeForm
+	4,  // 9: repository_proto.DatabaseRepository.ChangeUserFirstName:input_type -> repository_proto.ChangeForm
+	4,  // 10: repository_proto.DatabaseRepository.ChangeUserLastName:input_type -> repository_proto.ChangeForm
+	5,  // 11: repository_proto.DatabaseRepository.GetIncomeMails:input_type -> repository_proto.GetIncomeMailsRequest
+	6,  // 12: repository_proto.DatabaseRepository.GetOutcomeMails:input_type -> repository_proto.GetOutcomeMailsRequest
+	7,  // 13: repository_proto.DatabaseRepository.AddMail:input_type -> repository_proto.AddMailRequest
+	8,  // 14: repository_proto.DatabaseRepository.DeleteMail:input_type -> repository_proto.DeleteMailRequest
+	9,  // 15: repository_proto.DatabaseRepository.ReadMail:input_type -> repository_proto.ReadMailRequest
+	10, // 16: repository_proto.DatabaseRepository.GetMailInfoById:input_type -> repository_proto.GetMailInfoByIdRequest
+	11, // 17: repository_proto.DatabaseRepository.GetFolderById:input_type -> repository_proto.GetFolderByIdRequest
+	12, // 18: repository_proto.DatabaseRepository.GetFolderByName:input_type -> repository_proto.GetFolderByNameRequest
+	13, // 19: repository_proto.DatabaseRepository.GetFoldersByUser:input_type -> repository_proto.GetFoldersByUserRequest
+	14, // 20: repository_proto.DatabaseRepository.GetFolderMail:input_type -> repository_proto.GetFolderMailRequest
+	15, // 21: repository_proto.DatabaseRepository.DeleteFolder:input_type -> repository_proto.DeleteFolderRequest
+	16, // 22: repository_proto.DatabaseRepository.AddFolder:input_type -> repository_proto.AddFolderRequest
+	17, // 23: repository_proto.DatabaseRepository.ChangeFolderName:input_type -> repository_proto.ChangeFolderNameRequest
+	18, // 24: repository_proto.DatabaseRepository.AddMailToFolderById:input_type -> repository_proto.AddMailToFolderByIdRequest
+	19, // 25: repository_proto.DatabaseRepository.AddMailToFolderByObject:input_type -> repository_proto.AddMailToFolderByObjectRequest
+	20, // 26: repository_proto.DatabaseRepository.DeleteFolderMail:input_type -> repository_proto.DeleteFolderMailRequest
+	0,  // 27: repository_proto.DatabaseRepository.MoveFolderMail:input_type -> repository_proto.MoveFolderMailRequest
+	21, // 28: repository_proto.DatabaseRepository.GetUserInfoByUsername:output_type -> repository_proto.ResponseUser
+	21, // 29: repository_proto.DatabaseRepository.GetUserInfoById:output_type -> repository_proto.ResponseUser
+	26, // 30: repository_proto.DatabaseRepository.AddUser:output_type -> utils.DatabaseResponse
+	26, // 31: repository_proto.DatabaseRepository.ChangeUserPassword:output_type -> utils.DatabaseResponse
+	26, // 32: repository_proto.DatabaseRepository.ChangeUserFirstName:output_type -> utils.DatabaseResponse
+	26, // 33: repository_proto.DatabaseRepository.ChangeUserLastName:output_type -> utils.DatabaseResponse
+	25, // 34: repository_proto.DatabaseRepository.GetIncomeMails:output_type -> repository_proto.ResponseMails
+	25, // 35: repository_proto.DatabaseRepository.GetOutcomeMails:output_type -> repository_proto.ResponseMails
+	26, // 36: repository_proto.DatabaseRepository.AddMail:output_type -> utils.DatabaseResponse
+	26, // 37: repository_proto.DatabaseRepository.DeleteMail:output_type -> utils.DatabaseResponse
+	26, // 38: repository_proto.DatabaseRepository.ReadMail:output_type -> utils.DatabaseResponse
+	22, // 39: repository_proto.DatabaseRepository.GetMailInfoById:output_type -> repository_proto.ResponseMail
+	23, // 40: repository_proto.DatabaseRepository.GetFolderById:output_type -> repository_proto.ResponseFolder
+	23, // 41: repository_proto.DatabaseRepository.GetFolderByName:output_type -> repository_proto.ResponseFolder
+	24, // 42: repository_proto.DatabaseRepository.GetFoldersByUser:output_type -> repository_proto.ResponseFolders
+	25, // 43: repository_proto.DatabaseRepository.GetFolderMail:output_type -> repository_proto.ResponseMails
+	26, // 44: repository_proto.DatabaseRepository.DeleteFolder:output_type -> utils.DatabaseResponse
+	26, // 45: repository_proto.DatabaseRepository.AddFolder:output_type -> utils.DatabaseResponse
+	26, // 46: repository_proto.DatabaseRepository.ChangeFolderName:output_type -> utils.DatabaseResponse
+	26, // 47: repository_proto.DatabaseRepository.AddMailToFolderById:output_type -> utils.DatabaseResponse
+	26, // 48: repository_proto.DatabaseRepository.AddMailToFolderByObject:output_type -> utils.DatabaseResponse
+	26, // 49: repository_proto.DatabaseRepository.DeleteFolderMail:output_type -> utils.DatabaseResponse
+	26, // 50: repository_proto.DatabaseRepository.MoveFolderMail:output_type -> utils.DatabaseResponse
+	28, // [28:51] is the sub-list for method output_type
+	5,  // [5:28] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name
@@ -1689,7 +1839,7 @@ func file_proto_repository_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_proto_repository_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetUserInfoByUsernameRequest); i {
+			switch v := v.(*MoveFolderMailRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1701,7 +1851,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetUserInfoByIdRequest); i {
+			switch v := v.(*GetUserInfoByUsernameRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1713,7 +1863,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AddUserRequest); i {
+			switch v := v.(*GetUserInfoByIdRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1725,7 +1875,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ChangeForm); i {
+			switch v := v.(*AddUserRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1737,7 +1887,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetIncomeMailsRequest); i {
+			switch v := v.(*ChangeForm); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1749,7 +1899,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetOutcomeMailsRequest); i {
+			switch v := v.(*GetIncomeMailsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1761,7 +1911,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AddMailRequest); i {
+			switch v := v.(*GetOutcomeMailsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1773,7 +1923,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteMailRequest); i {
+			switch v := v.(*AddMailRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1785,7 +1935,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ReadMailRequest); i {
+			switch v := v.(*DeleteMailRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1797,7 +1947,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetMailInfoByIdRequest); i {
+			switch v := v.(*ReadMailRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1809,7 +1959,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetFolderByIdRequest); i {
+			switch v := v.(*GetMailInfoByIdRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1821,7 +1971,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetFolderByNameRequest); i {
+			switch v := v.(*GetFolderByIdRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1833,7 +1983,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetFoldersByUserRequest); i {
+			switch v := v.(*GetFolderByNameRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1845,7 +1995,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetFolderMailRequest); i {
+			switch v := v.(*GetFoldersByUserRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1857,7 +2007,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteFolderRequest); i {
+			switch v := v.(*GetFolderMailRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1869,7 +2019,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AddFolderRequest); i {
+			switch v := v.(*DeleteFolderRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1881,7 +2031,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ChangeFolderNameRequest); i {
+			switch v := v.(*AddFolderRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1893,7 +2043,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AddMailToFolderRequest); i {
+			switch v := v.(*ChangeFolderNameRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1905,7 +2055,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DeleteFolderMailRequest); i {
+			switch v := v.(*AddMailToFolderByIdRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1917,7 +2067,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ResponseUser); i {
+			switch v := v.(*AddMailToFolderByObjectRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1929,7 +2079,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ResponseMail); i {
+			switch v := v.(*DeleteFolderMailRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1941,7 +2091,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ResponseFolder); i {
+			switch v := v.(*ResponseUser); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1953,7 +2103,7 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ResponseFolders); i {
+			switch v := v.(*ResponseMail); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1965,6 +2115,30 @@ func file_proto_repository_proto_init() {
 			}
 		}
 		file_proto_repository_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ResponseFolder); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_repository_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ResponseFolders); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_proto_repository_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ResponseMails); i {
 			case 0:
 				return &v.state
@@ -1983,7 +2157,7 @@ func file_proto_repository_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_proto_repository_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   24,
+			NumMessages:   26,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
@@ -2028,8 +2202,10 @@ type DatabaseRepositoryClient interface {
 	DeleteFolder(ctx context.Context, in *DeleteFolderRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error)
 	AddFolder(ctx context.Context, in *AddFolderRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error)
 	ChangeFolderName(ctx context.Context, in *ChangeFolderNameRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error)
-	AddMailToFolder(ctx context.Context, in *AddMailToFolderRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error)
+	AddMailToFolderById(ctx context.Context, in *AddMailToFolderByIdRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error)
+	AddMailToFolderByObject(ctx context.Context, in *AddMailToFolderByObjectRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error)
 	DeleteFolderMail(ctx context.Context, in *DeleteFolderMailRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error)
+	MoveFolderMail(ctx context.Context, in *MoveFolderMailRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error)
 }
 
 type databaseRepositoryClient struct {
@@ -2211,9 +2387,18 @@ func (c *databaseRepositoryClient) ChangeFolderName(ctx context.Context, in *Cha
 	return out, nil
 }
 
-func (c *databaseRepositoryClient) AddMailToFolder(ctx context.Context, in *AddMailToFolderRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error) {
+func (c *databaseRepositoryClient) AddMailToFolderById(ctx context.Context, in *AddMailToFolderByIdRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error) {
 	out := new(utils_proto.DatabaseResponse)
-	err := c.cc.Invoke(ctx, "/repository_proto.DatabaseRepository/AddMailToFolder", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/repository_proto.DatabaseRepository/AddMailToFolderById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *databaseRepositoryClient) AddMailToFolderByObject(ctx context.Context, in *AddMailToFolderByObjectRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error) {
+	out := new(utils_proto.DatabaseResponse)
+	err := c.cc.Invoke(ctx, "/repository_proto.DatabaseRepository/AddMailToFolderByObject", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2223,6 +2408,15 @@ func (c *databaseRepositoryClient) AddMailToFolder(ctx context.Context, in *AddM
 func (c *databaseRepositoryClient) DeleteFolderMail(ctx context.Context, in *DeleteFolderMailRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error) {
 	out := new(utils_proto.DatabaseResponse)
 	err := c.cc.Invoke(ctx, "/repository_proto.DatabaseRepository/DeleteFolderMail", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *databaseRepositoryClient) MoveFolderMail(ctx context.Context, in *MoveFolderMailRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error) {
+	out := new(utils_proto.DatabaseResponse)
+	err := c.cc.Invoke(ctx, "/repository_proto.DatabaseRepository/MoveFolderMail", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2250,8 +2444,10 @@ type DatabaseRepositoryServer interface {
 	DeleteFolder(context.Context, *DeleteFolderRequest) (*utils_proto.DatabaseResponse, error)
 	AddFolder(context.Context, *AddFolderRequest) (*utils_proto.DatabaseResponse, error)
 	ChangeFolderName(context.Context, *ChangeFolderNameRequest) (*utils_proto.DatabaseResponse, error)
-	AddMailToFolder(context.Context, *AddMailToFolderRequest) (*utils_proto.DatabaseResponse, error)
+	AddMailToFolderById(context.Context, *AddMailToFolderByIdRequest) (*utils_proto.DatabaseResponse, error)
+	AddMailToFolderByObject(context.Context, *AddMailToFolderByObjectRequest) (*utils_proto.DatabaseResponse, error)
 	DeleteFolderMail(context.Context, *DeleteFolderMailRequest) (*utils_proto.DatabaseResponse, error)
+	MoveFolderMail(context.Context, *MoveFolderMailRequest) (*utils_proto.DatabaseResponse, error)
 }
 
 // UnimplementedDatabaseRepositoryServer can be embedded to have forward compatible implementations.
@@ -2315,11 +2511,17 @@ func (*UnimplementedDatabaseRepositoryServer) AddFolder(context.Context, *AddFol
 func (*UnimplementedDatabaseRepositoryServer) ChangeFolderName(context.Context, *ChangeFolderNameRequest) (*utils_proto.DatabaseResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChangeFolderName not implemented")
 }
-func (*UnimplementedDatabaseRepositoryServer) AddMailToFolder(context.Context, *AddMailToFolderRequest) (*utils_proto.DatabaseResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddMailToFolder not implemented")
+func (*UnimplementedDatabaseRepositoryServer) AddMailToFolderById(context.Context, *AddMailToFolderByIdRequest) (*utils_proto.DatabaseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMailToFolderById not implemented")
+}
+func (*UnimplementedDatabaseRepositoryServer) AddMailToFolderByObject(context.Context, *AddMailToFolderByObjectRequest) (*utils_proto.DatabaseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddMailToFolderByObject not implemented")
 }
 func (*UnimplementedDatabaseRepositoryServer) DeleteFolderMail(context.Context, *DeleteFolderMailRequest) (*utils_proto.DatabaseResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteFolderMail not implemented")
+}
+func (*UnimplementedDatabaseRepositoryServer) MoveFolderMail(context.Context, *MoveFolderMailRequest) (*utils_proto.DatabaseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MoveFolderMail not implemented")
 }
 
 func RegisterDatabaseRepositoryServer(s *grpc.Server, srv DatabaseRepositoryServer) {
@@ -2668,20 +2870,38 @@ func _DatabaseRepository_ChangeFolderName_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
-func _DatabaseRepository_AddMailToFolder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddMailToFolderRequest)
+func _DatabaseRepository_AddMailToFolderById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMailToFolderByIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DatabaseRepositoryServer).AddMailToFolder(ctx, in)
+		return srv.(DatabaseRepositoryServer).AddMailToFolderById(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/repository_proto.DatabaseRepository/AddMailToFolder",
+		FullMethod: "/repository_proto.DatabaseRepository/AddMailToFolderById",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DatabaseRepositoryServer).AddMailToFolder(ctx, req.(*AddMailToFolderRequest))
+		return srv.(DatabaseRepositoryServer).AddMailToFolderById(ctx, req.(*AddMailToFolderByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DatabaseRepository_AddMailToFolderByObject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddMailToFolderByObjectRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DatabaseRepositoryServer).AddMailToFolderByObject(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/repository_proto.DatabaseRepository/AddMailToFolderByObject",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DatabaseRepositoryServer).AddMailToFolderByObject(ctx, req.(*AddMailToFolderByObjectRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2700,6 +2920,24 @@ func _DatabaseRepository_DeleteFolderMail_Handler(srv interface{}, ctx context.C
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DatabaseRepositoryServer).DeleteFolderMail(ctx, req.(*DeleteFolderMailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DatabaseRepository_MoveFolderMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MoveFolderMailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DatabaseRepositoryServer).MoveFolderMail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/repository_proto.DatabaseRepository/MoveFolderMail",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DatabaseRepositoryServer).MoveFolderMail(ctx, req.(*MoveFolderMailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2785,12 +3023,20 @@ var _DatabaseRepository_serviceDesc = grpc.ServiceDesc{
 			Handler:    _DatabaseRepository_ChangeFolderName_Handler,
 		},
 		{
-			MethodName: "AddMailToFolder",
-			Handler:    _DatabaseRepository_AddMailToFolder_Handler,
+			MethodName: "AddMailToFolderById",
+			Handler:    _DatabaseRepository_AddMailToFolderById_Handler,
+		},
+		{
+			MethodName: "AddMailToFolderByObject",
+			Handler:    _DatabaseRepository_AddMailToFolderByObject_Handler,
 		},
 		{
 			MethodName: "DeleteFolderMail",
 			Handler:    _DatabaseRepository_DeleteFolderMail_Handler,
+		},
+		{
+			MethodName: "MoveFolderMail",
+			Handler:    _DatabaseRepository_MoveFolderMail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
