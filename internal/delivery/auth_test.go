@@ -19,7 +19,7 @@ func TestSignin(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+	mockUC := mocks.NewMockAuthServiceInterface(mockCtrl)
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(mockUC, &d, []string{"/signin"}, []func(http.ResponseWriter, *http.Request){d.SignIn})
