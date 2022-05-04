@@ -38,6 +38,22 @@ func (s *FolderManagerService) IsOwner(context context.Context, data *utils_prot
 	return user.Id == folderUserId, pkg.NO_ERR, nil
 }
 
+func (s *FolderManagerService) FolderExists(context context.Context, userId int32, folderName string) (bool) {
+	resp, err := s.db.GetFolderByName(context, &repository_proto.GetFolderByNameRequest{
+		UserId: userId,
+		FolderName: folderName,
+	})
+	if err != nil || resp.Response.Status != utils_proto.DatabaseStatus_OK {
+		return false
+	}
+	var folder models.Folder
+	err = json.Unmarshal(resp.Folder, &folder)
+	if err != nil {
+		return false
+	}
+	return (folder != models.Folder{})
+}
+
 func (s *FolderManagerService) Init(config *config.Config, db repository_proto.DatabaseRepositoryClient, profile profile_proto.ProfileClient) {
 	s.config = config
 	s.db = db
@@ -114,7 +130,7 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 			Response: &utils_proto.JsonResponse{
 				Response: pkg.CreateJsonErr(pkg.STATUS_OBJECT_EXISTS, "Такая папка уже существует.").Bytes(),
 			},
-		}, err
+		}, nil
 	}
 	resp3, err := s.db.AddFolder(context, &repository_proto.AddFolderRequest{
 		Name: request.Name,
@@ -297,6 +313,11 @@ func (s *FolderManagerService) ChangeFolder(context context.Context, request *fo
 	if pkg.IsFolderReserved(folder.Name) {
 		return &utils_proto.JsonResponse{
 			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
+		}, nil
+	}
+	if s.FolderExists(context, user.Id, request.FolderNewName) {
+		return &utils_proto.JsonResponse{
+			Response: pkg.CreateJsonErr(pkg.STATUS_OBJECT_EXISTS, "Такая папка уже существует.").Bytes(),
 		}, nil
 	}
 	resp3, err := s.db.ChangeFolderName(context, &repository_proto.ChangeFolderNameRequest{
