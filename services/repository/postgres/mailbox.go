@@ -140,7 +140,7 @@ func (c *Database) GetMailInfoById(context context.Context, request *repository_
 func (c *Database) GetIncomeMails(context context.Context, request *repository_proto.GetIncomeMailsRequest) (*repository_proto.ResponseMails, error) {
 	var results []models.Mail
 	resultsBytes, _ := json.Marshal(results)
-	rows, err := c.Conn.Query(context, "SELECT * FROM getIncomeMails($1, $2, $3);", request.UserId, request.Limit, request.Offset)
+	rows, err := c.Conn.Query(context, "SELECT sender, theme, text, files, date, read, id FROM overflow.mails WHERE only_folder = false AND (addressee IN (SELECT username FROM overflow.users WHERE id=$1)) ORDER BY date DESC OFFSET $3 LIMIT $2;", request.UserId, request.Limit, request.Offset)
 	if err != nil {
 		return &repository_proto.ResponseMails{
 			Mails: resultsBytes,
@@ -183,7 +183,7 @@ func (c *Database) GetIncomeMails(context context.Context, request *repository_p
 func (c *Database) GetOutcomeMails(context context.Context, request *repository_proto.GetOutcomeMailsRequest) (*repository_proto.ResponseMails, error) {
 	var results []models.Mail
 	resultsBytes, _ := json.Marshal(results)
-	rows, err := c.Conn.Query(context, "SELECT * FROM getOutcomeMails($1, $2, $3);", request.UserId, request.Limit, request.Offset)
+	rows, err := c.Conn.Query(context, "SELECT addressee, theme, text, files, date, id FROM overflow.mails WHERE sender IN (SELECT username FROM overflow.users WHERE id=$1) ORDER BY date DESC OFFSET $3 LIMIT $2;", request.UserId, request.Limit, request.Offset)
 	if err != nil {
 		return &repository_proto.ResponseMails{
 			Mails: resultsBytes,

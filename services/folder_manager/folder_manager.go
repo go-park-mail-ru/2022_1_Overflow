@@ -20,7 +20,7 @@ type FolderManagerService struct {
 	profile profile_proto.ProfileClient
 }
 
-func (s *FolderManagerService) IsOwner(context context.Context, data *utils_proto.Session, folderUserId int32) (bool, pkg.JsonResponse, error){
+func (s *FolderManagerService) IsOwner(context context.Context, data *utils_proto.Session, folderId int32) (bool, pkg.JsonResponse, error){
 	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
 		Username: data.Username,
 	})
@@ -35,7 +35,21 @@ func (s *FolderManagerService) IsOwner(context context.Context, data *utils_prot
 	if err != nil {
 		return false, pkg.JSON_ERR, err
 	}
-	return user.Id == folderUserId, pkg.NO_ERR, nil
+	resp2, err := s.db.GetFolderById(context, &repository_proto.GetFolderByIdRequest{
+		FolderId: folderId,
+	})
+	if err != nil {
+		return false, pkg.DB_ERR, err
+	}
+	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
+		return false, pkg.DB_ERR, nil
+	}
+	var folder models.Folder
+	err = json.Unmarshal(resp2.Folder, &folder)
+	if err != nil {
+		return false, pkg.JSON_ERR, err
+	}
+	return user.Id == folder.UserId, pkg.NO_ERR, nil
 }
 
 func (s *FolderManagerService) FolderExists(context context.Context, userId int32, folderName string) (bool) {
