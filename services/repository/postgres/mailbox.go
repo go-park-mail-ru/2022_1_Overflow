@@ -137,7 +137,7 @@ func (c *Database) GetMailInfoById(context context.Context, request *repository_
 
 // Получить входящие сообщения пользователя
 func (c *Database) GetIncomeMails(context context.Context, request *repository_proto.GetIncomeMailsRequest) (*repository_proto.ResponseMails, error) {
-	var results []models.Mail
+	var results models.MailList
 	resultsBytes, _ := json.Marshal(results)
 	var count int
 	err := c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.mails WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND addressee IN (SELECT username FROM overflow.users WHERE id=$1);", request.UserId).Scan(&count)
@@ -149,6 +149,7 @@ func (c *Database) GetIncomeMails(context context.Context, request *repository_p
 			},
 		}, err
 	}
+	results.Amount = count
 	rows, err := c.Conn.Query(context, "SELECT sender, theme, text, files, date, read, id FROM overflow.mails WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND addressee IN (SELECT username FROM overflow.users WHERE id=$1) ORDER BY date DESC OFFSET $3 LIMIT $2;", request.UserId, request.Limit, request.Offset)
 	if err != nil {
 		return &repository_proto.ResponseMails{
@@ -177,9 +178,9 @@ func (c *Database) GetIncomeMails(context context.Context, request *repository_p
 		mail.Date = values[4].(time.Time)
 		mail.Read = values[5].(bool)
 		mail.Id = values[6].(int32)
-		results = append(results, mail)
+		results.Mails = append(results.Mails, mail)
 	}
-	resultsBytes, _ = json.Marshal(models.MailList{Amount: count, Mails: results})
+	resultsBytes, _ = json.Marshal(results)
 	return &repository_proto.ResponseMails{
 		Mails: resultsBytes,
 		Response: &utils_proto.DatabaseResponse{
@@ -190,7 +191,7 @@ func (c *Database) GetIncomeMails(context context.Context, request *repository_p
 
 //Получить отправленные пользователем сообщения
 func (c *Database) GetOutcomeMails(context context.Context, request *repository_proto.GetOutcomeMailsRequest) (*repository_proto.ResponseMails, error) {
-	var results []models.Mail
+	var results models.MailList
 	resultsBytes, _ := json.Marshal(results)
 	var count int
 	err := c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.mails WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND sender IN (SELECT username FROM overflow.users WHERE id=$1);", request.UserId).Scan(&count)
@@ -202,6 +203,7 @@ func (c *Database) GetOutcomeMails(context context.Context, request *repository_
 			},
 		}, err
 	}
+	results.Amount = count
 	rows, err := c.Conn.Query(context, "SELECT addressee, theme, text, files, date, id FROM overflow.mails WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND sender IN (SELECT username FROM overflow.users WHERE id=$1) ORDER BY date DESC OFFSET $3 LIMIT $2;", request.UserId, request.Limit, request.Offset)
 	if err != nil {
 		return &repository_proto.ResponseMails{
@@ -229,9 +231,9 @@ func (c *Database) GetOutcomeMails(context context.Context, request *repository_
 		mail.Files = values[3].(string)
 		mail.Date = values[4].(time.Time)
 		mail.Id = values[5].(int32)
-		results = append(results, mail)
+		results.Mails = append(results.Mails, mail)
 	}
-	resultsBytes, _ = json.Marshal(models.MailList{Amount: count, Mails: results})
+	resultsBytes, _ = json.Marshal(results)
 	return &repository_proto.ResponseMails{
 		Mails: resultsBytes,
 		Response: &utils_proto.DatabaseResponse{

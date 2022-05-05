@@ -587,7 +587,7 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 			Mails: nil,
 		}, nil
 	}
-	var mails []models.Mail
+	var mails models.MailList
 	err = json.Unmarshal(resp2.Mails, &mails)
 	if err != nil {
 		return &folder_manager_proto.ResponseMails{
@@ -597,8 +597,9 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 			Mails: nil,
 		}, err
 	}
-	var mails_add []models.MailAdditional
-	for _, mail := range mails {
+	var mails_add models.MailAddList
+	mails_add.Amount = mails.Amount
+	for _, mail := range mails.Mails {
 		mail_add := models.MailAdditional{}
 		mail_add.Mail = mail
 		resp, err := s.profile.GetAvatar(
@@ -632,7 +633,7 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 			}, nil
 		}
 		mail_add.AvatarUrl = resp.Url
-		mails_add = append(mails_add, mail_add)
+		mails_add.Mails = append(mails_add.Mails, mail_add)
 	}
 	parsed, err := json.Marshal(mails_add)
 	if err != nil {

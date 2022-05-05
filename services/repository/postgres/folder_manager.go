@@ -100,8 +100,19 @@ func (c *Database) GetFolderByName(context context.Context, request *repository_
 }
 
 func (c *Database) GetFoldersByUser(context context.Context, request *repository_proto.GetFoldersByUserRequest) (*repository_proto.ResponseFolders, error) {
-	var folders []models.Folder
+	var folders models.FolderList
 	foldersBytes, _ := json.Marshal(folders)
+	var count int
+	err := c.Conn.QueryRow(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE user_id=$1 AND name NOT IN ($2, $3);", request.UserId, pkg.FOLDER_SPAM, pkg.FOLDER_DRAFTS).Scan(&count)
+	if err != nil {
+		return &repository_proto.ResponseFolders{
+			Response: &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			},
+			Folders: foldersBytes,
+		}, err
+	}
+	folders.Amount = count
 	rows, err := c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE user_id=$1 AND name NOT IN ($2, $3) ORDER BY created_at DESC;", request.UserId, pkg.FOLDER_SPAM, pkg.FOLDER_DRAFTS)
 	if err != nil {
 		return &repository_proto.ResponseFolders{
@@ -127,7 +138,7 @@ func (c *Database) GetFoldersByUser(context context.Context, request *repository
 		folder.Name = values[1].(string)
 		folder.UserId = values[2].(int32)
 		folder.CreatedAt = values[3].(time.Time)
-		folders = append(folders, folder)
+		folders.Folders = append(folders.Folders, folder)
 	}
 	foldersBytes, _ = json.Marshal(folders)
 	return &repository_proto.ResponseFolders{
@@ -139,8 +150,19 @@ func (c *Database) GetFoldersByUser(context context.Context, request *repository
 }
 
 func (c *Database) GetFolderMail(context context.Context, request *repository_proto.GetFolderMailRequest) (*repository_proto.ResponseMails, error) {
-	var mails []models.Mail
+	var mails models.MailList
 	mailsBytes, _ := json.Marshal(mails)
+	var count int
+	err := c.Conn.QueryRow(context, "SELECT addressee, sender, theme, text, files, date, read, id FROM overflow.mails WHERE id IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id in (SELECT id FROM overflow.folders WHERE user_id=$1 AND name=$2))", request.UserId, request.FolderName).Scan(&count)
+	if err != nil {
+		return &repository_proto.ResponseMails{
+			Response: &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			},
+			Mails: mailsBytes,
+		}, err
+	}
+	mails.Amount = count
 	rows, err := c.Conn.Query(context, "SELECT addressee, sender, theme, text, files, date, read, id FROM overflow.mails WHERE id IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id in (SELECT id FROM overflow.folders WHERE user_id=$1 AND name=$2)) ORDER BY date DESC;", request.UserId, request.FolderName)
 	if err != nil {
 		return &repository_proto.ResponseMails{
@@ -170,7 +192,7 @@ func (c *Database) GetFolderMail(context context.Context, request *repository_pr
 		mail.Date = values[5].(time.Time)
 		mail.Read = values[6].(bool)
 		mail.Id = values[7].(int32)
-		mails = append(mails, mail)
+		mails.Mails = append(mails.Mails, mail)
 	}
 	mailsBytes, _ = json.Marshal(mails)
 	return &repository_proto.ResponseMails{

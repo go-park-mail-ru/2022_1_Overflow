@@ -8,3 +8,8 @@ type Folder struct {
 	UserId    int32  `json:"user_id"`
 	CreatedAt time.Time `json:"created_at"`
 }
+
+type FolderList struct {
+	Amount int `json:"amount"`
+	Folders []Folder `json:"folders"`
+}
