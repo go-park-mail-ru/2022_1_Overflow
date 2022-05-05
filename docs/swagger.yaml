@@ -311,6 +311,14 @@ paths:
         in: query
         name: folder_name
         type: string
+      - description: Ограничение на количество писем\папок в списке
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение в списке писем\папок
+        in: query
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:

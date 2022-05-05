@@ -182,6 +182,18 @@ const docTemplate = `{
                         "description": "Имя папки с письмами",
                         "name": "folder_name",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Ограничение на количество писем\\папок в списке",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Смещение в списке писем\\папок",
+                        "name": "offset",
+                        "in": "query"
                     }
                 ],
                 "responses": {

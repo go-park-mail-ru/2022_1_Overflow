@@ -32,6 +32,7 @@ func StartFolderManagerServer(config *config.Config, db repository_proto.Databas
 }
 
 func main() {
+	log.SetReportCaller(true)
 	log.SetLevel(log.DebugLevel)
 	log.Info(SERVICE_PREFIX, "Запуск сервиса")
 	config, err := config.NewConfig("./configs/main.yml")
