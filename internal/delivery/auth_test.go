@@ -67,23 +67,31 @@ func TestSignin(t *testing.T) {
 	}
 }
 
-/*
 func TestBadSignin(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+	authUC := auth_proto.NewMockAuthClient(mockCtrl)
+	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
+	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
+	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
 
 	d := delivery.Delivery{}
-	router := InitTestRouter(mockUC, &d, []string{"/signin"}, []func(http.ResponseWriter, *http.Request){d.SignIn})
-	d.Init(mockUC, DefConf)
+	router := InitTestRouter(&d, []string{"/signin"}, []func(http.ResponseWriter, *http.Request){d.SignIn},
+		authUC, profileUC, mailboxUC, folderManagerUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
 
 	data := models.SignInForm{
 		Username: "test",
 		Password: "pass",
 	}
+	formBytes, _ := json.Marshal(data)
 
-	mockUC.EXPECT().SignIn(data).Return(pkg.WRONG_CREDS_ERR)
+	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
+		Form: formBytes,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.WRONG_CREDS_ERR.Bytes(),
+	}, nil)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -111,21 +119,30 @@ func TestSignup(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+	authUC := auth_proto.NewMockAuthClient(mockCtrl)
+	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
+	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
+	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
 
 	d := delivery.Delivery{}
-	router := InitTestRouter(mockUC, &d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp})
-	d.Init(mockUC, DefConf)
+	router := InitTestRouter(&d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp},
+		authUC, profileUC, mailboxUC, folderManagerUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
 
 	data := models.SignUpForm{
-		LastName:     "John",
-		FirstName:    "Doe",
-		Username:     "ededededed",
-		Password:     "pass",
-		PasswordConf: "pass",
+		Lastname:             "John",
+		Firstname:            "Doe",
+		Username:             "ededededed",
+		Password:             "pass",
+		PasswordConfirmation: "pass",
 	}
+	formBytes, _ := json.Marshal(data)
 
-	mockUC.EXPECT().SignUp(data).Return(pkg.NO_ERR)
+	authUC.EXPECT().SignUp(context.Background(), &auth_proto.SignUpRequest{
+		Form: formBytes,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -153,21 +170,30 @@ func TestBadPassword(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+	authUC := auth_proto.NewMockAuthClient(mockCtrl)
+	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
+	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
+	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
 
 	d := delivery.Delivery{}
-	router := InitTestRouter(mockUC, &d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp})
-	d.Init(mockUC, DefConf)
+	router := InitTestRouter(&d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp},
+		authUC, profileUC, mailboxUC, folderManagerUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
 
 	data := models.SignUpForm{
-		LastName:     "John",
-		FirstName:    "Doe",
-		Username:     "ededededed",
-		Password:     "pass",
-		PasswordConf: "passd",
+		Lastname:             "John",
+		Firstname:            "Doe",
+		Username:             "ededededed",
+		Password:             "pass",
+		PasswordConfirmation: "passd",
 	}
+	formBytes, _ := json.Marshal(data)
 
-	mockUC.EXPECT().SignUp(data).Return(pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, ""))
+	authUC.EXPECT().SignUp(context.Background(), &auth_proto.SignUpRequest{
+		Form: formBytes,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, "").Bytes(),
+	}, nil)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -186,7 +212,6 @@ func TestBadPassword(t *testing.T) {
 		return
 	}
 	_, err = Post(client, dataJson, fmt.Sprintf("%s/signup", srv.URL), http.StatusBadRequest, token, "")
-
 	if err != nil {
 		t.Error(err)
 		return
@@ -197,21 +222,30 @@ func TestEmptyForm(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+	authUC := auth_proto.NewMockAuthClient(mockCtrl)
+	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
+	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
+	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
 
 	d := delivery.Delivery{}
-	router := InitTestRouter(mockUC, &d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp})
-	d.Init(mockUC, DefConf)
+	router := InitTestRouter(&d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp},
+		authUC, profileUC, mailboxUC, folderManagerUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
 
 	data := models.SignUpForm{
-		LastName:     "",
-		FirstName:    "",
-		Username:     "ededededed",
-		Password:     "pass",
-		PasswordConf: "passd",
+		Lastname:             "",
+		Firstname:            "",
+		Username:             "ededededed",
+		Password:             "pass",
+		PasswordConfirmation: "passd",
 	}
+	formBytes, _ := json.Marshal(data)
 
-	mockUC.EXPECT().SignUp(data).Return(pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, ""))
+	authUC.EXPECT().SignUp(context.Background(), &auth_proto.SignUpRequest{
+		Form: formBytes,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, "").Bytes(),
+	}, nil)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -239,7 +273,10 @@ func TestSignout(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+	authUC := auth_proto.NewMockAuthClient(mockCtrl)
+	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
+	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
+	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -248,26 +285,32 @@ func TestSignout(t *testing.T) {
 	}
 
 	d := delivery.Delivery{}
-	router := InitTestRouter(mockUC, &d, []string{"/logout", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SignOut, d.SignIn})
+	router := InitTestRouter(&d, []string{"/logout", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SignOut, d.SignIn},
+		authUC, profileUC, mailboxUC, folderManagerUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
 	url := fmt.Sprintf("%s/logout", srv.URL)
-	
+
 	form := models.SignInForm{
 		Username: "test",
 		Password: "test",
 	}
+	formBytes, _ := json.Marshal(form)
 
-	mockUC.EXPECT().SignIn(form).Return(pkg.NO_ERR)
+	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
+		Form: formBytes,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil)
 
 	err := SigninUser(client, form, srv.URL)
 	if err != nil {
 		t.Error(err)
 		return
 	}
-	
+
 	_, err, token := Get(client, url, http.StatusMethodNotAllowed)
 	if err != nil {
 		t.Error(err)
@@ -279,4 +322,3 @@ func TestSignout(t *testing.T) {
 		return
 	}
 }
-*/
