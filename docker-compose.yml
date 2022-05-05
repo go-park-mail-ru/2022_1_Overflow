@@ -22,7 +22,7 @@ services:
       POSTGRES_PASSWORD: 123
 
   node-exporter:
-    image: prom/node-exporter:v0.18.1
+    image: prom/node-exporter:latest
     container_name: node-exporter
     restart: unless-stopped
     volumes:
@@ -40,7 +40,7 @@ services:
       - monitoring
 
   prometheus:
-    image: prom/prometheus:v2.17.1
+    image: prom/prometheus:latest
     container_name: prometheus
     restart: unless-stopped
     volumes:
@@ -60,7 +60,7 @@ services:
       - monitoring
 
   grafana:
-    image: grafana/grafana:6.7.2
+    image: grafana/grafana:latest
     ports:
       - 3001:3000
     networks:
