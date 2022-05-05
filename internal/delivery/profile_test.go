@@ -1,16 +1,18 @@
 package delivery_test
 
-/*
 import (
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/models"
-	"OverflowBackend/mocks"
 	"OverflowBackend/pkg"
+	"OverflowBackend/proto/auth_proto"
+	"OverflowBackend/proto/folder_manager_proto"
+	"OverflowBackend/proto/mailbox_proto"
+	"OverflowBackend/proto/profile_proto"
 	"OverflowBackend/proto/utils_proto"
-	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
-	"mime/multipart"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
@@ -23,7 +25,10 @@ func TestGetInfo(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+	authUC := auth_proto.NewMockAuthClient(mockCtrl)
+	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
+	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
+	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -32,7 +37,8 @@ func TestGetInfo(t *testing.T) {
 	}
 
 	d := delivery.Delivery{}
-	router := InitTestRouter(mockUC, &d, []string{"/profile", "/signin"}, []func(http.ResponseWriter, *http.Request){d.GetInfo, d.SignIn})
+	router := InitTestRouter(&d, []string{"/profile", "/signin"}, []func(http.ResponseWriter, *http.Request){d.GetInfo, d.SignIn},
+		authUC, profileUC, mailboxUC, folderManagerUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -43,17 +49,35 @@ func TestGetInfo(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
+	signinFormBytes, _ := json.Marshal(signinForm)
 
 	info, _ := json.Marshal(models.User{
 		Id:        0,
-		FirstName: "test",
-		LastName:  "test",
+		Firstname: "test",
+		Lastname:  "test",
 		Password:  "test",
 		Username:  "test",
 	})
 
-	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
-	mockUC.EXPECT().GetInfo(&models.Session{Username: "test", Authenticated: true}).Return(info, pkg.NO_ERR)
+	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
+		Form: signinFormBytes,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil)
+
+	//&models.Session{Username: "test", Authenticated: true}
+	getInfoData := &utils_proto.Session{
+		Username:      "test",
+		Authenticated: wrapperspb.Bool(true),
+	}
+	profileUC.EXPECT().GetInfo(context.Background(), &profile_proto.GetInfoRequest{
+		Data: getInfoData,
+	}).Return(&profile_proto.GetInfoResponse{
+		Data: info,
+		Response: &utils_proto.JsonResponse{
+			Response: pkg.NO_ERR.Bytes(),
+		},
+	}, nil)
 
 	_, err, _ := Get(client, url, http.StatusUnauthorized)
 	if err != nil {
@@ -85,7 +109,10 @@ func TestSetInfo(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+	authUC := auth_proto.NewMockAuthClient(mockCtrl)
+	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
+	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
+	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -94,7 +121,9 @@ func TestSetInfo(t *testing.T) {
 	}
 
 	d := delivery.Delivery{}
-	router := InitTestRouter(mockUC, &d, []string{"/profile/set", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SetInfo, d.SignIn})
+	router := InitTestRouter(&d, []string{"/profile/set", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SetInfo, d.SignIn},
+		authUC, profileUC, mailboxUC, folderManagerUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -103,17 +132,33 @@ func TestSetInfo(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
+	signinFormBytes, _ := json.Marshal(signinForm)
 
 	url := fmt.Sprintf("%s/profile/set", srv.URL)
 
-	data := models.SettingsForm{
-		FirstName: "changed",
-		LastName:  "changed",
-		Password:  "changed",
+	data := models.ProfileSettingsForm{
+		Firstname: "changed",
+		Lastname:  "changed",
 	}
+	dataBytes, _ := json.Marshal(data)
 
-	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
-	mockUC.EXPECT().SetInfo(&models.Session{Username: "test", Authenticated: true}, &data).Return(pkg.NO_ERR)
+	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
+		Form: signinFormBytes,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil)
+
+	//&models.Session{Username: "test", Authenticated: true}, &data
+	setInfoData := &utils_proto.Session{
+		Username:      "test",
+		Authenticated: wrapperspb.Bool(true),
+	}
+	profileUC.EXPECT().SetInfo(context.Background(), &profile_proto.SetInfoRequest{
+		Data: setInfoData,
+		Form: dataBytes,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil)
 
 	err := SigninUser(client, signinForm, srv.URL)
 
@@ -140,6 +185,7 @@ func TestSetInfo(t *testing.T) {
 	}
 }
 
+/*
 func TestGetAvatar(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
