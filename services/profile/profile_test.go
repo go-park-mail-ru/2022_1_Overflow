@@ -1,17 +1,37 @@
 package profile_test
 
 import (
+	"OverflowBackend/internal/config"
 	"OverflowBackend/internal/models"
 	"OverflowBackend/pkg"
+	"OverflowBackend/proto/profile_proto"
+	"OverflowBackend/proto/repository_proto"
+	"OverflowBackend/proto/utils_proto"
+	"OverflowBackend/services/profile"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"bou.ke/monkey"
 	"github.com/golang/mock/gomock"
+	log "github.com/sirupsen/logrus"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 )
+
+func InitTestUseCase(ctrl *gomock.Controller) (*repository_proto.MockDatabaseRepositoryClient, *profile.ProfileService) {
+	monkey.Patch(os.WriteFile, func(name string, data []byte, perm fs.FileMode) error {return nil})
+	monkey.Patch(os.MkdirAll, func(path string, perm fs.FileMode) error { return nil })
+	monkey.Patch(filepath.Glob, func(pattern string) (matches []string, err error) {return []string{}, nil})
+	log.SetLevel(log.FatalLevel)
+	db := repository_proto.NewMockDatabaseRepositoryClient(ctrl)
+	uc := profile.ProfileService{}
+	uc.Init(config.TestConfig(), db)
+	return db, &uc
+}
 
 func TestGetInfo(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
@@ -19,37 +39,56 @@ func TestGetInfo(t *testing.T) {
 
 	mockDB, uc := InitTestUseCase(mockCtrl)
 
-	session := models.Session{
-		Username:      "test",
-		Authenticated: true,
-	}
-
 	user := models.User{
 		Id:        0,
-		FirstName: "test",
-		LastName:  "test",
+		Firstname: "test",
+		Lastname:  "test",
 		Password:  "test",
 		Username:  "test",
 	}
+	userBytes, _ := json.Marshal(user)
 
-	mockDB.EXPECT().GetUserInfoByUsername(user.Username).Return(user, nil)
+	profileInfo := models.ProfileInfo{
+		Id: user.Id,
+		Firstname: user.Firstname,
+		Lastname: user.Lastname,
+		Username: user.Username,
+	}
 
-	resp, r := uc.GetInfo(&session)
-	if r != pkg.NO_ERR {
+	session := utils_proto.Session {
+		Username:      user.Username,
+		Authenticated: wrapperspb.Bool(true),
+	}
+
+	mockDB.EXPECT().GetUserInfoByUsername(context.Background(), &repository_proto.GetUserInfoByUsernameRequest{
+		Username: session.Username,
+	}).Return(&repository_proto.ResponseUser{
+		Response: &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		},
+		User: userBytes,
+	}, nil)
+
+	var response pkg.JsonResponse
+	resp, err := uc.GetInfo(context.Background(), &profile_proto.GetInfoRequest{
+		Data: &session,
+	})
+	json_err := json.Unmarshal(resp.Response.Response, &response)
+	if err != nil || json_err != nil || response != pkg.NO_ERR {
 		t.Errorf("Неверный ответ от UseCase.")
 		return
 	}
 
-	userUC := models.User{}
+	profileInfoResp := models.ProfileInfo{}
 
-	err := json.Unmarshal(resp, &userUC)
+	err = json.Unmarshal(resp.Data, &profileInfoResp)
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	if userUC != user {
-		t.Errorf("Информация о пользователе не соответствует заданной. Получено: %v, ожидается: %v.", userUC, user)
+	if profileInfoResp != profileInfo {
+		t.Errorf("Информация о пользователе не соответствует заданной. Получено: %v, ожидается: %v.", profileInfoResp, profileInfo)
 		return
 	}
 }
@@ -60,32 +99,54 @@ func TestSetInfo(t *testing.T) {
 
 	mockDB, uc := InitTestUseCase(mockCtrl)
 
-	session := models.Session{
-		Username:      "test",
-		Authenticated: true,
-	}
-
 	user := models.User{
 		Id:        0,
-		FirstName: "test",
-		LastName:  "test",
+		Firstname: "test",
+		Lastname:  "test",
 		Password:  "test",
 		Username:  "test",
 	}
+	userBytes, _ := json.Marshal(user)
 
-	settings := models.SettingsForm{
-		FirstName: "test2",
-		LastName:  "test2",
-		Password:  "test2",
+	settings := models.ProfileSettingsForm{
+		Firstname: user.Firstname+"test",
+		Lastname:  user.Lastname+"test",
+	}
+	settingsBytes, _ := json.Marshal(settings)
+
+	session := utils_proto.Session{
+		Username:      user.Username,
+		Authenticated: wrapperspb.Bool(true),
 	}
 
-	mockDB.EXPECT().GetUserInfoByUsername(user.Username).Return(user, nil)
-	mockDB.EXPECT().ChangeUserFirstName(user, settings.FirstName).Return(nil)
-	mockDB.EXPECT().ChangeUserLastName(user, settings.LastName).Return(nil)
-	mockDB.EXPECT().ChangeUserPassword(user, settings.Password).Return(nil)
+	mockDB.EXPECT().GetUserInfoByUsername(context.Background(), &repository_proto.GetUserInfoByUsernameRequest{
+		Username: session.Username,
+	}).Return(&repository_proto.ResponseUser{
+		Response: &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		},
+		User: userBytes,
+	}, nil)
+	mockDB.EXPECT().ChangeUserFirstName(context.Background(), &repository_proto.ChangeForm{
+		User: userBytes,
+		Data: settings.Firstname,
+	}).Return(&utils_proto.DatabaseResponse{
+		Status: utils_proto.DatabaseStatus_OK,
+	}, nil)
+	mockDB.EXPECT().ChangeUserLastName(context.Background(), &repository_proto.ChangeForm{
+		User: userBytes,
+		Data: settings.Lastname,
+	}).Return(&utils_proto.DatabaseResponse{
+		Status: utils_proto.DatabaseStatus_OK,
+	}, nil)
 
-	r := uc.SetInfo(&session, &settings)
-	if r != pkg.NO_ERR {
+	resp, err := uc.SetInfo(context.Background(), &profile_proto.SetInfoRequest{
+		Data: &session,
+		Form: settingsBytes,
+	})
+	var response pkg.JsonResponse
+	json_err := json.Unmarshal(resp.Response, &response)
+	if err != nil || json_err != nil || response != pkg.NO_ERR {
 		t.Errorf("Неверный ответ от UseCase.")
 		return
 	}
@@ -96,29 +157,38 @@ func TestSetAvatar(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	_, uc := InitTestUseCase(mockCtrl)
-
-	session := models.Session{
+	
+	session := utils_proto.Session{
 		Username:      "test",
-		Authenticated: true,
+		Authenticated: wrapperspb.Bool(true),
 	}
 
 	avatar := models.Avatar{
 		Name:      "avatar",
-		UserEmail: session.Username,
-		Content:   []byte{10, 10, 10, 10},
+		Username: session.Username,
+		File:   []byte{10, 10, 10, 10},
 	}
+	avatarBytes, _ := json.Marshal(avatar)
 
-	r := uc.SetAvatar(&session, &avatar)
-	if r != pkg.NO_ERR {
+	var response pkg.JsonResponse
+	resp, err := uc.SetAvatar(context.Background(), &profile_proto.SetAvatarRequest{
+		Data: &session,
+		Avatar: avatarBytes,
+	})
+	json_err := json.Unmarshal(resp.Response, &response)
+	if err != nil || json_err != nil || response != pkg.NO_ERR {
 		t.Errorf("Неверный ответ от UseCase.")
 		return
 	}
 
 	monkey.Patch(os.MkdirAll, func(path string, perm fs.FileMode) error { return fmt.Errorf("Ошибка.") })
-
-	r = uc.SetAvatar(&session, &avatar)
-	if r.Status != pkg.STATUS_UNKNOWN {
-		t.Errorf("Неверный возвращенный статус JSON ответа.")
+	resp, _ = uc.SetAvatar(context.Background(), &profile_proto.SetAvatarRequest{
+		Data: &session,
+		Avatar: avatarBytes,
+	})
+	json_err = json.Unmarshal(resp.Response, &response)
+	if json_err != nil || response.Status != pkg.STATUS_UNKNOWN {
+		t.Errorf("Неверный ответ от UseCase.")
 		return
 	}
 }
