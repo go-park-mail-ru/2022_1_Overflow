@@ -140,7 +140,15 @@ func (c *Database) GetIncomeMails(context context.Context, request *repository_p
 	var results []models.Mail
 	resultsBytes, _ := json.Marshal(results)
 	var count int
-	c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.mails WHERE WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND addressee IN (SELECT username FROM overflow.users WHERE id=$1);").Scan(&count)
+	err := c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.mails WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND addressee IN (SELECT username FROM overflow.users WHERE id=$1);", request.UserId).Scan(&count)
+	if err != nil {
+		return &repository_proto.ResponseMails{
+			Mails: resultsBytes,
+			Response: &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			},
+		}, err
+	}
 	rows, err := c.Conn.Query(context, "SELECT sender, theme, text, files, date, read, id FROM overflow.mails WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND addressee IN (SELECT username FROM overflow.users WHERE id=$1) ORDER BY date DESC OFFSET $3 LIMIT $2;", request.UserId, request.Limit, request.Offset)
 	if err != nil {
 		return &repository_proto.ResponseMails{
@@ -185,7 +193,15 @@ func (c *Database) GetOutcomeMails(context context.Context, request *repository_
 	var results []models.Mail
 	resultsBytes, _ := json.Marshal(results)
 	var count int
-	c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.mails WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND sender IN (SELECT username FROM overflow.users WHERE id=$1);").Scan(&count)
+	err := c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.mails WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND sender IN (SELECT username FROM overflow.users WHERE id=$1);", request.UserId).Scan(&count)
+	if err != nil {
+		return &repository_proto.ResponseMails{
+			Mails: resultsBytes,
+			Response: &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			},
+		}, err
+	}
 	rows, err := c.Conn.Query(context, "SELECT addressee, theme, text, files, date, id FROM overflow.mails WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND sender IN (SELECT username FROM overflow.users WHERE id=$1) ORDER BY date DESC OFFSET $3 LIMIT $2;", request.UserId, request.Limit, request.Offset)
 	if err != nil {
 		return &repository_proto.ResponseMails{
