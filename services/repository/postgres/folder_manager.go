@@ -103,7 +103,7 @@ func (c *Database) GetFoldersByUser(context context.Context, request *repository
 	var folders models.FolderList
 	foldersBytes, _ := json.Marshal(folders)
 	var count int
-	err := c.Conn.QueryRow(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE user_id=$1 AND name NOT IN ($2, $3);", request.UserId, pkg.FOLDER_SPAM, pkg.FOLDER_DRAFTS).Scan(&count)
+	err := c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.folders WHERE user_id=$1 AND name NOT IN ($2, $3);", request.UserId, pkg.FOLDER_SPAM, pkg.FOLDER_DRAFTS).Scan(&count)
 	if err != nil {
 		return &repository_proto.ResponseFolders{
 			Response: &utils_proto.DatabaseResponse{
@@ -153,7 +153,7 @@ func (c *Database) GetFolderMail(context context.Context, request *repository_pr
 	var mails models.MailList
 	mailsBytes, _ := json.Marshal(mails)
 	var count int
-	err := c.Conn.QueryRow(context, "SELECT addressee, sender, theme, text, files, date, read, id FROM overflow.mails WHERE id IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id in (SELECT id FROM overflow.folders WHERE user_id=$1 AND name=$2))", request.UserId, request.FolderName).Scan(&count)
+	err := c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.mails WHERE id IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id in (SELECT id FROM overflow.folders WHERE user_id=$1 AND name=$2))", request.UserId, request.FolderName).Scan(&count)
 	if err != nil {
 		return &repository_proto.ResponseMails{
 			Response: &utils_proto.DatabaseResponse{
