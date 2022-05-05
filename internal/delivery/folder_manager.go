@@ -435,8 +435,8 @@ func DeleteFolderMail() {}
 // @Summary Получить список папок пользователя или список писем в определенной папке
 // @Produce json
 // @Param folder_name query string false "Имя папки с письмами"
-// @Success 200 {object} []models.Folder "Список папок."
-// @Success 200 {object} []models.MailAdditional "Список писем в папке."
+// @Success 200 {object} models.FolderList "Список папок."
+// @Success 200 {object} models.MailAddList "Список писем в папке."
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
 // @Failure 500 {object} pkg.JsonResponse "Ошибка БД, неверные GET параметры."

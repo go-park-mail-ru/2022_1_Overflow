@@ -68,6 +68,15 @@ definitions:
       user_id:
         type: integer
     type: object
+  models.FolderList:
+    properties:
+      amount:
+        type: integer
+      folders:
+        items:
+          $ref: '#/definitions/models.Folder'
+        type: array
+    type: object
   models.Mail:
     properties:
       addressee:
@@ -308,9 +317,7 @@ paths:
         "200":
           description: Список писем в папке.
           schema:
-            items:
-              $ref: '#/definitions/models.MailAdditional'
-            type: array
+            $ref: '#/definitions/models.MailAddList'
         "401":
           description: Сессия отсутствует или сессия не валидна.
           schema:

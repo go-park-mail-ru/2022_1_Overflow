@@ -188,10 +188,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Список писем в папке.",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.MailAdditional"
-                            }
+                            "$ref": "#/definitions/models.MailAddList"
                         }
                     },
                     "401": {
@@ -1534,6 +1531,20 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "models.FolderList": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "folders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Folder"
+                    }
                 }
             }
         },
