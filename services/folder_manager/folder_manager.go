@@ -247,32 +247,6 @@ func (s *FolderManagerService) AddMailToFolderByObject(context context.Context, 
 			Response: pkg.JSON_ERR.Bytes(),
 		}, err
 	}
-	resp2, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
-		Username: form.Addressee,
-	})
-	if err != nil {
-		log.Error(err)
-		return &utils_proto.JsonResponse{
-			Response: pkg.DB_ERR.Bytes(),
-		}, err
-	}
-	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
-		return &utils_proto.JsonResponse{
-			Response: pkg.DB_ERR.Bytes(),
-		}, nil
-	}
-	var userAddressee models.User
-	err = json.Unmarshal(resp2.User, &userAddressee)
-	if err != nil {
-		return &utils_proto.JsonResponse{
-			Response: pkg.JSON_ERR.Bytes(),
-		}, err
-	}
-	if (userAddressee == models.User{}) {
-		return &utils_proto.JsonResponse{
-			Response: pkg.NO_USER_EXIST.Bytes(),
-		}, nil
-	}
 	mail := models.Mail{
 		Sender:    request.Data.Username,
 		Addressee: form.Addressee,

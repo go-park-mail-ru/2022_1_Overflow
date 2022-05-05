@@ -70,7 +70,7 @@ func (s *MailBoxService) Income(context context.Context, request *mailbox_proto.
 			}, Mails: nil,
 		}, nil
 	}
-	var mails []models.Mail
+	var mails models.MailList
 	err = json.Unmarshal(resp2.Mails, &mails)
 	if err != nil {
 		return &mailbox_proto.ResponseMails{
@@ -79,8 +79,9 @@ func (s *MailBoxService) Income(context context.Context, request *mailbox_proto.
 			}, Mails: nil,
 		}, err
 	}
-	var mails_add []models.MailAdditional
-	for _, mail := range mails {
+	var mails_add models.MailAddList
+	mails_add.Amount = mails.Amount
+	for _, mail := range mails.Mails {
 		mail_add := models.MailAdditional{}
 		mail_add.Mail = mail
 		resp, err := s.profile.GetAvatar(
@@ -107,7 +108,7 @@ func (s *MailBoxService) Income(context context.Context, request *mailbox_proto.
 			return &mailbox_proto.ResponseMails{Response: resp.Response, Mails: nil}, nil
 		}
 		mail_add.AvatarUrl = resp.Url
-		mails_add = append(mails_add, mail_add)
+		mails_add.Mails = append(mails_add.Mails, mail_add)
 	}
 	parsed, err := json.Marshal(mails_add)
 	if err != nil {
@@ -168,7 +169,7 @@ func (s *MailBoxService) Outcome(context context.Context, request *mailbox_proto
 			}, Mails: nil,
 		}, nil
 	}
-	var mails []models.Mail
+	var mails models.MailList
 	err = json.Unmarshal(resp2.Mails, &mails)
 	if err != nil {
 		return &mailbox_proto.ResponseMails{
@@ -177,8 +178,9 @@ func (s *MailBoxService) Outcome(context context.Context, request *mailbox_proto
 			}, Mails: nil,
 		}, err
 	}
-	var mails_add []models.MailAdditional
-	for _, mail := range mails {
+	var mails_add models.MailAddList
+	mails_add.Amount = mails.Amount
+	for _, mail := range mails.Mails {
 		mail_add := models.MailAdditional{}
 		mail_add.Mail = mail
 		resp, err := s.profile.GetAvatar(
@@ -205,7 +207,7 @@ func (s *MailBoxService) Outcome(context context.Context, request *mailbox_proto
 			return &mailbox_proto.ResponseMails{Response: resp.Response, Mails: nil}, nil
 		}
 		mail_add.AvatarUrl = resp.Url
-		mails_add = append(mails_add, mail_add)
+		mails_add.Mails = append(mails_add.Mails, mail_add)
 	}
 	parsed, err := json.Marshal(mails_add)
 	if err != nil {

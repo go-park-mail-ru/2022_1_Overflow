@@ -17,3 +17,13 @@ type MailAdditional struct {
 	Mail Mail `json:"mail"`
 	AvatarUrl string `json:"avatar_url"`
 }
+
+type MailAddList struct {
+	Amount int	`json:"amount"`
+	Mails []MailAdditional `json:"mails"`
+}
+
+type MailList struct {
+	Amount int `json:"amount"`
+	Mails []Mail `json:"mails"`
+}

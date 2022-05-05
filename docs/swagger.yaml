@@ -89,6 +89,15 @@ definitions:
       theme:
         type: string
     type: object
+  models.MailAddList:
+    properties:
+      amount:
+        type: integer
+      mails:
+        items:
+          $ref: '#/definitions/models.MailAdditional'
+        type: array
+    type: object
   models.MailAdditional:
     properties:
       avatar_url:
@@ -692,9 +701,7 @@ paths:
         "200":
           description: Список входящих писем
           schema:
-            items:
-              $ref: '#/definitions/models.MailAdditional'
-            type: array
+            $ref: '#/definitions/models.MailAddList'
         "401":
           description: Сессия отсутствует или сессия не валидна.
           schema:
@@ -727,9 +734,7 @@ paths:
         "200":
           description: Список исходящих писем
           schema:
-            items:
-              $ref: '#/definitions/models.MailAdditional'
-            type: array
+            $ref: '#/definitions/models.MailAddList'
         "401":
           description: Сессия отсутствует или сессия не валидна.
           schema:

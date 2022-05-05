@@ -19,7 +19,7 @@ import (
 // @Produce json
 // @Param limit query int false "Ограничение на количество писем"
 // @Param offset query int false "Смещение в списке писем"
-// @Success 200 {object} []models.MailAdditional "Список входящих писем"
+// @Success 200 {object} models.MailAddList "Список входящих писем"
 // @Failure 401 {object} pkg.JsonResponse"Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
 // @Failure 500 {object} pkg.JsonResponse "Ошибка БД."
@@ -71,7 +71,7 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param limit query int false "Ограничение на количество писем"
 // @Param offset query int false "Смещение в списке писем"
-// @Success 200 {object} []models.MailAdditional "Список исходящих писем"
+// @Success 200 {object} models.MailAddList "Список исходящих писем"
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
 // @Failure 405 {object} pkg.JsonResponse
 // @Failure 500 {object} pkg.JsonResponse "Ошибка БД."

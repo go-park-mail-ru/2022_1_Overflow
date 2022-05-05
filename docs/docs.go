@@ -791,10 +791,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Список входящих писем",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.MailAdditional"
-                            }
+                            "$ref": "#/definitions/models.MailAddList"
                         }
                     },
                     "401": {
@@ -845,10 +842,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Список исходящих писем",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.MailAdditional"
-                            }
+                            "$ref": "#/definitions/models.MailAddList"
                         }
                     },
                     "401": {
@@ -1571,6 +1565,20 @@ const docTemplate = `{
                 },
                 "theme": {
                     "type": "string"
+                }
+            }
+        },
+        "models.MailAddList": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "mails": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.MailAdditional"
+                    }
                 }
             }
         },
