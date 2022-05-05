@@ -2,7 +2,7 @@ global:
   scrape_interval: 1m
 
 scrape_configs:
-  - job_name: postgresql
+  - job_name: "postgresql"
     static_configs:
       - targets: ['localhost:9187']
         labels:
