@@ -80,8 +80,8 @@ func (s *StandardManager) IsLoggedIn(r *http.Request) bool {
 func (s *StandardManager) GetData(r *http.Request) (data *utils_proto.Session, err error) {
 	defer func() {
 		errRecover := recover()
-		log.Error(errRecover)
 		if errRecover != nil {
+			log.Error(errRecover)
 			data, err = nil, errRecover.(error)
 		}
 	}()
