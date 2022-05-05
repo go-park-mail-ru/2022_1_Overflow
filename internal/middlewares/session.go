@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"OverflowBackend/internal/usecase/session"
+	"OverflowBackend/internal/session"
 	"OverflowBackend/pkg"
 	"net/http"
 	"strings"
@@ -19,8 +19,8 @@ func CheckLogin(handler http.Handler) http.Handler {
 		for _, path := range allowedPaths {
 			allowed = allowed || strings.Contains(r.URL.Path, path)
 		}
-		if !allowed && !session.IsLoggedIn(r) {
-			pkg.WriteJsonErrFull(w, pkg.UNAUTHORIZED_ERR)
+		if !allowed && !session.Manager.IsLoggedIn(r) {
+			pkg.WriteJsonErrFull(w, &pkg.UNAUTHORIZED_ERR)
 			return
 		}
 		handler.ServeHTTP(w, r)

@@ -1,0 +1,107 @@
+syntax = "proto3";
+package folder_manager_proto;
+
+option go_package = "./folder_manager_proto";
+
+import "proto/utils.proto";
+
+service FolderManager {
+    rpc AddFolder(AddFolderRequest) returns (ResponseFolder) {}
+    rpc AddMailToFolderById(AddMailToFolderByIdRequest) returns (utils.JsonResponse) {}
+    rpc AddMailToFolderByObject(AddMailToFolderByObjectRequest) returns (utils.JsonResponse) {}
+    rpc ChangeFolder(ChangeFolderRequest) returns (utils.JsonResponse) {}
+    //rpc GetFolderByName(GetFolderByNameRequest) returns (ResponseFolder) {}
+    //rpc GetFolderById(GetFolderByIdRequest) returns (ResponseFolder) {}
+    rpc DeleteFolder(DeleteFolderRequest) returns (utils.JsonResponse) {}
+    rpc ListFolders(ListFoldersRequest) returns (ResponseFolders) {}
+    rpc ListFolder(ListFolderRequest) returns (ResponseMails) {}
+    rpc DeleteFolderMail(DeleteFolderMailRequest) returns (utils.JsonResponse) {}
+    rpc MoveFolderMail(MoveFolderMailRequest) returns (utils.JsonResponse) {}
+}
+
+message MoveFolderMailRequest {
+    utils.Session data = 1;
+    string folderNameSrc = 2;
+    string folderNameDest = 3;
+    int32 mailId = 4;
+}
+
+message AddFolderRequest {
+    utils.Session data = 1;
+    string name = 2;
+}
+
+message AddMailToFolderByIdRequest {
+    utils.Session data = 1;
+    string folderName = 2;
+    int32 mailId = 3;
+    bool move = 4;
+}
+
+message AddMailToFolderByObjectRequest {
+    utils.Session data = 1;
+    string folderName = 2;
+    bytes form = 3;
+}
+
+message ChangeFolderRequest {
+    utils.Session data = 1;
+    string folderName = 2;
+    string folderNewName = 3;
+}
+
+/*
+message GetFolderByNameRequest {
+    utils.Session data = 1;
+    string name = 2;
+}
+
+message GetFolderByIdRequest {
+    utils.Session data = 1;
+    int32 id = 2;
+}
+
+message ResponseFolder {
+    utils.JsonResponse response = 1;
+    bytes folder = 2;
+}
+*/
+
+message ResponseFolder {
+    utils.JsonResponse response = 1;
+    bytes folder = 2;
+}
+
+message ResponseFolders {
+    utils.JsonResponse response = 1;
+    bytes folders = 2;
+}
+
+message ResponseMails {
+    utils.JsonResponse response = 1;
+    bytes mails = 2;
+}
+
+message DeleteFolderRequest {
+    utils.Session data = 1;
+    string folderName = 2;
+}
+
+message DeleteFolderMailRequest {
+    utils.Session data = 1;
+    string folderName = 2;
+    int32 mailId = 3;
+}
+
+message ListFoldersRequest {
+    utils.Session data = 1;
+    int32 limit = 2;
+    int32 offset = 3;
+}
+
+message ListFolderRequest {
+    utils.Session data = 1;
+    string folderName = 2;
+    int32 limit = 3;
+    int32 offset = 4;
+}

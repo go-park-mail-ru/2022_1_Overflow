@@ -5,8 +5,11 @@ import (
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/middlewares"
 	"OverflowBackend/internal/models"
-	"OverflowBackend/internal/usecase"
-	"OverflowBackend/internal/usecase/session"
+	"OverflowBackend/internal/session"
+	"OverflowBackend/proto/auth_proto"
+	"OverflowBackend/proto/folder_manager_proto"
+	"OverflowBackend/proto/mailbox_proto"
+	"OverflowBackend/proto/profile_proto"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -22,10 +25,16 @@ func init() {
 	log.SetLevel(log.FatalLevel)
 }
 
-func InitTestRouter(uc usecase.UseCaseInterface, d *delivery.Delivery, urls []string, handles []func(http.ResponseWriter, *http.Request)) http.Handler {
-	middlewares.Init(DefConf)
+func InitTestRouter(
+	d *delivery.Delivery,
+	urls []string,
+	handles []func(http.ResponseWriter, *http.Request),
+	auth auth_proto.AuthClient, profile profile_proto.ProfileClient, mailbox mailbox_proto.MailboxClient, folderManager folder_manager_proto.FolderManagerClient,
+	) http.Handler {
 	session.Init(DefConf)
-	d.Init(uc, DefConf)
+	middlewares.Init(DefConf)
+
+	d.Init(DefConf, auth, profile, mailbox, folderManager)
 	router := mux.NewRouter()
 	for i := range urls {
 		router.HandleFunc(urls[i], handles[i])

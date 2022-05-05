@@ -5,16 +5,33 @@ server:
     read: 15s
     write: 10s
     idle: 5s
+    csrf_timeout: 10s
   static:
     dir: "static"
     handle: "/static/"
   keys:
-    csrf_token: "7ad7b8be40fef684833eaf00770082cf"
+    csrf_authkey: "7ad7b8be40fef684833eaf00770082cf"
     auth_key: "aPdSgVkYp3s6v9y$B&E)H+MbQeThWmZq"
     enc_key: "cRfUjXn2r5u8x/A?D*G-KaPdSgVkYp3s"
+  services:
+    auth:
+      address: "localhost"
+      port: 8081
+    profile:
+      address: "localhost"
+      port: 8082
+    mailbox:
+      address: "localhost"
+      port: 8083
+    folder_manager:
+      address: "localhost"
+      port: 8084
+    database:
+      address: "localhost"
+      port: 8085
+  session_manager: "standard"
   
 database:
-  type: "postgres"
   user: "postgres"
   password: "123"
   host: "localhost"

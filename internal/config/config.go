@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -35,6 +36,7 @@ type Config struct {
 			Write  time.Duration `yaml:"write"`
 			Read   time.Duration `yaml:"read"`
 			Idle   time.Duration `yaml:"idle"`
+			CSRFTimeout time.Duration `yaml:"csrf_timeout"`
 		} `yaml:"timeout"`
 		Static struct {
 			Dir    string `yaml:"dir"`
@@ -45,9 +47,31 @@ type Config struct {
 			AuthKey     string `yaml:"auth_key"`
 			EncKey      string `yaml:"enc_key"`
 		} `yaml:"keys"`
+		Services struct {
+			Auth struct {
+				Address	string `yaml:"address"`
+				Port string `yaml:"port"`
+			} `yaml:"auth"`
+			Profile struct {
+				Address	string `yaml:"address"`
+				Port string `yaml:"port"`
+			} `yaml:"profile"`
+			MailBox struct {
+				Address	string `yaml:"address"`
+				Port string `yaml:"port"`
+			} `yaml:"mailbox"`
+			FolderManager struct {
+				Address string `yaml:"address"`
+				Port string `yaml:"port"`
+			} `yaml:"folder_manager"`
+			Database struct {
+				Address	string `yaml:"address"`
+				Port string `yaml:"port"`
+			} `yaml:"database"`
+		}
+		SessionType string `yaml:"session_manager"`
 	} `yaml:"server"`
 	Database struct {
-		Type     string `yaml:"type"`
 		User     string `yaml:"user"`
 		Password string `yaml:"password"`
 		Host     string `yaml:"host"`
@@ -79,64 +103,9 @@ func NewConfig(configPath string) (*Config, error) {
 }
 
 func TestConfig() *Config {
-	config := &Config{
-		Server: struct {
-			Port    string "yaml:\"port\""
-			Timeout struct {
-				Server time.Duration "yaml:\"server\""
-				Write  time.Duration "yaml:\"write\""
-				Read   time.Duration "yaml:\"read\""
-				Idle   time.Duration "yaml:\"idle\""
-			} "yaml:\"timeout\""
-			Static struct {
-				Dir    string "yaml:\"dir\""
-				Handle string "yaml:\"handle\""
-			} "yaml:\"static\""
-			Keys struct {
-				CSRFAuthKey string "yaml:\"csrf_authkey\""
-				AuthKey     string "yaml:\"auth_key\""
-				EncKey      string "yaml:\"enc_key\""
-			} "yaml:\"keys\""
-		}{
-			Port: "8080",
-			Timeout: struct {
-				Server time.Duration "yaml:\"server\""
-				Write  time.Duration "yaml:\"write\""
-				Read   time.Duration "yaml:\"read\""
-				Idle   time.Duration "yaml:\"idle\""
-			}{
-				Server: 10 * time.Second,
-				Write:  5 * time.Second,
-				Read:   5 * time.Second,
-				Idle:   5 * time.Second,
-			},
-			Static: struct {
-				Dir    string "yaml:\"dir\""
-				Handle string "yaml:\"handle\""
-			}{
-				Dir:    "static",
-				Handle: "/static",
-			},
-			Keys: struct {
-				CSRFAuthKey string "yaml:\"csrf_authkey\""
-				AuthKey     string "yaml:\"auth_key\""
-				EncKey      string "yaml:\"enc_key\""
-			}{
-				CSRFAuthKey: "7ad7b8be40fef684833eaf00770082cf",
-				AuthKey:     "aPdSgVkYp3s6v9y$B&E)H+MbQeThWmZq",
-				EncKey:      "cRfUjXn2r5u8x/A?D*G-KaPdSgVkYp3s",
-			},
-		},
-		Database: struct {
-			Type     string "yaml:\"type\""
-			User     string "yaml:\"user\""
-			Password string "yaml:\"password\""
-			Host     string "yaml:\"host\""
-			Port     int    "yaml:\"port\""
-			Name     string "yaml:\"dbname\""
-		}{
-			Type: "mock",
-		},
+	config, err := NewConfig("configs/test.yml")
+	if err != nil {
+		log.Fatal(err)
 	}
 	return config
 }

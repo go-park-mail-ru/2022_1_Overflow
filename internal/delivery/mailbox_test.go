@@ -3,25 +3,32 @@ package delivery_test
 import (
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/models"
-	"OverflowBackend/mocks"
 	"OverflowBackend/pkg"
+	"OverflowBackend/proto/auth_proto"
+	"OverflowBackend/proto/folder_manager_proto"
+	"OverflowBackend/proto/mailbox_proto"
+	"OverflowBackend/proto/profile_proto"
+	"OverflowBackend/proto/utils_proto"
+	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/golang/mock/gomock"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
 	"testing"
 	"time"
-
-	"github.com/golang/mock/gomock"
 )
-
 
 func TestSend(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+	authUC := auth_proto.NewMockAuthClient(mockCtrl)
+	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
+	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
+	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -30,7 +37,9 @@ func TestSend(t *testing.T) {
 	}
 
 	d := delivery.Delivery{}
-	router := InitTestRouter(mockUC, &d, []string{"/mail/send", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SendMail, d.SignIn})
+	router := InitTestRouter(&d, []string{"/mail/send", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SendMail, d.SignIn},
+		authUC, profileUC, mailboxUC, folderManagerUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -42,18 +51,35 @@ func TestSend(t *testing.T) {
 		Password: "test",
 	}
 
-	data := models.MailForm{
+	mailData := models.MailForm{
 		Addressee: "test2",
-		Theme: "test",
-		Text: "test",
-		Files: "test",
+		Theme:     "test",
+		Text:      "test",
+		Files:     "test",
 	}
+	formBytesSignIn, _ := json.Marshal(signinForm)
+	formBytesMailData, _ := json.Marshal(mailData)
 
-	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
-	mockUC.EXPECT().SendMail(&models.Session{Username: "test", Authenticated: true}, data).Return(pkg.NO_ERR)
+	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
+		Form: formBytesSignIn,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil)
 
-	dataJson, _ := json.Marshal(data)
-	
+	data := &utils_proto.Session{
+		Username:      "test",
+		Authenticated: wrapperspb.Bool(true),
+	}
+	mailboxUC.EXPECT().SendMail(context.Background(), &mailbox_proto.SendMailRequest{
+		Data: data,
+		Form: formBytesMailData,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil)
+	//&models.Session{Username: "test", Authenticated: true}, data)
+
+	dataJson, _ := json.Marshal(mailData)
+
 	_, err := Post(client, dataJson, sendUrl, http.StatusForbidden, "", "")
 	if err != nil {
 		t.Error(err)
@@ -85,7 +111,10 @@ func TestIncome(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+	authUC := auth_proto.NewMockAuthClient(mockCtrl)
+	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
+	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
+	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -94,30 +123,49 @@ func TestIncome(t *testing.T) {
 	}
 
 	d := delivery.Delivery{}
-	router := InitTestRouter(mockUC, &d, []string{"/mail/income", "/signin"}, []func(http.ResponseWriter, *http.Request){d.Income, d.SignIn})
+	router := InitTestRouter(&d, []string{"/mail/income", "/signin"}, []func(http.ResponseWriter, *http.Request){d.Income, d.SignIn},
+		authUC, profileUC, mailboxUC, folderManagerUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
 	url := fmt.Sprintf("%s/mail/income", srv.URL)
 
-	signinForm := models.SignInForm{
+	signInForm := models.SignInForm{
 		Username: "test2",
 		Password: "test2",
 	}
+	signInFormBytes, _ := json.Marshal(signInForm)
 
 	mails, _ := json.Marshal([]models.MailAdditional{})
 
-	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
-	mockUC.EXPECT().Income(&models.Session{Username:"test2", Authenticated: true}).Return(mails, pkg.NO_ERR)
+	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
+		Form: signInFormBytes,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil)
 
+	incomeData := &utils_proto.Session{
+		Username:      "test2",
+		Authenticated: wrapperspb.Bool(true),
+	}
+	mailboxUC.EXPECT().Income(context.Background(), &mailbox_proto.IncomeRequest{
+		Data:  incomeData,
+		Limit: 100,
+	}).Return(&mailbox_proto.ResponseMails{
+		Response: &utils_proto.JsonResponse{Response: pkg.NO_ERR.Bytes()},
+		Mails:    mails,
+	}, nil)
+	//Return(mails, pkg.NO_ERR)
+	//&models.Session{Username:"test2", Authenticated: true}
 	_, err, _ := Get(client, url, http.StatusUnauthorized)
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	err = SigninUser(client, signinForm, srv.URL)
+	err = SigninUser(client, signInForm, srv.URL)
 
 	if err != nil {
 		t.Error(err)
@@ -141,7 +189,10 @@ func TestOutcome(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+	authUC := auth_proto.NewMockAuthClient(mockCtrl)
+	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
+	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
+	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -150,22 +201,41 @@ func TestOutcome(t *testing.T) {
 	}
 
 	d := delivery.Delivery{}
-	router := InitTestRouter(mockUC, &d, []string{"/mail/outcome", "/signin"}, []func(http.ResponseWriter, *http.Request){d.Outcome, d.SignIn})
+	router := InitTestRouter(&d, []string{"/mail/outcome", "/signin"}, []func(http.ResponseWriter, *http.Request){d.Outcome, d.SignIn},
+		authUC, profileUC, mailboxUC, folderManagerUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
 	url := fmt.Sprintf("%s/mail/outcome", srv.URL)
 
-	signinForm := models.SignInForm{
+	signInForm := models.SignInForm{
 		Username: "test",
 		Password: "test",
 	}
+	signInFormBytes, _ := json.Marshal(signInForm)
 
 	mails, _ := json.Marshal([]models.MailAdditional{})
 
-	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
-	mockUC.EXPECT().Outcome(&models.Session{Username:"test", Authenticated: true}).Return(mails, pkg.NO_ERR)
+	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
+		Form: signInFormBytes,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil)
+
+	outcomeData := &utils_proto.Session{
+		Username:      "test",
+		Authenticated: wrapperspb.Bool(true),
+	}
+	mailboxUC.EXPECT().Outcome(context.Background(), &mailbox_proto.OutcomeRequest{
+		Data:  outcomeData,
+		Limit: 100,
+	}).Return(&mailbox_proto.ResponseMails{
+		Response: &utils_proto.JsonResponse{Response: pkg.NO_ERR.Bytes()},
+		Mails:    mails,
+	}, nil)
+	//&models.Session{Username:"test", Authenticated: true}
 
 	_, err, _ := Get(client, url, http.StatusUnauthorized)
 	if err != nil {
@@ -173,7 +243,7 @@ func TestOutcome(t *testing.T) {
 		return
 	}
 
-	err = SigninUser(client, signinForm, srv.URL)
+	err = SigninUser(client, signInForm, srv.URL)
 
 	if err != nil {
 		t.Error(err)
@@ -197,7 +267,10 @@ func TestRead(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+	authUC := auth_proto.NewMockAuthClient(mockCtrl)
+	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
+	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
+	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -206,7 +279,9 @@ func TestRead(t *testing.T) {
 	}
 
 	d := delivery.Delivery{}
-	router := InitTestRouter(mockUC, &d, []string{"/mail/read", "/signin"}, []func(http.ResponseWriter, *http.Request){d.ReadMail, d.SignIn})
+	router := InitTestRouter(&d, []string{"/mail/read", "/signin"}, []func(http.ResponseWriter, *http.Request){d.ReadMail, d.SignIn},
+		authUC, profileUC, mailboxUC, folderManagerUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -215,9 +290,27 @@ func TestRead(t *testing.T) {
 		Username: "test2",
 		Password: "test2",
 	}
+	signinFormBytes, _ := json.Marshal(signinForm)
 
-	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
-	mockUC.EXPECT().ReadMail(&models.Session{Username: "test2", Authenticated: true}, int32(0)).Return(pkg.NO_ERR)
+	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
+		Form: signinFormBytes,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil)
+
+	readMailData := &utils_proto.Session{
+		Username:      "test2",
+		Authenticated: wrapperspb.Bool(true),
+	}
+	//readMailDataBytes, _ := json.Marshal(readMailData)
+	mailboxUC.EXPECT().ReadMail(context.Background(), &mailbox_proto.ReadMailRequest{
+		Data: readMailData,
+		Id:   1,
+		Read: true,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil)
+	//&models.Session{Username: "test2", Authenticated: true}, int32(0)
 
 	err := SigninUser(client, signinForm, srv.URL)
 
@@ -233,139 +326,23 @@ func TestRead(t *testing.T) {
 		t.Error(err)
 		return
 	}
-	r, err := Post(client, nil, url, http.StatusOK, token, "")
+
+	form := models.ReadMailForm{
+		Id:     1,
+		IsRead: true,
+	}
+	formBytes, _ := json.Marshal(form)
+
+	r, err := Post(client, formBytes, url, http.StatusOK, token, "")
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	var resp pkg.JsonResponse
+	var resp utils_proto.JsonResponse
 
 	err = json.NewDecoder(r.Body).Decode(&resp)
 
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	if resp.Status != pkg.STATUS_OK {
-		t.Errorf("Статус тела ответа не соответствует ожидаемому. Получено: %v, ожидается: %v.", resp.Status, pkg.STATUS_OK)
-		return
-	}
-}
-
-func TestForwardMail(t *testing.T) {
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
-
-	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
-
-	jar, _ := cookiejar.New(nil)
-
-	client := &http.Client{
-		Jar: jar,
-	}
-
-	d := delivery.Delivery{}
-	router := InitTestRouter(mockUC, &d, []string{"/mail/forward", "/signin"}, []func(http.ResponseWriter, *http.Request){d.ForwardMail, d.SignIn})
-
-	srv := httptest.NewServer(router)
-	defer srv.Close()
-
-	url := fmt.Sprintf("%s/mail/forward?mail_id=0", srv.URL)
-
-	data := models.MailForm {
-		Addressee: "test2",
-		Theme: "forwarded",
-		Text: "hello",
-		Files: "files",
-	}
-
-	signinForm := models.SignInForm{
-		Username: "test",
-		Password: "test",
-	}
-
-	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
-	mockUC.EXPECT().ForwardMail(&models.Session{Username: "test", Authenticated: true}, data, int32(0)).Return(pkg.NO_ERR)
-
-	err := SigninUser(client, signinForm, srv.URL)
-
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	dataJson, err := json.Marshal(data)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	_, err, token := Get(client, url, http.StatusMethodNotAllowed)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	_, err = Post(client, dataJson, url, http.StatusOK, token, "")
-	if err != nil {
-		t.Error(err)
-		return
-	}
-}
-
-func TestRespondMail(t *testing.T) {
-	mockCtrl := gomock.NewController(t)
-	defer mockCtrl.Finish()
-
-	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
-
-	jar, _ := cookiejar.New(nil)
-
-	client := &http.Client{
-		Jar: jar,
-	}
-
-	d := delivery.Delivery{}
-	router := InitTestRouter(mockUC, &d, []string{"/mail/respond", "/signin"}, []func(http.ResponseWriter, *http.Request){d.RespondMail, d.SignIn})
-
-	srv := httptest.NewServer(router)
-	defer srv.Close()
-
-	url := fmt.Sprintf("%s/mail/respond?mail_id=0", srv.URL)
-
-	data := models.MailForm{
-		Addressee: "test2",
-		Theme: "forwarded",
-		Text: "hello",
-		Files: "files",
-	}
-
-	signinForm := models.SignInForm{
-		Username: "test",
-		Password: "test",
-	}
-
-	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
-	mockUC.EXPECT().RespondMail(&models.Session{Username: "test", Authenticated: true}, data, int32(0)).Return(pkg.NO_ERR)
-
-	err := SigninUser(client, signinForm, srv.URL)
-
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	dataJson, err := json.Marshal(data)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	_, err, token := Get(client, url, http.StatusMethodNotAllowed)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-	_, err = Post(client, dataJson, url, http.StatusOK, token, "")
 	if err != nil {
 		t.Error(err)
 		return
@@ -376,7 +353,10 @@ func TestDelete(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+	authUC := auth_proto.NewMockAuthClient(mockCtrl)
+	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
+	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
+	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -385,20 +365,38 @@ func TestDelete(t *testing.T) {
 	}
 
 	d := delivery.Delivery{}
-	router := InitTestRouter(mockUC, &d, []string{"/mail/delete", "/signin"}, []func(http.ResponseWriter, *http.Request){d.DeleteMail, d.SignIn})
+	router := InitTestRouter(&d, []string{"/mail/delete", "/signin"}, []func(http.ResponseWriter, *http.Request){d.DeleteMail, d.SignIn},
+		authUC, profileUC, mailboxUC, folderManagerUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
 	url := fmt.Sprintf("%s/mail/delete?id=0", srv.URL)
 
-	signinForm :=  models.SignInForm{
+	signinForm := models.SignInForm{
 		Username: "test",
 		Password: "test",
 	}
+	signinFormBytes, _ := json.Marshal(signinForm)
 
-	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
-	mockUC.EXPECT().DeleteMail(&models.Session{Username: "test", Authenticated: true}, int32(0)).Return(pkg.NO_ERR)
+	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
+		Form: signinFormBytes,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil)
+
+	deleteData := &utils_proto.Session{
+		Username:      "test",
+		Authenticated: wrapperspb.Bool(true),
+	}
+	mailboxUC.EXPECT().DeleteMail(context.Background(), &mailbox_proto.DeleteMailRequest{
+		Data: deleteData,
+		Id:   1,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil)
+	//&models.Session{Username: "test", Authenticated: true}, int32(0)
 
 	err := SigninUser(client, signinForm, srv.URL)
 
@@ -413,7 +411,11 @@ func TestDelete(t *testing.T) {
 		return
 	}
 
-	_, err = Post(client, nil, url, http.StatusOK, token, "")
+	form := &models.DeleteMailForm{
+		Id: 1,
+	}
+	formBytes, _ := json.Marshal(form)
+	_, err = Post(client, formBytes, url, http.StatusOK, token, "")
 	if err != nil {
 		t.Error(err)
 		return
@@ -424,7 +426,10 @@ func TestGetMail(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockUC := mocks.NewMockUseCaseInterface(mockCtrl)
+	authUC := auth_proto.NewMockAuthClient(mockCtrl)
+	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
+	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
+	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -433,21 +438,23 @@ func TestGetMail(t *testing.T) {
 	}
 
 	d := delivery.Delivery{}
-	router := InitTestRouter(mockUC, &d, []string{"/mail/get", "/signin"}, []func(http.ResponseWriter, *http.Request){d.GetMail, d.SignIn})
+	router := InitTestRouter(&d, []string{"/mail/get", "/signin"}, []func(http.ResponseWriter, *http.Request){d.GetMail, d.SignIn},
+		authUC, profileUC, mailboxUC, folderManagerUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
 	url := fmt.Sprintf("%s/mail/get?id=0", srv.URL)
 
-	signinForm :=  models.SignInForm{
+	signinForm := models.SignInForm{
 		Username: "test",
 		Password: "test",
 	}
+	signinFormBytes, _ := json.Marshal(signinForm)
 
 	mail := models.Mail{
 		Id:        0,
-		Client_id: 0,
 		Sender:    "test",
 		Addressee: "test2",
 		Theme:     "test",
@@ -456,12 +463,28 @@ func TestGetMail(t *testing.T) {
 		Date:      time.Now(),
 		Read:      false,
 	}
-
 	mailBytes, _ := json.Marshal(mail)
 
-	mockUC.EXPECT().SignIn(signinForm).Return(pkg.NO_ERR)
-	mockUC.EXPECT().GetMail(&models.Session{Username: "test", Authenticated: true}, int32(0)).Return(mailBytes, pkg.NO_ERR)
+	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
+		Form: signinFormBytes,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil)
 
+	getMailData := &utils_proto.Session{
+		Username:      "test",
+		Authenticated: wrapperspb.Bool(true),
+	}
+	mailboxUC.EXPECT().GetMail(context.Background(), &mailbox_proto.GetMailRequest{
+		Data: getMailData,
+	}).Return(&mailbox_proto.ResponseMail{
+		Mail: mailBytes,
+		Response: &utils_proto.JsonResponse{
+			Response: pkg.NO_ERR.Bytes(),
+		},
+	}, nil)
+
+	//&models.Session{Username: "test", Authenticated: true}, int32(0)
 	err := SigninUser(client, signinForm, srv.URL)
 
 	if err != nil {
@@ -475,17 +498,12 @@ func TestGetMail(t *testing.T) {
 		return
 	}
 
-	var resp pkg.JsonResponse
+	var resp utils_proto.JsonResponse
 
 	err = json.NewDecoder(r.Body).Decode(&resp)
 
 	if err != nil {
 		t.Error(err)
-		return
-	}
-
-	if resp.Status != pkg.STATUS_OK {
-		t.Errorf("Статус тела ответа не соответствует ожидаемому. Получено: %v, ожидается: %v.", resp.Status, pkg.STATUS_OK)
 		return
 	}
 }

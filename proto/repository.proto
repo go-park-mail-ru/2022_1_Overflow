@@ -1,0 +1,175 @@
+syntax = "proto3";
+package repository_proto;
+
+option go_package = "./repository_proto";
+
+import "proto/utils.proto";
+
+service DatabaseRepository {
+    rpc GetUserInfoByUsername(GetUserInfoByUsernameRequest) returns (ResponseUser) {}
+    rpc GetUserInfoById(GetUserInfoByIdRequest) returns (ResponseUser) {}
+
+    rpc AddUser(AddUserRequest) returns (utils.DatabaseResponse) {}
+
+    rpc ChangeUserPassword(ChangeForm) returns (utils.DatabaseResponse) {}
+    rpc ChangeUserFirstName(ChangeForm) returns (utils.DatabaseResponse) {}
+    rpc ChangeUserLastName(ChangeForm) returns (utils.DatabaseResponse) {}
+
+    rpc GetIncomeMails(GetIncomeMailsRequest) returns (ResponseMails) {}
+    rpc GetOutcomeMails(GetOutcomeMailsRequest) returns (ResponseMails) {}
+    rpc AddMail(AddMailRequest) returns (utils.DatabaseResponse) {}
+    rpc DeleteMail(DeleteMailRequest) returns (utils.DatabaseResponse) {}
+    rpc ReadMail(ReadMailRequest) returns (utils.DatabaseResponse) {}
+    rpc GetMailInfoById(GetMailInfoByIdRequest) returns (ResponseMail) {}
+
+    rpc GetFolderById(GetFolderByIdRequest) returns (ResponseFolder) {}
+    rpc GetFolderByName(GetFolderByNameRequest) returns (ResponseFolder) {}
+    rpc GetFoldersByUser(GetFoldersByUserRequest) returns (ResponseFolders) {}
+    rpc GetFolderMail(GetFolderMailRequest) returns (ResponseMails) {}
+    rpc DeleteFolder(DeleteFolderRequest) returns (utils.DatabaseResponse) {}
+    rpc AddFolder(AddFolderRequest) returns (utils.DatabaseResponse) {}
+    rpc ChangeFolderName(ChangeFolderNameRequest) returns (utils.DatabaseResponse) {}
+    rpc AddMailToFolderById(AddMailToFolderByIdRequest) returns (utils.DatabaseResponse) {}
+    rpc AddMailToFolderByObject(AddMailToFolderByObjectRequest) returns (utils.DatabaseResponse) {}
+    rpc DeleteFolderMail(DeleteFolderMailRequest) returns (utils.DatabaseResponse) {}
+    rpc MoveFolderMail(MoveFolderMailRequest) returns (utils.DatabaseResponse) {}
+}
+
+// ================ requests ================
+
+message MoveFolderMailRequest {
+    int32 userId = 1;
+    string folderNameSrc = 2;
+    string folderNameDest = 3;
+    int32 mailId = 4;
+}
+
+message GetUserInfoByUsernameRequest {
+    string username = 1;
+}
+
+message GetUserInfoByIdRequest {
+    int32 userId = 1;
+}
+
+message AddUserRequest {
+    bytes user = 1;
+}
+
+message ChangeForm {
+    bytes user = 1;
+    string data = 2;
+}
+
+message GetIncomeMailsRequest {
+    int32 userId = 1;
+    int32 limit = 2;
+    int32 offset = 3;
+}
+
+message GetOutcomeMailsRequest {
+    int32 userId = 1;
+    int32 limit = 2;
+    int32 offset = 3;
+}
+
+message AddMailRequest {
+    bytes mail = 1;
+}
+
+message DeleteMailRequest {
+    bytes mail = 1;
+    int32 user_id = 2;
+}
+
+message ReadMailRequest {
+    bytes mail = 1;
+    bool read = 2;
+}
+
+message GetMailInfoByIdRequest {
+    int32 mailId = 1;
+}
+
+message GetFolderByIdRequest {
+    int32 folderId = 1;
+}
+
+message GetFolderByNameRequest {
+    int32 userId = 1;
+    string folderName = 2;
+}
+
+message GetFoldersByUserRequest {
+    int32 userId = 1;
+    int32 limit = 2;
+    int32 offset = 3;
+}
+
+message GetFolderMailRequest {
+    int32 userId = 1;
+    string folderName = 2;
+    int32 limit = 3;
+    int32 offset = 4;
+}
+
+message DeleteFolderRequest {
+    int32 userId = 1;
+    string folderName = 2;
+}
+
+message AddFolderRequest {
+    string name = 1;
+    int32 userId = 2;
+}
+
+message ChangeFolderNameRequest {
+    int32 userId = 1;
+    string folderName = 2;
+    string newName = 3;
+}
+
+message AddMailToFolderByIdRequest {
+    int32 userId = 1;
+    string folderName = 2;
+    int32 mailId = 3;
+    bool move = 4;
+}
+
+message AddMailToFolderByObjectRequest {
+    int32 userId = 1;
+    string folderName = 2;
+    bytes mail = 3;
+}
+
+message DeleteFolderMailRequest {
+    int32 userId = 1;
+    int32 mailId = 2;
+}
+
+// ================= responses ==================
+
+message ResponseUser {
+    utils.DatabaseResponse response = 1;
+    bytes user = 2;
+}
+
+message ResponseMail {
+    utils.DatabaseResponse response = 1;
+    bytes mail = 2;
+}
+
+message ResponseFolder {
+    utils.DatabaseResponse response = 1;
+    bytes folder = 2;
+}
+
+message ResponseFolders {
+    utils.DatabaseResponse response = 1;
+    bytes folders = 2;
+}
+
+message ResponseMails {
+    utils.DatabaseResponse response = 1;
+    bytes mails = 2;
+}

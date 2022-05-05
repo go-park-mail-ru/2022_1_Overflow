@@ -1,12 +1,87 @@
 basePath: /
 definitions:
+  models.AddFolderForm:
+    properties:
+      folder_name:
+        type: string
+    type: object
+  models.AddMailToFolderByIdForm:
+    properties:
+      folder_name:
+        type: string
+      mail_id:
+        type: integer
+      move:
+        type: boolean
+    type: object
+  models.AddMailToFolderByObjectForm:
+    properties:
+      folder_name:
+        type: string
+      form:
+        $ref: '#/definitions/models.MailForm'
+    type: object
+  models.ChangeFolderForm:
+    properties:
+      folder_name:
+        type: string
+      new_folder_name:
+        type: string
+    type: object
+  models.ChangePasswordForm:
+    properties:
+      password_new:
+        maxLength: 45
+        type: string
+      password_new_confirmation:
+        maxLength: 45
+        type: string
+      password_old:
+        maxLength: 45
+        type: string
+    type: object
+  models.DeleteFolderForm:
+    properties:
+      folder_name:
+        type: string
+    type: object
+  models.DeleteFolderMailForm:
+    properties:
+      folder_name:
+        type: string
+      mail_id:
+        type: integer
+    type: object
+  models.DeleteMailForm:
+    properties:
+      id:
+        type: integer
+    type: object
+  models.Folder:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  models.FolderList:
+    properties:
+      amount:
+        type: integer
+      folders:
+        items:
+          $ref: '#/definitions/models.Folder'
+        type: array
+    type: object
   models.Mail:
-    description: Структура письма
     properties:
       addressee:
+        maxLength: 45
         type: string
-      client_id:
-        type: integer
       date:
         type: string
       files:
@@ -16,78 +91,106 @@ definitions:
       read:
         type: boolean
       sender:
+        maxLength: 45
         type: string
       text:
         type: string
       theme:
         type: string
     type: object
+  models.MailAddList:
+    properties:
+      amount:
+        type: integer
+      mails:
+        items:
+          $ref: '#/definitions/models.MailAdditional'
+        type: array
+    type: object
   models.MailAdditional:
     properties:
+      avatar_url:
+        type: string
       mail:
         $ref: '#/definitions/models.Mail'
-      sender_avatar:
-        type: string
     type: object
   models.MailForm:
     properties:
       addressee:
+        maxLength: 45
         type: string
       files:
         type: string
       text:
         type: string
       theme:
+        maxLength: 45
         type: string
     type: object
-  models.SettingsForm:
+  models.MoveFolderMailForm:
+    properties:
+      folder_name_dest:
+        type: string
+      folder_name_src:
+        type: string
+      mail_id:
+        type: integer
+    type: object
+  models.ProfileInfo:
     properties:
       first_name:
+        maxLength: 45
+        type: string
+      id:
+        type: integer
+      last_name:
+        maxLength: 45
+        type: string
+      username:
+        maxLength: 45
+        type: string
+    type: object
+  models.ProfileSettingsForm:
+    properties:
+      first_name:
+        maxLength: 45
         type: string
       last_name:
+        maxLength: 45
         type: string
-      password:
-        type: string
+    type: object
+  models.ReadMailForm:
+    properties:
+      id:
+        type: integer
+      isread:
+        type: boolean
     type: object
   models.SignInForm:
     properties:
       password:
-        maxLength: 20
+        maxLength: 45
         type: string
       username:
-        maxLength: 20
+        maxLength: 45
         type: string
     type: object
   models.SignUpForm:
     properties:
       first_name:
-        maxLength: 20
+        maxLength: 45
         type: string
       last_name:
-        maxLength: 20
+        maxLength: 45
         type: string
       password:
-        maxLength: 20
+        maxLength: 45
         type: string
       password_confirmation:
-        maxLength: 20
+        maxLength: 45
         type: string
       username:
-        maxLength: 20
-        type: string
-    type: object
-  models.User:
-    description: Структура пользователя
-    properties:
-      firstName:
-        type: string
-      id:
-        type: integer
-      lastName:
-        type: string
-      password:
-        type: string
-      username:
+        maxLength: 45
         type: string
     type: object
   pkg.JsonResponse:
@@ -105,6 +208,380 @@ info:
   title: OverMail API
   version: "1.0"
 paths:
+  /folder/add:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - folder_manager
+    post:
+      parameters:
+      - description: Форма запроса
+        in: body
+        name: AddFolderForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddFolderForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Folder'
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка БД, неверные GET параметры.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Добавить папку с письмами для пользователя
+      tags:
+      - folder_manager
+  /folder/delete:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - folder_manager
+    post:
+      parameters:
+      - description: Форма запроса
+        in: body
+        name: DeleteFolderForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.DeleteFolderForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка БД, неверные GET параметры.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Удалить папку с письмами
+      tags:
+      - folder_manager
+  /folder/list:
+    get:
+      parameters:
+      - description: Имя папки с письмами
+        in: query
+        name: folder_name
+        type: string
+      - description: Ограничение на количество писем\папок в списке
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение в списке писем\папок
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список писем в папке.
+          schema:
+            $ref: '#/definitions/models.MailAddList'
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка БД, неверные GET параметры.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Получить список папок пользователя или список писем в определенной
+        папке
+      tags:
+      - folder_manager
+  /folder/mail/add:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - folder_manager
+    post:
+      parameters:
+      - description: Форма запроса
+        in: body
+        name: AddMailToFolderByIdForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddMailToFolderByIdForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка БД, неверные GET параметры.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Добавить письмо в папку с письмами по его id
+      tags:
+      - folder_manager
+  /folder/mail/add_form:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - folder_manager
+    post:
+      parameters:
+      - description: Форма запроса
+        in: body
+        name: AddMailToFolderByObjectForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddMailToFolderByObjectForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка БД, неверные GET параметры.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Добавить письмо в папку с письмами по форме
+      tags:
+      - folder_manager
+  /folder/mail/delete:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - folder_manager
+    post:
+      parameters:
+      - description: Форма запроса
+        in: body
+        name: DeleteFolderMailForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.DeleteFolderMailForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка БД, неверные GET параметры.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Удалить письмо из папки
+      tags:
+      - folder_manager
+  /folder/mail/move:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - folder_manager
+    post:
+      parameters:
+      - description: Форма запроса
+        in: body
+        name: MoveFolderMailForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.MoveFolderMailForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка БД, неверные GET параметры.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Переместить письмо из одной папки в другую
+      tags:
+      - folder_manager
+  /folder/rename:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - folder_manager
+    post:
+      parameters:
+      - description: Форма запроса
+        in: body
+        name: ChangeFolderForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.ChangeFolderForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка БД, неверные GET параметры.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Переименовать папку с письмами
+      tags:
+      - folder_manager
   /logout:
     get:
       responses:
@@ -116,6 +593,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - auth
     post:
       parameters:
       - description: CSRF токен
@@ -139,6 +618,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Завершение сессии пользователя
+      tags:
+      - auth
   /mail/delete:
     get:
       responses:
@@ -150,13 +631,16 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - mailbox
     post:
       parameters:
-      - description: ID запрашиваемого письма.
-        in: query
-        name: id
+      - description: Форма запроса
+        in: body
+        name: DeleteMailForm
         required: true
-        type: integer
+        schema:
+          $ref: '#/definitions/models.DeleteMailForm'
       - description: CSRF токен
         in: header
         name: X-CSRF-Token
@@ -183,56 +667,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Удалить письмо по его id
-  /mail/forward:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-    post:
-      parameters:
-      - description: ID запрашиваемого письма.
-        in: query
-        name: mail_id
-        required: true
-        type: integer
-      - description: Форма письма
-        in: body
-        name: MailForm
-        required: true
-        schema:
-          $ref: '#/definitions/models.MailForm'
-      - description: CSRF токен
-        in: header
-        name: X-CSRF-Token
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-        "401":
-          description: Сессия отсутствует или сессия не валидна.
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-        "405":
-          description: Method Not Allowed
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-        "500":
-          description: Письмо не принадлежит пользователю, ошибка БД, неверные GET
-            параметры.
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      summary: Переслать уже существующее письмо
+      tags:
+      - mailbox
   /mail/get:
     get:
       parameters:
@@ -261,17 +697,26 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение сообщения по его id
+      tags:
+      - mailbox
   /mail/income:
     get:
+      parameters:
+      - description: Ограничение на количество писем
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение в списке писем
+        in: query
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: Список входящих писем
           schema:
-            items:
-              $ref: '#/definitions/models.MailAdditional'
-            type: array
+            $ref: '#/definitions/models.MailAddList'
         "401":
           description: Сессия отсутствует или сессия не валидна.
           schema:
@@ -285,17 +730,26 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение входящих сообщений
+      tags:
+      - mailbox
   /mail/outcome:
     get:
+      parameters:
+      - description: Ограничение на количество писем
+        in: query
+        name: limit
+        type: integer
+      - description: Смещение в списке писем
+        in: query
+        name: offset
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: Список исходящих писем
           schema:
-            items:
-              $ref: '#/definitions/models.MailAdditional'
-            type: array
+            $ref: '#/definitions/models.MailAddList'
         "401":
           description: Сессия отсутствует или сессия не валидна.
           schema:
@@ -309,6 +763,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение исходящих сообщений
+      tags:
+      - mailbox
   /mail/read:
     get:
       responses:
@@ -320,63 +776,16 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - mailbox
     post:
       parameters:
-      - description: ID запрашиваемого письма.
-        in: query
-        name: id
-        required: true
-        type: string
-      - description: CSRF токен
-        in: header
-        name: X-CSRF-Token
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-        "401":
-          description: Сессия отсутствует или сессия не валидна.
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-        "405":
-          description: Method Not Allowed
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-        "500":
-          description: Письмо не принадлежит пользователю, ошибка БД, неверные GET
-            параметры.
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      summary: Прочитать письмо по его id
-  /mail/respond:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-    post:
-      parameters:
-      - description: ID запрашиваемого письма.
-        in: query
-        name: mail_id
-        required: true
-        type: integer
-      - description: Форма письма
+      - description: Форма запроса
         in: body
-        name: MailForm
+        name: ReadMailForm
         required: true
         schema:
-          $ref: '#/definitions/models.MailForm'
+          $ref: '#/definitions/models.ReadMailForm'
       - description: CSRF токен
         in: header
         name: X-CSRF-Token
@@ -402,7 +811,10 @@ paths:
             параметры.
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
-      summary: Ответить на письмо пользователя
+      summary: Отметить число прочитанным/непрочитанным по его id. При отсутствии
+        параметра isread запрос отмечает письмо с заданным id прочитанным.
+      tags:
+      - mailbox
   /mail/send:
     get:
       responses:
@@ -414,6 +826,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - mailbox
     post:
       consumes:
       - application/json
@@ -445,6 +859,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Выполняет отправку письма получателю
+      tags:
+      - mailbox
   /profile:
     get:
       produces:
@@ -453,7 +869,7 @@ paths:
         "200":
           description: Информация о пользователе
           schema:
-            $ref: '#/definitions/models.User'
+            $ref: '#/definitions/models.ProfileInfo'
         "401":
           description: Сессия отсутствует, сессия не валидна.
           schema:
@@ -467,8 +883,17 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение данных пользователя
+      tags:
+      - profile
   /profile/avatar:
     get:
+      description: Получение ссылки на аватарку текущего пользователя или пользователя
+        с конкретным логином (username).
+      parameters:
+      - description: Имя пользователя, соответствующее аватарке.
+        in: query
+        name: username
+        type: string
       produces:
       - application/json
       responses:
@@ -485,6 +910,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Получение ссылки на аватарку пользователя
+      tags:
+      - profile
   /profile/avatar/set:
     get:
       responses:
@@ -496,6 +923,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - profile
     post:
       consumes:
       - multipart/form-data
@@ -526,6 +955,54 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Установка/смена аватарки пользователя
+      tags:
+      - profile
+  /profile/change_password:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - profile
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Форма изменение пароля.
+        in: body
+        name: SettingsForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.ChangePasswordForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное изменение пароля.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка валидации формы, БД или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Изменение пароля пользователя
+      tags:
+      - profile
   /profile/set:
     get:
       responses:
@@ -537,6 +1014,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - profile
     post:
       consumes:
       - application/json
@@ -546,7 +1025,7 @@ paths:
         name: SettingsForm
         required: true
         schema:
-          $ref: '#/definitions/models.SettingsForm'
+          $ref: '#/definitions/models.ProfileSettingsForm'
       - description: CSRF токен
         in: header
         name: X-CSRF-Token
@@ -568,6 +1047,8 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Изменение настроек пользователя
+      tags:
+      - profile
   /signin:
     get:
       responses:
@@ -579,6 +1060,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - auth
     post:
       consumes:
       - application/json
@@ -607,6 +1090,8 @@ paths:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Выполняет аутентификацию и выставляет сессионый cookie с названием
         OverflowMail
+      tags:
+      - auth
   /signup:
     get:
       responses:
@@ -618,6 +1103,8 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - auth
     post:
       consumes:
       - application/json
@@ -646,4 +1133,6 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Выполняет регистрацию пользователя
+      tags:
+      - auth
 swagger: "2.0"

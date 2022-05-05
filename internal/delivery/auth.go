@@ -3,8 +3,11 @@ package delivery
 import (
 	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/security/xss"
-	"OverflowBackend/internal/usecase/session"
+	"OverflowBackend/internal/session"
 	"OverflowBackend/pkg"
+	"OverflowBackend/proto/auth_proto"
+	"context"
+
 	"encoding/json"
 	"net/http"
 
@@ -22,47 +25,62 @@ import (
 // @Produce json
 // @Router /signin [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
+// @Tags auth
 func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	log.Info("SignIn: ", "checking method")
 	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
-
 	log.Info("SignIn: ", "checking session")
-	if session.IsLoggedIn(r) {
-		pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+	if session.Manager.IsLoggedIn(r) {
+		pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 		return
 	}
-
 	log.Info("SignIn: ", "checking data")
 	var data models.SignInForm
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		pkg.WriteJsonErrFull(w, pkg.JSON_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-
-	if err := d.uc.SignIn(data); err != pkg.NO_ERR {
-		pkg.WriteJsonErrFull(w, err)
-		return
-	}
-
-	log.Info("SignIn: ", "creating session")
-	err = session.CreateSession(w, r, data.Username)
+	log.Info("SignIn: ", "XSS handling")
+	data.Username = xss.EscapeInput(data.Username)
+	dataBytes, _ := json.Marshal(data)
+	resp, err := d.auth.SignIn(context.Background(), &auth_proto.SignInRequest{
+		Form: dataBytes,
+	})
 	if err != nil {
-		pkg.WriteJsonErrFull(w, pkg.INTERNAL_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
+		return
+	}
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
+		return
+	}
+	log.Info("SignIn: ", "creating session")
+	err = session.Manager.CreateSession(w, r, data.Username)
+	if err != nil {
+		log.Errorf("SignIn: %v", err)
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
 	csrf.Secure(false) // возможно стоит убрать
 	w.Header().Set("X-CSRF-Token", csrf.Token(r))
-	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
 // @Router /signin [get]
 // @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
+// @Tags auth
 func SignIn() {}
 
 // SignUp godoc
@@ -75,49 +93,62 @@ func SignIn() {}
 // @Produce json
 // @Router /signup [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
+// @Tags auth
 func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	log.Info("SignUp: ", "checking method")
 	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
-
 	log.Info("SignUp: ", "checking session")
-	if session.IsLoggedIn(r) {
-		pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+	if session.Manager.IsLoggedIn(r) {
+		pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 		return
 	}
-
 	log.Info("SignUp: ", "checking data")
 	var data models.SignUpForm
 	err := json.NewDecoder(r.Body).Decode(&data)
 	if err != nil {
-		pkg.WriteJsonErrFull(w, pkg.JSON_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-
-	log.Info("SignUp: ", "sanitizing data")
-	data.Username = xss.P.Sanitize(data.Username)
-	data.FirstName = xss.P.Sanitize(data.FirstName)
-	data.LastName = xss.P.Sanitize(data.LastName)
-	passSanitized := xss.P.Sanitize(data.Password)
-	if passSanitized != data.Password {
+	log.Info("SignUp: ", "XSS handling")
+	data.Username = xss.EscapeInput(data.Username)
+	data.Firstname = xss.EscapeInput(data.Firstname)
+	data.Lastname = xss.EscapeInput(data.Lastname)
+	/*
+	passSafe := xss.EscapeInput(data.Password)
+	if passSafe != data.Password {
 		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, "Пароль содержит недопустимое содержимое.")
 		return
 	}
-
-	if err := d.uc.SignUp(data); err != pkg.NO_ERR {
-		pkg.WriteJsonErrFull(w, err)
+	*/
+	dataBytes, _ := json.Marshal(data)
+	resp, err := d.auth.SignUp(context.Background(), &auth_proto.SignUpRequest{
+		Form: dataBytes,
+	})
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-
-	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+	var response pkg.JsonResponse 
+	err = json.Unmarshal(resp.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if (response != pkg.NO_ERR) {
+		pkg.WriteJsonErrFull(w, &response)
+		return
+	}
+	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
 // @Router /signup [get]
 // @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
+// @Tags auth
 func SignUp() {}
 
 // SignOut godoc
@@ -128,22 +159,23 @@ func SignUp() {}
 // @Produce json
 // @Router /logout [post]
 // @Param X-CSRF-Token header string true "CSRF токен"
+// @Tags auth
 func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {
-		pkg.WriteJsonErrFull(w, pkg.BAD_METHOD_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
 		return
 	}
-
-	err := session.DeleteSession(w, r)
+	err := session.Manager.DeleteSession(w, r)
 	if err != nil {
-		pkg.WriteJsonErrFull(w, pkg.INTERNAL_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	pkg.WriteJsonErrFull(w, pkg.NO_ERR)
+	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
 // @Router /logout [get]
 // @Response 200 {object} pkg.JsonResponse
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
+// @Tags auth
 func SignOut() {}

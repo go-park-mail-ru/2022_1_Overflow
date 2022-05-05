@@ -1,0 +1,23 @@
+syntax = "proto3";
+package utils;
+
+option go_package = "./utils_proto";
+import "google/protobuf/wrappers.proto";
+
+enum DatabaseStatus {
+    OK = 0x0;
+    ERROR = 0x1;
+}
+
+message DatabaseResponse {
+    DatabaseStatus status = 1;
+}
+
+message Session {
+    string username = 1;
+    google.protobuf.BoolValue authenticated = 2;
+}
+
+message JsonResponse {
+    bytes response = 1;
+}

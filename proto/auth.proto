@@ -1,0 +1,19 @@
+syntax = "proto3";
+package auth_proto;
+
+option go_package = "./auth_proto";
+
+import "proto/utils.proto";
+
+service Auth {
+    rpc SignIn(SignInRequest) returns (utils.JsonResponse) {}
+    rpc SignUp(SignUpRequest) returns (utils.JsonResponse) {}
+}
+
+message SignInRequest {
+    bytes form = 1;
+}
+
+message SignUpRequest {
+    bytes form = 1;
+}

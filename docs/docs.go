@@ -19,8 +19,11 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/logout": {
+        "/folder/add": {
             "get": {
+                "tags": [
+                    "folder_manager"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -39,6 +42,584 @@ const docTemplate = `{
             "post": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "folder_manager"
+                ],
+                "summary": "Добавить папку с письмами для пользователя",
+                "parameters": [
+                    {
+                        "description": "Форма запроса",
+                        "name": "AddFolderForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AddFolderForm"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Folder"
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка БД, неверные GET параметры.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/folder/delete": {
+            "get": {
+                "tags": [
+                    "folder_manager"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "folder_manager"
+                ],
+                "summary": "Удалить папку с письмами",
+                "parameters": [
+                    {
+                        "description": "Форма запроса",
+                        "name": "DeleteFolderForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DeleteFolderForm"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка БД, неверные GET параметры.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/folder/list": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "folder_manager"
+                ],
+                "summary": "Получить список папок пользователя или список писем в определенной папке",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Имя папки с письмами",
+                        "name": "folder_name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Ограничение на количество писем\\папок в списке",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Смещение в списке писем\\папок",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Список писем в папке.",
+                        "schema": {
+                            "$ref": "#/definitions/models.MailAddList"
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка БД, неверные GET параметры.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/folder/mail/add": {
+            "get": {
+                "tags": [
+                    "folder_manager"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "folder_manager"
+                ],
+                "summary": "Добавить письмо в папку с письмами по его id",
+                "parameters": [
+                    {
+                        "description": "Форма запроса",
+                        "name": "AddMailToFolderByIdForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AddMailToFolderByIdForm"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка БД, неверные GET параметры.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/folder/mail/add_form": {
+            "get": {
+                "tags": [
+                    "folder_manager"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "folder_manager"
+                ],
+                "summary": "Добавить письмо в папку с письмами по форме",
+                "parameters": [
+                    {
+                        "description": "Форма запроса",
+                        "name": "AddMailToFolderByObjectForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.AddMailToFolderByObjectForm"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка БД, неверные GET параметры.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/folder/mail/delete": {
+            "get": {
+                "tags": [
+                    "folder_manager"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "folder_manager"
+                ],
+                "summary": "Удалить письмо из папки",
+                "parameters": [
+                    {
+                        "description": "Форма запроса",
+                        "name": "DeleteFolderMailForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DeleteFolderMailForm"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка БД, неверные GET параметры.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/folder/mail/move": {
+            "get": {
+                "tags": [
+                    "folder_manager"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "folder_manager"
+                ],
+                "summary": "Переместить письмо из одной папки в другую",
+                "parameters": [
+                    {
+                        "description": "Форма запроса",
+                        "name": "MoveFolderMailForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.MoveFolderMailForm"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка БД, неверные GET параметры.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/folder/rename": {
+            "get": {
+                "tags": [
+                    "folder_manager"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "folder_manager"
+                ],
+                "summary": "Переименовать папку с письмами",
+                "parameters": [
+                    {
+                        "description": "Форма запроса",
+                        "name": "ChangeFolderForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ChangeFolderForm"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка БД, неверные GET параметры.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "get": {
+                "tags": [
+                    "auth"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
                 ],
                 "summary": "Завершение сессии пользователя",
                 "parameters": [
@@ -74,6 +655,9 @@ const docTemplate = `{
         },
         "/mail/delete": {
             "get": {
+                "tags": [
+                    "mailbox"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -92,89 +676,19 @@ const docTemplate = `{
             "post": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "mailbox"
                 ],
                 "summary": "Удалить письмо по его id",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "ID запрашиваемого письма.",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "CSRF токен",
-                        "name": "X-CSRF-Token",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Сессия отсутствует или сессия не валидна.",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        }
-                    },
-                    "405": {
-                        "description": "Method Not Allowed",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Письмо не принадлежит пользователю, ошибка БД, неверные GET параметры.",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/mail/forward": {
-            "get": {
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Переслать уже существующее письмо",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID запрашиваемого письма.",
-                        "name": "mail_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "description": "Форма письма",
-                        "name": "MailForm",
+                        "description": "Форма запроса",
+                        "name": "DeleteMailForm",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.MailForm"
+                            "$ref": "#/definitions/models.DeleteMailForm"
                         }
                     },
                     {
@@ -217,6 +731,9 @@ const docTemplate = `{
             "get": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "mailbox"
                 ],
                 "summary": "Получение сообщения по его id",
                 "parameters": [
@@ -261,15 +778,29 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "mailbox"
+                ],
                 "summary": "Получение входящих сообщений",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Ограничение на количество писем",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Смещение в списке писем",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Список входящих писем",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.MailAdditional"
-                            }
+                            "$ref": "#/definitions/models.MailAddList"
                         }
                     },
                     "401": {
@@ -298,15 +829,29 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "mailbox"
+                ],
                 "summary": "Получение исходящих сообщений",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Ограничение на количество писем",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Смещение в списке писем",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Список исходящих писем",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.MailAdditional"
-                            }
+                            "$ref": "#/definitions/models.MailAddList"
                         }
                     },
                     "401": {
@@ -332,6 +877,9 @@ const docTemplate = `{
         },
         "/mail/read": {
             "get": {
+                "tags": [
+                    "mailbox"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -351,88 +899,18 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Прочитать письмо по его id",
+                "tags": [
+                    "mailbox"
+                ],
+                "summary": "Отметить число прочитанным/непрочитанным по его id. При отсутствии параметра isread запрос отмечает письмо с заданным id прочитанным.",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "ID запрашиваемого письма.",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "CSRF токен",
-                        "name": "X-CSRF-Token",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Сессия отсутствует или сессия не валидна.",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        }
-                    },
-                    "405": {
-                        "description": "Method Not Allowed",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Письмо не принадлежит пользователю, ошибка БД, неверные GET параметры.",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/mail/respond": {
-            "get": {
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "Ответить на письмо пользователя",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "ID запрашиваемого письма.",
-                        "name": "mail_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "description": "Форма письма",
-                        "name": "MailForm",
+                        "description": "Форма запроса",
+                        "name": "ReadMailForm",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.MailForm"
+                            "$ref": "#/definitions/models.ReadMailForm"
                         }
                     },
                     {
@@ -473,6 +951,9 @@ const docTemplate = `{
         },
         "/mail/send": {
             "get": {
+                "tags": [
+                    "mailbox"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -494,6 +975,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "mailbox"
                 ],
                 "summary": "Выполняет отправку письма получателю",
                 "parameters": [
@@ -541,12 +1025,15 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "profile"
+                ],
                 "summary": "Получение данных пользователя",
                 "responses": {
                     "200": {
                         "description": "Информация о пользователе",
                         "schema": {
-                            "$ref": "#/definitions/models.User"
+                            "$ref": "#/definitions/models.ProfileInfo"
                         }
                     },
                     "401": {
@@ -572,10 +1059,22 @@ const docTemplate = `{
         },
         "/profile/avatar": {
             "get": {
+                "description": "Получение ссылки на аватарку текущего пользователя или пользователя с конкретным логином (username).",
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "profile"
+                ],
                 "summary": "Получение ссылки на аватарку пользователя",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Имя пользователя, соответствующее аватарке.",
+                        "name": "username",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Ссылка на аватарку в формате /{static_dir}/{file}.{ext}.",
@@ -600,6 +1099,9 @@ const docTemplate = `{
         },
         "/profile/avatar/set": {
             "get": {
+                "tags": [
+                    "profile"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -621,6 +1123,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "profile"
                 ],
                 "summary": "Установка/смена аватарки пользователя",
                 "parameters": [
@@ -661,8 +1166,11 @@ const docTemplate = `{
                 }
             }
         },
-        "/profile/set": {
+        "/profile/change_password": {
             "get": {
+                "tags": [
+                    "profile"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -685,6 +1193,80 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "profile"
+                ],
+                "summary": "Изменение пароля пользователя",
+                "parameters": [
+                    {
+                        "description": "Форма изменение пароля.",
+                        "name": "SettingsForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ChangePasswordForm"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Успешное изменение пароля.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка валидации формы, БД или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/profile/set": {
+            "get": {
+                "tags": [
+                    "profile"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        },
+                        "headers": {
+                            "X-CSRF-Token": {
+                                "type": "string",
+                                "description": "CSRF токен"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile"
+                ],
                 "summary": "Изменение настроек пользователя",
                 "parameters": [
                     {
@@ -693,7 +1275,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.SettingsForm"
+                            "$ref": "#/definitions/models.ProfileSettingsForm"
                         }
                     },
                     {
@@ -728,6 +1310,9 @@ const docTemplate = `{
         },
         "/signin": {
             "get": {
+                "tags": [
+                    "auth"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -749,6 +1334,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "auth"
                 ],
                 "summary": "Выполняет аутентификацию и выставляет сессионый cookie с названием OverflowMail",
                 "parameters": [
@@ -787,6 +1375,9 @@ const docTemplate = `{
         },
         "/signup": {
             "get": {
+                "tags": [
+                    "auth"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -809,6 +1400,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "auth"
                 ],
                 "summary": "Выполняет регистрацию пользователя",
                 "parameters": [
@@ -847,15 +1441,131 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.AddFolderForm": {
+            "type": "object",
+            "properties": {
+                "folder_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.AddMailToFolderByIdForm": {
+            "type": "object",
+            "properties": {
+                "folder_name": {
+                    "type": "string"
+                },
+                "mail_id": {
+                    "type": "integer"
+                },
+                "move": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "models.AddMailToFolderByObjectForm": {
+            "type": "object",
+            "properties": {
+                "folder_name": {
+                    "type": "string"
+                },
+                "form": {
+                    "$ref": "#/definitions/models.MailForm"
+                }
+            }
+        },
+        "models.ChangeFolderForm": {
+            "type": "object",
+            "properties": {
+                "folder_name": {
+                    "type": "string"
+                },
+                "new_folder_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ChangePasswordForm": {
+            "type": "object",
+            "properties": {
+                "password_new": {
+                    "type": "string",
+                    "maxLength": 45
+                },
+                "password_new_confirmation": {
+                    "type": "string",
+                    "maxLength": 45
+                },
+                "password_old": {
+                    "type": "string",
+                    "maxLength": 45
+                }
+            }
+        },
+        "models.DeleteFolderForm": {
+            "type": "object",
+            "properties": {
+                "folder_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.DeleteFolderMailForm": {
+            "type": "object",
+            "properties": {
+                "folder_name": {
+                    "type": "string"
+                },
+                "mail_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.DeleteMailForm": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Folder": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.FolderList": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "folders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Folder"
+                    }
+                }
+            }
+        },
         "models.Mail": {
-            "description": "Структура письма",
             "type": "object",
             "properties": {
                 "addressee": {
-                    "type": "string"
-                },
-                "client_id": {
-                    "type": "integer"
+                    "type": "string",
+                    "maxLength": 45
                 },
                 "date": {
                     "type": "string"
@@ -870,7 +1580,8 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "sender": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 45
                 },
                 "text": {
                     "type": "string"
@@ -880,14 +1591,28 @@ const docTemplate = `{
                 }
             }
         },
+        "models.MailAddList": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "mails": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.MailAdditional"
+                    }
+                }
+            }
+        },
         "models.MailAdditional": {
             "type": "object",
             "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
                 "mail": {
                     "$ref": "#/definitions/models.Mail"
-                },
-                "sender_avatar": {
-                    "type": "string"
                 }
             }
         },
@@ -895,7 +1620,8 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "addressee": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 45
                 },
                 "files": {
                     "type": "string"
@@ -904,21 +1630,66 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "theme": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 45
                 }
             }
         },
-        "models.SettingsForm": {
+        "models.MoveFolderMailForm": {
+            "type": "object",
+            "properties": {
+                "folder_name_dest": {
+                    "type": "string"
+                },
+                "folder_name_src": {
+                    "type": "string"
+                },
+                "mail_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.ProfileInfo": {
             "type": "object",
             "properties": {
                 "first_name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 45
+                },
+                "id": {
+                    "type": "integer"
                 },
                 "last_name": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 45
                 },
-                "password": {
-                    "type": "string"
+                "username": {
+                    "type": "string",
+                    "maxLength": 45
+                }
+            }
+        },
+        "models.ProfileSettingsForm": {
+            "type": "object",
+            "properties": {
+                "first_name": {
+                    "type": "string",
+                    "maxLength": 45
+                },
+                "last_name": {
+                    "type": "string",
+                    "maxLength": 45
+                }
+            }
+        },
+        "models.ReadMailForm": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "isread": {
+                    "type": "boolean"
                 }
             }
         },
@@ -927,11 +1698,11 @@ const docTemplate = `{
             "properties": {
                 "password": {
                     "type": "string",
-                    "maxLength": 20
+                    "maxLength": 45
                 },
                 "username": {
                     "type": "string",
-                    "maxLength": 20
+                    "maxLength": 45
                 }
             }
         },
@@ -940,44 +1711,23 @@ const docTemplate = `{
             "properties": {
                 "first_name": {
                     "type": "string",
-                    "maxLength": 20
+                    "maxLength": 45
                 },
                 "last_name": {
                     "type": "string",
-                    "maxLength": 20
+                    "maxLength": 45
                 },
                 "password": {
                     "type": "string",
-                    "maxLength": 20
+                    "maxLength": 45
                 },
                 "password_confirmation": {
                     "type": "string",
-                    "maxLength": 20
+                    "maxLength": 45
                 },
                 "username": {
                     "type": "string",
-                    "maxLength": 20
-                }
-            }
-        },
-        "models.User": {
-            "description": "Структура пользователя",
-            "type": "object",
-            "properties": {
-                "firstName": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "lastName": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
+                    "maxLength": 45
                 }
             }
         },
