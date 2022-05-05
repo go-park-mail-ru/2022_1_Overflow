@@ -103,34 +103,54 @@ func TestSignIn(t *testing.T) {
 	}
 }
 
-/*
 func TestSignUp(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
 	mockDB, uc := InitTestUseCase(mockCtrl)
-
+	
 	form := models.SignUpForm{
-		FirstName: "test",
-		LastName: "test",
+		Firstname: "test",
+		Lastname: "test",
 		Username: "test",
 		Password: "test",
-		PasswordConf: "test",
+		PasswordConfirmation: "test",
 	}
+	formBytes, _ := json.Marshal(form)
 
-	mockDB.EXPECT().GetUserInfoByUsername(form.Username).Return(models.User{}, nil)
-	mockDB.EXPECT().AddUser(models.User{
+	user := models.User{
 		Id: 0,
-		FirstName: form.FirstName,
-		LastName: form.LastName,
+		Firstname: "test",
+		Lastname: "test",
 		Username: form.Username,
-		Password: form.Password,
-	}).Return(nil)
+		Password: pkg.HashPassword(form.Password),
+	}
+	userBytes, _ := json.Marshal(user)
+	userEmptyBytes, _ := json.Marshal(models.User{})
 
-	r := uc.SignUp(form)
-	if r != pkg.NO_ERR {
+	var response pkg.JsonResponse
+
+	mockDB.EXPECT().GetUserInfoByUsername(context.Background(), &repository_proto.GetUserInfoByUsernameRequest{
+		Username: form.Username,
+	}).Return(&repository_proto.ResponseUser{
+		User: userEmptyBytes,
+		Response: &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		},
+	}, nil)
+
+	mockDB.EXPECT().AddUser(context.Background(), &repository_proto.AddUserRequest{
+		User: userBytes,
+	}).Return(&utils_proto.DatabaseResponse{
+		Status: utils_proto.DatabaseStatus_OK,
+	}, nil)
+
+	resp, err := uc.SignUp(context.Background(), &auth_proto.SignUpRequest{
+		Form: formBytes,
+	})
+	json_err := json.Unmarshal(resp.Response, &response)
+	if err != nil || json_err != nil || response != pkg.NO_ERR {
 		t.Errorf("Неверный ответ от UseCase.")
 		return
 	}
 }
-*/

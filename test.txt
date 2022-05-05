@@ -1,0 +1,3 @@
+go test -cover ./... -coverprofile=profile
+go tool cover -func profile
+go tool cover -html profile

@@ -190,6 +190,12 @@ func (d *Delivery) AddMailToFolderByObject(w http.ResponseWriter, r *http.Reques
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
+// @Router /folder/mail/add_form [get]
+// @Response 200 {object} pkg.JsonResponse
+// @Header 200 {string} X-CSRF-Token "CSRF токен"
+// @Tags folder_manager
+func AddMailToFolderByObject() {}
+
 // MoveFolderMail godoc
 // @Summary Переместить письмо из одной папки в другую
 // @Produce json
@@ -249,12 +255,6 @@ func (d *Delivery) MoveFolderMail(w http.ResponseWriter, r *http.Request) {
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 // @Tags folder_manager
 func MoveFolderMail() {}
-
-// @Router /folder/mail/add_form [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags folder_manager
-func AddMailToFolderByObject() {}
 
 // ChangeFolder godoc
 // @Summary Переименовать папку с письмами

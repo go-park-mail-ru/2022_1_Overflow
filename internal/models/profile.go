@@ -1,9 +1,9 @@
 package models
 
 type Avatar struct {
-	Name string
-	Username string
-	File []byte
+	Name string `json:"name"`
+	Username string `json:"username"`
+	File []byte `json:"file"`
 }
 
 type ProfileInfo struct {

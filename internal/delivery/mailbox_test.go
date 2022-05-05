@@ -455,7 +455,6 @@ func TestGetMail(t *testing.T) {
 
 	mail := models.Mail{
 		Id:        0,
-		ClientId:  0,
 		Sender:    "test",
 		Addressee: "test2",
 		Theme:     "test",

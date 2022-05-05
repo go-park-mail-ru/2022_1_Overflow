@@ -192,3 +192,58 @@ func TestSetAvatar(t *testing.T) {
 		return
 	}
 }
+
+
+func TestChangePassword(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockDB, uc := InitTestUseCase(mockCtrl)
+
+	user := models.User{
+		Id:        0,
+		Firstname: "test",
+		Lastname:  "test",
+		Password:  pkg.HashPassword("test"),
+		Username:  "test",
+	}
+	userBytes, _ := json.Marshal(user)
+
+	session := utils_proto.Session {
+		Username:      user.Username,
+		Authenticated: wrapperspb.Bool(true),
+	}
+
+	form := models.ChangePasswordForm{
+		OldPassword: "test",
+		NewPassword: "test2",
+		NewPasswordConf: "test2",
+	}
+
+	mockDB.EXPECT().GetUserInfoByUsername(context.Background(), &repository_proto.GetUserInfoByUsernameRequest{
+		Username: session.Username,
+	}).Return(&repository_proto.ResponseUser{
+		Response: &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		},
+		User: userBytes,
+	}, nil)
+	mockDB.EXPECT().ChangeUserPassword(context.Background(), &repository_proto.ChangeForm{
+		User: userBytes,
+		Data: pkg.HashPassword(form.NewPassword),
+	}).Return(&utils_proto.DatabaseResponse{
+		Status: utils_proto.DatabaseStatus_OK,
+	}, nil)
+
+	var response pkg.JsonResponse
+	resp, err := uc.ChangePassword(context.Background(), &profile_proto.ChangePasswordRequest{
+		Data: &session,
+		PasswordOld: form.OldPassword,
+		PasswordNew: form.NewPassword,
+	})
+	json_err := json.Unmarshal(resp.Response, &response)
+	if err != nil || json_err != nil || response != pkg.NO_ERR {
+		t.Errorf("Неверный ответ от UseCase.")
+		return
+	}
+}
