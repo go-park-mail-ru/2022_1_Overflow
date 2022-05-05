@@ -7,22 +7,7 @@ networks:
 volumes:
   prometheus_data: {}
 
-configs:
-  postgres_exporter_config:
-    file: ./queries.yaml
-
 services:
-  postgres-exporter-pgserver94:
-      image: wrouesnel/postgres_exporter:latest
-      configs:
-        - source: postgres_exporter_config
-          target: /etc/postgres_exporter/queries.yaml
-      deploy:
-        mode: replicated
-        replicas: 1
-      environment:
-        - DATA_SOURCE_NAME=postgresql://postgres@localhost:5432/postgres?sslmode=disable
-        - PG_EXPORTER_EXTEND_QUERY_PATH=/etc/postgres_exporter/queries.yaml
   db:
     image: postgres:13.3-alpine
     restart: "no"
