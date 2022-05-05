@@ -102,11 +102,15 @@ message GetFolderByNameRequest {
 
 message GetFoldersByUserRequest {
     int32 userId = 1;
+    int32 limit = 2;
+    int32 offset = 3;
 }
 
 message GetFolderMailRequest {
     int32 userId = 1;
     string folderName = 2;
+    int32 limit = 3;
+    int32 offset = 4;
 }
 
 message DeleteFolderRequest {

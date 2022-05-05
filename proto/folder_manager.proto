@@ -95,9 +95,13 @@ message DeleteFolderMailRequest {
 
 message ListFoldersRequest {
     utils.Session data = 1;
+    int32 limit = 2;
+    int32 offset = 3;
 }
 
 message ListFolderRequest {
     utils.Session data = 1;
     string folderName = 2;
+    int32 limit = 3;
+    int32 offset = 4;
 }

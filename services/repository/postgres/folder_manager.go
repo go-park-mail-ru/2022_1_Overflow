@@ -113,7 +113,7 @@ func (c *Database) GetFoldersByUser(context context.Context, request *repository
 		}, err
 	}
 	folders.Amount = count
-	rows, err := c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE user_id=$1 AND name NOT IN ($2, $3) ORDER BY created_at DESC;", request.UserId, pkg.FOLDER_SPAM, pkg.FOLDER_DRAFTS)
+	rows, err := c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE user_id=$1 AND name NOT IN ($2, $3) ORDER BY created_at DESC OFFSET $5 LIMIT $4;", request.UserId, pkg.FOLDER_SPAM, pkg.FOLDER_DRAFTS, request.Limit, request.Offset)
 	if err != nil {
 		return &repository_proto.ResponseFolders{
 			Response: &utils_proto.DatabaseResponse{
@@ -163,7 +163,7 @@ func (c *Database) GetFolderMail(context context.Context, request *repository_pr
 		}, err
 	}
 	mails.Amount = count
-	rows, err := c.Conn.Query(context, "SELECT addressee, sender, theme, text, files, date, read, id FROM overflow.mails WHERE id IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id in (SELECT id FROM overflow.folders WHERE user_id=$1 AND name=$2)) ORDER BY date DESC;", request.UserId, request.FolderName)
+	rows, err := c.Conn.Query(context, "SELECT addressee, sender, theme, text, files, date, read, id FROM overflow.mails WHERE id IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id in (SELECT id FROM overflow.folders WHERE user_id=$1 AND name=$2)) ORDER BY date DESC OFFSET $4 LIMIT $3;", request.UserId, request.FolderName, request.Limit, request.Offset)
 	if err != nil {
 		return &repository_proto.ResponseMails{
 			Response: &utils_proto.DatabaseResponse{

@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"gopkg.in/validator.v2"
 )
@@ -435,6 +436,8 @@ func DeleteFolderMail() {}
 // @Summary Получить список папок пользователя или список писем в определенной папке
 // @Produce json
 // @Param folder_name query string false "Имя папки с письмами"
+// @Param limit query int false "Ограничение на количество писем\папок в списке"
+// @Param offset query int false "Смещение в списке писем\папок"
 // @Success 200 {object} models.FolderList "Список папок."
 // @Success 200 {object} models.MailAddList "Список писем в папке."
 // @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
@@ -453,11 +456,21 @@ func (d *Delivery) ListFolders(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
+	limit, e := strconv.Atoi(r.URL.Query().Get("limit"))
+	if e != nil || limit > 100 {
+		limit = 100
+	}
+	offset, e := strconv.Atoi(r.URL.Query().Get("offset"))
+	if e != nil {
+		offset = 0
+	}
 	folderName := r.URL.Query().Get("folder_name")
 	if len(folderName) > 0 {
 		resp, err := d.folderManager.ListFolder(context.Background(), &folder_manager_proto.ListFolderRequest{
 			Data: data,
 			FolderName: folderName,
+			Limit: int32(limit),
+			Offset: int32(offset),
 		})
 		if err != nil {
 			pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
@@ -477,6 +490,8 @@ func (d *Delivery) ListFolders(w http.ResponseWriter, r *http.Request) {
 	} else {
 		resp, err := d.folderManager.ListFolders(context.Background(), &folder_manager_proto.ListFoldersRequest{
 			Data: data,
+			Limit: int32(limit),
+			Offset: int32(offset),
 		})
 		if err != nil {
 			pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)

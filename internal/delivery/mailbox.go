@@ -37,7 +37,7 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	limit, e := strconv.Atoi(r.URL.Query().Get("limit"))
-	if e != nil {
+	if e != nil || limit > 100 {
 		limit = 100
 	}
 	offset, e := strconv.Atoi(r.URL.Query().Get("offset"))
@@ -89,7 +89,7 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	limit, e := strconv.Atoi(r.URL.Query().Get("limit"))
-	if e != nil {
+	if e != nil || limit > 100 {
 		limit = 100
 	}
 	offset, e := strconv.Atoi(r.URL.Query().Get("offset"))

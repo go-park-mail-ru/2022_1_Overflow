@@ -492,6 +492,8 @@ func (s *FolderManagerService) ListFolders(context context.Context, request *fol
 	}
 	resp2, err := s.db.GetFoldersByUser(context, &repository_proto.GetFoldersByUserRequest{
 		UserId: user.Id,
+		Limit: request.Limit,
+		Offset: request.Offset,
 	})
 	if err != nil {
 		log.Error(err)
@@ -569,6 +571,8 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 	resp2, err := s.db.GetFolderMail(context, &repository_proto.GetFolderMailRequest{
 		UserId: user.Id,
 		FolderName: request.FolderName,
+		Limit: request.Limit,
+		Offset: request.Offset,
 	})
 	if err != nil {
 		log.Error(err)
