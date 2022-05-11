@@ -46,7 +46,7 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Info("SignIn: ", "XSS handling")
-	data.Username = xss.EscapeInput(data.Username)
+	//data.Username = xss.EscapeInput(data.Username)
 	dataBytes, _ := json.Marshal(data)
 	resp, err := d.auth.SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: dataBytes,
