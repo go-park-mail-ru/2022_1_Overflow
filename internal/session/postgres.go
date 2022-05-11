@@ -50,6 +50,9 @@ func (pm *PostgresManager) CreateSession(w http.ResponseWriter, r *http.Request,
 			return err
 		}
 		session, err = pm.store.Get(r, session_name)
+		if err != nil {
+			return err
+		}
 	}
 	data := &utils_proto.Session{
 		Username:      username,

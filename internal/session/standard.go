@@ -12,7 +12,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var session_name string = "OveflowMail"
+var session_name string = "OverflowMail"
 
 type StandardManager struct {
 	// Данные всех сессий.
@@ -46,6 +46,9 @@ func (s *StandardManager) CreateSession(w http.ResponseWriter, r *http.Request, 
 			return err
 		}
 		session, err = s.store.Get(r, session_name)
+		if err != nil {
+			return err
+		}
 	}
 	data := &utils_proto.Session{
 		Username:      username,
