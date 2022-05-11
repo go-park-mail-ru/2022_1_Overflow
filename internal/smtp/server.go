@@ -17,7 +17,7 @@ import (
 	"net/mail"
 
 	"github.com/emersion/go-smtp"
-	//log "github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -45,10 +45,12 @@ func (s *SMTPServer) Init(
 }
 
 func (s *SMTPServer) AnonymousLogin(state *smtp.ConnectionState) (smtp.Session, error) {
+	log.Debug("Попытка анонимного входа: ", *state)
 	return nil, smtp.ErrAuthUnsupported
 }
 
 func (s *SMTPServer) Login(state *smtp.ConnectionState, username string, password string)  (smtp.Session, error) {
+	log.Debug("Попытка аутентификации: ", *state)
 	form := models.SignInForm{
 		Username: username,
 		Password: password,
@@ -58,21 +60,26 @@ func (s *SMTPServer) Login(state *smtp.ConnectionState, username string, passwor
 		Form: formBytes,
 	})
 	if err != nil {
+		log.Error("Ошибка входа: ", err)
 		return nil, err
 	}
 	var response pkg.JsonResponse
 	err = json.Unmarshal(resp.Response, &response)
 	if err != nil {
+		log.Error("Ошибка входа: ", err)
 		return nil, err
 	}
 	if response != pkg.NO_ERR {
-		return nil, errors.New(response.Message)
+		err = errors.New(response.Message)
+		log.Error("Ошибка входа: ", err)
+		return nil, err
 	}
 	sess := &Session{}
 	sess.Init(s.config, s.auth, s.profile, s.mailbox, s.folderManager, &utils_proto.Session{
 		Username: username,
 		Authenticated: wrapperspb.Bool(true),
 	})
+	log.Debug("Успешный вход.")
 	return sess, nil
 }
 
@@ -106,6 +113,7 @@ func (s *Session) Init(
 }
 
 func (s *Session) Mail(from string, opts smtp.MailOptions) error {
+	log.Debug("MAIL from ", from)
 	if opts.Auth == nil {
 		return smtp.ErrAuthRequired
 	}
@@ -116,11 +124,13 @@ func (s *Session) Mail(from string, opts smtp.MailOptions) error {
 }
 
 func (s *Session) Rcpt(to string) error {
+	log.Debug("RCPT to ", to)
 	s.mailForm.Addressee = to
 	return nil
 }
 
 func (s *Session) Data(r io.Reader) error {
+	log.Debug("DATA")
 	msg, err := mail.ReadMessage(r)
 	if err != nil {
 		return err
@@ -144,9 +154,11 @@ func (s *Session) Data(r io.Reader) error {
 }
 
 func (s *Session) Reset() {
+	log.Debug("RESET")
 	s.mailForm = models.MailForm{}
 }
 
 func (s *Session) Logout() error {
+	log.Debug("LOGOUT")
 	return nil
 }
