@@ -21,7 +21,7 @@ type FolderManagerService struct {
 	profile profile_proto.ProfileClient
 }
 
-func (s *FolderManagerService) FolderExists(context context.Context, userId int32, folderName string) (bool) {
+func (s *FolderManagerService) FolderExistsByUserId(context context.Context, userId int32, folderName string) (bool) {
 	resp, err := s.db.GetFolderByName(context, &repository_proto.GetFolderByNameRequest{
 		UserId: userId,
 		FolderName: folderName,
@@ -35,6 +35,21 @@ func (s *FolderManagerService) FolderExists(context context.Context, userId int3
 		return false
 	}
 	return (folder != models.Folder{})
+}
+
+func (s *FolderManagerService) FolderExistsByUsername(context context.Context, username string, folderName string) (bool) {
+	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
+		Username: username,
+	})
+	if err != nil || resp.Response.Status != utils_proto.DatabaseStatus_OK {
+		return false
+	}
+	var user models.User
+	err = json.Unmarshal(resp.User, &user)
+	if err != nil {
+		return false
+	}
+	return s.FolderExistsByUserId(context, user.Id, folderName)
 }
 
 func (s *FolderManagerService) Init(config *config.Config, db repository_proto.DatabaseRepositoryClient, profile profile_proto.ProfileClient) {
@@ -305,12 +320,12 @@ func (s *FolderManagerService) MoveFolderMail(context context.Context, request *
 			Response: pkg.NO_USER_EXIST.Bytes(),
 		}, nil
 	}
-	if !s.FolderExists(context, user.Id, request.FolderNameSrc) {
+	if !s.FolderExistsByUserId(context, user.Id, request.FolderNameSrc) {
 		return &utils_proto.JsonResponse{
 			Response: pkg.CreateJsonErr(pkg.STATUS_OBJECT_EXISTS, "Папки источника не существует.").Bytes(),
 		}, nil
 	}
-	if !s.FolderExists(context, user.Id, request.FolderNameDest) {
+	if !s.FolderExistsByUserId(context, user.Id, request.FolderNameDest) {
 		return &utils_proto.JsonResponse{
 			Response: pkg.CreateJsonErr(pkg.STATUS_OBJECT_EXISTS, "Папки назначения не существует.").Bytes(),
 		}, nil
@@ -371,7 +386,7 @@ func (s *FolderManagerService) ChangeFolder(context context.Context, request *fo
 			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
 		}, nil
 	}
-	if s.FolderExists(context, user.Id, request.FolderNewName) {
+	if s.FolderExistsByUserId(context, user.Id, request.FolderNewName) {
 		return &utils_proto.JsonResponse{
 			Response: pkg.CreateJsonErr(pkg.STATUS_OBJECT_EXISTS, "Такая папка уже существует.").Bytes(),
 		}, nil
@@ -494,6 +509,7 @@ func (s *FolderManagerService) ListFolders(context context.Context, request *fol
 		UserId: user.Id,
 		Limit: request.Limit,
 		Offset: request.Offset,
+		ShowReserved: request.ShowReserved,
 	})
 	if err != nil {
 		log.Error(err)

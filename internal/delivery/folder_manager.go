@@ -492,6 +492,7 @@ func (d *Delivery) ListFolders(w http.ResponseWriter, r *http.Request) {
 			Data: data,
 			Limit: int32(limit),
 			Offset: int32(offset),
+			ShowReserved: false,
 		})
 		if err != nil {
 			pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)

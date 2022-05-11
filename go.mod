@@ -23,6 +23,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cention-sany/utf7 v0.0.0-20170124080048-26cad61bd60a // indirect
 	github.com/cespare/xxhash/v2 v2.1.1 // indirect
+	github.com/emersion/go-imap v1.2.1 // indirect
 	github.com/emersion/go-sasl v0.0.0-20200509203442-7bfe0ed36a21 // indirect
 	github.com/emersion/go-smtp v0.15.0 // indirect
 	github.com/gogs/chardet v0.0.0-20191104214054-4b6791f73a28 // indirect

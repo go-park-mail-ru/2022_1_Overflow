@@ -8,6 +8,8 @@ import (
 	"context"
 	"encoding/json"
 	"time"
+
+	"github.com/jackc/pgx/v4"
 	//log "github.com/sirupsen/logrus"
 )
 
@@ -103,7 +105,12 @@ func (c *Database) GetFoldersByUser(context context.Context, request *repository
 	var folders models.FolderList
 	foldersBytes, _ := json.Marshal(folders)
 	var count int
-	err := c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.folders WHERE user_id=$1 AND name NOT IN ($2, $3);", request.UserId, pkg.FOLDER_SPAM, pkg.FOLDER_DRAFTS).Scan(&count)
+	var err error
+	if request.ShowReserved {
+		err = c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.folders WHERE user_id=$1;", request.UserId).Scan(&count)
+	} else {
+		err = c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.folders WHERE user_id=$1 AND name NOT IN ($2, $3);", request.UserId, pkg.FOLDER_SPAM, pkg.FOLDER_DRAFTS).Scan(&count)
+	}
 	if err != nil {
 		return &repository_proto.ResponseFolders{
 			Response: &utils_proto.DatabaseResponse{
@@ -113,7 +120,12 @@ func (c *Database) GetFoldersByUser(context context.Context, request *repository
 		}, err
 	}
 	folders.Amount = count
-	rows, err := c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE user_id=$1 AND name NOT IN ($2, $3) ORDER BY created_at DESC OFFSET $5 LIMIT $4;", request.UserId, pkg.FOLDER_SPAM, pkg.FOLDER_DRAFTS, request.Limit, request.Offset)
+	var rows pgx.Rows
+	if request.ShowReserved {
+		rows, err = c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE user_id=$1 ORDER BY created_at DESC OFFSET $3 LIMIT $2;", request.UserId, request.Limit, request.Offset)
+	} else {
+		rows, err = c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE user_id=$1 AND name NOT IN ($2, $3) ORDER BY created_at DESC OFFSET $5 LIMIT $4;", request.UserId, pkg.FOLDER_SPAM, pkg.FOLDER_DRAFTS, request.Limit, request.Offset)
+	}
 	if err != nil {
 		return &repository_proto.ResponseFolders{
 			Response: &utils_proto.DatabaseResponse{
