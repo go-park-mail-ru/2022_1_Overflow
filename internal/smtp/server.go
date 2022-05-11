@@ -20,6 +20,7 @@ import (
 	"github.com/emersion/go-smtp"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/wrapperspb"
+	enmime "github.com/jhillyerd/enmime"
 )
 
 
@@ -129,21 +130,12 @@ func (s *Session) Rcpt(to string) error {
 
 func (s *Session) Data(r io.Reader) error {
 	log.Debug("DATA")
-	msg, err := mail.ReadMessage(r)
+	msg, err := enmime.ReadEnvelope(r)
 	if err != nil {
 		return err
 	}
-	s.mailForm.Theme = msg.Header.Get("Subject")
-	reader := quotedprintable.NewReader(msg.Body)
-	body, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return err
-	}
-	// body has \r\n on the end of the message
-	if len(body) > 0 {
-		body = body[:len(body)-2]
-	}
-	s.mailForm.Text = string(body)
+	s.mailForm.Theme = msg.GetHeader("Subject")
+	s.mailForm.Text = msg.Text
 	mailFormBytes, _ := json.Marshal(s.mailForm)
 	resp, err := s.mailbox.SendMail(context.Background(), &mailbox_proto.SendMailRequest{
 		Data: s.userSession,
