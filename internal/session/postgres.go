@@ -44,26 +44,13 @@ func (pm *PostgresManager) Init(config *config.Config) (err error) {
 }
 
 func (pm *PostgresManager) CreateSession(w http.ResponseWriter, r *http.Request, username string) error {
-	session, err := pm.store.Get(r, session_name)
-	if err != nil {
-		log.Debug("Ошибка декодирования сессии.")
-		err := pm.DeleteSession(w, r)
-		if err != nil {
-			log.Debug("Ошибка удаления сессии.")
-			return err
-		}
-		session, err = pm.store.Get(r, session_name)
-		if err != nil {
-			log.Debug("Повторная ошибка декодирования сессии.")
-			return err
-		}
-	}
+	session, _ := pm.store.Get(r, session_name)
 	data := &utils_proto.Session{
 		Username:      username,
 		Authenticated: wrapperspb.Bool(true),
 	}
 	session.Values["data"] = data
-	err = session.Save(r, w)
+	err := session.Save(r, w)
 	return err
 }
 
