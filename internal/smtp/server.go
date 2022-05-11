@@ -14,6 +14,7 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+	"mime/quotedprintable"
 	"net/mail"
 
 	"github.com/emersion/go-smtp"
@@ -133,7 +134,8 @@ func (s *Session) Data(r io.Reader) error {
 		return err
 	}
 	s.mailForm.Theme = msg.Header.Get("Subject")
-	body, err := ioutil.ReadAll(msg.Body)
+	reader := quotedprintable.NewReader(msg.Body)
+	body, err := ioutil.ReadAll(reader)
 	if err != nil {
 		return err
 	}
