@@ -41,7 +41,11 @@ func (s *StandardManager) Init(config *config.Config) (err error) {
 func (s *StandardManager) CreateSession(w http.ResponseWriter, r *http.Request, username string) error {
 	session, err := s.store.Get(r, session_name)
 	if err != nil {
-		return err
+		err := s.DeleteSession(w, r)
+		if err != nil {
+			return err
+		}
+		session, err = s.store.Get(r, session_name)
 	}
 	data := &utils_proto.Session{
 		Username:      username,

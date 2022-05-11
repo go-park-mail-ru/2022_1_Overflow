@@ -45,7 +45,11 @@ func (pm *PostgresManager) Init(config *config.Config) (err error) {
 func (pm *PostgresManager) CreateSession(w http.ResponseWriter, r *http.Request, username string) error {
 	session, err := pm.store.Get(r, session_name)
 	if err != nil {
-		return err
+		err := pm.DeleteSession(w, r)
+		if err != nil {
+			return err
+		}
+		session, err = pm.store.Get(r, session_name)
 	}
 	data := &utils_proto.Session{
 		Username:      username,
