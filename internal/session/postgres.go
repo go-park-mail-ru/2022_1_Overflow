@@ -64,15 +64,11 @@ func (pm *PostgresManager) CreateSession(w http.ResponseWriter, r *http.Request,
 }
 
 func (pm *PostgresManager) DeleteSession(w http.ResponseWriter, r *http.Request) error {
-	session, err := pm.store.Get(r, session_name)
-	if err != nil {
-		return err
-	}
-
+	session, _ := pm.store.Get(r, session_name)
 	session.Values["data"] = &utils_proto.Session{}
 	session.Options.MaxAge = -1
 
-	err = session.Save(r, w)
+	err := session.Save(r, w)
 	if err != nil {
 		return err
 	}
