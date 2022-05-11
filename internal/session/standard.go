@@ -12,7 +12,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var session_name string = "OveflowMail"
+var session_name string = "OverflowMail"
 
 type StandardManager struct {
 	// Данные всех сессий.
@@ -39,29 +39,22 @@ func (s *StandardManager) Init(config *config.Config) (err error) {
 }
 
 func (s *StandardManager) CreateSession(w http.ResponseWriter, r *http.Request, username string) error {
-	session, err := s.store.Get(r, session_name)
-	if err != nil {
-		return err
-	}
+	session, _ := s.store.Get(r, session_name)
 	data := &utils_proto.Session{
 		Username:      username,
 		Authenticated: wrapperspb.Bool(true),
 	}
 	session.Values["data"] = data
-	err = session.Save(r, w)
+	err := session.Save(r, w)
 	return err
 }
 
 func (s *StandardManager) DeleteSession(w http.ResponseWriter, r *http.Request) error {
-	session, err := s.store.Get(r, session_name)
-	if err != nil {
-		return err
-	}
-
+	session, _ := s.store.Get(r, session_name)
 	session.Values["data"] = &utils_proto.Session{}
 	session.Options.MaxAge = -1
 
-	err = session.Save(r, w)
+	err := session.Save(r, w)
 	if err != nil {
 		return err
 	}
