@@ -114,9 +114,6 @@ func (s *Session) Init(
 
 func (s *Session) Mail(from string, opts smtp.MailOptions) error {
 	log.Debug("MAIL from ", from)
-	if opts.Auth == nil {
-		return smtp.ErrAuthRequired
-	}
 	if from != s.userSession.Username {
 		return errors.New("имя отправителя отличается от имени пользователя")
 	}
