@@ -13,9 +13,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
-	"mime/quotedprintable"
-	"net/mail"
 
 	"github.com/emersion/go-smtp"
 	log "github.com/sirupsen/logrus"
