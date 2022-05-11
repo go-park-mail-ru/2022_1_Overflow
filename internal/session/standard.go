@@ -41,15 +41,15 @@ func (s *StandardManager) Init(config *config.Config) (err error) {
 func (s *StandardManager) CreateSession(w http.ResponseWriter, r *http.Request, username string) error {
 	session, err := s.store.Get(r, session_name)
 	if err != nil {
-		//log.Debug("Ошибка декодирования сессии.")
+		log.Debug("Ошибка декодирования сессии.")
 		err := s.DeleteSession(w, r)
 		if err != nil {
-			//log.Debug("Ошибка удаления сессии.")
+			log.Debug("Ошибка удаления сессии.")
 			return err
 		}
 		session, err = s.store.Get(r, session_name)
 		if err != nil {
-			//log.Debug("Повторная ошибка декодирования сессии.")
+			log.Debug("Повторная ошибка декодирования сессии.")
 			return err
 		}
 	}

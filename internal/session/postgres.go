@@ -9,6 +9,7 @@ import (
 
 	"github.com/antonlindstrom/pgstore"
 	"github.com/gorilla/sessions"
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -45,12 +46,15 @@ func (pm *PostgresManager) Init(config *config.Config) (err error) {
 func (pm *PostgresManager) CreateSession(w http.ResponseWriter, r *http.Request, username string) error {
 	session, err := pm.store.Get(r, session_name)
 	if err != nil {
+		log.Debug("Ошибка декодирования сессии.")
 		err := pm.DeleteSession(w, r)
 		if err != nil {
+			log.Debug("Ошибка удаления сессии.")
 			return err
 		}
 		session, err = pm.store.Get(r, session_name)
 		if err != nil {
+			log.Debug("Повторная ошибка декодирования сессии.")
 			return err
 		}
 	}
