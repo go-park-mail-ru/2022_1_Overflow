@@ -14,6 +14,7 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+	"net/mail"
 
 	"github.com/emersion/go-smtp"
 	//log "github.com/sirupsen/logrus"
@@ -120,12 +121,20 @@ func (s *Session) Rcpt(to string) error {
 }
 
 func (s *Session) Data(r io.Reader) error {
-	b, err := ioutil.ReadAll(r)
+	msg, err := mail.ReadMessage(r)
 	if err != nil {
 		return err
 	}
-	message := string(b)
-	s.mailForm.Text = message
+	s.mailForm.Theme = msg.Header.Get("Subject")
+	body, err := ioutil.ReadAll(msg.Body)
+	if err != nil {
+		return err
+	}
+	// body has \r\n on the end of the message
+	if len(body) > 0 {
+		body = body[:len(body)-2]
+	}
+	s.mailForm.Text = string(body)
 	mailFormBytes, _ := json.Marshal(s.mailForm)
 	s.mailbox.SendMail(context.Background(), &mailbox_proto.SendMailRequest{
 		Data: s.userSession,
