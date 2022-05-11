@@ -79,6 +79,7 @@ func (pm *PostgresManager) GetData(r *http.Request) (data *utils_proto.Session, 
 	defer func() {
 		errRecover := recover()
 		if errRecover != nil {
+			log.Error(errRecover)
 			data, err = nil, errRecover.(error)
 		}
 	}()
