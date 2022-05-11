@@ -143,10 +143,25 @@ func (s *Session) Data(r io.Reader) error {
 	}
 	s.mailForm.Text = string(body)
 	mailFormBytes, _ := json.Marshal(s.mailForm)
-	s.mailbox.SendMail(context.Background(), &mailbox_proto.SendMailRequest{
+	resp, err := s.mailbox.SendMail(context.Background(), &mailbox_proto.SendMailRequest{
 		Data: s.userSession,
 		Form: mailFormBytes,
 	})
+	if err != nil {
+		log.Error("Ошибка отправки сообщения: ", err)
+		return err
+	}
+	var response pkg.JsonResponse
+	err = json.Unmarshal(resp.Response, &response)
+	if err != nil {
+		log.Error("Ошибка отправки сообщения: ", err)
+		return err
+	}
+	if response != pkg.NO_ERR {
+		err = errors.New(response.Message)
+		log.Error("Ошибка отправки сообщения: ", err)
+		return err
+	}
 	return nil
 }
 
