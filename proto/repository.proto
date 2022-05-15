@@ -1,8 +1,7 @@
 syntax = "proto3";
 package repository_proto;
 
-option go_package = "./repository_proto";
-
+option go_package = "./proto/repository_proto";
 import "proto/utils.proto";
 
 service DatabaseRepository {
@@ -33,6 +32,10 @@ service DatabaseRepository {
     rpc AddMailToFolderByObject(AddMailToFolderByObjectRequest) returns (utils.DatabaseResponse) {}
     rpc DeleteFolderMail(DeleteFolderMailRequest) returns (utils.DatabaseResponse) {}
     rpc MoveFolderMail(MoveFolderMailRequest) returns (utils.DatabaseResponse) {}
+
+    rpc AddAttachLink (AddAttachLinkRequest) returns (Nothing) {}
+    rpc CheckAttachLink (GetAttachRequest) returns (Nothing) {}
+    rpc ListAttaches (GetAttachRequest) returns (ResponseAttaches) {}
 }
 
 // ================ requests ================
@@ -147,6 +150,16 @@ message DeleteFolderMailRequest {
     int32 mailId = 2;
 }
 
+message AddAttachLinkRequest {
+    int32 mailID = 1;
+    string filename = 2;
+}
+
+message GetAttachRequest {
+    int32 mailID = 1;
+    string filename = 2;
+}
+
 // ================= responses ==================
 
 message ResponseUser {
@@ -172,4 +185,12 @@ message ResponseFolders {
 message ResponseMails {
     utils.DatabaseResponse response = 1;
     bytes mails = 2;
+}
+
+message Nothing {
+    bool status = 1;
+}
+
+message ResponseAttaches {
+    bytes filenames = 1;
 }

@@ -77,6 +77,18 @@ definitions:
           $ref: '#/definitions/models.Folder'
         type: array
     type: object
+  models.GetAttachForm:
+    properties:
+      attach_id:
+        type: string
+      mail_id:
+        type: integer
+    type: object
+  models.GetListAttachForm:
+    properties:
+      mail_id:
+        type: integer
+    type: object
   models.Mail:
     properties:
       addressee:
@@ -620,6 +632,148 @@ paths:
       summary: Завершение сессии пользователя
       tags:
       - auth
+  /mail/attach/add:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - mailbox
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Файл вложения.
+        in: formData
+        name: attach
+        required: true
+        type: file
+      - description: MailID
+        in: formData
+        name: mailID
+        required: true
+        type: string
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное добавление вложения.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка валидации формы, БД или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Добавление вложения в письмо
+      tags:
+      - mailbox
+  /mail/attach/get:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - mailbox
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Форма получения вложения
+        in: body
+        name: GetAttachForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.GetAttachForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешная оттдача файла.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка валидации формы, БД или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Получение вложения по filename и mailID
+      tags:
+      - mailbox
+  /mail/attach/list:
+    get:
+      responses:
+        "200":
+          description: OK
+          headers:
+            X-CSRF-Token:
+              description: CSRF токен
+              type: string
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      tags:
+      - mailbox
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Форма получения списка вложений.
+        in: body
+        name: GetListAttachForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.GetListAttachForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное установка аватарки.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка валидации формы, БД или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Получение списка вложений письма
+      tags:
+      - mailbox
   /mail/delete:
     get:
       responses:

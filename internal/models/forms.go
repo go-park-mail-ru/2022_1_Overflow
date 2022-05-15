@@ -76,6 +76,10 @@ type DeleteFolderMailForm struct {
 }
 
 type GetAttachForm struct {
-	MailID   string `json:"mail_id" validate:"nonzero"`
+	MailID   int32  `json:"mail_id" validate:"nonzero"`
 	AttachID string `json:"attach_id" validate:"nonzero"`
+}
+
+type GetListAttachForm struct {
+	MailID int32 `json:"mail_id" validate:"nonzero"`
 }

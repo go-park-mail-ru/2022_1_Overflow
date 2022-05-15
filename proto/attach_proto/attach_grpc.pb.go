@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type AttachClient interface {
 	GetAttach(ctx context.Context, in *GetAttachRequest, opts ...grpc.CallOption) (*AttachResponse, error)
 	SaveAttach(ctx context.Context, in *SaveAttachRequest, opts ...grpc.CallOption) (*Nothing, error)
+	ListAttach(ctx context.Context, in *GetAttachRequest, opts ...grpc.CallOption) (*AttachListResponse, error)
 }
 
 type attachClient struct {
@@ -52,12 +53,22 @@ func (c *attachClient) SaveAttach(ctx context.Context, in *SaveAttachRequest, op
 	return out, nil
 }
 
+func (c *attachClient) ListAttach(ctx context.Context, in *GetAttachRequest, opts ...grpc.CallOption) (*AttachListResponse, error) {
+	out := new(AttachListResponse)
+	err := c.cc.Invoke(ctx, "/attach_proto.Attach/ListAttach", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AttachServer is the server API for Attach service.
 // All implementations must embed UnimplementedAttachServer
 // for forward compatibility
 type AttachServer interface {
 	GetAttach(context.Context, *GetAttachRequest) (*AttachResponse, error)
 	SaveAttach(context.Context, *SaveAttachRequest) (*Nothing, error)
+	ListAttach(context.Context, *GetAttachRequest) (*AttachListResponse, error)
 	mustEmbedUnimplementedAttachServer()
 }
 
@@ -70,6 +81,9 @@ func (UnimplementedAttachServer) GetAttach(context.Context, *GetAttachRequest) (
 }
 func (UnimplementedAttachServer) SaveAttach(context.Context, *SaveAttachRequest) (*Nothing, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SaveAttach not implemented")
+}
+func (UnimplementedAttachServer) ListAttach(context.Context, *GetAttachRequest) (*AttachListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAttach not implemented")
 }
 func (UnimplementedAttachServer) mustEmbedUnimplementedAttachServer() {}
 
@@ -120,6 +134,24 @@ func _Attach_SaveAttach_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Attach_ListAttach_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAttachRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AttachServer).ListAttach(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/attach_proto.Attach/ListAttach",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AttachServer).ListAttach(ctx, req.(*GetAttachRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Attach_ServiceDesc is the grpc.ServiceDesc for Attach service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,6 +166,10 @@ var Attach_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SaveAttach",
 			Handler:    _Attach_SaveAttach_Handler,
+		},
+		{
+			MethodName: "ListAttach",
+			Handler:    _Attach_ListAttach_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

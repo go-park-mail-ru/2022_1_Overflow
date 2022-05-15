@@ -35,3 +35,7 @@ type Attach struct {
 	Payload     []byte `json:"payload"`
 	PayloadSize int64  `json:"payload_size"`
 }
+
+type AttachList struct {
+	Filenames []string `json:"filenames"`
+}
