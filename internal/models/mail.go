@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type Mail struct {
 	Id        int32     `json:"id"`
@@ -14,16 +16,22 @@ type Mail struct {
 }
 
 type MailAdditional struct {
-	Mail Mail `json:"mail"`
+	Mail      Mail   `json:"mail"`
 	AvatarUrl string `json:"avatar_url"`
 }
 
 type MailAddList struct {
-	Amount int	`json:"amount"`
-	Mails []MailAdditional `json:"mails"`
+	Amount int              `json:"amount"`
+	Mails  []MailAdditional `json:"mails"`
 }
 
 type MailList struct {
-	Amount int `json:"amount"`
-	Mails []Mail `json:"mails"`
+	Amount int    `json:"amount"`
+	Mails  []Mail `json:"mails"`
+}
+
+type Attach struct {
+	Filename    string `json:"filename"`
+	Payload     []byte `json:"payload"`
+	PayloadSize int64  `json:"payload_size"`
 }

@@ -4,6 +4,7 @@ import (
 	"OverflowBackend/internal/config"
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/middlewares"
+	"OverflowBackend/proto/attach_proto"
 	"OverflowBackend/proto/auth_proto"
 	"OverflowBackend/proto/folder_manager_proto"
 	"OverflowBackend/proto/mailbox_proto"
@@ -18,7 +19,7 @@ import (
 )
 
 type RouterManager struct {
-	d *delivery.Delivery
+	d      *delivery.Delivery
 	config *config.Config
 }
 
@@ -28,9 +29,10 @@ func (rm *RouterManager) Init(
 	profileDial grpc.ClientConnInterface,
 	mailboxDial grpc.ClientConnInterface,
 	folderManagerDial grpc.ClientConnInterface,
-	) {
+	attachDial grpc.ClientConnInterface,
+) {
 	rm.d = &delivery.Delivery{}
-	rm.d.Init(config, auth_proto.NewAuthClient(authDial), profile_proto.NewProfileClient(profileDial), mailbox_proto.NewMailboxClient(mailboxDial), folder_manager_proto.NewFolderManagerClient(folderManagerDial))
+	rm.d.Init(config, auth_proto.NewAuthClient(authDial), profile_proto.NewProfileClient(profileDial), mailbox_proto.NewMailboxClient(mailboxDial), folder_manager_proto.NewFolderManagerClient(folderManagerDial), attach_proto.NewAttachClient(attachDial))
 	rm.config = config
 }
 
@@ -38,8 +40,7 @@ func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 	router := mux.NewRouter()
 	fs := http.FileServer(http.Dir(rm.config.Server.Static.Dir))
 	router.PathPrefix(rm.config.Server.Static.Handle).Handler(
-		http.StripPrefix(rm.config.Server.Static.Handle, fs,
-	))
+		http.StripPrefix(rm.config.Server.Static.Handle, fs))
 	router.HandleFunc("/signin", rm.d.SignIn)
 	router.HandleFunc("/logout", rm.d.SignOut)
 	router.HandleFunc("/signup", rm.d.SignUp)
@@ -56,6 +57,8 @@ func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 	router.HandleFunc("/mail/delete", rm.d.DeleteMail)
 	router.HandleFunc("/mail/read", rm.d.ReadMail)
 	router.HandleFunc("/mail/send", rm.d.SendMail)
+	router.HandleFunc("/mail/attach/add", rm.d.UploadAttach)
+	router.HandleFunc("/mail/attach/get", rm.d.GetAttach)
 	// ======================================================================
 	router.HandleFunc("/folder/add", rm.d.AddFolder)
 	router.HandleFunc("/folder/mail/add", rm.d.AddMailToFolderById)
