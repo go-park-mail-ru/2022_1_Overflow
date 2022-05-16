@@ -10,10 +10,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	log "github.com/sirupsen/logrus"
+	"gopkg.in/validator.v2"
+	"image"
+	_ "image/jpeg"
+	_ "image/png"
 	"io"
 	"net/http"
-
-	"gopkg.in/validator.v2"
 )
 
 // GetInfo godoc
@@ -43,13 +46,13 @@ func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
+	var response pkg.JsonResponse
 	err = json.Unmarshal(resp.Response.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
@@ -98,13 +101,13 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
+	var response pkg.JsonResponse
 	err = json.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
@@ -157,7 +160,7 @@ func (d *Delivery) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	resp, err := d.profile.ChangePassword(context.Background(), &profile_proto.ChangePasswordRequest{
-		Data: data,
+		Data:        data,
 		PasswordOld: form.OldPassword,
 		PasswordNew: form.NewPassword,
 	})
@@ -165,13 +168,13 @@ func (d *Delivery) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
+	var response pkg.JsonResponse
 	err = json.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
@@ -213,6 +216,19 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
+
+	_, format, err := image.DecodeConfig(file)
+	if err != nil {
+		log.Warning("can't decode file: ", err)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_FILETYPE)
+		return
+	}
+
+	if format != "jpeg" && format != "png" {
+		log.Warning("file is not jpeg or png")
+		pkg.WriteJsonErrFull(w, &pkg.BAD_FILETYPE)
+	}
+
 	io.Copy(&buf, file)
 	avatar := models.Avatar{
 		Name:     header.Filename,
@@ -228,13 +244,13 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
+	var response pkg.JsonResponse
 	err = json.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
@@ -279,13 +295,13 @@ func (d *Delivery) GetAvatar(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
+	var response pkg.JsonResponse
 	err = json.Unmarshal(resp.Response.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
