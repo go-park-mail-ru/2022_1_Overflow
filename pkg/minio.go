@@ -22,14 +22,13 @@ func NewMinioClient(config *config.Config) (*minio.Client, error) {
 	err = client.MakeBucket(ctx, config.Minio.Bucket, minio.MakeBucketOptions{})
 	if err != nil {
 		exists, errBucketExists := client.BucketExists(ctx, config.Minio.Bucket)
-		if errBucketExists == nil && exists {
-			log.Info("We already own ", config.Minio.Bucket)
-		} else {
+		if errBucketExists != nil || !exists {
 			return nil, err
 		}
-	} else {
-		log.Info("Successfully created ", config.Minio.Bucket)
+		log.Info("We already own ", config.Minio.Bucket)
+		return client, nil
 	}
 
+	log.Info("Successfully created ", config.Minio.Bucket)
 	return client, nil
 }

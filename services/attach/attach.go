@@ -23,6 +23,7 @@ type AttachService struct {
 }
 
 var ErrAccess = errors.New("User don't have access to this email")
+var ErrJson = errors.New("Error with marshal/unmarshal")
 var ErrAccessAttach = errors.New("User don't have access to this attach")
 
 func (s *AttachService) Init(config *config.Config, db repository_proto.DatabaseRepositoryClient, s3 *minio.Client) {
@@ -111,11 +112,11 @@ func (s *AttachService) GetAttach(ctx context.Context, request *attach_proto.Get
 		request.Filename,
 		minio.GetObjectOptions{},
 	)
-	defer reader.Close()
 	if err != nil {
 		log.Error(err)
 		return nil, err
 	}
+	defer reader.Close()
 
 	var file bytes.Buffer
 	io.Copy(&file, reader)
@@ -136,6 +137,9 @@ func (s *AttachService) ListAttach(ctx context.Context, request *attach_proto.Ge
 
 	var mail models.Mail
 	err = json.Unmarshal(respMail.Mail, &mail)
+	if err != nil {
+		return &attach_proto.AttachListResponse{}, ErrJson
+	}
 	if mail.Sender != request.Username {
 		log.Warning(ErrAccess)
 		return &attach_proto.AttachListResponse{}, ErrAccess
