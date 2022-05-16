@@ -13,9 +13,9 @@ import (
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/validator.v2"
 	"image"
+	"image/jpeg"
 	_ "image/jpeg"
 	_ "image/png"
-	"io"
 	"net/http"
 )
 
@@ -209,7 +209,7 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-	var buf bytes.Buffer
+
 	file, header, err := r.FormFile("file")
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
@@ -217,19 +217,20 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	_, format, err := image.DecodeConfig(file)
+	img, format, err := image.Decode(file)
 	if err != nil {
 		log.Warning("can't decode file: ", err)
 		pkg.WriteJsonErrFull(w, &pkg.BAD_FILETYPE)
 		return
 	}
-
 	if format != "jpeg" && format != "png" {
 		log.Warning("file is not jpeg or png")
 		pkg.WriteJsonErrFull(w, &pkg.BAD_FILETYPE)
+		return
 	}
 
-	io.Copy(&buf, file)
+	buf := new(bytes.Buffer)
+	jpeg.Encode(buf, img, nil)
 	avatar := models.Avatar{
 		Name:     header.Filename,
 		Username: data.Username,
