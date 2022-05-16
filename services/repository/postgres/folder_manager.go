@@ -25,15 +25,20 @@ func (c *Database) IsMailMoved(context context.Context, mailId int32) bool {
 	return err == nil && counter > 0
 }
 
-func (c *Database) GetFolderById(context context.Context, request *repository_proto.GetFolderByIdRequest) (*repository_proto.ResponseFolder, error) {
-	var err error
+func (c *Database) GetFolderById(context context.Context, request *repository_proto.GetFolderByIdRequest) (response *repository_proto.ResponseFolder, err error) {
+	var folder models.Folder
+	folderBytes, _ := json.Marshal(folder)
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
 		}
+		response = &repository_proto.ResponseFolder{
+			Response: &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			},
+			Folder: folderBytes,
+		}
 	}()
-	var folder models.Folder
-	folderBytes, _ := json.Marshal(folder)
 	rows, err := c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE id = $1;", request.FolderId)
 	if err != nil {
 		return &repository_proto.ResponseFolder{
@@ -68,15 +73,20 @@ func (c *Database) GetFolderById(context context.Context, request *repository_pr
 	}, nil
 }
 
-func (c *Database) GetFolderByName(context context.Context, request *repository_proto.GetFolderByNameRequest) (*repository_proto.ResponseFolder, error) {
-	var err error
+func (c *Database) GetFolderByName(context context.Context, request *repository_proto.GetFolderByNameRequest) (response *repository_proto.ResponseFolder, err error) {
+	var folder models.Folder
+	folderBytes, _ := json.Marshal(folder)
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
 		}
+		response = &repository_proto.ResponseFolder{
+			Response: &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			},
+			Folder: folderBytes,
+		}
 	}()
-	var folder models.Folder
-	folderBytes, _ := json.Marshal(folder)
 	rows, err := c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE name = $1 AND user_id = $2;", request.FolderName, request.UserId)
 	if err != nil {
 		return &repository_proto.ResponseFolder{
@@ -111,15 +121,20 @@ func (c *Database) GetFolderByName(context context.Context, request *repository_
 	}, nil
 }
 
-func (c *Database) GetFoldersByUser(context context.Context, request *repository_proto.GetFoldersByUserRequest) (*repository_proto.ResponseFolders, error) {
-	var err error
+func (c *Database) GetFoldersByUser(context context.Context, request *repository_proto.GetFoldersByUserRequest) (response *repository_proto.ResponseFolders, err error) {
+	var folders models.FolderList
+	foldersBytes, _ := json.Marshal(folders)
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
 		}
+		response = &repository_proto.ResponseFolders{
+			Response: &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			},
+			Folders: foldersBytes,
+		}
 	}()
-	var folders models.FolderList
-	foldersBytes, _ := json.Marshal(folders)
 	var count int
 	err = c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.folders WHERE user_id=$1 AND name NOT IN ($2, $3);", request.UserId, pkg.FOLDER_SPAM, pkg.FOLDER_DRAFTS).Scan(&count)
 	if err != nil {
@@ -167,15 +182,20 @@ func (c *Database) GetFoldersByUser(context context.Context, request *repository
 	}, nil
 }
 
-func (c *Database) GetFolderMail(context context.Context, request *repository_proto.GetFolderMailRequest) (*repository_proto.ResponseMails, error) {
-	var err error
+func (c *Database) GetFolderMail(context context.Context, request *repository_proto.GetFolderMailRequest) (response *repository_proto.ResponseMails, err error) {
+	var mails models.MailList
+	mailsBytes, _ := json.Marshal(mails)
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
 		}
+		response = &repository_proto.ResponseMails{
+			Response: &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			},
+			Mails: mailsBytes,
+		}
 	}()
-	var mails models.MailList
-	mailsBytes, _ := json.Marshal(mails)
 	var count int
 	err = c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.mails WHERE id IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id in (SELECT id FROM overflow.folders WHERE user_id=$1 AND name=$2))", request.UserId, request.FolderName).Scan(&count)
 	if err != nil {

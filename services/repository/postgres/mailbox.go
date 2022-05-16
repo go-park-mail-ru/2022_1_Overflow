@@ -94,15 +94,20 @@ func (c *Database) ReadMail(context context.Context, request *repository_proto.R
 }
 
 // Получить письмо по ID
-func (c *Database) GetMailInfoById(context context.Context, request *repository_proto.GetMailInfoByIdRequest) (*repository_proto.ResponseMail, error) {
-	var err error
+func (c *Database) GetMailInfoById(context context.Context, request *repository_proto.GetMailInfoByIdRequest) (response *repository_proto.ResponseMail, err error) {
+	var mail models.Mail
+	mailBytes, _ := json.Marshal(mail)
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
 		}
+		response = &repository_proto.ResponseMail{
+			Response: &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			},
+			Mail: mailBytes,
+		}
 	}()
-	var mail models.Mail
-	mailBytes, _ := json.Marshal(mail)
 	rows, err := c.Conn.Query(context, "SELECT id, sender, addressee, date, theme, text, files, read FROM overflow.mails WHERE Id = $1;", request.MailId)
 	if err != nil {
 		return &repository_proto.ResponseMail{
@@ -142,15 +147,20 @@ func (c *Database) GetMailInfoById(context context.Context, request *repository_
 }
 
 // Получить входящие сообщения пользователя
-func (c *Database) GetIncomeMails(context context.Context, request *repository_proto.GetIncomeMailsRequest) (*repository_proto.ResponseMails, error) {
-	var err error
+func (c *Database) GetIncomeMails(context context.Context, request *repository_proto.GetIncomeMailsRequest) (response *repository_proto.ResponseMails, err error) {
+	var results models.MailList
+	resultsBytes, _ := json.Marshal(results)
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
 		}
+		response = &repository_proto.ResponseMails{
+			Response: &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			},
+			Mails: resultsBytes,
+		}
 	}()
-	var results models.MailList
-	resultsBytes, _ := json.Marshal(results)
 	var count int
 	err = c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.mails WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND addressee IN (SELECT username FROM overflow.users WHERE id=$1);", request.UserId).Scan(&count)
 	if err != nil {
@@ -202,15 +212,20 @@ func (c *Database) GetIncomeMails(context context.Context, request *repository_p
 }
 
 //Получить отправленные пользователем сообщения
-func (c *Database) GetOutcomeMails(context context.Context, request *repository_proto.GetOutcomeMailsRequest) (*repository_proto.ResponseMails, error) {
-	var err error
+func (c *Database) GetOutcomeMails(context context.Context, request *repository_proto.GetOutcomeMailsRequest) (response *repository_proto.ResponseMails, err error) {
+	var results models.MailList
+	resultsBytes, _ := json.Marshal(results)
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
 		}
+		response = &repository_proto.ResponseMails{
+			Response: &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			},
+			Mails: resultsBytes,
+		}
 	}()
-	var results models.MailList
-	resultsBytes, _ := json.Marshal(results)
 	var count int
 	err = c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.mails WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND sender IN (SELECT username FROM overflow.users WHERE id=$1);", request.UserId).Scan(&count)
 	if err != nil {

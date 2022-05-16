@@ -11,15 +11,20 @@ import (
 )
 
 // Получить данные пользователя по его почте
-func (c *Database) GetUserInfoByUsername(context context.Context, request *repository_proto.GetUserInfoByUsernameRequest) (*repository_proto.ResponseUser, error) {
-	var err error
+func (c *Database) GetUserInfoByUsername(context context.Context, request *repository_proto.GetUserInfoByUsernameRequest) (response *repository_proto.ResponseUser, err error) {
+	var user models.User
+	userBytes, _ := json.Marshal(user)
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
 		}
+		response = &repository_proto.ResponseUser{
+			Response: &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			},
+			User: userBytes,
+		}
 	}()
-	var user models.User
-	userBytes, _ := json.Marshal(user)
 	rows, err := c.Conn.Query(context, "Select id, first_name, last_name, password, username from overflow.users where username = $1;", request.Username)
 	if err != nil {
 		return &repository_proto.ResponseUser{
@@ -56,15 +61,20 @@ func (c *Database) GetUserInfoByUsername(context context.Context, request *repos
 }
 
 // Получить данные пользователя по его айди в бд
-func (c *Database) GetUserInfoById(context context.Context, request *repository_proto.GetUserInfoByIdRequest) (*repository_proto.ResponseUser, error) {
-	var err error
+func (c *Database) GetUserInfoById(context context.Context, request *repository_proto.GetUserInfoByIdRequest) (response *repository_proto.ResponseUser, err error) {
+	var user models.User
+	userBytes, _ := json.Marshal(user)
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
 		}
+		response = &repository_proto.ResponseUser{
+			Response: &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			},
+			User: userBytes,
+		}
 	}()
-	var user models.User
-	userBytes, _ := json.Marshal(user)
 	rows, err := c.Conn.Query(context, "Select id, first_name, last_name, password, username from overflow.users(id, first_name, last_name, password, username) where id = $1;", request.UserId)
 	if err != nil {
 		return &repository_proto.ResponseUser{
