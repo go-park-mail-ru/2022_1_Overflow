@@ -7,7 +7,7 @@ import (
 	"context"
 	"encoding/json"
 
-	//log "github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // Получить данные пользователя по его почте
@@ -17,12 +17,13 @@ func (c *Database) GetUserInfoByUsername(context context.Context, request *repos
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
-		}
-		response = &repository_proto.ResponseUser{
-			Response: &utils_proto.DatabaseResponse{
-				Status: utils_proto.DatabaseStatus_ERROR,
-			},
-			User: userBytes,
+			log.Error(err)
+			response = &repository_proto.ResponseUser{
+				Response: &utils_proto.DatabaseResponse{
+					Status: utils_proto.DatabaseStatus_ERROR,
+				},
+				User: userBytes,
+			}
 		}
 	}()
 	rows, err := c.Conn.Query(context, "Select id, first_name, last_name, password, username from overflow.users where username = $1;", request.Username)
@@ -67,12 +68,13 @@ func (c *Database) GetUserInfoById(context context.Context, request *repository_
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
-		}
-		response = &repository_proto.ResponseUser{
-			Response: &utils_proto.DatabaseResponse{
-				Status: utils_proto.DatabaseStatus_ERROR,
-			},
-			User: userBytes,
+			log.Error(err)
+			response = &repository_proto.ResponseUser{
+				Response: &utils_proto.DatabaseResponse{
+					Status: utils_proto.DatabaseStatus_ERROR,
+				},
+				User: userBytes,
+			}
 		}
 	}()
 	rows, err := c.Conn.Query(context, "Select id, first_name, last_name, password, username from overflow.users(id, first_name, last_name, password, username) where id = $1;", request.UserId)

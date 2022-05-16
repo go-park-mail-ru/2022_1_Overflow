@@ -8,9 +8,8 @@ import (
 	"encoding/json"
 	"time"
 
-	//log "github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
-
 
 // Добавить письмо
 func (c *Database) AddMail(context context.Context, request *repository_proto.AddMailRequest) (*utils_proto.DatabaseResponse, error) {
@@ -100,12 +99,13 @@ func (c *Database) GetMailInfoById(context context.Context, request *repository_
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
-		}
-		response = &repository_proto.ResponseMail{
-			Response: &utils_proto.DatabaseResponse{
-				Status: utils_proto.DatabaseStatus_ERROR,
-			},
-			Mail: mailBytes,
+			log.Error(err)
+			response = &repository_proto.ResponseMail{
+				Response: &utils_proto.DatabaseResponse{
+					Status: utils_proto.DatabaseStatus_ERROR,
+				},
+				Mail: mailBytes,
+			}
 		}
 	}()
 	rows, err := c.Conn.Query(context, "SELECT id, sender, addressee, date, theme, text, files, read FROM overflow.mails WHERE Id = $1;", request.MailId)
@@ -153,12 +153,13 @@ func (c *Database) GetIncomeMails(context context.Context, request *repository_p
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
-		}
-		response = &repository_proto.ResponseMails{
-			Response: &utils_proto.DatabaseResponse{
-				Status: utils_proto.DatabaseStatus_ERROR,
-			},
-			Mails: resultsBytes,
+			log.Error(err)
+			response = &repository_proto.ResponseMails{
+				Response: &utils_proto.DatabaseResponse{
+					Status: utils_proto.DatabaseStatus_ERROR,
+				},
+				Mails: resultsBytes,
+			}
 		}
 	}()
 	var count int
@@ -218,12 +219,13 @@ func (c *Database) GetOutcomeMails(context context.Context, request *repository_
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
-		}
-		response = &repository_proto.ResponseMails{
-			Response: &utils_proto.DatabaseResponse{
-				Status: utils_proto.DatabaseStatus_ERROR,
-			},
-			Mails: resultsBytes,
+			log.Error(err)
+			response = &repository_proto.ResponseMails{
+				Response: &utils_proto.DatabaseResponse{
+					Status: utils_proto.DatabaseStatus_ERROR,
+				},
+				Mails: resultsBytes,
+			}
 		}
 	}()
 	var count int

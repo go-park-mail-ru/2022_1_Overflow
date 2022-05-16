@@ -8,6 +8,8 @@ import (
 	"context"
 	"encoding/json"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 	//log "github.com/sirupsen/logrus"
 )
 
@@ -31,12 +33,13 @@ func (c *Database) GetFolderById(context context.Context, request *repository_pr
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
-		}
-		response = &repository_proto.ResponseFolder{
-			Response: &utils_proto.DatabaseResponse{
-				Status: utils_proto.DatabaseStatus_ERROR,
-			},
-			Folder: folderBytes,
+			log.Error(err)
+			response = &repository_proto.ResponseFolder{
+				Response: &utils_proto.DatabaseResponse{
+					Status: utils_proto.DatabaseStatus_ERROR,
+				},
+				Folder: folderBytes,
+			}
 		}
 	}()
 	rows, err := c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE id = $1;", request.FolderId)
@@ -79,12 +82,13 @@ func (c *Database) GetFolderByName(context context.Context, request *repository_
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
-		}
-		response = &repository_proto.ResponseFolder{
-			Response: &utils_proto.DatabaseResponse{
-				Status: utils_proto.DatabaseStatus_ERROR,
-			},
-			Folder: folderBytes,
+			log.Error(err)
+			response = &repository_proto.ResponseFolder{
+				Response: &utils_proto.DatabaseResponse{
+					Status: utils_proto.DatabaseStatus_ERROR,
+				},
+				Folder: folderBytes,
+			}
 		}
 	}()
 	rows, err := c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE name = $1 AND user_id = $2;", request.FolderName, request.UserId)
@@ -127,12 +131,13 @@ func (c *Database) GetFoldersByUser(context context.Context, request *repository
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
-		}
-		response = &repository_proto.ResponseFolders{
-			Response: &utils_proto.DatabaseResponse{
-				Status: utils_proto.DatabaseStatus_ERROR,
-			},
-			Folders: foldersBytes,
+			log.Error(err)
+			response = &repository_proto.ResponseFolders{
+				Response: &utils_proto.DatabaseResponse{
+					Status: utils_proto.DatabaseStatus_ERROR,
+				},
+				Folders: foldersBytes,
+			}
 		}
 	}()
 	var count int
@@ -188,12 +193,13 @@ func (c *Database) GetFolderMail(context context.Context, request *repository_pr
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
-		}
-		response = &repository_proto.ResponseMails{
-			Response: &utils_proto.DatabaseResponse{
-				Status: utils_proto.DatabaseStatus_ERROR,
-			},
-			Mails: mailsBytes,
+			log.Error(err)
+			response = &repository_proto.ResponseMails{
+				Response: &utils_proto.DatabaseResponse{
+					Status: utils_proto.DatabaseStatus_ERROR,
+				},
+				Mails: mailsBytes,
+			}
 		}
 	}()
 	var count int
