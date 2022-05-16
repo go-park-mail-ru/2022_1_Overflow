@@ -96,7 +96,11 @@ func (c *Database) ReadMail(context context.Context, request *repository_proto.R
 // Получить письмо по ID
 func (c *Database) GetMailInfoById(context context.Context, request *repository_proto.GetMailInfoByIdRequest) (*repository_proto.ResponseMail, error) {
 	var err error
-	defer func() {err = recover().(error)}()
+	defer func() {
+		if errRecover := recover(); errRecover != nil {
+			err = errRecover.(error)
+		}
+	}()
 	var mail models.Mail
 	mailBytes, _ := json.Marshal(mail)
 	rows, err := c.Conn.Query(context, "SELECT id, sender, addressee, date, theme, text, files, read FROM overflow.mails WHERE Id = $1;", request.MailId)
@@ -140,7 +144,11 @@ func (c *Database) GetMailInfoById(context context.Context, request *repository_
 // Получить входящие сообщения пользователя
 func (c *Database) GetIncomeMails(context context.Context, request *repository_proto.GetIncomeMailsRequest) (*repository_proto.ResponseMails, error) {
 	var err error
-	defer func() {err = recover().(error)}()
+	defer func() {
+		if errRecover := recover(); errRecover != nil {
+			err = errRecover.(error)
+		}
+	}()
 	var results models.MailList
 	resultsBytes, _ := json.Marshal(results)
 	var count int
@@ -196,7 +204,11 @@ func (c *Database) GetIncomeMails(context context.Context, request *repository_p
 //Получить отправленные пользователем сообщения
 func (c *Database) GetOutcomeMails(context context.Context, request *repository_proto.GetOutcomeMailsRequest) (*repository_proto.ResponseMails, error) {
 	var err error
-	defer func() {err = recover().(error)}()
+	defer func() {
+		if errRecover := recover(); errRecover != nil {
+			err = errRecover.(error)
+		}
+	}()
 	var results models.MailList
 	resultsBytes, _ := json.Marshal(results)
 	var count int

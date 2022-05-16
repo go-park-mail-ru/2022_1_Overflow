@@ -27,7 +27,11 @@ func (c *Database) IsMailMoved(context context.Context, mailId int32) bool {
 
 func (c *Database) GetFolderById(context context.Context, request *repository_proto.GetFolderByIdRequest) (*repository_proto.ResponseFolder, error) {
 	var err error
-	defer func() {err = recover().(error)}()
+	defer func() {
+		if errRecover := recover(); errRecover != nil {
+			err = errRecover.(error)
+		}
+	}()
 	var folder models.Folder
 	folderBytes, _ := json.Marshal(folder)
 	rows, err := c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE id = $1;", request.FolderId)
@@ -66,7 +70,11 @@ func (c *Database) GetFolderById(context context.Context, request *repository_pr
 
 func (c *Database) GetFolderByName(context context.Context, request *repository_proto.GetFolderByNameRequest) (*repository_proto.ResponseFolder, error) {
 	var err error
-	defer func() {err = recover().(error)}()
+	defer func() {
+		if errRecover := recover(); errRecover != nil {
+			err = errRecover.(error)
+		}
+	}()
 	var folder models.Folder
 	folderBytes, _ := json.Marshal(folder)
 	rows, err := c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE name = $1 AND user_id = $2;", request.FolderName, request.UserId)
@@ -105,7 +113,11 @@ func (c *Database) GetFolderByName(context context.Context, request *repository_
 
 func (c *Database) GetFoldersByUser(context context.Context, request *repository_proto.GetFoldersByUserRequest) (*repository_proto.ResponseFolders, error) {
 	var err error
-	defer func() {err = recover().(error)}()
+	defer func() {
+		if errRecover := recover(); errRecover != nil {
+			err = errRecover.(error)
+		}
+	}()
 	var folders models.FolderList
 	foldersBytes, _ := json.Marshal(folders)
 	var count int
@@ -157,7 +169,11 @@ func (c *Database) GetFoldersByUser(context context.Context, request *repository
 
 func (c *Database) GetFolderMail(context context.Context, request *repository_proto.GetFolderMailRequest) (*repository_proto.ResponseMails, error) {
 	var err error
-	defer func() {err = recover().(error)}()
+	defer func() {
+		if errRecover := recover(); errRecover != nil {
+			err = errRecover.(error)
+		}
+	}()
 	var mails models.MailList
 	mailsBytes, _ := json.Marshal(mails)
 	var count int
