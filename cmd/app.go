@@ -59,6 +59,11 @@ func (app *Application) Run(configPath string) {
 		log.Fatal("Ошибка подключения к микросервису FolderManager:", err)
 	}
 	log.Info("Успешное подключение к микросервису FolderManager.")
-	router.Init(config, authDial, profileDial, mailboxDial, folderManagerDial)
+	attachDial, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.Attach.Address, config.Server.Services.Attach.Port))
+	if err != nil {
+		log.Fatal("Ошибка подключения к микросервису Attach:", err)
+	}
+	log.Info("Успешное подключение к микросервису Attach.")
+	router.Init(config, authDial, profileDial, mailboxDial, folderManagerDial, attachDial)
 	HandleServer(config, router)
 }

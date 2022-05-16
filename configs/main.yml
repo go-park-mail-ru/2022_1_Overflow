@@ -29,6 +29,9 @@ server:
     database:
       address: "localhost"
       port: 8085
+    attach:
+      address: "localhost"
+      port: 8086
   session_manager: "standard"
   
 database:
@@ -37,3 +40,9 @@ database:
   host: "localhost"
   port: 5432
   dbname: "postgres"
+
+minio:
+  user: "minio"
+  password: "minio1234"
+  url: "localhost:9000"
+  bucket: "attach"
