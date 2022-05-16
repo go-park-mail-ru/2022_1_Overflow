@@ -186,6 +186,7 @@ func (c *Database) GetIncomeMails(context context.Context, request *repository_p
 	for rows.Next() {
 		var mail models.Mail
 		values, err := rows.Values()
+		log.Debug("Получены значения: ", values)
 		if err != nil {
 			return &repository_proto.ResponseMails{
 				Mails: resultsBytes,
