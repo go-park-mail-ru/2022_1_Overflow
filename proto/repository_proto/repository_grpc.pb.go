@@ -31,7 +31,7 @@ type DatabaseRepositoryClient interface {
 	ChangeUserLastName(ctx context.Context, in *ChangeForm, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error)
 	GetIncomeMails(ctx context.Context, in *GetIncomeMailsRequest, opts ...grpc.CallOption) (*ResponseMails, error)
 	GetOutcomeMails(ctx context.Context, in *GetOutcomeMailsRequest, opts ...grpc.CallOption) (*ResponseMails, error)
-	AddMail(ctx context.Context, in *AddMailRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error)
+	AddMail(ctx context.Context, in *AddMailRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseExtendResponse, error)
 	DeleteMail(ctx context.Context, in *DeleteMailRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error)
 	ReadMail(ctx context.Context, in *ReadMailRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error)
 	GetMailInfoById(ctx context.Context, in *GetMailInfoByIdRequest, opts ...grpc.CallOption) (*ResponseMail, error)
@@ -131,8 +131,8 @@ func (c *databaseRepositoryClient) GetOutcomeMails(ctx context.Context, in *GetO
 	return out, nil
 }
 
-func (c *databaseRepositoryClient) AddMail(ctx context.Context, in *AddMailRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error) {
-	out := new(utils_proto.DatabaseResponse)
+func (c *databaseRepositoryClient) AddMail(ctx context.Context, in *AddMailRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseExtendResponse, error) {
+	out := new(utils_proto.DatabaseExtendResponse)
 	err := c.cc.Invoke(ctx, "/repository_proto.DatabaseRepository/AddMail", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -305,7 +305,7 @@ type DatabaseRepositoryServer interface {
 	ChangeUserLastName(context.Context, *ChangeForm) (*utils_proto.DatabaseResponse, error)
 	GetIncomeMails(context.Context, *GetIncomeMailsRequest) (*ResponseMails, error)
 	GetOutcomeMails(context.Context, *GetOutcomeMailsRequest) (*ResponseMails, error)
-	AddMail(context.Context, *AddMailRequest) (*utils_proto.DatabaseResponse, error)
+	AddMail(context.Context, *AddMailRequest) (*utils_proto.DatabaseExtendResponse, error)
 	DeleteMail(context.Context, *DeleteMailRequest) (*utils_proto.DatabaseResponse, error)
 	ReadMail(context.Context, *ReadMailRequest) (*utils_proto.DatabaseResponse, error)
 	GetMailInfoById(context.Context, *GetMailInfoByIdRequest) (*ResponseMail, error)
@@ -353,7 +353,7 @@ func (UnimplementedDatabaseRepositoryServer) GetIncomeMails(context.Context, *Ge
 func (UnimplementedDatabaseRepositoryServer) GetOutcomeMails(context.Context, *GetOutcomeMailsRequest) (*ResponseMails, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOutcomeMails not implemented")
 }
-func (UnimplementedDatabaseRepositoryServer) AddMail(context.Context, *AddMailRequest) (*utils_proto.DatabaseResponse, error) {
+func (UnimplementedDatabaseRepositoryServer) AddMail(context.Context, *AddMailRequest) (*utils_proto.DatabaseExtendResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddMail not implemented")
 }
 func (UnimplementedDatabaseRepositoryServer) DeleteMail(context.Context, *DeleteMailRequest) (*utils_proto.DatabaseResponse, error) {

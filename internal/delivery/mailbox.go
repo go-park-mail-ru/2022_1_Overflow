@@ -45,21 +45,21 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 		offset = 0
 	}
 	resp, err := d.mailbox.Income(context.Background(), &mailbox_proto.IncomeRequest{
-		Data: data,
-		Limit: int32(limit),
+		Data:   data,
+		Limit:  int32(limit),
 		Offset: int32(offset),
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
+	var response pkg.JsonResponse
 	err = json.Unmarshal(resp.Response.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
@@ -97,21 +97,21 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 		offset = 0
 	}
 	resp, err := d.mailbox.Outcome(context.Background(), &mailbox_proto.OutcomeRequest{
-		Data: data,
-		Limit: int32(limit),
+		Data:   data,
+		Limit:  int32(limit),
 		Offset: int32(offset),
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
+	var response pkg.JsonResponse
 	err = json.Unmarshal(resp.Response.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
@@ -152,13 +152,13 @@ func (d *Delivery) GetMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
+	var response pkg.JsonResponse
 	err = json.Unmarshal(resp.Response.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
@@ -205,13 +205,13 @@ func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
+	var response pkg.JsonResponse
 	err = json.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
@@ -264,13 +264,13 @@ func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
+	var response pkg.JsonResponse
 	err = json.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
@@ -327,17 +327,18 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
+	var response pkg.JsonResponse
 	err = json.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
-	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
+	response.Message = resp.Param
+	pkg.WriteJsonErrFull(w, &response)
 }
 
 // @Router /mail/send [get]

@@ -20,7 +20,7 @@ type DatabaseRepository interface {
 
 	GetIncomeMails(context.Context, *repository_proto.GetIncomeMailsRequest) (*repository_proto.ResponseMails, error)   // Получить входящие письма
 	GetOutcomeMails(context.Context, *repository_proto.GetOutcomeMailsRequest) (*repository_proto.ResponseMails, error) // Получить исходящие письма
-	AddMail(context.Context, *repository_proto.AddMailRequest) (*utils_proto.DatabaseResponse, error)                   // Добавить письмо
+	AddMail(context.Context, *repository_proto.AddMailRequest) (*utils_proto.DatabaseExtendResponse, error)             // Добавить письмо
 	DeleteMail(context.Context, *repository_proto.DeleteMailRequest) (*utils_proto.DatabaseResponse, error)             // Удалить письмо
 	ReadMail(context.Context, *repository_proto.ReadMailRequest) (*utils_proto.DatabaseResponse, error)                 // Прочитать письмо
 	GetMailInfoById(context.Context, *repository_proto.GetMailInfoByIdRequest) (*repository_proto.ResponseMail, error)  // Получить информацию о письме по его id

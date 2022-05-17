@@ -1,7 +1,7 @@
 syntax = "proto3";
 package mailbox_proto;
 
-option go_package = "./mailbox_proto";
+option go_package = "./proto/mailbox_proto";
 
 import "proto/utils.proto";
 
@@ -11,7 +11,7 @@ service Mailbox {
     rpc GetMail(GetMailRequest) returns (ResponseMail) {}
     rpc DeleteMail(DeleteMailRequest) returns (utils.JsonResponse) {}
     rpc ReadMail(ReadMailRequest) returns (utils.JsonResponse) {}
-    rpc SendMail(SendMailRequest) returns (utils.JsonResponse) {}
+    rpc SendMail(SendMailRequest) returns (utils.JsonExtendResponse) {}
 }
 
 message IncomeRequest {

@@ -6,29 +6,41 @@ import (
 	"OverflowBackend/proto/utils_proto"
 	"context"
 	"encoding/json"
+	"strconv"
 	"time"
 
 	log "github.com/sirupsen/logrus"
 )
 
 // Добавить письмо
-func (c *Database) AddMail(context context.Context, request *repository_proto.AddMailRequest) (*utils_proto.DatabaseResponse, error) {
+func (c *Database) AddMail(context context.Context, request *repository_proto.AddMailRequest) (*utils_proto.DatabaseExtendResponse, error) {
 	var mail models.Mail
 	err := json.Unmarshal(request.Mail, &mail)
 	if err != nil {
-		return &utils_proto.DatabaseResponse{
+		return &utils_proto.DatabaseExtendResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
+			Param:  "",
 		}, err
 	}
 	res, err := c.Conn.Query(context, "INSERT INTO overflow.mails(sender, addressee, theme, text, files, date) VALUES ($1, $2, $3, $4, $5, $6);", mail.Sender, mail.Addressee, mail.Theme, mail.Text, mail.Files, mail.Date)
 	if err == nil {
 		res.Close()
-		return &utils_proto.DatabaseResponse{
+		row := c.Conn.QueryRow(context, "SELECT max(id) FROM overflow.mails WHERE sender = $1", mail.Sender)
+		var mailid int
+		if err := row.Scan(&mailid); err != nil {
+			return &utils_proto.DatabaseExtendResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+				Param:  "",
+			}, err
+		}
+		return &utils_proto.DatabaseExtendResponse{
 			Status: utils_proto.DatabaseStatus_OK,
-		}, err
+			Param:  strconv.Itoa(mailid),
+		}, nil
 	} else {
-		return &utils_proto.DatabaseResponse{
+		return &utils_proto.DatabaseExtendResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
+			Param:  "",
 		}, err
 	}
 }

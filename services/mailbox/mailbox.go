@@ -328,8 +328,8 @@ func (s *MailBoxService) DeleteMail(context context.Context, request *mailbox_pr
 		}, nil
 	}
 	resp2, err := s.db.DeleteMail(context, &repository_proto.DeleteMailRequest{
-		Mail:     resp.Mail,
-		UserId:	  user.Id,
+		Mail:   resp.Mail,
+		UserId: user.Id,
 	})
 	if err != nil {
 		log.Error(err)
@@ -396,19 +396,19 @@ func (s *MailBoxService) ReadMail(context context.Context, request *mailbox_prot
 	}, nil
 }
 
-func (s *MailBoxService) SendMail(context context.Context, request *mailbox_proto.SendMailRequest) (*utils_proto.JsonResponse, error) {
+func (s *MailBoxService) SendMail(context context.Context, request *mailbox_proto.SendMailRequest) (*utils_proto.JsonExtendResponse, error) {
 	log.Debug("Отправить письмо, username = ", request.Data.Username)
 	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
 		Username: request.Data.Username,
 	})
 	if err != nil {
 		log.Error(err)
-		return &utils_proto.JsonResponse{
+		return &utils_proto.JsonExtendResponse{
 			Response: pkg.DB_ERR.Bytes(),
 		}, err
 	}
 	if resp.Response.Status != utils_proto.DatabaseStatus_OK {
-		return &utils_proto.JsonResponse{
+		return &utils_proto.JsonExtendResponse{
 			Response: pkg.DB_ERR.Bytes(),
 		}, nil
 	}
@@ -416,19 +416,19 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 	var user models.User
 	err = json.Unmarshal(resp.User, &user)
 	if err != nil {
-		return &utils_proto.JsonResponse{
+		return &utils_proto.JsonExtendResponse{
 			Response: pkg.JSON_ERR.Bytes(),
 		}, err
 	}
 	if (user == models.User{}) {
-		return &utils_proto.JsonResponse{
+		return &utils_proto.JsonExtendResponse{
 			Response: pkg.NO_USER_EXIST.Bytes(),
 		}, nil
 	}
 	var form models.MailForm
 	err = json.Unmarshal(request.Form, &form)
 	if err != nil {
-		return &utils_proto.JsonResponse{
+		return &utils_proto.JsonExtendResponse{
 			Response: pkg.JSON_ERR.Bytes(),
 		}, err
 	}
@@ -437,24 +437,24 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 	})
 	if err != nil {
 		log.Error(err)
-		return &utils_proto.JsonResponse{
+		return &utils_proto.JsonExtendResponse{
 			Response: pkg.DB_ERR.Bytes(),
 		}, err
 	}
 	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
-		return &utils_proto.JsonResponse{
+		return &utils_proto.JsonExtendResponse{
 			Response: pkg.DB_ERR.Bytes(),
 		}, nil
 	}
 	var userAddressee models.User
 	err = json.Unmarshal(resp2.User, &userAddressee)
 	if err != nil {
-		return &utils_proto.JsonResponse{
+		return &utils_proto.JsonExtendResponse{
 			Response: pkg.JSON_ERR.Bytes(),
 		}, err
 	}
 	if (userAddressee == models.User{}) {
-		return &utils_proto.JsonResponse{
+		return &utils_proto.JsonExtendResponse{
 			Response: pkg.NO_USER_EXIST.Bytes(),
 		}, nil
 	}
@@ -472,16 +472,17 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 	})
 	if err != nil {
 		log.Error(err)
-		return &utils_proto.JsonResponse{
+		return &utils_proto.JsonExtendResponse{
 			Response: pkg.DB_ERR.Bytes(),
 		}, err
 	}
 	if resp3.Status != utils_proto.DatabaseStatus_OK {
-		return &utils_proto.JsonResponse{
+		return &utils_proto.JsonExtendResponse{
 			Response: pkg.DB_ERR.Bytes(),
 		}, nil
 	}
-	return &utils_proto.JsonResponse{
+	return &utils_proto.JsonExtendResponse{
 		Response: pkg.NO_ERR.Bytes(),
+		Param:    resp3.Param,
 	}, nil
 }

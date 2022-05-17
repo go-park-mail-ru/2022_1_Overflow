@@ -16,7 +16,7 @@ service DatabaseRepository {
 
     rpc GetIncomeMails(GetIncomeMailsRequest) returns (ResponseMails) {}
     rpc GetOutcomeMails(GetOutcomeMailsRequest) returns (ResponseMails) {}
-    rpc AddMail(AddMailRequest) returns (utils.DatabaseResponse) {}
+    rpc AddMail(AddMailRequest) returns (utils.DatabaseExtendResponse) {}
     rpc DeleteMail(DeleteMailRequest) returns (utils.DatabaseResponse) {}
     rpc ReadMail(ReadMailRequest) returns (utils.DatabaseResponse) {}
     rpc GetMailInfoById(GetMailInfoByIdRequest) returns (ResponseMail) {}
