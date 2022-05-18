@@ -12,10 +12,9 @@ import (
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/validator.v2"
-	"image"
-	"image/jpeg"
 	_ "image/jpeg"
 	_ "image/png"
+	"io"
 	"net/http"
 )
 
@@ -187,6 +186,10 @@ func (d *Delivery) ChangePassword(w http.ResponseWriter, r *http.Request) {
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 func ChangePassword() {}
 
+const (
+	MB = 1 << 20
+)
+
 // SetAvatar godoc
 // @Summary Установка/смена аватарки пользователя
 // @Success 200 {object} pkg.JsonResponse "Успешное установка аватарки."
@@ -210,29 +213,66 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	file, header, err := r.FormFile("file")
+	if err := r.ParseMultipartForm(5 * MB); err != nil {
+		log.Warning(err)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_FILETYPE)
+		return
+	}
+
+	// Limit upload size
+	r.Body = http.MaxBytesReader(w, r.Body, 5*MB) // 5 Mb
+
+	file, multipartFileHeader, err := r.FormFile("file")
 	if err != nil {
-		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_FILETYPE)
 		return
 	}
 	defer file.Close()
 
-	img, format, err := image.Decode(file)
-	if err != nil {
-		log.Warning("can't decode file: ", err)
-		pkg.WriteJsonErrFull(w, &pkg.BAD_FILETYPE)
+	// Create a buffer to store the header of the file in
+	fileHeader := make([]byte, 512)
+
+	// Copy the headers into the FileHeader buffer
+	if _, err := file.Read(fileHeader); err != nil {
+		log.Warning(err)
 		return
 	}
-	if format != "jpeg" && format != "png" {
+
+	// set position back to start.
+	if _, err := file.Seek(0, 0); err != nil {
+		log.Warning(err)
+		return
+	}
+
+	//log.Printf("Name: %#v\n", multipartFileHeader.Filename)
+	//log.Printf("Size: %#v\n", file.(Sizer).Size())
+	log.Printf("MIME: %#v\n", http.DetectContentType(fileHeader))
+	mime := http.DetectContentType(fileHeader)
+
+	if mime != "image/png" && mime != "image/jpeg" && mime != "image/webp" {
 		log.Warning("file is not jpeg or png")
 		pkg.WriteJsonErrFull(w, &pkg.BAD_FILETYPE)
 		return
 	}
 
+	//file, header, err := r.FormFile("file")
+	//if err != nil {
+	//	pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
+	//	return
+	//}
+	//defer file.Close()
+
+	//img, format, err := image.Decode(file)
+	//if err != nil {
+	//	log.Warning("can't decode file: ", err)
+	//	pkg.WriteJsonErrFull(w, &pkg.BAD_FILETYPE)
+	//	return
+	//}
+
 	buf := new(bytes.Buffer)
-	jpeg.Encode(buf, img, nil)
+	io.Copy(buf, file)
 	avatar := models.Avatar{
-		Name:     header.Filename,
+		Name:     multipartFileHeader.Filename,
 		Username: data.Username,
 		File:     buf.Bytes(),
 	}
