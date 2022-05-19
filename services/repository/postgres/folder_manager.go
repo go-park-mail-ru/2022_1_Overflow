@@ -233,7 +233,11 @@ func (c *Database) GetFolderMail(context context.Context, request *repository_pr
 				Mails: mailsBytes,
 			}, err
 		}
-		mail.Addressee = values[0].(string)
+		addressee, ok := values[0].(string)
+		if !ok {
+			addressee = ""
+		}
+		mail.Addressee = addressee
 		mail.Sender = values[1].(string)
 		mail.Theme = values[2].(string)
 		mail.Text = values[3].(string)
@@ -300,6 +304,7 @@ func (c *Database) AddMailToFolderById(context context.Context, request *reposit
 	}
 	rows, err := c.Conn.Query(context, "INSERT INTO overflow.folder_to_mail(folder_id, mail_id, only_folder) SELECT id, $3, $4 FROM overflow.folders WHERE user_id=$1 AND name=$2;", request.UserId, request.FolderName, request.MailId, request.Move)
 	if err != nil {
+		log.Error(err)
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err
