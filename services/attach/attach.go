@@ -22,9 +22,9 @@ type AttachService struct {
 	attach_proto.UnimplementedAttachServer
 }
 
-var ErrAccess = errors.New("User don't have access to this email")
-var ErrJson = errors.New("Error with marshal/unmarshal")
-var ErrAccessAttach = errors.New("User don't have access to this attach")
+var ErrAccess = errors.New("Пользователь не имеет доступа к данному письму.")
+var ErrJson = errors.New("Ошибка упаковки/распаковки JSON.")
+var ErrAccessAttach = errors.New("Пользователь не имеет доступа к данному вложению.")
 
 func (s *AttachService) Init(config *config.Config, db repository_proto.DatabaseRepositoryClient, s3 *minio.Client) {
 	s.config = config

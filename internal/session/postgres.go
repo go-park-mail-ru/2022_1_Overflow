@@ -10,7 +10,6 @@ import (
 	"github.com/antonlindstrom/pgstore"
 	"github.com/gorilla/sessions"
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 type PostgresManager struct {
@@ -47,7 +46,7 @@ func (pm *PostgresManager) CreateSession(w http.ResponseWriter, r *http.Request,
 	session, _ := pm.store.Get(r, session_name)
 	data := &utils_proto.Session{
 		Username:      username,
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 	session.Values["data"] = data
 	err := session.Save(r, w)

@@ -473,7 +473,7 @@ func TestGetMail(t *testing.T) {
 
 	getMailData := &utils_proto.Session{
 		Username:      "test",
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 	mailboxUC.EXPECT().GetMail(context.Background(), &mailbox_proto.GetMailRequest{
 		Data: getMailData,

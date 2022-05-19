@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/gorilla/sessions"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -42,7 +41,7 @@ func (s *StandardManager) CreateSession(w http.ResponseWriter, r *http.Request, 
 	session, _ := s.store.Get(r, session_name)
 	data := &utils_proto.Session{
 		Username:      username,
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 	session.Values["data"] = data
 	err := session.Save(r, w)

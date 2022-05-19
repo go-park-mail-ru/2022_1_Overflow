@@ -10,7 +10,6 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
-	//log "github.com/sirupsen/logrus"
 )
 
 // Находится ли письмо в какой либо папке

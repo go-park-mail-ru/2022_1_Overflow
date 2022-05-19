@@ -6,7 +6,7 @@ import (
 
 type Mail struct {
 	Id        int32     `json:"id"`
-	Sender    string    `json:"sender" validate:"max=45"`
+	Sender    string    `json:"sender" validate:"nonzero,max=45"`
 	Addressee string    `json:"addressee" validate:"max=45"`
 	Theme     string    `json:"theme"`
 	Text      string    `json:"text"`
