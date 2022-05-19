@@ -13,16 +13,22 @@ import (
 )
 
 // Находится ли письмо в какой либо папке
-func (c *Database) IsMailInAnyFolder(context context.Context, mailId int32) bool {
+func (c *Database) IsMailInAnyFolder(context context.Context, mailId int32, userId int32) bool {
 	var counter int
-	err := c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.folder_to_mail WHERE mail_id=$1", mailId).Scan(&counter)
+	err := c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.folder_to_mail WHERE mail_id=$1 AND folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$2)", mailId).Scan(&counter)
+	if err != nil {
+		log.Error(err)
+	}
 	return err == nil && counter > 0
 }
 
 // Является ли письмо перемещенным в какую либо папку
 func (c *Database) IsMailMoved(context context.Context, mailId int32, userId int32) bool {
 	var counter int
-	err := c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.folder_to_mail WHERE mail_id=$1 AND mail_id IN (SELECT id FROM overflow.mails WHERE sender IN (SELECT username FROM overflow.users WHERE id=$2)) AND only_folder=true", mailId, userId).Scan(&counter)
+	err := c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.folder_to_mail WHERE mail_id=$1 AND folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$2) AND only_folder=true", mailId, userId).Scan(&counter)
+	if err != nil {
+		log.Error(err)
+	}
 	return err == nil && counter > 0
 }
 
