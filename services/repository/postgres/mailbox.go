@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"OverflowBackend/internal/models"
+	"OverflowBackend/pkg"
 	"OverflowBackend/proto/repository_proto"
 	"OverflowBackend/proto/utils_proto"
 	"context"
@@ -141,8 +142,16 @@ func (c *Database) GetMailInfoById(context context.Context, request *repository_
 			}, err
 		}
 		mail.Id = values[0].(int32)
-		mail.Sender = values[1].(string)
-		mail.Addressee = values[2].(string)
+		sender, ok := values[1].(string) // может быть пустым
+		if !ok {
+			sender = ""
+		}
+		mail.Sender = sender
+		addressee, ok := values[2].(string)
+		if !ok {
+			addressee = ""
+		}
+		mail.Addressee = addressee
 		mail.Date = values[3].(time.Time)
 		mail.Theme = values[4].(string)
 		mail.Text = values[5].(string)
@@ -175,7 +184,7 @@ func (c *Database) GetIncomeMails(context context.Context, request *repository_p
 		}
 	}()
 	var count int
-	err = c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.mails WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND addressee IN (SELECT username FROM overflow.users WHERE id=$1) AND sender NOT IN (NULL, '');", request.UserId).Scan(&count)
+	err = c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.mails WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND addressee IN (SELECT username FROM overflow.users WHERE id=$1);", request.UserId).Scan(&count)
 	if err != nil {
 		return &repository_proto.ResponseMails{
 			Mails: resultsBytes,
@@ -185,7 +194,7 @@ func (c *Database) GetIncomeMails(context context.Context, request *repository_p
 		}, err
 	}
 	results.Amount = count
-	rows, err := c.Conn.Query(context, "SELECT sender, theme, text, files, date, read, id FROM overflow.mails WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND addressee IN (SELECT username FROM overflow.users WHERE id=$1) AND sender NOT IN (NULL, '') ORDER BY date DESC OFFSET $3 LIMIT $2;", request.UserId, request.Limit, request.Offset)
+	rows, err := c.Conn.Query(context, "SELECT sender, theme, text, files, date, read, id FROM overflow.mails WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND addressee IN (SELECT username FROM overflow.users WHERE id=$1) ORDER BY date DESC OFFSET $3 LIMIT $2;", request.UserId, request.Limit, request.Offset)
 	if err != nil {
 		return &repository_proto.ResponseMails{
 			Mails: resultsBytes,
@@ -207,7 +216,11 @@ func (c *Database) GetIncomeMails(context context.Context, request *repository_p
 				},
 			}, err
 		}
-		mail.Sender = values[0].(string)
+		sender, ok := values[0].(string) // может быть пустым
+		if !ok {
+			sender = pkg.DELETED_USERNAME
+		}
+		mail.Sender = sender
 		mail.Theme = values[1].(string)
 		mail.Text = values[2].(string)
 		mail.Files = values[3].(string)
@@ -273,7 +286,11 @@ func (c *Database) GetOutcomeMails(context context.Context, request *repository_
 				},
 			}, err
 		}
-		mail.Addressee = values[0].(string)
+		addressee, ok := values[0].(string)
+		if !ok {
+			addressee = pkg.DELETED_USERNAME
+		}
+		mail.Addressee = addressee
 		mail.Theme = values[1].(string)
 		mail.Text = values[2].(string)
 		mail.Files = values[3].(string)
