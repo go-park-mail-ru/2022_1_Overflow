@@ -20,9 +20,9 @@ func (c *Database) IsMailInAnyFolder(context context.Context, mailId int32) bool
 }
 
 // Является ли письмо перемещенным в какую либо папку
-func (c *Database) IsMailMoved(context context.Context, mailId int32) bool {
+func (c *Database) IsMailMoved(context context.Context, mailId int32, userId int32) bool {
 	var counter int
-	err := c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.folder_to_mail WHERE mail_id=$1 AND only_folder=true", mailId).Scan(&counter)
+	err := c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.folder_to_mail WHERE mail_id=$1 AND mail_id IN (SELECT id FROM overflow.mails WHERE sender IN (SELECT username FROM overflow.users WHERE id=$2)) AND only_folder=true", mailId, userId).Scan(&counter)
 	return err == nil && counter > 0
 }
 
@@ -308,7 +308,7 @@ func (c *Database) ChangeFolderName(context context.Context, request *repository
 
 // Добавить письмо в папку
 func (c *Database) AddMailToFolderById(context context.Context, request *repository_proto.AddMailToFolderByIdRequest) (*utils_proto.DatabaseResponse, error) {
-	if c.IsMailMoved(context, request.MailId) {
+	if c.IsMailMoved(context, request.MailId, request.UserId) {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, nil
