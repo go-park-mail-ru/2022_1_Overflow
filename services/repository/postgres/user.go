@@ -28,6 +28,7 @@ func (c *Database) GetUserInfoByUsername(context context.Context, request *repos
 	}()
 	rows, err := c.Conn.Query(context, "Select id, first_name, last_name, password, username from overflow.users where username = $1;", request.Username)
 	if err != nil {
+		log.Error(err)
 		return &repository_proto.ResponseUser{
 			User: userBytes,
 			Response: &utils_proto.DatabaseResponse{
@@ -39,6 +40,7 @@ func (c *Database) GetUserInfoByUsername(context context.Context, request *repos
 	for rows.Next() {
 		values, err := rows.Values()
 		if err != nil {
+			log.Error(err)
 			return &repository_proto.ResponseUser{
 				User: userBytes,
 				Response: &utils_proto.DatabaseResponse{
@@ -79,6 +81,7 @@ func (c *Database) GetUserInfoById(context context.Context, request *repository_
 	}()
 	rows, err := c.Conn.Query(context, "Select id, first_name, last_name, password, username from overflow.users(id, first_name, last_name, password, username) where id = $1;", request.UserId)
 	if err != nil {
+		log.Error(err)
 		return &repository_proto.ResponseUser{
 			User: userBytes,
 			Response: &utils_proto.DatabaseResponse{
@@ -90,6 +93,7 @@ func (c *Database) GetUserInfoById(context context.Context, request *repository_
 	for rows.Next() {
 		values, err := rows.Values()
 		if err != nil {
+			log.Error(err)
 			return &repository_proto.ResponseUser{
 				User: userBytes,
 				Response: &utils_proto.DatabaseResponse{
@@ -117,6 +121,7 @@ func (c *Database) AddUser(context context.Context, request *repository_proto.Ad
 	var user models.User
 	err := json.Unmarshal(request.User, &user)
 	if err != nil {
+		log.Error(err)
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err
@@ -128,12 +133,14 @@ func (c *Database) AddUser(context context.Context, request *repository_proto.Ad
 			Username: user.Username,
 		})
 		if err != nil {
+			log.Error(err)
 			return &utils_proto.DatabaseResponse{
 				Status: utils_proto.DatabaseStatus_ERROR,
 			}, err
 		}
 		err = json.Unmarshal(resp.User, &user)
 		if err != nil{
+			log.Error(err)
 			return &utils_proto.DatabaseResponse{
 				Status: utils_proto.DatabaseStatus_ERROR,
 			}, err
@@ -154,6 +161,7 @@ func (c *Database) ChangeUserPassword(context context.Context, request *reposito
 	var user models.User
 	err := json.Unmarshal(request.User, &user)
 	if err != nil {
+		log.Error(err)
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err
@@ -164,6 +172,7 @@ func (c *Database) ChangeUserPassword(context context.Context, request *reposito
 			Status: utils_proto.DatabaseStatus_OK,
 		}, err
 	} else {
+		log.Error(err)
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err
@@ -175,6 +184,7 @@ func (c *Database) ChangeUserFirstName(context context.Context, request *reposit
 	var user models.User
 	err := json.Unmarshal(request.User, &user)
 	if err != nil {
+		log.Error(err)
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err
@@ -185,6 +195,7 @@ func (c *Database) ChangeUserFirstName(context context.Context, request *reposit
 			Status: utils_proto.DatabaseStatus_OK,
 		}, err
 	} else {
+		log.Error(err)
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err

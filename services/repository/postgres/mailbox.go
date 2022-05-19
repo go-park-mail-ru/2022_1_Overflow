@@ -18,6 +18,7 @@ func (c *Database) AddMail(context context.Context, request *repository_proto.Ad
 	var mail models.Mail
 	err := json.Unmarshal(request.Mail, &mail)
 	if err != nil {
+		log.Error(err)
 		return &utils_proto.DatabaseExtendResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
 			Param:  "",
@@ -29,6 +30,7 @@ func (c *Database) AddMail(context context.Context, request *repository_proto.Ad
 		row := c.Conn.QueryRow(context, "SELECT max(id) FROM overflow.mails WHERE sender = $1", mail.Sender)
 		var mailid int
 		if err := row.Scan(&mailid); err != nil {
+			log.Error(err)
 			return &utils_proto.DatabaseExtendResponse{
 				Status: utils_proto.DatabaseStatus_ERROR,
 				Param:  "",
@@ -39,6 +41,7 @@ func (c *Database) AddMail(context context.Context, request *repository_proto.Ad
 			Param:  strconv.Itoa(mailid),
 		}, nil
 	} else {
+		log.Error(err)
 		return &utils_proto.DatabaseExtendResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
 			Param:  "",
@@ -51,6 +54,7 @@ func (c *Database) DeleteMail(context context.Context, request *repository_proto
 	var mail models.Mail
 	err := json.Unmarshal(request.Mail, &mail)
 	if err != nil {
+		log.Error(err)
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err
@@ -58,6 +62,7 @@ func (c *Database) DeleteMail(context context.Context, request *repository_proto
 	userId := request.UserId
 	res, err := c.Conn.Query(context, "UPDATE overflow.mails SET sender = NULL WHERE id = $1 AND sender IN (SELECT username FROM overflow.users WHERE id=$2);", mail.Id, userId)
 	if err != nil {
+		log.Error(err)
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err
@@ -65,6 +70,7 @@ func (c *Database) DeleteMail(context context.Context, request *repository_proto
 	res.Close()
 	res, err = c.Conn.Query(context, "UPDATE overflow.mails SET addressee = NULL WHERE id = $1 AND addressee IN (SELECT username FROM overflow.users WHERE id=$2);", mail.Id, userId)
 	if err != nil {
+		log.Error(err)
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err
@@ -77,6 +83,7 @@ func (c *Database) DeleteMail(context context.Context, request *repository_proto
 			Status: utils_proto.DatabaseStatus_OK,
 		}, err
 	} else {
+		log.Error(err)
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err
@@ -123,6 +130,7 @@ func (c *Database) GetMailInfoById(context context.Context, request *repository_
 	}()
 	rows, err := c.Conn.Query(context, "SELECT id, sender, addressee, date, theme, text, files, read FROM overflow.mails WHERE Id = $1;", request.MailId)
 	if err != nil {
+		log.Error(err)
 		return &repository_proto.ResponseMail{
 			Mail: mailBytes,
 			Response: &utils_proto.DatabaseResponse{
@@ -134,6 +142,7 @@ func (c *Database) GetMailInfoById(context context.Context, request *repository_
 	for rows.Next() {
 		values, err := rows.Values()
 		if err != nil {
+			log.Error(err)
 			return &repository_proto.ResponseMail{
 				Mail: mailBytes,
 				Response: &utils_proto.DatabaseResponse{
@@ -186,6 +195,7 @@ func (c *Database) GetIncomeMails(context context.Context, request *repository_p
 	var count int
 	err = c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.mails WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND addressee IN (SELECT username FROM overflow.users WHERE id=$1);", request.UserId).Scan(&count)
 	if err != nil {
+		log.Error(err)
 		return &repository_proto.ResponseMails{
 			Mails: resultsBytes,
 			Response: &utils_proto.DatabaseResponse{
@@ -196,6 +206,7 @@ func (c *Database) GetIncomeMails(context context.Context, request *repository_p
 	results.Amount = count
 	rows, err := c.Conn.Query(context, "SELECT sender, theme, text, files, date, read, id FROM overflow.mails WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND addressee IN (SELECT username FROM overflow.users WHERE id=$1) ORDER BY date DESC OFFSET $3 LIMIT $2;", request.UserId, request.Limit, request.Offset)
 	if err != nil {
+		log.Error(err)
 		return &repository_proto.ResponseMails{
 			Mails: resultsBytes,
 			Response: &utils_proto.DatabaseResponse{
@@ -209,6 +220,7 @@ func (c *Database) GetIncomeMails(context context.Context, request *repository_p
 		values, err := rows.Values()
 		log.Debug("Получены значения: ", values)
 		if err != nil {
+			log.Error(err)
 			return &repository_proto.ResponseMails{
 				Mails: resultsBytes,
 				Response: &utils_proto.DatabaseResponse{
@@ -257,6 +269,7 @@ func (c *Database) GetOutcomeMails(context context.Context, request *repository_
 	var count int
 	err = c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.mails WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND sender IN (SELECT username FROM overflow.users WHERE id=$1);", request.UserId).Scan(&count)
 	if err != nil {
+		log.Error(err)
 		return &repository_proto.ResponseMails{
 			Mails: resultsBytes,
 			Response: &utils_proto.DatabaseResponse{
@@ -267,6 +280,7 @@ func (c *Database) GetOutcomeMails(context context.Context, request *repository_
 	results.Amount = count
 	rows, err := c.Conn.Query(context, "SELECT addressee, theme, text, files, date, id FROM overflow.mails WHERE id NOT IN (SELECT mail_id FROM overflow.folder_to_mail WHERE folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$1) AND only_folder=true) AND sender IN (SELECT username FROM overflow.users WHERE id=$1) ORDER BY date DESC OFFSET $3 LIMIT $2;", request.UserId, request.Limit, request.Offset)
 	if err != nil {
+		log.Error(err)
 		return &repository_proto.ResponseMails{
 			Mails: resultsBytes,
 			Response: &utils_proto.DatabaseResponse{
@@ -279,6 +293,7 @@ func (c *Database) GetOutcomeMails(context context.Context, request *repository_
 		var mail models.Mail
 		values, err := rows.Values()
 		if err != nil {
+			log.Error(err)
 			return &repository_proto.ResponseMails{
 				Mails: resultsBytes,
 				Response: &utils_proto.DatabaseResponse{
