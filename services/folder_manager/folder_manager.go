@@ -86,7 +86,7 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 			Response: &utils_proto.JsonResponse{
 				Response: pkg.DB_ERR.Bytes(),
 			},
-		}, err
+		}, nil
 	}
 	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
 		return &folder_manager_proto.ResponseFolder{
@@ -102,7 +102,7 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 			Response: &utils_proto.JsonResponse{
 				Response: pkg.JSON_ERR.Bytes(),
 			},
-		}, err
+		}, nil
 	}
 	if (folder != models.Folder{}) {
 		return &folder_manager_proto.ResponseFolder{
@@ -121,7 +121,7 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 			Response: &utils_proto.JsonResponse{
 				Response: pkg.DB_ERR.Bytes(),
 			},
-		}, err
+		}, nil
 	}
 	if resp3.Status != utils_proto.DatabaseStatus_OK {
 		return &folder_manager_proto.ResponseFolder{
@@ -140,7 +140,7 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 			Response: &utils_proto.JsonResponse{
 				Response: pkg.DB_ERR.Bytes(),
 			},
-		}, err
+		}, nil
 	}
 	if resp4.Response.Status != utils_proto.DatabaseStatus_OK {
 		return &folder_manager_proto.ResponseFolder{
