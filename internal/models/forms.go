@@ -14,9 +14,9 @@ type SignUpForm struct {
 }
 
 type MailForm struct {
-	Addressee string `json:"addressee" validate:"nonzero,max=45"`
-	Theme     string `json:"theme" validate:"nonzero,max=45"`
-	Text      string `json:"text" validate:"nonzero"`
+	Addressee string `json:"addressee" folder_object:"max=45" validate:"nonzero,max=45"`
+	Theme     string `json:"theme" folder_object:"max=45" validate:"nonzero,max=45"`
+	Text      string `json:"text" folder_object:"" validate:"nonzero"`
 	Files     string `json:"files"`
 }
 
@@ -51,7 +51,7 @@ type AddMailToFolderByIdForm struct {
 }
 
 type AddMailToFolderByObjectForm struct {
-	FolderName string   `json:"folder_name" validate:"nonzero"`
+	FolderName string   `json:"folder_name" folder_object:"nonzero"`
 	Mail       MailForm `json:"form"`
 }
 

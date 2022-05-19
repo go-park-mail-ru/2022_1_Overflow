@@ -164,7 +164,9 @@ func (d *Delivery) AddMailToFolderByObject(w http.ResponseWriter, r *http.Reques
 	form.Mail.Text = xss.EscapeInput(form.Mail.Text)
 	form.Mail.Theme = xss.EscapeInput(form.Mail.Theme)
 	formBytes, _ := json.Marshal(form.Mail)
-	if err := validator.Validate(form); err != nil {
+	objectValidator := validator.NewValidator()
+	objectValidator.SetTag("folder_object")
+	if err := objectValidator.Validate(form); err != nil {
 		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
 		return
 	}
