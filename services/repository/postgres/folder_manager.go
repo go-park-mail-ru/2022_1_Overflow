@@ -318,8 +318,12 @@ func (c *Database) AddMailToFolderByObject(context context.Context, request *rep
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err
 	}
-	var mailId int32 
-	err = c.Conn.QueryRow(context, "INSERT INTO overflow.mails(addressee, date, files, sender, text, theme) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;", mail.Addressee, mail.Date, mail.Files, mail.Sender, mail.Text, mail.Theme).Scan(&mailId)
+	var mailId int32
+	if len(mail.Addressee) == 0 {
+		err = c.Conn.QueryRow(context, "INSERT INTO overflow.mails(date, files, sender, text, theme) VALUES ($1, $2, $3, $4, $5) RETURNING id;", mail.Date, mail.Files, mail.Sender, mail.Text, mail.Theme).Scan(&mailId)
+	} else {
+		err = c.Conn.QueryRow(context, "INSERT INTO overflow.mails(addressee, date, files, sender, text, theme) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;", mail.Addressee, mail.Date, mail.Files, mail.Sender, mail.Text, mail.Theme).Scan(&mailId)
+	}
 	if err != nil {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
