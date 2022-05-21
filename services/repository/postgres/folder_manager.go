@@ -344,14 +344,34 @@ func (c *Database) AddMailToFolderByObject(context context.Context, request *rep
 	var mailId int32
 	if len(mail.Addressee) == 0 {
 		err = c.Conn.QueryRow(context, "INSERT INTO overflow.mails(date, files, sender, text, theme) VALUES ($1, $2, $3, $4, $5) RETURNING id;", mail.Date, mail.Files, mail.Sender, mail.Text, mail.Theme).Scan(&mailId)
+		if err != nil {
+			log.Error(err)
+			return &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			}, err
+		}
 	} else {
-		err = c.Conn.QueryRow(context, "INSERT INTO overflow.mails(addressee, date, files, sender, text, theme) VALUES ($1, $2, $3, $4, $5, $6) ON CONFLICT ON CONSTRAINT mails_addressee_fkey DO UPDATE SET addressee=excluded.addressee RETURNING id;", mail.Addressee, mail.Date, mail.Files, mail.Sender, mail.Text, mail.Theme).Scan(&mailId)
-	}
-	if err != nil {
-		log.Error(err)
-		return &utils_proto.DatabaseResponse{
-			Status: utils_proto.DatabaseStatus_ERROR,
-		}, err
+		_, err := c.Conn.Exec(context, "ALTER TABLE overflow.mails DISABLE TRIGGER ALL;")
+		if err != nil {
+			log.Error(err)
+			return &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			}, err
+		}
+		err = c.Conn.QueryRow(context, "INSERT INTO overflow.mails(addressee, date, files, sender, text, theme) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;", mail.Addressee, mail.Date, mail.Files, mail.Sender, mail.Text, mail.Theme).Scan(&mailId)
+		if err != nil {
+			log.Error(err)
+			return &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			}, err
+		}
+		_, err = c.Conn.Exec(context, "ALTER TABLE overflow.mails ENABLE TRIGGER ALL;")
+		if err != nil {
+			log.Error(err)
+			return &utils_proto.DatabaseResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			}, err
+		}
 	}
 	_, err = c.Conn.Exec(context, "INSERT INTO overflow.folder_to_mail(folder_id, mail_id, only_folder) SELECT id, $3, true FROM overflow.folders WHERE user_id=$1 AND name=$2;", request.UserId, request.FolderName, mailId)
 	if err != nil {
