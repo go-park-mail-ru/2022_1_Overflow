@@ -9,7 +9,7 @@
         },
         "version": "1.0"
     },
-    "basePath": "/",
+    "basePath": "/api/v1",
     "paths": {
         "/folder/add": {
             "get": {

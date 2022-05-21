@@ -22,7 +22,8 @@ type Application struct{}
 // @contact.url https://vk.com/l____l____l____l____l____l
 // @contact.username jellybe@yandex.ru
 
-// @BasePath /
+// @BasePath /api/v1
+
 func (app *Application) Run(configPath string) {
 	log.Info("Чтение конфигурационного файла сервера.")
 	config, err := config.NewConfig(configPath)

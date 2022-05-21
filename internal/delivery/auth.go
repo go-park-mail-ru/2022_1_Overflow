@@ -55,13 +55,13 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
+	var response pkg.JsonResponse
 	err = json.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
@@ -118,11 +118,11 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	data.Firstname = xss.EscapeInput(data.Firstname)
 	data.Lastname = xss.EscapeInput(data.Lastname)
 	/*
-	passSafe := xss.EscapeInput(data.Password)
-	if passSafe != data.Password {
-		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, "Пароль содержит недопустимое содержимое.")
-		return
-	}
+		passSafe := xss.EscapeInput(data.Password)
+		if passSafe != data.Password {
+			pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, "Пароль содержит недопустимое содержимое.")
+			return
+		}
 	*/
 	dataBytes, _ := json.Marshal(data)
 	resp, err := d.auth.SignUp(context.Background(), &auth_proto.SignUpRequest{
@@ -132,13 +132,13 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
+	var response pkg.JsonResponse
 	err = json.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
