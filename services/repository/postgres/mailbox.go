@@ -321,3 +321,15 @@ func (c *Database) GetOutcomeMails(context context.Context, request *repository_
 		},
 	}, nil
 }
+
+func (c *Database) CountUnread(context context.Context, request *repository_proto.CountUnreadRequest) (*repository_proto.ResponseCountUnread, error) {
+	row := c.Conn.QueryRow(context, "SELECT count(id) FROM overflow.mails WHERE addressee = $1 AND read = false;", request.Username)
+	var countUnreadMess int
+	if err := row.Scan(&countUnreadMess); err != nil {
+		log.Warning(err)
+		return nil, err
+	}
+	return &repository_proto.ResponseCountUnread{
+		Count: int32(countUnreadMess),
+	}, nil
+}

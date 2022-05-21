@@ -60,6 +60,7 @@ func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 	router.HandleFunc("/mail/attach/add", rm.d.UploadAttach)
 	router.HandleFunc("/mail/attach/get", rm.d.GetAttach)
 	router.HandleFunc("/mail/attach/list", rm.d.ListAttach)
+	router.HandleFunc("/mail/countunread", rm.d.GetCountUnread)
 	// ======================================================================
 	router.HandleFunc("/folder/add", rm.d.AddFolder)
 	router.HandleFunc("/folder/mail/add", rm.d.AddMailToFolderById)

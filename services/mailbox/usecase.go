@@ -17,4 +17,5 @@ type MailBoxServiceInterface interface {
 	DeleteMail(context context.Context, request *mailbox_proto.DeleteMailRequest) (*utils_proto.JsonResponse, error)
 	ReadMail(context context.Context, request *mailbox_proto.ReadMailRequest) (*utils_proto.JsonResponse, error)
 	SendMail(context context.Context, request *mailbox_proto.SendMailRequest) (*utils_proto.JsonExtendResponse, error)
+	CountUnread(context context.Context, request *mailbox_proto.CountUnreadRequest) (*mailbox_proto.ResponseCountUnread, error)
 }

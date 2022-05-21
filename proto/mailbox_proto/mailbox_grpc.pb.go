@@ -26,6 +26,7 @@ type MailboxClient interface {
 	Income(ctx context.Context, in *IncomeRequest, opts ...grpc.CallOption) (*ResponseMails, error)
 	Outcome(ctx context.Context, in *OutcomeRequest, opts ...grpc.CallOption) (*ResponseMails, error)
 	GetMail(ctx context.Context, in *GetMailRequest, opts ...grpc.CallOption) (*ResponseMail, error)
+	CountUnread(ctx context.Context, in *CountUnreadRequest, opts ...grpc.CallOption) (*ResponseCountUnread, error)
 	DeleteMail(ctx context.Context, in *DeleteMailRequest, opts ...grpc.CallOption) (*utils_proto.JsonResponse, error)
 	ReadMail(ctx context.Context, in *ReadMailRequest, opts ...grpc.CallOption) (*utils_proto.JsonResponse, error)
 	SendMail(ctx context.Context, in *SendMailRequest, opts ...grpc.CallOption) (*utils_proto.JsonExtendResponse, error)
@@ -66,6 +67,15 @@ func (c *mailboxClient) GetMail(ctx context.Context, in *GetMailRequest, opts ..
 	return out, nil
 }
 
+func (c *mailboxClient) CountUnread(ctx context.Context, in *CountUnreadRequest, opts ...grpc.CallOption) (*ResponseCountUnread, error) {
+	out := new(ResponseCountUnread)
+	err := c.cc.Invoke(ctx, "/mailbox_proto.Mailbox/CountUnread", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *mailboxClient) DeleteMail(ctx context.Context, in *DeleteMailRequest, opts ...grpc.CallOption) (*utils_proto.JsonResponse, error) {
 	out := new(utils_proto.JsonResponse)
 	err := c.cc.Invoke(ctx, "/mailbox_proto.Mailbox/DeleteMail", in, out, opts...)
@@ -100,6 +110,7 @@ type MailboxServer interface {
 	Income(context.Context, *IncomeRequest) (*ResponseMails, error)
 	Outcome(context.Context, *OutcomeRequest) (*ResponseMails, error)
 	GetMail(context.Context, *GetMailRequest) (*ResponseMail, error)
+	CountUnread(context.Context, *CountUnreadRequest) (*ResponseCountUnread, error)
 	DeleteMail(context.Context, *DeleteMailRequest) (*utils_proto.JsonResponse, error)
 	ReadMail(context.Context, *ReadMailRequest) (*utils_proto.JsonResponse, error)
 	SendMail(context.Context, *SendMailRequest) (*utils_proto.JsonExtendResponse, error)
@@ -117,6 +128,9 @@ func (UnimplementedMailboxServer) Outcome(context.Context, *OutcomeRequest) (*Re
 }
 func (UnimplementedMailboxServer) GetMail(context.Context, *GetMailRequest) (*ResponseMail, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMail not implemented")
+}
+func (UnimplementedMailboxServer) CountUnread(context.Context, *CountUnreadRequest) (*ResponseCountUnread, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CountUnread not implemented")
 }
 func (UnimplementedMailboxServer) DeleteMail(context.Context, *DeleteMailRequest) (*utils_proto.JsonResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteMail not implemented")
@@ -194,6 +208,24 @@ func _Mailbox_GetMail_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Mailbox_CountUnread_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CountUnreadRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MailboxServer).CountUnread(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/mailbox_proto.Mailbox/CountUnread",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MailboxServer).CountUnread(ctx, req.(*CountUnreadRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Mailbox_DeleteMail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteMailRequest)
 	if err := dec(in); err != nil {
@@ -266,6 +298,10 @@ var Mailbox_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetMail",
 			Handler:    _Mailbox_GetMail_Handler,
+		},
+		{
+			MethodName: "CountUnread",
+			Handler:    _Mailbox_CountUnread_Handler,
 		},
 		{
 			MethodName: "DeleteMail",

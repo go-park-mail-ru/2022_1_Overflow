@@ -4,6 +4,8 @@ package repository_proto;
 option go_package = "./proto/repository_proto";
 import "proto/utils.proto";
 
+// protoc --go_out=. --go-grpc_out=. proto/repository.proto
+
 service DatabaseRepository {
     rpc GetUserInfoByUsername(GetUserInfoByUsernameRequest) returns (ResponseUser) {}
     rpc GetUserInfoById(GetUserInfoByIdRequest) returns (ResponseUser) {}
@@ -20,6 +22,7 @@ service DatabaseRepository {
     rpc DeleteMail(DeleteMailRequest) returns (utils.DatabaseResponse) {}
     rpc ReadMail(ReadMailRequest) returns (utils.DatabaseResponse) {}
     rpc GetMailInfoById(GetMailInfoByIdRequest) returns (ResponseMail) {}
+    rpc CountUnread(CountUnreadRequest) returns (ResponseCountUnread) {}
 
     rpc GetFolderById(GetFolderByIdRequest) returns (ResponseFolder) {}
     rpc GetFolderByName(GetFolderByNameRequest) returns (ResponseFolder) {}
@@ -160,6 +163,10 @@ message GetAttachRequest {
     string filename = 2;
 }
 
+message CountUnreadRequest{
+    string username = 1;
+}
+
 // ================= responses ==================
 
 message ResponseUser {
@@ -193,4 +200,8 @@ message Nothing {
 
 message ResponseAttaches {
     bytes filenames = 1;
+}
+
+message ResponseCountUnread{
+    int32 count = 1;
 }

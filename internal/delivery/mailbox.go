@@ -338,16 +338,22 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
+	response.Message = resp.Param
+	pkg.WriteJsonErrFull(w, &response)
 
+	respCU, err := d.mailbox.CountUnread(context.Background(), &mailbox_proto.CountUnreadRequest{
+		Data: data,
+	})
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
+		return
+	}
 	d.ws <- ws.WSMessage{
 		Type:          ws.TYPE_ALERT,
 		Username:      form.Addressee,
-		Message:       "Новое письмо!",
+		Message:       strconv.Itoa(int(respCU.Count)),
 		MessageStatus: ws.STATUS_INFO,
 	}
-
-	response.Message = resp.Param
-	pkg.WriteJsonErrFull(w, &response)
 }
 
 // @Router /mail/send [get]
@@ -355,3 +361,39 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 // @Tags mailbox
 func SendMail() {}
+
+// CountUnread godoc
+// @Summary Выполняет отправку письма получателю
+// @Success 200 {object} pkg.JsonResponse "Успешная отправка письма."
+// @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
+// @Failure 500 {object} pkg.JsonResponse "Получатель не существует, ошибка БД."
+// @Accept json
+// @Produce json
+// @Router /mail/countunread [get]
+// @Tags mailbox
+func (d *Delivery) GetCountUnread(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodGet {
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
+		return
+	}
+	data, err := session.Manager.GetData(r)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
+		return
+	}
+
+	resp, err := d.mailbox.CountUnread(context.Background(), &mailbox_proto.CountUnreadRequest{
+		Data: data,
+	})
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
+		return
+	}
+
+	countResp := &models.CountUnread{
+		Count: int(resp.Count),
+	}
+	countRespBytes, _ := json.Marshal(countResp)
+	w.Write(countRespBytes)
+}
