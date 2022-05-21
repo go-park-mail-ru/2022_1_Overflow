@@ -2,6 +2,7 @@ package delivery
 
 import (
 	"OverflowBackend/internal/config"
+	ws "OverflowBackend/internal/websocket"
 	"OverflowBackend/proto/attach_proto"
 	"OverflowBackend/proto/auth_proto"
 	"OverflowBackend/proto/folder_manager_proto"
@@ -16,6 +17,7 @@ type Delivery struct {
 	folderManager folder_manager_proto.FolderManagerClient
 	attach        attach_proto.AttachClient
 	config        *config.Config
+	ws            chan ws.WSMessage
 }
 
 func (d *Delivery) Init(
@@ -32,4 +34,5 @@ func (d *Delivery) Init(
 	d.mailbox = mailbox
 	d.folderManager = folderManager
 	d.attach = attach
+	d.ws = ws.NewWSServer()
 }

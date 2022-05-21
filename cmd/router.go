@@ -70,6 +70,8 @@ func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 	router.HandleFunc("/folder/delete", rm.d.DeleteFolder)
 	router.HandleFunc("/folder/list", rm.d.ListFolders)
 	// ======================================================================
+	router.HandleFunc("/ws", rm.d.WSConnect)
+	// ======================================================================
 	router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
 		httpSwagger.URL("/swagger/doc.json"), //The url pointing to API definition
 		httpSwagger.DeepLinking(true),

@@ -4,6 +4,7 @@ import (
 	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/security/xss"
 	"OverflowBackend/internal/session"
+	ws "OverflowBackend/internal/websocket"
 	"OverflowBackend/pkg"
 	"OverflowBackend/proto/mailbox_proto"
 	"context"
@@ -337,6 +338,14 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
+
+	d.ws <- ws.WSMessage{
+		Type:          ws.TYPE_ALERT,
+		Username:      form.Addressee,
+		Message:       "Новое письмо!",
+		MessageStatus: ws.STATUS_INFO,
+	}
+
 	response.Message = resp.Param
 	pkg.WriteJsonErrFull(w, &response)
 }
