@@ -20,11 +20,6 @@ func CheckLogin(handler http.Handler) http.Handler {
 		for _, path := range allowedPaths {
 			allowed = allowed || strings.Contains(r.URL.Path, path)
 		}
-		cok, err := r.Cookie("OverflowMail")
-		if err != nil {
-			log.Info(err)
-		}
-		log.Info(cok.Value)
 
 		if !allowed && !session.Manager.IsLoggedIn(r) {
 			log.Info("unauthorized")
