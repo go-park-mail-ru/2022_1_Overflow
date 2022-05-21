@@ -486,3 +486,17 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 		Param:    resp3.Param,
 	}, nil
 }
+
+func (s *MailBoxService) CountUnread(ctx context.Context, request *mailbox_proto.CountUnreadRequest) (*mailbox_proto.ResponseCountUnread, error) {
+	countMess, err := s.db.CountUnread(context.Background(), &repository_proto.CountUnreadRequest{
+		Username: request.Data.Username,
+	})
+
+	if err != nil {
+		log.Warning(err)
+		return nil, err
+	}
+	return &mailbox_proto.ResponseCountUnread{
+		Count: countMess.Count,
+	}, nil
+}

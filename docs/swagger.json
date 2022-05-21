@@ -863,6 +863,40 @@
                 }
             }
         },
+        "/mail/countunread": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "mailbox"
+                ],
+                "summary": "Выполняет отправку письма получателю",
+                "responses": {
+                    "200": {
+                        "description": "Успешная отправка письма.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Получатель не существует, ошибка БД.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/mail/delete": {
             "get": {
                 "tags": [

@@ -35,6 +35,7 @@ type DatabaseRepositoryClient interface {
 	DeleteMail(ctx context.Context, in *DeleteMailRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error)
 	ReadMail(ctx context.Context, in *ReadMailRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error)
 	GetMailInfoById(ctx context.Context, in *GetMailInfoByIdRequest, opts ...grpc.CallOption) (*ResponseMail, error)
+	CountUnread(ctx context.Context, in *CountUnreadRequest, opts ...grpc.CallOption) (*ResponseCountUnread, error)
 	GetFolderById(ctx context.Context, in *GetFolderByIdRequest, opts ...grpc.CallOption) (*ResponseFolder, error)
 	GetFolderByName(ctx context.Context, in *GetFolderByNameRequest, opts ...grpc.CallOption) (*ResponseFolder, error)
 	GetFoldersByUser(ctx context.Context, in *GetFoldersByUserRequest, opts ...grpc.CallOption) (*ResponseFolders, error)
@@ -161,6 +162,15 @@ func (c *databaseRepositoryClient) ReadMail(ctx context.Context, in *ReadMailReq
 func (c *databaseRepositoryClient) GetMailInfoById(ctx context.Context, in *GetMailInfoByIdRequest, opts ...grpc.CallOption) (*ResponseMail, error) {
 	out := new(ResponseMail)
 	err := c.cc.Invoke(ctx, "/repository_proto.DatabaseRepository/GetMailInfoById", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *databaseRepositoryClient) CountUnread(ctx context.Context, in *CountUnreadRequest, opts ...grpc.CallOption) (*ResponseCountUnread, error) {
+	out := new(ResponseCountUnread)
+	err := c.cc.Invoke(ctx, "/repository_proto.DatabaseRepository/CountUnread", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -309,6 +319,7 @@ type DatabaseRepositoryServer interface {
 	DeleteMail(context.Context, *DeleteMailRequest) (*utils_proto.DatabaseResponse, error)
 	ReadMail(context.Context, *ReadMailRequest) (*utils_proto.DatabaseResponse, error)
 	GetMailInfoById(context.Context, *GetMailInfoByIdRequest) (*ResponseMail, error)
+	CountUnread(context.Context, *CountUnreadRequest) (*ResponseCountUnread, error)
 	GetFolderById(context.Context, *GetFolderByIdRequest) (*ResponseFolder, error)
 	GetFolderByName(context.Context, *GetFolderByNameRequest) (*ResponseFolder, error)
 	GetFoldersByUser(context.Context, *GetFoldersByUserRequest) (*ResponseFolders, error)
@@ -364,6 +375,9 @@ func (UnimplementedDatabaseRepositoryServer) ReadMail(context.Context, *ReadMail
 }
 func (UnimplementedDatabaseRepositoryServer) GetMailInfoById(context.Context, *GetMailInfoByIdRequest) (*ResponseMail, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMailInfoById not implemented")
+}
+func (UnimplementedDatabaseRepositoryServer) CountUnread(context.Context, *CountUnreadRequest) (*ResponseCountUnread, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CountUnread not implemented")
 }
 func (UnimplementedDatabaseRepositoryServer) GetFolderById(context.Context, *GetFolderByIdRequest) (*ResponseFolder, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFolderById not implemented")
@@ -632,6 +646,24 @@ func _DatabaseRepository_GetMailInfoById_Handler(srv interface{}, ctx context.Co
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DatabaseRepositoryServer).GetMailInfoById(ctx, req.(*GetMailInfoByIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DatabaseRepository_CountUnread_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CountUnreadRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DatabaseRepositoryServer).CountUnread(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/repository_proto.DatabaseRepository/CountUnread",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DatabaseRepositoryServer).CountUnread(ctx, req.(*CountUnreadRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -942,6 +974,10 @@ var DatabaseRepository_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetMailInfoById",
 			Handler:    _DatabaseRepository_GetMailInfoById_Handler,
+		},
+		{
+			MethodName: "CountUnread",
+			Handler:    _DatabaseRepository_CountUnread_Handler,
 		},
 		{
 			MethodName: "GetFolderById",

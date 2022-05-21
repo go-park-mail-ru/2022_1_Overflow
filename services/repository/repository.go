@@ -24,6 +24,7 @@ type DatabaseRepository interface {
 	DeleteMail(context.Context, *repository_proto.DeleteMailRequest) (*utils_proto.DatabaseResponse, error)             // Удалить письмо
 	ReadMail(context.Context, *repository_proto.ReadMailRequest) (*utils_proto.DatabaseResponse, error)                 // Прочитать письмо
 	GetMailInfoById(context.Context, *repository_proto.GetMailInfoByIdRequest) (*repository_proto.ResponseMail, error)  // Получить информацию о письме по его id
+	CountUnread(ctx context.Context, request *repository_proto.CountUnreadRequest) (*repository_proto.ResponseCountUnread, error)
 
 	AddAttachLink(ctx context.Context, request *repository_proto.AddAttachLinkRequest) (*repository_proto.Nothing, error)
 	CheckAttachLink(ctx context.Context, request *repository_proto.GetAttachRequest) (*repository_proto.Nothing, error)

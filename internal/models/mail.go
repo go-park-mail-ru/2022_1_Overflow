@@ -39,3 +39,7 @@ type Attach struct {
 type AttachList struct {
 	Filenames []string `json:"filenames"`
 }
+
+type CountUnread struct {
+	Count int `json:"count"`
+}
