@@ -345,7 +345,7 @@ func (c *Database) AddMailToFolderByObject(context context.Context, request *rep
 	if len(mail.Addressee) == 0 {
 		err = c.Conn.QueryRow(context, "INSERT INTO overflow.mails(date, files, sender, text, theme) VALUES ($1, $2, $3, $4, $5) RETURNING id;", mail.Date, mail.Files, mail.Sender, mail.Text, mail.Theme).Scan(&mailId)
 	} else {
-		err = c.Conn.QueryRow(context, "INSERT INTO overflow.mails(addressee, date, files, sender, text, theme) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;", mail.Addressee, mail.Date, mail.Files, mail.Sender, mail.Text, mail.Theme).Scan(&mailId)
+		err = c.Conn.QueryRow(context, "INSERT INTO overflow.mails(addressee, date, files, sender, text, theme) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id ON CONFLICT(addressee) ON CONSTRAINT mails_addressee_fkey DO UPDATE SET addressee=excluded.addressee;", mail.Addressee, mail.Date, mail.Files, mail.Sender, mail.Text, mail.Theme).Scan(&mailId)
 	}
 	if err != nil {
 		log.Error(err)
