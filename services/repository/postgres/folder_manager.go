@@ -249,12 +249,17 @@ func (c *Database) GetFolderMail(context context.Context, request *repository_pr
 		}
 		addressee, ok := values[0].(string)
 		if !ok {
+			log.Error("Пустой адресат.")
 			addressee = ""
 		}
 		mail.Addressee = addressee
+		log.Info("Выставляю отправителя.")
 		mail.Sender = values[1].(string)
+		log.Info("Выставляю тему.")
 		mail.Theme = values[2].(string)
+		log.Info("Выставляю текст.")
 		mail.Text = values[3].(string)
+		log.Info("Выставляю файлы.")
 		mail.Files = values[4].(string)
 		mail.Date = values[5].(time.Time)
 		mail.Read = values[6].(bool)
