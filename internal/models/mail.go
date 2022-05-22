@@ -36,8 +36,13 @@ type Attach struct {
 	PayloadSize int64  `json:"payload_size"`
 }
 
+type AttachShort struct {
+	Filename string `json:"filename"`
+	Url      string `json:"url"`
+}
+
 type AttachList struct {
-	Filenames []string `json:"filenames"`
+	Attaches []AttachShort `json:"attaches"`
 }
 
 type CountUnread struct {

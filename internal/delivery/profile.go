@@ -213,14 +213,14 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := r.ParseMultipartForm(5 * MB); err != nil {
+	if err := r.ParseMultipartForm(10 * MB); err != nil {
 		log.Warning(err)
 		pkg.WriteJsonErrFull(w, &pkg.BAD_FILETYPE)
 		return
 	}
 
 	// Limit upload size
-	r.Body = http.MaxBytesReader(w, r.Body, 5*MB) // 5 Mb
+	r.Body = http.MaxBytesReader(w, r.Body, 10*MB) // 10 Mb
 
 	file, multipartFileHeader, err := r.FormFile("file")
 	if err != nil {

@@ -22,6 +22,11 @@ type AttachService struct {
 	attach_proto.UnimplementedAttachServer
 }
 
+const (
+	BASE_ATTACH_URL    = "/minio-storage/attach/"
+	ATTACH_PREFIX_SIZE = 6
+)
+
 var ErrAccess = errors.New("Пользователь не имеет доступа к данному письму.")
 var ErrJson = errors.New("Ошибка упаковки/распаковки JSON.")
 var ErrAccessAttach = errors.New("Пользователь не имеет доступа к данному вложению.")
@@ -52,7 +57,7 @@ func (s *AttachService) SaveAttach(ctx context.Context, request *attach_proto.Sa
 		return &attach_proto.Nothing{Status: false}, err
 	}
 
-	fileName := pkg.RandSID(6) + "_" + file.Filename
+	fileName := pkg.RandSID(ATTACH_PREFIX_SIZE) + "_" + file.Filename
 	clearFile := bytes.NewReader(file.Payload)
 	_, err = s.s3.PutObject(
 		context.Background(),
@@ -150,12 +155,34 @@ func (s *AttachService) ListAttach(ctx context.Context, request *attach_proto.Ge
 		Filename: "",
 	})
 	if err != nil {
+		log.Warning(err)
+		return &attach_proto.AttachListResponse{
+			Filenames: nil,
+		}, err
+	}
+
+	var attaches models.AttachList
+	if err := json.Unmarshal(resp.Filenames, &attaches); err != nil {
+		log.Warning(err)
+		return &attach_proto.AttachListResponse{
+			Filenames: nil,
+		}, err
+	}
+
+	for i := 0; i < len(attaches.Attaches); i++ {
+		attaches.Attaches[i].Url = BASE_ATTACH_URL + attaches.Attaches[i].Filename
+		attaches.Attaches[i].Filename = attaches.Attaches[i].Filename[ATTACH_PREFIX_SIZE+1:]
+	}
+
+	attachesBytes, err := json.Marshal(attaches)
+	if err != nil {
+		log.Warning(err)
 		return &attach_proto.AttachListResponse{
 			Filenames: nil,
 		}, err
 	}
 
 	return &attach_proto.AttachListResponse{
-		Filenames: resp.Filenames,
+		Filenames: attachesBytes,
 	}, nil
 }

@@ -46,14 +46,14 @@ func (c *Database) ListAttaches(context context.Context, request *repository_pro
 
 	var attaches models.AttachList
 	for rows.Next() {
-		var filename string
-		if err := rows.Scan(&filename); err != nil {
+		var attachShort models.AttachShort
+		if err := rows.Scan(&attachShort.Filename); err != nil {
 			log.Error(err)
 			return &repository_proto.ResponseAttaches{
 				Filenames: nil,
 			}, err
 		}
-		attaches.Filenames = append(attaches.Filenames, filename)
+		attaches.Attaches = append(attaches.Attaches, attachShort)
 	}
 
 	if err := rows.Err(); err != nil {
@@ -63,8 +63,15 @@ func (c *Database) ListAttaches(context context.Context, request *repository_pro
 		}, err
 	}
 
-	filenamesBytes, _ := json.Marshal(attaches)
+	filenamesBytes, err := json.Marshal(attaches)
+	if err != nil {
+		log.Error(err)
+		return &repository_proto.ResponseAttaches{
+			Filenames: nil,
+		}, err
+	}
+
 	return &repository_proto.ResponseAttaches{
 		Filenames: filenamesBytes,
-	}, err
+	}, nil
 }
