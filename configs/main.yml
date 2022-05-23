@@ -9,6 +9,9 @@ server:
   static:
     dir: "static"
     handle: "/static/"
+  minio:
+    dir: "minio-storage"
+    handle: "/minio-storage"
   keys:
     csrf_authkey: "7ad7b8be40fef684833eaf00770082cf"
     auth_key: "aPdSgVkYp3s6v9y$B&E)H+MbQeThWmZq"

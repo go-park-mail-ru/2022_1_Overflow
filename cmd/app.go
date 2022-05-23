@@ -5,6 +5,7 @@ import (
 	"OverflowBackend/internal/middlewares"
 	"OverflowBackend/internal/session"
 	"OverflowBackend/pkg"
+	"OverflowBackend/proto/attach_proto"
 	"fmt"
 
 	log "github.com/sirupsen/logrus"
@@ -38,7 +39,6 @@ func (app *Application) Run(configPath string) {
 	}
 
 	log.Info("Инициализация роутеров.")
-	middlewares.Init(config)
 	router := RouterManager{}
 	authDial, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.Auth.Address, config.Server.Services.Auth.Port))
 	if err != nil {
@@ -66,5 +66,6 @@ func (app *Application) Run(configPath string) {
 	}
 	log.Info("Успешное подключение к микросервису Attach.")
 	router.Init(config, authDial, profileDial, mailboxDial, folderManagerDial, attachDial)
+	middlewares.Init(config, attach_proto.NewAttachClient(attachDial))
 	HandleServer(config, router)
 }

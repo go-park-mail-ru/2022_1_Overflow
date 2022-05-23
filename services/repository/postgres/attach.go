@@ -75,3 +75,19 @@ func (c *Database) ListAttaches(context context.Context, request *repository_pro
 		Filenames: filenamesBytes,
 	}, nil
 }
+
+func (c *Database) CheckAttachPermission(context context.Context, request *repository_proto.AttachPermissionRequest) (*repository_proto.ResponseAttachPermission, error) {
+	row := c.Conn.QueryRow(context,
+		"SELECT 'access' FROM overflow.mails "+
+			"JOIN overflow.attaches ON overflow.mails.id = overflow.attaches.mail_id "+
+			"WHERE filename = $1 AND (sender = $2 OR addressee = $2);", request.Filename, request.Username)
+	var access string
+	if err := row.Scan(&access); err != nil {
+		return &repository_proto.ResponseAttachPermission{
+			Access: false,
+		}, nil
+	}
+	return &repository_proto.ResponseAttachPermission{
+		Access: true,
+	}, nil
+}

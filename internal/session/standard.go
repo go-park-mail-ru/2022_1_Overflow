@@ -28,7 +28,8 @@ func (s *StandardManager) Init(config *config.Config) (err error) {
 	)
 
 	s.store.Options = &sessions.Options{
-		MaxAge:   10*365*24*60*60,
+		MaxAge:   10 * 365 * 24 * 60 * 60,
+		Path:     "/",
 		HttpOnly: false,
 		Secure:   false,
 	}

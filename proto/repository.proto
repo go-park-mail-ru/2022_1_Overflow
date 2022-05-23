@@ -39,6 +39,7 @@ service DatabaseRepository {
     rpc AddAttachLink (AddAttachLinkRequest) returns (Nothing) {}
     rpc CheckAttachLink (GetAttachRequest) returns (Nothing) {}
     rpc ListAttaches (GetAttachRequest) returns (ResponseAttaches) {}
+    rpc CheckAttachPermission (AttachPermissionRequest) returns (ResponseAttachPermission) {}
 }
 
 // ================ requests ================
@@ -167,6 +168,11 @@ message CountUnreadRequest{
     string username = 1;
 }
 
+message AttachPermissionRequest {
+    string username = 1;
+    string filename = 2;
+}
+
 // ================= responses ==================
 
 message ResponseUser {
@@ -204,4 +210,8 @@ message ResponseAttaches {
 
 message ResponseCountUnread{
     int32 count = 1;
+}
+
+message ResponseAttachPermission {
+    bool access = 1;
 }

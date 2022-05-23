@@ -29,6 +29,7 @@ type DatabaseRepository interface {
 	AddAttachLink(ctx context.Context, request *repository_proto.AddAttachLinkRequest) (*repository_proto.Nothing, error)
 	CheckAttachLink(ctx context.Context, request *repository_proto.GetAttachRequest) (*repository_proto.Nothing, error)
 	ListAttaches(ctx context.Context, request *repository_proto.GetAttachRequest) (*repository_proto.ResponseAttaches, error)
+	CheckAttachPermission(ctx context.Context, request *repository_proto.AttachPermissionRequest) (*repository_proto.ResponseAttachPermission, error)
 
 	FolderRepositoryInterface
 }

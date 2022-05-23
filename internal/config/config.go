@@ -42,6 +42,10 @@ type Config struct {
 			Dir    string `yaml:"dir"`
 			Handle string `yaml:"handle"`
 		} `yaml:"static"`
+		Minio struct {
+			Dir    string `yaml:"dir"`
+			Handle string `yaml:"handle"`
+		} `yaml:"minio"`
 		Keys struct {
 			CSRFAuthKey string `yaml:"csrf_authkey"`
 			AuthKey     string `yaml:"auth_key"`

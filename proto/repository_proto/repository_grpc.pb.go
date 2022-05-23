@@ -50,6 +50,7 @@ type DatabaseRepositoryClient interface {
 	AddAttachLink(ctx context.Context, in *AddAttachLinkRequest, opts ...grpc.CallOption) (*Nothing, error)
 	CheckAttachLink(ctx context.Context, in *GetAttachRequest, opts ...grpc.CallOption) (*Nothing, error)
 	ListAttaches(ctx context.Context, in *GetAttachRequest, opts ...grpc.CallOption) (*ResponseAttaches, error)
+	CheckAttachPermission(ctx context.Context, in *AttachPermissionRequest, opts ...grpc.CallOption) (*ResponseAttachPermission, error)
 }
 
 type databaseRepositoryClient struct {
@@ -303,6 +304,15 @@ func (c *databaseRepositoryClient) ListAttaches(ctx context.Context, in *GetAtta
 	return out, nil
 }
 
+func (c *databaseRepositoryClient) CheckAttachPermission(ctx context.Context, in *AttachPermissionRequest, opts ...grpc.CallOption) (*ResponseAttachPermission, error) {
+	out := new(ResponseAttachPermission)
+	err := c.cc.Invoke(ctx, "/repository_proto.DatabaseRepository/CheckAttachPermission", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DatabaseRepositoryServer is the server API for DatabaseRepository service.
 // All implementations must embed UnimplementedDatabaseRepositoryServer
 // for forward compatibility
@@ -334,6 +344,7 @@ type DatabaseRepositoryServer interface {
 	AddAttachLink(context.Context, *AddAttachLinkRequest) (*Nothing, error)
 	CheckAttachLink(context.Context, *GetAttachRequest) (*Nothing, error)
 	ListAttaches(context.Context, *GetAttachRequest) (*ResponseAttaches, error)
+	CheckAttachPermission(context.Context, *AttachPermissionRequest) (*ResponseAttachPermission, error)
 }
 
 // UnimplementedDatabaseRepositoryServer must be embedded to have forward compatible implementations.
@@ -420,6 +431,9 @@ func (UnimplementedDatabaseRepositoryServer) CheckAttachLink(context.Context, *G
 }
 func (UnimplementedDatabaseRepositoryServer) ListAttaches(context.Context, *GetAttachRequest) (*ResponseAttaches, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListAttaches not implemented")
+}
+func (UnimplementedDatabaseRepositoryServer) CheckAttachPermission(context.Context, *AttachPermissionRequest) (*ResponseAttachPermission, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckAttachPermission not implemented")
 }
 func (UnimplementedDatabaseRepositoryServer) mustEmbedUnimplementedDatabaseRepositoryServer() {}
 
@@ -920,6 +934,24 @@ func _DatabaseRepository_ListAttaches_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DatabaseRepository_CheckAttachPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AttachPermissionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DatabaseRepositoryServer).CheckAttachPermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/repository_proto.DatabaseRepository/CheckAttachPermission",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DatabaseRepositoryServer).CheckAttachPermission(ctx, req.(*AttachPermissionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DatabaseRepository_ServiceDesc is the grpc.ServiceDesc for DatabaseRepository service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1034,6 +1066,10 @@ var DatabaseRepository_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListAttaches",
 			Handler:    _DatabaseRepository_ListAttaches_Handler,
+		},
+		{
+			MethodName: "CheckAttachPermission",
+			Handler:    _DatabaseRepository_CheckAttachPermission_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

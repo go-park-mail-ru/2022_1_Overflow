@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"OverflowBackend/internal/config"
+	"OverflowBackend/proto/attach_proto"
 	"net/http"
 	"time"
 
@@ -41,7 +42,8 @@ func GetCSRFToken(r *http.Request) (token string, isNew bool) {
 	*/
 }
 
-func Init(config *config.Config) {
+func Init(config *config.Config, attachDial attach_proto.AttachClient) {
+	attach = attachDial
 	tokenTimeout := config.Server.Timeout.CSRFTimeout
 	csrfTokenTicker = time.NewTicker(tokenTimeout)
 	csrfKey := config.Server.Keys.CSRFAuthKey

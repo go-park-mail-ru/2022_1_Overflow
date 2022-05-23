@@ -38,9 +38,14 @@ func (rm *RouterManager) Init(
 
 func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 	router := mux.NewRouter()
-	fs := http.FileServer(http.Dir(rm.config.Server.Static.Dir))
+
+	fsStatic := http.FileServer(http.Dir(rm.config.Server.Static.Dir))
 	router.PathPrefix(rm.config.Server.Static.Handle).Handler(
-		http.StripPrefix(rm.config.Server.Static.Handle, fs))
+		http.StripPrefix(rm.config.Server.Static.Handle, fsStatic))
+
+	fsMinio := http.FileServer(http.Dir(rm.config.Server.Minio.Dir))
+	router.PathPrefix(rm.config.Server.Minio.Handle).Handler(
+		http.StripPrefix(rm.config.Server.Minio.Handle, fsMinio))
 
 	routerAPI := router.PathPrefix("/api/v1").Subrouter()
 

@@ -13,6 +13,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	log "github.com/sirupsen/logrus"
 	"io"
+	"strings"
 )
 
 type AttachService struct {
@@ -184,5 +185,23 @@ func (s *AttachService) ListAttach(ctx context.Context, request *attach_proto.Ge
 
 	return &attach_proto.AttachListResponse{
 		Filenames: attachesBytes,
+	}, nil
+}
+
+func (s *AttachService) CheckAttachPermission(ctx context.Context, request *attach_proto.AttachPermissionRequest) (*attach_proto.AttachPermissionResponse, error) {
+	clearFileName := strings.TrimPrefix(request.FileUrl, BASE_ATTACH_URL)
+	//log.Info(request.Username)
+	//log.Info(clearFileName)
+
+	resp, err := s.db.CheckAttachPermission(context.Background(), &repository_proto.AttachPermissionRequest{
+		Username: request.Username,
+		Filename: clearFileName,
+	})
+	if err != nil {
+		log.Warning(err)
+		return nil, err
+	}
+	return &attach_proto.AttachPermissionResponse{
+		Access: resp.Access,
 	}, nil
 }
