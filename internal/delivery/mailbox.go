@@ -7,6 +7,7 @@ import (
 	ws "OverflowBackend/internal/websocket"
 	"OverflowBackend/pkg"
 	"OverflowBackend/proto/mailbox_proto"
+	"OverflowBackend/proto/utils_proto"
 	"context"
 	"encoding/json"
 	"net/http"
@@ -342,7 +343,10 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, &response)
 
 	respCU, err := d.mailbox.CountUnread(context.Background(), &mailbox_proto.CountUnreadRequest{
-		Data: data,
+		Data: &utils_proto.Session{
+			Username:      form.Addressee,
+			Authenticated: true,
+		},
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
