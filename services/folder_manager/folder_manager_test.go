@@ -17,44 +17,44 @@ import (
 	"bou.ke/monkey"
 	"github.com/golang/mock/gomock"
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
-func InitTestUseCase(ctrl *gomock.Controller) (*repository_proto.MockDatabaseRepositoryClient, *profile_proto.MockProfileClient, *folder_manager.FolderManagerService) {
+func InitTestUseCase(ctrl *gomock.Controller) (*repository_proto.MockDatabaseRepositoryClient, *profile_proto.MockProfileClient, *folder_manager_proto.MockFolderManagerClient, *folder_manager.FolderManagerService) {
 	current := time.Now()
-	monkey.Patch(time.Now, func() (time.Time) {return current})
+	monkey.Patch(time.Now, func() time.Time { return current })
 	log.SetLevel(log.FatalLevel)
 	db := repository_proto.NewMockDatabaseRepositoryClient(ctrl)
 	profile := profile_proto.NewMockProfileClient(ctrl)
+	folder := folder_manager_proto.NewMockFolderManagerClient(ctrl)
 	uc := folder_manager.FolderManagerService{}
 	uc.Init(config.TestConfig(), db, profile)
-	return db, profile, &uc
+	return db, profile, folder, &uc
 }
 
 func TestAddFolder(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockDB, _, uc := InitTestUseCase(mockCtrl)
+	mockDB, _, _, uc := InitTestUseCase(mockCtrl)
 
 	user := models.User{
-		Id: 0,
+		Id:        0,
 		Firstname: "test",
-		Lastname: "test",
-		Username: "test",
-		Password: "test",
+		Lastname:  "test",
+		Username:  "test",
+		Password:  "test",
 	}
 	userBytes, _ := json.Marshal(user)
 
 	session := utils_proto.Session{
-		Username: user.Username,
-		Authenticated: wrapperspb.Bool(true),
+		Username:      user.Username,
+		Authenticated: true,
 	}
 
 	folder := models.Folder{
-		Id: 0,
-		Name: "folder",
-		UserId: user.Id,
+		Id:        0,
+		Name:      "folder",
+		UserId:    user.Id,
 		CreatedAt: time.Now(),
 	}
 	folderBytes, _ := json.Marshal(folder)
@@ -71,7 +71,7 @@ func TestAddFolder(t *testing.T) {
 	}, nil)
 
 	mockDB.EXPECT().GetFolderByName(context.Background(), &repository_proto.GetFolderByNameRequest{
-		UserId: user.Id,
+		UserId:     user.Id,
 		FolderName: folder.Name,
 	}).Return(&repository_proto.ResponseFolder{
 		Response: &utils_proto.DatabaseResponse{
@@ -81,14 +81,14 @@ func TestAddFolder(t *testing.T) {
 	}, nil)
 
 	mockDB.EXPECT().AddFolder(context.Background(), &repository_proto.AddFolderRequest{
-		Name: folder.Name,
+		Name:   folder.Name,
 		UserId: user.Id,
 	}).Return(&utils_proto.DatabaseResponse{
 		Status: utils_proto.DatabaseStatus_OK,
 	}, nil)
 
 	mockDB.EXPECT().GetFolderByName(context.Background(), &repository_proto.GetFolderByNameRequest{
-		UserId: user.Id,
+		UserId:     user.Id,
 		FolderName: folder.Name,
 	}).Return(&repository_proto.ResponseFolder{
 		Response: &utils_proto.DatabaseResponse{
@@ -113,20 +113,20 @@ func TestAddMailToFolderById(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockDB, _, uc := InitTestUseCase(mockCtrl)
+	mockDB, _, _, uc := InitTestUseCase(mockCtrl)
 
 	user := models.User{
-		Id: 0,
+		Id:        0,
 		Firstname: "test",
-		Lastname: "test",
-		Username: "test",
-		Password: "test",
+		Lastname:  "test",
+		Username:  "test",
+		Password:  "test",
 	}
 	userBytes, _ := json.Marshal(user)
 
 	session := utils_proto.Session{
-		Username: user.Username,
-		Authenticated: wrapperspb.Bool(true),
+		Username:      user.Username,
+		Authenticated: true,
 	}
 
 	folderName := "folder"
@@ -143,19 +143,36 @@ func TestAddMailToFolderById(t *testing.T) {
 	}, nil)
 
 	mockDB.EXPECT().AddMailToFolderById(context.Background(), &repository_proto.AddMailToFolderByIdRequest{
-		UserId: user.Id,
+		UserId:     user.Id,
 		FolderName: folderName,
-		MailId: mailId,
-		Move: move,
+		MailId:     mailId,
+		Move:       move,
 	}).Return(&utils_proto.DatabaseResponse{
 		Status: utils_proto.DatabaseStatus_OK,
 	}, nil)
 
-	resp, err := uc.AddMailToFolderById(context.Background(), &folder_manager_proto.AddMailToFolderByIdRequest{
-		Data: &session,
+	//folder.EXPECT().FolderExist(context.Background(), user.Id, folderName).Return(true)
+
+	fold := &models.Folder{
+		Id:     0,
+		Name:   "folder",
+		UserId: 0,
+	}
+	foldBytes, _ := json.Marshal(fold)
+	mockDB.EXPECT().GetFolderByName(context.Background(), &repository_proto.GetFolderByNameRequest{
 		FolderName: folderName,
-		MailId: mailId,
-		Move: move,
+	}).Return(&repository_proto.ResponseFolder{
+		Folder: foldBytes,
+		Response: &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		},
+	}, nil)
+
+	resp, err := uc.AddMailToFolderById(context.Background(), &folder_manager_proto.AddMailToFolderByIdRequest{
+		Data:       &session,
+		FolderName: folderName,
+		MailId:     mailId,
+		Move:       move,
 	})
 
 	var response pkg.JsonResponse
@@ -170,43 +187,62 @@ func TestAddMailToFolderByObject(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockDB, _, uc := InitTestUseCase(mockCtrl)
+	mockDB, _, _, uc := InitTestUseCase(mockCtrl)
 
 	user := models.User{
-		Id: 0,
+		Id:        0,
 		Firstname: "test",
-		Lastname: "test",
-		Username: "test",
-		Password: "test",
+		Lastname:  "test",
+		Username:  "test",
+		Password:  "test",
 	}
 	userBytes, _ := json.Marshal(user)
 
 	session := utils_proto.Session{
-		Username: user.Username,
-		Authenticated: wrapperspb.Bool(true),
+		Username:      user.Username,
+		Authenticated: true,
 	}
 
 	form := models.MailForm{
 		Addressee: "test2",
-		Theme: "test",
-		Text: "test",
-		Files: "files",
+		Theme:     "test",
+		Text:      "test",
+		Files:     "files",
 	}
 	formBytes, _ := json.Marshal(form)
 
 	folderName := "folder"
 
 	mail := models.Mail{
-		Id: 0,
-		Sender: session.Username,
+		Id:        0,
+		Sender:    session.Username,
 		Addressee: form.Addressee,
-		Theme: form.Theme,
-		Text: form.Text,
-		Files: form.Files,
-		Date: time.Now(),
-		Read: false,
+		Theme:     form.Theme,
+		Text:      form.Text,
+		Files:     form.Files,
+		Date:      time.Now(),
+		Read:      false,
 	}
 	mailBytes, _ := json.Marshal(mail)
+
+	folder := models.Folder{
+		Id:        0,
+		Name:      "folder",
+		UserId:    user.Id,
+		CreatedAt: time.Now(),
+	}
+	folderBytes, _ := json.Marshal(folder)
+	//folderEmptyBytes, _ := json.Marshal(models.Folder{})
+
+	mockDB.EXPECT().GetFolderByName(context.Background(), &repository_proto.GetFolderByNameRequest{
+		UserId:     user.Id,
+		FolderName: folder.Name,
+	}).Return(&repository_proto.ResponseFolder{
+		Response: &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		},
+		Folder: folderBytes,
+	}, nil)
 
 	mockDB.EXPECT().GetUserInfoByUsername(context.Background(), &repository_proto.GetUserInfoByUsernameRequest{
 		Username: user.Username,
@@ -218,17 +254,17 @@ func TestAddMailToFolderByObject(t *testing.T) {
 	}, nil)
 
 	mockDB.EXPECT().AddMailToFolderByObject(context.Background(), &repository_proto.AddMailToFolderByObjectRequest{
-		UserId: user.Id,
+		UserId:     user.Id,
 		FolderName: folderName,
-		Mail: mailBytes,
+		Mail:       mailBytes,
 	}).Return(&utils_proto.DatabaseResponse{
 		Status: utils_proto.DatabaseStatus_OK,
 	}, nil)
 
 	resp, err := uc.AddMailToFolderByObject(context.Background(), &folder_manager_proto.AddMailToFolderByObjectRequest{
-		Data: &session,
+		Data:       &session,
 		FolderName: folderName,
-		Form: formBytes,
+		Form:       formBytes,
 	})
 	var response pkg.JsonResponse
 	json_err := json.Unmarshal(resp.Response, &response)
@@ -242,20 +278,20 @@ func TestMoveFolderMail(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockDB, _, uc := InitTestUseCase(mockCtrl)
+	mockDB, _, _, uc := InitTestUseCase(mockCtrl)
 
 	user := models.User{
-		Id: 0,
+		Id:        0,
 		Firstname: "test",
-		Lastname: "test",
-		Username: "test",
-		Password: "test",
+		Lastname:  "test",
+		Username:  "test",
+		Password:  "test",
 	}
 	userBytes, _ := json.Marshal(user)
 
 	session := utils_proto.Session{
-		Username: user.Username,
-		Authenticated: wrapperspb.Bool(true),
+		Username:      user.Username,
+		Authenticated: true,
 	}
 
 	var mailId int32 = 0
@@ -264,17 +300,17 @@ func TestMoveFolderMail(t *testing.T) {
 	folderNameDest := "folder2"
 
 	folderSrc := models.Folder{
-		Id: 0,
-		Name: folderNameSrc,
-		UserId: user.Id,
+		Id:        0,
+		Name:      folderNameSrc,
+		UserId:    user.Id,
 		CreatedAt: time.Now(),
 	}
 	folderSrcBytes, _ := json.Marshal(folderSrc)
 
 	folderDest := models.Folder{
-		Id: 0,
-		Name: folderNameDest,
-		UserId: user.Id,
+		Id:        0,
+		Name:      folderNameDest,
+		UserId:    user.Id,
 		CreatedAt: time.Now(),
 	}
 	folderDestBytes, _ := json.Marshal(folderDest)
@@ -289,7 +325,7 @@ func TestMoveFolderMail(t *testing.T) {
 	}, nil)
 
 	mockDB.EXPECT().GetFolderByName(context.Background(), &repository_proto.GetFolderByNameRequest{
-		UserId: user.Id,
+		UserId:     user.Id,
 		FolderName: folderNameSrc,
 	}).Return(&repository_proto.ResponseFolder{
 		Response: &utils_proto.DatabaseResponse{
@@ -299,7 +335,7 @@ func TestMoveFolderMail(t *testing.T) {
 	}, nil)
 
 	mockDB.EXPECT().GetFolderByName(context.Background(), &repository_proto.GetFolderByNameRequest{
-		UserId: user.Id,
+		UserId:     user.Id,
 		FolderName: folderNameDest,
 	}).Return(&repository_proto.ResponseFolder{
 		Response: &utils_proto.DatabaseResponse{
@@ -309,19 +345,19 @@ func TestMoveFolderMail(t *testing.T) {
 	}, nil)
 
 	mockDB.EXPECT().MoveFolderMail(context.Background(), &repository_proto.MoveFolderMailRequest{
-		UserId: user.Id,
-		FolderNameSrc: folderNameSrc,
+		UserId:         user.Id,
+		FolderNameSrc:  folderNameSrc,
 		FolderNameDest: folderNameDest,
-		MailId: mailId,
+		MailId:         mailId,
 	}).Return(&utils_proto.DatabaseResponse{
 		Status: utils_proto.DatabaseStatus_OK,
 	}, nil)
 
 	resp, err := uc.MoveFolderMail(context.Background(), &folder_manager_proto.MoveFolderMailRequest{
-		Data: &session,
-		FolderNameSrc: folderNameSrc,
+		Data:           &session,
+		FolderNameSrc:  folderNameSrc,
 		FolderNameDest: folderNameDest,
-		MailId: mailId,
+		MailId:         mailId,
 	})
 	var response pkg.JsonResponse
 	json_err := json.Unmarshal(resp.Response, &response)
@@ -335,33 +371,33 @@ func TestChangeFolder(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockDB, _, uc := InitTestUseCase(mockCtrl)
+	mockDB, _, _, uc := InitTestUseCase(mockCtrl)
 
 	user := models.User{
-		Id: 0,
+		Id:        0,
 		Firstname: "test",
-		Lastname: "test",
-		Username: "test",
-		Password: "test",
+		Lastname:  "test",
+		Username:  "test",
+		Password:  "test",
 	}
 	userBytes, _ := json.Marshal(user)
 
 	session := utils_proto.Session{
-		Username: user.Username,
-		Authenticated: wrapperspb.Bool(true),
+		Username:      user.Username,
+		Authenticated: true,
 	}
 
 	folderName := "folder"
 	folderNameNew := "folder2"
 
 	/*
-	folder := models.Folder{
-		Id: 0,
-		Name: folderName,
-		UserId: user.Id,
-		CreatedAt: time.Now(),
-	}
-	folderBytes, _ := json.Marshal(folder)
+		folder := models.Folder{
+			Id: 0,
+			Name: folderName,
+			UserId: user.Id,
+			CreatedAt: time.Now(),
+		}
+		folderBytes, _ := json.Marshal(folder)
 	*/
 
 	folderNew := models.Folder{}
@@ -377,7 +413,7 @@ func TestChangeFolder(t *testing.T) {
 	}, nil)
 
 	mockDB.EXPECT().GetFolderByName(context.Background(), &repository_proto.GetFolderByNameRequest{
-		UserId: user.Id,
+		UserId:     user.Id,
 		FolderName: folderNameNew,
 	}).Return(&repository_proto.ResponseFolder{
 		Response: &utils_proto.DatabaseResponse{
@@ -387,16 +423,16 @@ func TestChangeFolder(t *testing.T) {
 	}, nil)
 
 	mockDB.EXPECT().ChangeFolderName(context.Background(), &repository_proto.ChangeFolderNameRequest{
-		UserId: user.Id,
+		UserId:     user.Id,
 		FolderName: folderName,
-		NewName: folderNameNew,
+		NewName:    folderNameNew,
 	}).Return(&utils_proto.DatabaseResponse{
 		Status: utils_proto.DatabaseStatus_OK,
 	}, nil)
 
 	resp, err := uc.ChangeFolder(context.Background(), &folder_manager_proto.ChangeFolderRequest{
-		Data: &session,
-		FolderName: folderName,
+		Data:          &session,
+		FolderName:    folderName,
 		FolderNewName: folderNameNew,
 	})
 	var response pkg.JsonResponse
@@ -411,23 +447,42 @@ func TestDeleteFolder(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockDB, _, uc := InitTestUseCase(mockCtrl)
+	mockDB, _, _, uc := InitTestUseCase(mockCtrl)
 
 	user := models.User{
-		Id: 0,
+		Id:        0,
 		Firstname: "test",
-		Lastname: "test",
-		Username: "test",
-		Password: "test",
+		Lastname:  "test",
+		Username:  "test",
+		Password:  "test",
 	}
 	userBytes, _ := json.Marshal(user)
 
 	session := utils_proto.Session{
-		Username: user.Username,
-		Authenticated: wrapperspb.Bool(true),
+		Username:      user.Username,
+		Authenticated: true,
 	}
 
 	folderName := "folder"
+
+	folder := models.Folder{
+		Id:        0,
+		Name:      "folder",
+		UserId:    user.Id,
+		CreatedAt: time.Now(),
+	}
+	folderBytes, _ := json.Marshal(folder)
+	//folderEmptyBytes, _ := json.Marshal(models.Folder{})
+
+	mockDB.EXPECT().GetFolderByName(context.Background(), &repository_proto.GetFolderByNameRequest{
+		UserId:     user.Id,
+		FolderName: folderName,
+	}).Return(&repository_proto.ResponseFolder{
+		Response: &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		},
+		Folder: folderBytes,
+	}, nil)
 
 	mockDB.EXPECT().GetUserInfoByUsername(context.Background(), &repository_proto.GetUserInfoByUsernameRequest{
 		Username: user.Username,
@@ -439,14 +494,14 @@ func TestDeleteFolder(t *testing.T) {
 	}, nil)
 
 	mockDB.EXPECT().DeleteFolder(context.Background(), &repository_proto.DeleteFolderRequest{
-		UserId: user.Id,
+		UserId:     user.Id,
 		FolderName: folderName,
 	}).Return(&utils_proto.DatabaseResponse{
 		Status: utils_proto.DatabaseStatus_OK,
 	}, nil)
 
 	resp, err := uc.DeleteFolder(context.Background(), &folder_manager_proto.DeleteFolderRequest{
-		Data: &session,
+		Data:       &session,
 		FolderName: folderName,
 	})
 	var response pkg.JsonResponse
@@ -461,29 +516,29 @@ func TestListFolders(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockDB, _, uc := InitTestUseCase(mockCtrl)
+	mockDB, _, _, uc := InitTestUseCase(mockCtrl)
 
 	user := models.User{
-		Id: 0,
+		Id:        0,
 		Firstname: "test",
-		Lastname: "test",
-		Username: "test",
-		Password: "test",
+		Lastname:  "test",
+		Username:  "test",
+		Password:  "test",
 	}
 	userBytes, _ := json.Marshal(user)
 
 	session := utils_proto.Session{
-		Username: user.Username,
-		Authenticated: wrapperspb.Bool(true),
+		Username:      user.Username,
+		Authenticated: true,
 	}
 
 	folders := models.FolderList{
 		Amount: 1,
-		Folders: []models.Folder {
+		Folders: []models.Folder{
 			{
-				Id: 0,
-				Name: "folder",
-				UserId: user.Id,
+				Id:        0,
+				Name:      "folder",
+				UserId:    user.Id,
 				CreatedAt: time.Now(),
 			},
 		},
@@ -504,7 +559,7 @@ func TestListFolders(t *testing.T) {
 
 	mockDB.EXPECT().GetFoldersByUser(context.Background(), &repository_proto.GetFoldersByUserRequest{
 		UserId: user.Id,
-		Limit: limit,
+		Limit:  limit,
 		Offset: offset,
 	}).Return(&repository_proto.ResponseFolders{
 		Response: &utils_proto.DatabaseResponse{
@@ -514,8 +569,8 @@ func TestListFolders(t *testing.T) {
 	}, nil)
 
 	resp, err := uc.ListFolders(context.Background(), &folder_manager_proto.ListFoldersRequest{
-		Data: &session,
-		Limit: limit,
+		Data:   &session,
+		Limit:  limit,
 		Offset: offset,
 	})
 
@@ -533,38 +588,55 @@ func TestListFolder(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockDB, _, uc := InitTestUseCase(mockCtrl)
+	mockDB, _, _, uc := InitTestUseCase(mockCtrl)
 
 	user := models.User{
-		Id: 0,
+		Id:        0,
 		Firstname: "test",
-		Lastname: "test",
-		Username: "test",
-		Password: "test",
+		Lastname:  "test",
+		Username:  "test",
+		Password:  "test",
 	}
 	userBytes, _ := json.Marshal(user)
 
 	session := utils_proto.Session{
-		Username: user.Username,
-		Authenticated: wrapperspb.Bool(true),
+		Username:      user.Username,
+		Authenticated: true,
 	}
 
 	folderName := "folder"
 
-	/*
-	mailsAdd := models.MailAddList{
-		Amount: 0,
-		Mails: []models.MailAdditional{
-		},
+	folder := models.Folder{
+		Id:        0,
+		Name:      "folder",
+		UserId:    user.Id,
+		CreatedAt: time.Now(),
 	}
-	mailsAddBytes, _ := json.Marshal(mailsAdd)
+	folderBytes, _ := json.Marshal(folder)
+	//folderEmptyBytes, _ := json.Marshal(models.Folder{})
+
+	mockDB.EXPECT().GetFolderByName(context.Background(), &repository_proto.GetFolderByNameRequest{
+		UserId:     user.Id,
+		FolderName: folderName,
+	}).Return(&repository_proto.ResponseFolder{
+		Response: &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		},
+		Folder: folderBytes,
+	}, nil)
+
+	/*
+		mailsAdd := models.MailAddList{
+			Amount: 0,
+			Mails: []models.MailAdditional{
+			},
+		}
+		mailsAddBytes, _ := json.Marshal(mailsAdd)
 	*/
 
 	mails := models.MailList{
 		Amount: 0,
-		Mails: []models.Mail{
-
-		},
+		Mails:  []models.Mail{},
 	}
 	mailsBytes, _ := json.Marshal(mails)
 
@@ -581,10 +653,10 @@ func TestListFolder(t *testing.T) {
 	}, nil)
 
 	mockDB.EXPECT().GetFolderMail(context.Background(), &repository_proto.GetFolderMailRequest{
-		UserId: user.Id,
+		UserId:     user.Id,
 		FolderName: folderName,
-		Limit: limit,
-		Offset: offset,
+		Limit:      limit,
+		Offset:     offset,
 	}).Return(&repository_proto.ResponseMails{
 		Response: &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,
@@ -593,10 +665,10 @@ func TestListFolder(t *testing.T) {
 	}, nil)
 
 	resp, err := uc.ListFolder(context.Background(), &folder_manager_proto.ListFolderRequest{
-		Data: &session,
+		Data:       &session,
 		FolderName: folderName,
-		Limit: limit,
-		Offset: offset,
+		Limit:      limit,
+		Offset:     offset,
 	})
 
 	var response pkg.JsonResponse
@@ -613,24 +685,43 @@ func TestDeleteFolderMail(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockDB, _, uc := InitTestUseCase(mockCtrl)
+	mockDB, _, _, uc := InitTestUseCase(mockCtrl)
 
 	user := models.User{
-		Id: 0,
+		Id:        0,
 		Firstname: "test",
-		Lastname: "test",
-		Username: "test",
-		Password: "test",
+		Lastname:  "test",
+		Username:  "test",
+		Password:  "test",
 	}
 	userBytes, _ := json.Marshal(user)
 
 	session := utils_proto.Session{
-		Username: user.Username,
-		Authenticated: wrapperspb.Bool(true),
+		Username:      user.Username,
+		Authenticated: true,
 	}
 
 	folderName := "folder"
 	var mailId int32 = 0
+
+	folder := models.Folder{
+		Id:        0,
+		Name:      "folder",
+		UserId:    user.Id,
+		CreatedAt: time.Now(),
+	}
+	folderBytes, _ := json.Marshal(folder)
+	//folderEmptyBytes, _ := json.Marshal(models.Folder{})
+
+	mockDB.EXPECT().GetFolderByName(context.Background(), &repository_proto.GetFolderByNameRequest{
+		UserId:     user.Id,
+		FolderName: folderName,
+	}).Return(&repository_proto.ResponseFolder{
+		Response: &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_OK,
+		},
+		Folder: folderBytes,
+	}, nil)
 
 	mockDB.EXPECT().GetUserInfoByUsername(context.Background(), &repository_proto.GetUserInfoByUsernameRequest{
 		Username: user.Username,
@@ -649,9 +740,9 @@ func TestDeleteFolderMail(t *testing.T) {
 	}, nil)
 
 	resp, err := uc.DeleteFolderMail(context.Background(), &folder_manager_proto.DeleteFolderMailRequest{
-		Data: &session,
+		Data:       &session,
 		FolderName: folderName,
-		MailId: mailId,
+		MailId:     mailId,
 	})
 	var response pkg.JsonResponse
 	json_err := json.Unmarshal(resp.Response, &response)

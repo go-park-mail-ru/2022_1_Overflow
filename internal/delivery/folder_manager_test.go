@@ -4,6 +4,7 @@ import (
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/models"
 	"OverflowBackend/pkg"
+	"OverflowBackend/proto/attach_proto"
 	"OverflowBackend/proto/auth_proto"
 	"OverflowBackend/proto/folder_manager_proto"
 	"OverflowBackend/proto/mailbox_proto"
@@ -18,7 +19,6 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 func TestAddFolder(t *testing.T) {
@@ -29,11 +29,12 @@ func TestAddFolder(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/signin", "/folder/add"}, []func(http.ResponseWriter, *http.Request){d.SignIn, d.AddFolder},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -77,8 +78,8 @@ func TestAddFolder(t *testing.T) {
 
 	folderManagerUC.EXPECT().AddFolder(context.Background(), &folder_manager_proto.AddFolderRequest{
 		Data: &utils_proto.Session{
-			Username: "test",
-			Authenticated: wrapperspb.Bool(true),
+			Username:      "test",
+			Authenticated: true,
 		},
 		Name: form.FolderName,
 	}).Return(&folder_manager_proto.ResponseFolder{
@@ -103,11 +104,12 @@ func TestAddMailToFolderById(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/signin", "/folder/mail/add"}, []func(http.ResponseWriter, *http.Request){d.SignIn, d.AddMailToFolderById},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -140,12 +142,12 @@ func TestAddMailToFolderById(t *testing.T) {
 
 	folderManagerUC.EXPECT().AddMailToFolderById(context.Background(), &folder_manager_proto.AddMailToFolderByIdRequest{
 		Data: &utils_proto.Session{
-			Username: signInForm.Username,
-			Authenticated: wrapperspb.Bool(true),
+			Username:      signInForm.Username,
+			Authenticated: true,
 		},
 		FolderName: "folder",
-		MailId: 1,
-		Move: true,
+		MailId:     1,
+		Move:       true,
 	}).Return(&utils_proto.JsonResponse{
 		Response: pkg.NO_ERR.Bytes(),
 	}, nil)
@@ -158,8 +160,8 @@ func TestAddMailToFolderById(t *testing.T) {
 
 	form := models.AddMailToFolderByIdForm{
 		FolderName: "folder",
-		MailId: 1,
-		Move: true,
+		MailId:     1,
+		Move:       true,
 	}
 	formBytes, _ := json.Marshal(form)
 
@@ -178,11 +180,12 @@ func TestAddMailToFolderByObject(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/signin", "/folder/mail/add_form"}, []func(http.ResponseWriter, *http.Request){d.SignIn, d.AddMailToFolderByObject},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -203,15 +206,15 @@ func TestAddMailToFolderByObject(t *testing.T) {
 
 	mailForm := models.MailForm{
 		Addressee: "test",
-		Theme: "test",
-		Text: "test",
-		Files: "files",
+		Theme:     "test",
+		Text:      "test",
+		Files:     "files",
 	}
 	mailFormBytes, _ := json.Marshal(mailForm)
 
 	form := models.AddMailToFolderByObjectForm{
 		FolderName: "folder",
-		Mail: mailForm,
+		Mail:       mailForm,
 	}
 	formBytes, _ := json.Marshal(form)
 
@@ -223,11 +226,11 @@ func TestAddMailToFolderByObject(t *testing.T) {
 
 	folderManagerUC.EXPECT().AddMailToFolderByObject(context.Background(), &folder_manager_proto.AddMailToFolderByObjectRequest{
 		Data: &utils_proto.Session{
-			Username: signInForm.Username,
-			Authenticated: wrapperspb.Bool(true),
+			Username:      signInForm.Username,
+			Authenticated: true,
 		},
 		FolderName: "folder",
-		Form: mailFormBytes,
+		Form:       mailFormBytes,
 	}).Return(&utils_proto.JsonResponse{
 		Response: pkg.NO_ERR.Bytes(),
 	}, nil)
@@ -258,11 +261,12 @@ func TestMoveFolderMail(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/signin", "/folder/mail/move"}, []func(http.ResponseWriter, *http.Request){d.SignIn, d.MoveFolderMail},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -285,9 +289,9 @@ func TestMoveFolderMail(t *testing.T) {
 	folderNameDest := "folder1"
 
 	form := models.MoveFolderMailForm{
-		FolderNameSrc: folderNameSrc,
+		FolderNameSrc:  folderNameSrc,
 		FolderNameDest: folderNameDest,
-		MailId: 1,
+		MailId:         1,
 	}
 	formBytes, _ := json.Marshal(form)
 
@@ -299,12 +303,12 @@ func TestMoveFolderMail(t *testing.T) {
 
 	folderManagerUC.EXPECT().MoveFolderMail(context.Background(), &folder_manager_proto.MoveFolderMailRequest{
 		Data: &utils_proto.Session{
-			Username: signInForm.Username,
-			Authenticated: wrapperspb.Bool(true),
+			Username:      signInForm.Username,
+			Authenticated: true,
 		},
-		FolderNameSrc: folderNameSrc,
+		FolderNameSrc:  folderNameSrc,
 		FolderNameDest: folderNameDest,
-		MailId: 1,
+		MailId:         1,
 	}).Return(&utils_proto.JsonResponse{
 		Response: pkg.NO_ERR.Bytes(),
 	}, nil)
@@ -335,11 +339,12 @@ func TestChangeFolder(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/signin", "/folder/rename"}, []func(http.ResponseWriter, *http.Request){d.SignIn, d.ChangeFolder},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -362,7 +367,7 @@ func TestChangeFolder(t *testing.T) {
 	folderNameNew := "folder1"
 
 	form := models.ChangeFolderForm{
-		FolderName: folderName,
+		FolderName:    folderName,
 		NewFolderName: folderNameNew,
 	}
 	formBytes, _ := json.Marshal(form)
@@ -375,10 +380,10 @@ func TestChangeFolder(t *testing.T) {
 
 	folderManagerUC.EXPECT().ChangeFolder(context.Background(), &folder_manager_proto.ChangeFolderRequest{
 		Data: &utils_proto.Session{
-			Username: signInForm.Username,
-			Authenticated: wrapperspb.Bool(true),
+			Username:      signInForm.Username,
+			Authenticated: true,
 		},
-		FolderName: folderName,
+		FolderName:    folderName,
 		FolderNewName: folderNameNew,
 	}).Return(&utils_proto.JsonResponse{
 		Response: pkg.NO_ERR.Bytes(),
@@ -411,11 +416,12 @@ func TestDeleteFolder(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/signin", "/folder/delete"}, []func(http.ResponseWriter, *http.Request){d.SignIn, d.DeleteFolder},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -449,8 +455,8 @@ func TestDeleteFolder(t *testing.T) {
 
 	folderManagerUC.EXPECT().DeleteFolder(context.Background(), &folder_manager_proto.DeleteFolderRequest{
 		Data: &utils_proto.Session{
-			Username: signInForm.Username,
-			Authenticated: wrapperspb.Bool(true),
+			Username:      signInForm.Username,
+			Authenticated: true,
 		},
 		FolderName: form.FolderName,
 	}).Return(&utils_proto.JsonResponse{
@@ -483,11 +489,12 @@ func TestDeleteFolderMail(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/signin", "/folder/mail/delete"}, []func(http.ResponseWriter, *http.Request){d.SignIn, d.DeleteFolderMail},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -510,7 +517,7 @@ func TestDeleteFolderMail(t *testing.T) {
 
 	form := models.DeleteFolderMailForm{
 		FolderName: folderName,
-		MailId: 1,
+		MailId:     1,
 	}
 	formBytes, _ := json.Marshal(form)
 
@@ -522,11 +529,11 @@ func TestDeleteFolderMail(t *testing.T) {
 
 	folderManagerUC.EXPECT().DeleteFolderMail(context.Background(), &folder_manager_proto.DeleteFolderMailRequest{
 		Data: &utils_proto.Session{
-			Username: signInForm.Username,
-			Authenticated: wrapperspb.Bool(true),
+			Username:      signInForm.Username,
+			Authenticated: true,
 		},
 		FolderName: folderName,
-		MailId: 1,
+		MailId:     1,
 	}).Return(&utils_proto.JsonResponse{
 		Response: pkg.NO_ERR.Bytes(),
 	}, nil)
@@ -558,11 +565,12 @@ func TestListFolders(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/signin", "/folder/list"}, []func(http.ResponseWriter, *http.Request){d.SignIn, d.ListFolders},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -591,10 +599,10 @@ func TestListFolders(t *testing.T) {
 
 	folderManagerUC.EXPECT().ListFolders(context.Background(), &folder_manager_proto.ListFoldersRequest{
 		Data: &utils_proto.Session{
-			Username: signInForm.Username,
-			Authenticated: wrapperspb.Bool(true),
+			Username:      signInForm.Username,
+			Authenticated: true,
 		},
-		Limit: 100,
+		Limit:  100,
 		Offset: 0,
 	}).Return(&folder_manager_proto.ResponseFolders{
 		Response: &utils_proto.JsonResponse{
@@ -604,12 +612,12 @@ func TestListFolders(t *testing.T) {
 	}, nil)
 	folderManagerUC.EXPECT().ListFolder(context.Background(), &folder_manager_proto.ListFolderRequest{
 		Data: &utils_proto.Session{
-			Username: signInForm.Username,
-			Authenticated: wrapperspb.Bool(true),
+			Username:      signInForm.Username,
+			Authenticated: true,
 		},
 		FolderName: folderName,
-		Limit: 100,
-		Offset: 0,
+		Limit:      100,
+		Offset:     0,
 	}).Return(&folder_manager_proto.ResponseMails{
 		Response: &utils_proto.JsonResponse{
 			Response: pkg.NO_ERR.Bytes(),

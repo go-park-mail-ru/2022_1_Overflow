@@ -4,6 +4,7 @@ import (
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/models"
 	"OverflowBackend/pkg"
+	"OverflowBackend/proto/attach_proto"
 	"OverflowBackend/proto/auth_proto"
 	"OverflowBackend/proto/folder_manager_proto"
 	"OverflowBackend/proto/mailbox_proto"
@@ -13,15 +14,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/golang/mock/gomock"
 	"mime/multipart"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
+	"os"
 	"testing"
-
-	"google.golang.org/protobuf/types/known/wrapperspb"
-
-	"github.com/golang/mock/gomock"
 )
 
 func TestGetInfo(t *testing.T) {
@@ -32,6 +31,7 @@ func TestGetInfo(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -41,7 +41,7 @@ func TestGetInfo(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/profile", "/signin"}, []func(http.ResponseWriter, *http.Request){d.GetInfo, d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -71,7 +71,7 @@ func TestGetInfo(t *testing.T) {
 	//&models.Session{Username: "test", Authenticated: true}
 	getInfoData := &utils_proto.Session{
 		Username:      "test",
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 	profileUC.EXPECT().GetInfo(context.Background(), &profile_proto.GetInfoRequest{
 		Data: getInfoData,
@@ -116,6 +116,7 @@ func TestSetInfo(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -125,8 +126,8 @@ func TestSetInfo(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/profile/set", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SetInfo, d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -154,7 +155,7 @@ func TestSetInfo(t *testing.T) {
 	//&models.Session{Username: "test", Authenticated: true}, &data
 	setInfoData := &utils_proto.Session{
 		Username:      "test",
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 	profileUC.EXPECT().SetInfo(context.Background(), &profile_proto.SetInfoRequest{
 		Data: setInfoData,
@@ -188,7 +189,6 @@ func TestSetInfo(t *testing.T) {
 	}
 }
 
-
 func TestGetAvatar(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
@@ -197,6 +197,7 @@ func TestGetAvatar(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -206,7 +207,7 @@ func TestGetAvatar(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/profile/avatar", "/signin"}, []func(http.ResponseWriter, *http.Request){d.GetAvatar, d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -252,7 +253,6 @@ func TestGetAvatar(t *testing.T) {
 	}
 }
 
-
 func TestSetAvatar(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
@@ -261,6 +261,7 @@ func TestSetAvatar(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -270,7 +271,7 @@ func TestSetAvatar(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/profile/avatar/set", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SetAvatar, d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -280,19 +281,24 @@ func TestSetAvatar(t *testing.T) {
 		Password: "test",
 	}
 	signinFormBytes, _ := json.Marshal(signinForm)
-	
+
 	reqUrl := fmt.Sprintf("%s/profile/avatar/set", srv.URL)
 
+	file, err := os.ReadFile("../../static/dummy.png")
+	if err != nil {
+		t.Error(err)
+		return
+	}
 	avatar := models.Avatar{
-		Name:      "avatar",
+		Name:     "avatar",
 		Username: signinForm.Username,
-		File:   []byte{10, 10, 10, 10},
+		File:     file, //[]byte{10, 10, 10, 10},
 	}
 	avatarBytes, _ := json.Marshal(avatar)
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	_, err := writer.CreateFormFile("file", avatar.Name)
+	_, err = writer.CreateFormFile("file", avatar.Name)
 
 	if err != nil {
 		t.Error(err)
@@ -309,8 +315,8 @@ func TestSetAvatar(t *testing.T) {
 	}, nil)
 	profileUC.EXPECT().SetAvatar(context.Background(), &profile_proto.SetAvatarRequest{
 		Data: &utils_proto.Session{
-			Username: signinForm.Username,
-			Authenticated: wrapperspb.Bool(true),
+			Username:      signinForm.Username,
+			Authenticated: true,
 		},
 		Avatar: avatarBytes,
 	}).Return(&utils_proto.JsonResponse{
@@ -350,6 +356,7 @@ func TestChangePassword(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -359,7 +366,7 @@ func TestChangePassword(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/profile/change_password", "/signin"}, []func(http.ResponseWriter, *http.Request){d.ChangePassword, d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -369,12 +376,12 @@ func TestChangePassword(t *testing.T) {
 		Password: "test",
 	}
 	signinFormBytes, _ := json.Marshal(signinForm)
-	
+
 	reqUrl := fmt.Sprintf("%s/profile/change_password", srv.URL)
 
 	form := models.ChangePasswordForm{
-		OldPassword: "test",
-		NewPassword: "test2",
+		OldPassword:     "test",
+		NewPassword:     "test2",
 		NewPasswordConf: "test2",
 	}
 	formBytes, _ := json.Marshal(form)
@@ -386,8 +393,8 @@ func TestChangePassword(t *testing.T) {
 	}, nil)
 	profileUC.EXPECT().ChangePassword(context.Background(), &profile_proto.ChangePasswordRequest{
 		Data: &utils_proto.Session{
-			Username: signinForm.Username,
-			Authenticated: wrapperspb.Bool(true),
+			Username:      signinForm.Username,
+			Authenticated: true,
 		},
 		PasswordOld: form.OldPassword,
 		PasswordNew: form.NewPassword,

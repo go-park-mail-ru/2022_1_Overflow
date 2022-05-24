@@ -4,6 +4,7 @@ import (
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/models"
 	"OverflowBackend/pkg"
+	"OverflowBackend/proto/attach_proto"
 	"OverflowBackend/proto/auth_proto"
 	"OverflowBackend/proto/folder_manager_proto"
 	"OverflowBackend/proto/mailbox_proto"
@@ -28,11 +29,12 @@ func TestSignin(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/signin"}, []func(http.ResponseWriter, *http.Request){d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	form := models.SignInForm{
 		Username: "test",
@@ -75,11 +77,12 @@ func TestBadSignin(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/signin"}, []func(http.ResponseWriter, *http.Request){d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	data := models.SignInForm{
 		Username: "test",
@@ -123,11 +126,12 @@ func TestSignup(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	data := models.SignUpForm{
 		Lastname:             "John",
@@ -174,11 +178,12 @@ func TestBadPassword(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	data := models.SignUpForm{
 		Lastname:             "John",
@@ -226,11 +231,12 @@ func TestEmptyForm(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	data := models.SignUpForm{
 		Lastname:             "",
@@ -277,6 +283,7 @@ func TestSignout(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -286,7 +293,7 @@ func TestSignout(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/logout", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SignOut, d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()

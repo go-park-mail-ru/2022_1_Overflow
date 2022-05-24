@@ -4,6 +4,7 @@ import (
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/models"
 	"OverflowBackend/pkg"
+	"OverflowBackend/proto/attach_proto"
 	"OverflowBackend/proto/auth_proto"
 	"OverflowBackend/proto/folder_manager_proto"
 	"OverflowBackend/proto/mailbox_proto"
@@ -13,7 +14,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/golang/mock/gomock"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
@@ -29,6 +29,7 @@ func TestSend(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -38,8 +39,8 @@ func TestSend(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/mail/send", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SendMail, d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -68,13 +69,21 @@ func TestSend(t *testing.T) {
 
 	data := &utils_proto.Session{
 		Username:      "test",
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 	mailboxUC.EXPECT().SendMail(context.Background(), &mailbox_proto.SendMailRequest{
 		Data: data,
 		Form: formBytesMailData,
-	}).Return(&utils_proto.JsonResponse{
+	}).Return(&utils_proto.JsonExtendResponse{
 		Response: pkg.NO_ERR.Bytes(),
+		Param:    "1",
+	}, nil)
+
+	var UNREAD_COUNT = 5
+	mailboxUC.EXPECT().CountUnread(context.Background(), &mailbox_proto.CountUnreadRequest{
+		Data: data,
+	}).Return(&mailbox_proto.ResponseCountUnread{
+		Count: int32(UNREAD_COUNT),
 	}, nil)
 	//&models.Session{Username: "test", Authenticated: true}, data)
 
@@ -115,6 +124,7 @@ func TestIncome(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -124,8 +134,8 @@ func TestIncome(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/mail/income", "/signin"}, []func(http.ResponseWriter, *http.Request){d.Income, d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -148,7 +158,7 @@ func TestIncome(t *testing.T) {
 
 	incomeData := &utils_proto.Session{
 		Username:      "test2",
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 	mailboxUC.EXPECT().Income(context.Background(), &mailbox_proto.IncomeRequest{
 		Data:  incomeData,
@@ -193,6 +203,7 @@ func TestOutcome(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -202,8 +213,8 @@ func TestOutcome(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/mail/outcome", "/signin"}, []func(http.ResponseWriter, *http.Request){d.Outcome, d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -226,7 +237,7 @@ func TestOutcome(t *testing.T) {
 
 	outcomeData := &utils_proto.Session{
 		Username:      "test",
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 	mailboxUC.EXPECT().Outcome(context.Background(), &mailbox_proto.OutcomeRequest{
 		Data:  outcomeData,
@@ -271,6 +282,7 @@ func TestRead(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -280,8 +292,8 @@ func TestRead(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/mail/read", "/signin"}, []func(http.ResponseWriter, *http.Request){d.ReadMail, d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -300,7 +312,7 @@ func TestRead(t *testing.T) {
 
 	readMailData := &utils_proto.Session{
 		Username:      "test2",
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 	//readMailDataBytes, _ := json.Marshal(readMailData)
 	mailboxUC.EXPECT().ReadMail(context.Background(), &mailbox_proto.ReadMailRequest{
@@ -357,6 +369,7 @@ func TestDelete(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -366,8 +379,8 @@ func TestDelete(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/mail/delete", "/signin"}, []func(http.ResponseWriter, *http.Request){d.DeleteMail, d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -388,7 +401,7 @@ func TestDelete(t *testing.T) {
 
 	deleteData := &utils_proto.Session{
 		Username:      "test",
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 	mailboxUC.EXPECT().DeleteMail(context.Background(), &mailbox_proto.DeleteMailRequest{
 		Data: deleteData,
@@ -430,6 +443,7 @@ func TestGetMail(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -439,8 +453,8 @@ func TestGetMail(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/mail/get", "/signin"}, []func(http.ResponseWriter, *http.Request){d.GetMail, d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()

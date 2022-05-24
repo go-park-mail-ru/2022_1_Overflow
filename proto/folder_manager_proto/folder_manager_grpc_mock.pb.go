@@ -37,6 +37,25 @@ func (m *MockFolderManagerClient) EXPECT() *MockFolderManagerClientMockRecorder 
 }
 
 // AddFolder mocks base method.
+func (m *MockFolderManagerClient) FolderExist(ctx context.Context, userId int32, folderName string, opts ...grpc.CallOption) bool {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, userId, folderName}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "FolderExist", varargs...)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// AddFolder indicates an expected call of AddFolder.
+func (mr *MockFolderManagerClientMockRecorder) FolderExist(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FolderExist", reflect.TypeOf((*MockFolderManagerClient)(nil).FolderExist), varargs...)
+}
+
+// AddFolder mocks base method.
 func (m *MockFolderManagerClient) AddFolder(ctx context.Context, in *AddFolderRequest, opts ...grpc.CallOption) (*ResponseFolder, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
