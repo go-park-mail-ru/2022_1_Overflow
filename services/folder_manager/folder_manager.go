@@ -9,28 +9,28 @@ import (
 	"OverflowBackend/proto/repository_proto"
 	"OverflowBackend/proto/utils_proto"
 	"context"
-	"encoding/json"
+	"github.com/mailru/easyjson"
 	"time"
 
 	log "github.com/sirupsen/logrus"
 )
 
 type FolderManagerService struct {
-	config *config.Config
-	db repository_proto.DatabaseRepositoryClient
+	config  *config.Config
+	db      repository_proto.DatabaseRepositoryClient
 	profile profile_proto.ProfileClient
 }
 
-func (s *FolderManagerService) FolderExists(context context.Context, userId int32, folderName string) (bool) {
+func (s *FolderManagerService) FolderExists(context context.Context, userId int32, folderName string) bool {
 	resp, err := s.db.GetFolderByName(context, &repository_proto.GetFolderByNameRequest{
-		UserId: userId,
+		UserId:     userId,
 		FolderName: folderName,
 	})
 	if err != nil || resp.Response.Status != utils_proto.DatabaseStatus_OK {
 		return false
 	}
 	var folder models.Folder
-	err = json.Unmarshal(resp.Folder, &folder)
+	err = easyjson.Unmarshal(resp.Folder, &folder)
 	if err != nil {
 		return false
 	}
@@ -49,7 +49,7 @@ func (s *FolderManagerService) GetValidateUser(context context.Context, username
 	if resp.Response.Status != utils_proto.DatabaseStatus_OK {
 		return user, pkg.DB_ERR, nil
 	}
-	err = json.Unmarshal(resp.User, &user)
+	err = easyjson.Unmarshal(resp.User, &user)
 	if err != nil {
 		return user, pkg.JSON_ERR, err
 	}
@@ -77,7 +77,7 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 		}, err
 	}
 	resp2, err := s.db.GetFolderByName(context, &repository_proto.GetFolderByNameRequest{
-		UserId: user.Id,
+		UserId:     user.Id,
 		FolderName: request.Name,
 	})
 	if err != nil {
@@ -96,7 +96,7 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 		}, nil
 	}
 	var folder models.Folder
-	err = json.Unmarshal(resp2.Folder, &folder)
+	err = easyjson.Unmarshal(resp2.Folder, &folder)
 	if err != nil {
 		return &folder_manager_proto.ResponseFolder{
 			Response: &utils_proto.JsonResponse{
@@ -112,7 +112,7 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 		}, nil
 	}
 	resp3, err := s.db.AddFolder(context, &repository_proto.AddFolderRequest{
-		Name: request.Name,
+		Name:   request.Name,
 		UserId: user.Id,
 	})
 	if err != nil {
@@ -131,7 +131,7 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 		}, nil
 	}
 	resp4, err := s.db.GetFolderByName(context, &repository_proto.GetFolderByNameRequest{
-		UserId: user.Id,
+		UserId:     user.Id,
 		FolderName: request.Name,
 	})
 	if err != nil {
@@ -172,10 +172,10 @@ func (s *FolderManagerService) AddMailToFolderById(context context.Context, requ
 		}, nil
 	}
 	resp2, err := s.db.AddMailToFolderById(context, &repository_proto.AddMailToFolderByIdRequest{
-		UserId: user.Id,
+		UserId:     user.Id,
 		FolderName: request.FolderName,
-		MailId: request.MailId,
-		Move: request.Move,
+		MailId:     request.MailId,
+		Move:       request.Move,
 	})
 	if err != nil {
 		log.Error(err)
@@ -207,7 +207,7 @@ func (s *FolderManagerService) AddMailToFolderByObject(context context.Context, 
 		}, nil
 	}
 	var form models.MailForm
-	err = json.Unmarshal(request.Form, &form)
+	err = easyjson.Unmarshal(request.Form, &form)
 	if err != nil {
 		return &utils_proto.JsonResponse{
 			Response: pkg.JSON_ERR.Bytes(),
@@ -221,11 +221,11 @@ func (s *FolderManagerService) AddMailToFolderByObject(context context.Context, 
 		Files:     form.Files,
 		Date:      time.Now(),
 	}
-	mailBytes, _ := json.Marshal(mail)
+	mailBytes, _ := easyjson.Marshal(mail)
 	resp3, err := s.db.AddMailToFolderByObject(context, &repository_proto.AddMailToFolderByObjectRequest{
-		UserId: user.Id,
+		UserId:     user.Id,
 		FolderName: request.FolderName,
-		Mail: mailBytes,
+		Mail:       mailBytes,
 	})
 	if err != nil {
 		log.Error(err)
@@ -267,10 +267,10 @@ func (s *FolderManagerService) MoveFolderMail(context context.Context, request *
 		}, nil
 	}
 	resp2, err := s.db.MoveFolderMail(context, &repository_proto.MoveFolderMailRequest{
-		UserId: user.Id,
-		FolderNameSrc: request.FolderNameSrc,
+		UserId:         user.Id,
+		FolderNameSrc:  request.FolderNameSrc,
 		FolderNameDest: request.FolderNameDest,
-		MailId: request.MailId,
+		MailId:         request.MailId,
 	})
 	if err != nil {
 		log.Error(err)
@@ -308,9 +308,9 @@ func (s *FolderManagerService) ChangeFolder(context context.Context, request *fo
 		}, nil
 	}
 	resp3, err := s.db.ChangeFolderName(context, &repository_proto.ChangeFolderNameRequest{
-		UserId: user.Id,
+		UserId:     user.Id,
 		FolderName: request.FolderName,
-		NewName: request.FolderNewName,
+		NewName:    request.FolderNewName,
 	})
 	if err != nil {
 		log.Error(err)
@@ -347,7 +347,7 @@ func (s *FolderManagerService) DeleteFolder(context context.Context, request *fo
 		}, nil
 	}
 	resp3, err := s.db.DeleteFolder(context, &repository_proto.DeleteFolderRequest{
-		UserId: user.Id,
+		UserId:     user.Id,
 		FolderName: request.FolderName,
 	})
 	if err != nil {
@@ -371,7 +371,7 @@ func (s *FolderManagerService) ListFolders(context context.Context, request *fol
 	user, resp, err := s.GetValidateUser(context, request.Data.Username)
 	if err != nil || resp != pkg.NO_ERR {
 		return &folder_manager_proto.ResponseFolders{
-			Response:&utils_proto.JsonResponse{
+			Response: &utils_proto.JsonResponse{
 				Response: resp.Bytes(),
 			},
 			Folders: nil,
@@ -379,13 +379,13 @@ func (s *FolderManagerService) ListFolders(context context.Context, request *fol
 	}
 	resp2, err := s.db.GetFoldersByUser(context, &repository_proto.GetFoldersByUserRequest{
 		UserId: user.Id,
-		Limit: request.Limit,
+		Limit:  request.Limit,
 		Offset: request.Offset,
 	})
 	if err != nil {
 		log.Error(err)
 		return &folder_manager_proto.ResponseFolders{
-			Response:&utils_proto.JsonResponse{
+			Response: &utils_proto.JsonResponse{
 				Response: pkg.DB_ERR.Bytes(),
 			},
 			Folders: nil,
@@ -393,7 +393,7 @@ func (s *FolderManagerService) ListFolders(context context.Context, request *fol
 	}
 	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
 		return &folder_manager_proto.ResponseFolders{
-			Response:&utils_proto.JsonResponse{
+			Response: &utils_proto.JsonResponse{
 				Response: pkg.DB_ERR.Bytes(),
 			},
 			Folders: nil,
@@ -401,14 +401,14 @@ func (s *FolderManagerService) ListFolders(context context.Context, request *fol
 	}
 	if err != nil {
 		return &folder_manager_proto.ResponseFolders{
-			Response:&utils_proto.JsonResponse{
+			Response: &utils_proto.JsonResponse{
 				Response: pkg.JSON_ERR.Bytes(),
 			},
 			Folders: nil,
 		}, err
 	}
 	return &folder_manager_proto.ResponseFolders{
-		Response:&utils_proto.JsonResponse{
+		Response: &utils_proto.JsonResponse{
 			Response: pkg.NO_ERR.Bytes(),
 		},
 		Folders: resp2.Folders,
@@ -420,7 +420,7 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 	user, resp, err := s.GetValidateUser(context, request.Data.Username)
 	if err != nil || resp != pkg.NO_ERR {
 		return &folder_manager_proto.ResponseMails{
-			Response:&utils_proto.JsonResponse{
+			Response: &utils_proto.JsonResponse{
 				Response: resp.Bytes(),
 			},
 			Mails: nil,
@@ -428,22 +428,22 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 	}
 	if !s.FolderExists(context, user.Id, request.FolderName) {
 		return &folder_manager_proto.ResponseMails{
-			Response:&utils_proto.JsonResponse{
+			Response: &utils_proto.JsonResponse{
 				Response: pkg.CreateJsonErr(pkg.STATUS_OBJECT_EXISTS, "Такой папки не существует.").Bytes(),
 			},
 			Mails: nil,
 		}, nil
 	}
 	resp2, err := s.db.GetFolderMail(context, &repository_proto.GetFolderMailRequest{
-		UserId: user.Id,
+		UserId:     user.Id,
 		FolderName: request.FolderName,
-		Limit: request.Limit,
-		Offset: request.Offset,
+		Limit:      request.Limit,
+		Offset:     request.Offset,
 	})
 	if err != nil {
 		log.Error(err)
 		return &folder_manager_proto.ResponseMails{
-			Response:&utils_proto.JsonResponse{
+			Response: &utils_proto.JsonResponse{
 				Response: pkg.DB_ERR.Bytes(),
 			},
 			Mails: nil,
@@ -451,17 +451,17 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 	}
 	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
 		return &folder_manager_proto.ResponseMails{
-			Response:&utils_proto.JsonResponse{
+			Response: &utils_proto.JsonResponse{
 				Response: pkg.DB_ERR.Bytes(),
 			},
 			Mails: nil,
 		}, nil
 	}
 	var mails models.MailList
-	err = json.Unmarshal(resp2.Mails, &mails)
+	err = easyjson.Unmarshal(resp2.Mails, &mails)
 	if err != nil {
 		return &folder_manager_proto.ResponseMails{
-			Response:&utils_proto.JsonResponse{
+			Response: &utils_proto.JsonResponse{
 				Response: pkg.JSON_ERR.Bytes(),
 			},
 			Mails: nil,
@@ -478,17 +478,17 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 		)
 		if err != nil {
 			return &folder_manager_proto.ResponseMails{
-				Response:&utils_proto.JsonResponse{
+				Response: &utils_proto.JsonResponse{
 					Response: pkg.DB_ERR.Bytes(),
 				},
 				Mails: nil,
 			}, err
 		}
 		var response pkg.JsonResponse
-		err = json.Unmarshal(resp.Response.Response, &response)
+		err = easyjson.Unmarshal(resp.Response.Response, &response)
 		if err != nil {
 			return &folder_manager_proto.ResponseMails{
-				Response:&utils_proto.JsonResponse{
+				Response: &utils_proto.JsonResponse{
 					Response: pkg.JSON_ERR.Bytes(),
 				},
 				Mails: nil,
@@ -496,7 +496,7 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 		}
 		if response != pkg.NO_ERR {
 			return &folder_manager_proto.ResponseMails{
-				Response:&utils_proto.JsonResponse{
+				Response: &utils_proto.JsonResponse{
 					Response: pkg.DB_ERR.Bytes(),
 				},
 				Mails: nil,
@@ -505,18 +505,18 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 		mail_add.AvatarUrl = resp.Url
 		mails_add.Mails = append(mails_add.Mails, mail_add)
 	}
-	parsed, err := json.Marshal(mails_add)
+	parsed, err := easyjson.Marshal(mails_add)
 	if err != nil {
 		log.Error(err)
 		return &folder_manager_proto.ResponseMails{
-			Response:&utils_proto.JsonResponse{
+			Response: &utils_proto.JsonResponse{
 				Response: pkg.DB_ERR.Bytes(),
 			},
 			Mails: nil,
 		}, err
 	}
 	return &folder_manager_proto.ResponseMails{
-		Response:&utils_proto.JsonResponse{
+		Response: &utils_proto.JsonResponse{
 			Response: pkg.NO_ERR.Bytes(),
 		},
 		Mails: parsed,

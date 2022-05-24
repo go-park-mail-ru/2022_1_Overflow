@@ -6,7 +6,7 @@ import (
 	"OverflowBackend/proto/repository_proto"
 	"OverflowBackend/proto/utils_proto"
 	"context"
-	"encoding/json"
+	"github.com/mailru/easyjson"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -34,7 +34,7 @@ func (c *Database) IsMailMoved(context context.Context, mailId int32, userId int
 
 func (c *Database) GetFolderById(context context.Context, request *repository_proto.GetFolderByIdRequest) (response *repository_proto.ResponseFolder, err error) {
 	var folder models.Folder
-	folderBytes, _ := json.Marshal(folder)
+	folderBytes, _ := easyjson.Marshal(folder)
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
@@ -73,7 +73,7 @@ func (c *Database) GetFolderById(context context.Context, request *repository_pr
 		folder.UserId = values[2].(int32)
 		folder.CreatedAt = values[3].(time.Time)
 	}
-	folderBytes, _ = json.Marshal(folder)
+	folderBytes, _ = easyjson.Marshal(folder)
 	return &repository_proto.ResponseFolder{
 		Response: &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,
@@ -84,7 +84,7 @@ func (c *Database) GetFolderById(context context.Context, request *repository_pr
 
 func (c *Database) GetFolderByName(context context.Context, request *repository_proto.GetFolderByNameRequest) (response *repository_proto.ResponseFolder, err error) {
 	var folder models.Folder
-	folderBytes, _ := json.Marshal(folder)
+	folderBytes, _ := easyjson.Marshal(folder)
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
@@ -123,7 +123,7 @@ func (c *Database) GetFolderByName(context context.Context, request *repository_
 		folder.UserId = values[2].(int32)
 		folder.CreatedAt = values[3].(time.Time)
 	}
-	folderBytes, _ = json.Marshal(folder)
+	folderBytes, _ = easyjson.Marshal(folder)
 	return &repository_proto.ResponseFolder{
 		Response: &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,
@@ -134,7 +134,7 @@ func (c *Database) GetFolderByName(context context.Context, request *repository_
 
 func (c *Database) GetFoldersByUser(context context.Context, request *repository_proto.GetFoldersByUserRequest) (response *repository_proto.ResponseFolders, err error) {
 	var folders models.FolderList
-	foldersBytes, _ := json.Marshal(folders)
+	foldersBytes, _ := easyjson.Marshal(folders)
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
@@ -188,7 +188,7 @@ func (c *Database) GetFoldersByUser(context context.Context, request *repository
 		folder.CreatedAt = values[3].(time.Time)
 		folders.Folders = append(folders.Folders, folder)
 	}
-	foldersBytes, _ = json.Marshal(folders)
+	foldersBytes, _ = easyjson.Marshal(folders)
 	return &repository_proto.ResponseFolders{
 		Response: &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,
@@ -199,7 +199,7 @@ func (c *Database) GetFoldersByUser(context context.Context, request *repository
 
 func (c *Database) GetFolderMail(context context.Context, request *repository_proto.GetFolderMailRequest) (response *repository_proto.ResponseMails, err error) {
 	var mails models.MailList
-	mailsBytes, _ := json.Marshal(mails)
+	mailsBytes, _ := easyjson.Marshal(mails)
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
@@ -265,7 +265,7 @@ func (c *Database) GetFolderMail(context context.Context, request *repository_pr
 		mail.Id = values[7].(int32)
 		mails.Mails = append(mails.Mails, mail)
 	}
-	mailsBytes, _ = json.Marshal(mails)
+	mailsBytes, _ = easyjson.Marshal(mails)
 	return &repository_proto.ResponseMails{
 		Response: &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,
@@ -338,7 +338,7 @@ func (c *Database) AddMailToFolderById(context context.Context, request *reposit
 
 func (c *Database) AddMailToFolderByObject(context context.Context, request *repository_proto.AddMailToFolderByObjectRequest) (*utils_proto.DatabaseResponse, error) {
 	var mail models.Mail
-	err := json.Unmarshal(request.Mail, &mail)
+	err := easyjson.Unmarshal(request.Mail, &mail)
 	if err != nil {
 		log.Error(err)
 		return &utils_proto.DatabaseResponse{

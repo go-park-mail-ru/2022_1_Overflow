@@ -4,7 +4,7 @@ import (
 	"OverflowBackend/internal/models"
 	"OverflowBackend/proto/repository_proto"
 	"context"
-	"encoding/json"
+	"github.com/mailru/easyjson"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -63,7 +63,7 @@ func (c *Database) ListAttaches(context context.Context, request *repository_pro
 		}, err
 	}
 
-	filenamesBytes, err := json.Marshal(attaches)
+	filenamesBytes, err := easyjson.Marshal(attaches)
 	if err != nil {
 		log.Error(err)
 		return &repository_proto.ResponseAttaches{

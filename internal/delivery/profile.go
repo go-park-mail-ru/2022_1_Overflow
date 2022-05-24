@@ -10,6 +10,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/mailru/easyjson"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/validator.v2"
 	_ "image/jpeg"
@@ -46,7 +47,7 @@ func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var response pkg.JsonResponse
-	err = json.Unmarshal(resp.Response.Response, &response)
+	err = easyjson.Unmarshal(resp.Response.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
@@ -91,7 +92,7 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
 		return
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 	resp, err := d.profile.SetInfo(context.Background(), &profile_proto.SetInfoRequest{
 		Data: data,
 		Form: formBytes,
@@ -101,7 +102,7 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var response pkg.JsonResponse
-	err = json.Unmarshal(resp.Response, &response)
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
@@ -168,7 +169,7 @@ func (d *Delivery) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var response pkg.JsonResponse
-	err = json.Unmarshal(resp.Response, &response)
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
@@ -276,7 +277,7 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 		Username: data.Username,
 		File:     buf.Bytes(),
 	}
-	avatarBytes, _ := json.Marshal(avatar)
+	avatarBytes, _ := easyjson.Marshal(avatar)
 	resp, err := d.profile.SetAvatar(context.Background(), &profile_proto.SetAvatarRequest{
 		Data:   data,
 		Avatar: avatarBytes,
@@ -286,7 +287,7 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var response pkg.JsonResponse
-	err = json.Unmarshal(resp.Response, &response)
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
@@ -337,7 +338,7 @@ func (d *Delivery) GetAvatar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var response pkg.JsonResponse
-	err = json.Unmarshal(resp.Response.Response, &response)
+	err = easyjson.Unmarshal(resp.Response.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return

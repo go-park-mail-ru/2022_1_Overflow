@@ -11,8 +11,8 @@ import (
 	"OverflowBackend/proto/profile_proto"
 	"OverflowBackend/proto/utils_proto"
 	"context"
-	"encoding/json"
 	"fmt"
+	"github.com/mailru/easyjson"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
@@ -51,7 +51,7 @@ func TestAddFolder(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	signInFormBytes, _ := json.Marshal(signInForm)
+	signInFormBytes, _ := easyjson.Marshal(signInForm)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: signInFormBytes,
@@ -74,7 +74,7 @@ func TestAddFolder(t *testing.T) {
 	form := models.AddFolderForm{
 		FolderName: "folder",
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 
 	folderManagerUC.EXPECT().AddFolder(context.Background(), &folder_manager_proto.AddFolderRequest{
 		Data: &utils_proto.Session{
@@ -126,7 +126,7 @@ func TestAddMailToFolderById(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	signInFormBytes, _ := json.Marshal(signInForm)
+	signInFormBytes, _ := easyjson.Marshal(signInForm)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: signInFormBytes,
@@ -163,7 +163,7 @@ func TestAddMailToFolderById(t *testing.T) {
 		MailId:     1,
 		Move:       true,
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 
 	_, err = Post(client, formBytes, url, http.StatusOK, token, "")
 	if err != nil {
@@ -202,7 +202,7 @@ func TestAddMailToFolderByObject(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	signInFormBytes, _ := json.Marshal(signInForm)
+	signInFormBytes, _ := easyjson.Marshal(signInForm)
 
 	mailForm := models.MailForm{
 		Addressee: "test",
@@ -210,13 +210,13 @@ func TestAddMailToFolderByObject(t *testing.T) {
 		Text:      "test",
 		Files:     "files",
 	}
-	mailFormBytes, _ := json.Marshal(mailForm)
+	mailFormBytes, _ := easyjson.Marshal(mailForm)
 
 	form := models.AddMailToFolderByObjectForm{
 		FolderName: "folder",
 		Mail:       mailForm,
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: signInFormBytes,
@@ -283,7 +283,7 @@ func TestMoveFolderMail(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	signInFormBytes, _ := json.Marshal(signInForm)
+	signInFormBytes, _ := easyjson.Marshal(signInForm)
 
 	folderNameSrc := "folder"
 	folderNameDest := "folder1"
@@ -293,7 +293,7 @@ func TestMoveFolderMail(t *testing.T) {
 		FolderNameDest: folderNameDest,
 		MailId:         1,
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: signInFormBytes,
@@ -361,7 +361,7 @@ func TestChangeFolder(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	signInFormBytes, _ := json.Marshal(signInForm)
+	signInFormBytes, _ := easyjson.Marshal(signInForm)
 
 	folderName := "folder"
 	folderNameNew := "folder1"
@@ -370,7 +370,7 @@ func TestChangeFolder(t *testing.T) {
 		FolderName:    folderName,
 		NewFolderName: folderNameNew,
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: signInFormBytes,
@@ -438,14 +438,14 @@ func TestDeleteFolder(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	signInFormBytes, _ := json.Marshal(signInForm)
+	signInFormBytes, _ := easyjson.Marshal(signInForm)
 
 	folderName := "folder"
 
 	form := models.DeleteFolderForm{
 		FolderName: folderName,
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: signInFormBytes,
@@ -511,7 +511,7 @@ func TestDeleteFolderMail(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	signInFormBytes, _ := json.Marshal(signInForm)
+	signInFormBytes, _ := easyjson.Marshal(signInForm)
 
 	folderName := "folder"
 
@@ -519,7 +519,7 @@ func TestDeleteFolderMail(t *testing.T) {
 		FolderName: folderName,
 		MailId:     1,
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: signInFormBytes,
@@ -587,7 +587,7 @@ func TestListFolders(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	signInFormBytes, _ := json.Marshal(signInForm)
+	signInFormBytes, _ := easyjson.Marshal(signInForm)
 
 	folderName := "folder"
 

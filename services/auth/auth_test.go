@@ -9,7 +9,7 @@ import (
 	"OverflowBackend/proto/utils_proto"
 	"OverflowBackend/services/auth"
 	"context"
-	"encoding/json"
+	"github.com/mailru/easyjson"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -29,21 +29,21 @@ func TestSignIn(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	mockDB, uc := InitTestUseCase(mockCtrl)
-	
+
 	form := models.SignInForm{
 		Username: "test",
 		Password: "test",
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 
 	user := models.User{
-		Id: 0,
+		Id:        0,
 		Firstname: "test",
-		Lastname: "test",
-		Username: form.Username,
-		Password: pkg.HashPassword(form.Password),
+		Lastname:  "test",
+		Username:  form.Username,
+		Password:  pkg.HashPassword(form.Password),
 	}
-	userBytes, _ := json.Marshal(user)
+	userBytes, _ := easyjson.Marshal(user)
 
 	var response pkg.JsonResponse
 
@@ -59,13 +59,13 @@ func TestSignIn(t *testing.T) {
 	resp, err := uc.SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: formBytes,
 	})
-	json_err := json.Unmarshal(resp.Response, &response)
+	json_err := easyjson.Unmarshal(resp.Response, &response)
 	if err != nil || json_err != nil || response != pkg.NO_ERR {
 		t.Errorf("Неверный ответ от UseCase.")
 		return
 	}
 
-	userBytes, _ = json.Marshal(models.User{})
+	userBytes, _ = easyjson.Marshal(models.User{})
 	mockDB.EXPECT().GetUserInfoByUsername(context.Background(), &repository_proto.GetUserInfoByUsernameRequest{
 		Username: form.Username,
 	}).Return(&repository_proto.ResponseUser{
@@ -77,14 +77,14 @@ func TestSignIn(t *testing.T) {
 	resp, _ = uc.SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: formBytes,
 	})
-	json_err = json.Unmarshal(resp.Response, &response)
+	json_err = easyjson.Unmarshal(resp.Response, &response)
 	if json_err != nil || response != pkg.WRONG_CREDS_ERR {
 		t.Errorf("Неверный ответ от UseCase.")
 		return
 	}
 
 	user.Password = "123"
-	userBytes, _ = json.Marshal(user)
+	userBytes, _ = easyjson.Marshal(user)
 	mockDB.EXPECT().GetUserInfoByUsername(context.Background(), &repository_proto.GetUserInfoByUsernameRequest{
 		Username: form.Username,
 	}).Return(&repository_proto.ResponseUser{
@@ -96,7 +96,7 @@ func TestSignIn(t *testing.T) {
 	resp, _ = uc.SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: formBytes,
 	})
-	json_err = json.Unmarshal(resp.Response, &response)
+	json_err = easyjson.Unmarshal(resp.Response, &response)
 	if json_err != nil || response != pkg.WRONG_CREDS_ERR {
 		t.Errorf("Неверный ответ от UseCase.")
 		return
@@ -108,25 +108,25 @@ func TestSignUp(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	mockDB, uc := InitTestUseCase(mockCtrl)
-	
+
 	form := models.SignUpForm{
-		Firstname: "test",
-		Lastname: "test",
-		Username: "test",
-		Password: "test",
+		Firstname:            "test",
+		Lastname:             "test",
+		Username:             "test",
+		Password:             "test",
 		PasswordConfirmation: "test",
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 
 	user := models.User{
-		Id: 0,
+		Id:        0,
 		Firstname: "test",
-		Lastname: "test",
-		Username: form.Username,
-		Password: pkg.HashPassword(form.Password),
+		Lastname:  "test",
+		Username:  form.Username,
+		Password:  pkg.HashPassword(form.Password),
 	}
-	userBytes, _ := json.Marshal(user)
-	userEmptyBytes, _ := json.Marshal(models.User{})
+	userBytes, _ := easyjson.Marshal(user)
+	userEmptyBytes, _ := easyjson.Marshal(models.User{})
 
 	var response pkg.JsonResponse
 
@@ -148,7 +148,7 @@ func TestSignUp(t *testing.T) {
 	resp, err := uc.SignUp(context.Background(), &auth_proto.SignUpRequest{
 		Form: formBytes,
 	})
-	json_err := json.Unmarshal(resp.Response, &response)
+	json_err := easyjson.Unmarshal(resp.Response, &response)
 	if err != nil || json_err != nil || response != pkg.NO_ERR {
 		t.Errorf("Неверный ответ от UseCase.")
 		return

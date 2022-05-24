@@ -7,6 +7,7 @@ import (
 	"OverflowBackend/pkg"
 	"OverflowBackend/proto/auth_proto"
 	"context"
+	"github.com/mailru/easyjson"
 
 	"encoding/json"
 	"net/http"
@@ -47,7 +48,7 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Info("SignIn: ", "XSS handling")
 	data.Username = xss.EscapeInput(data.Username)
-	dataBytes, _ := json.Marshal(data)
+	dataBytes, _ := easyjson.Marshal(data)
 	resp, err := d.auth.SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: dataBytes,
 	})
@@ -56,7 +57,7 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var response pkg.JsonResponse
-	err = json.Unmarshal(resp.Response, &response)
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
@@ -124,7 +125,7 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	*/
-	dataBytes, _ := json.Marshal(data)
+	dataBytes, _ := easyjson.Marshal(data)
 	resp, err := d.auth.SignUp(context.Background(), &auth_proto.SignUpRequest{
 		Form: dataBytes,
 	})
@@ -133,7 +134,7 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var response pkg.JsonResponse
-	err = json.Unmarshal(resp.Response, &response)
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return

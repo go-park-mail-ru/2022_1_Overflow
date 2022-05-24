@@ -6,7 +6,7 @@ import (
 	"OverflowBackend/proto/repository_proto"
 	"OverflowBackend/proto/utils_proto"
 	"context"
-	"encoding/json"
+	"github.com/mailru/easyjson"
 	"strconv"
 	"time"
 
@@ -16,7 +16,7 @@ import (
 // Добавить письмо
 func (c *Database) AddMail(context context.Context, request *repository_proto.AddMailRequest) (*utils_proto.DatabaseExtendResponse, error) {
 	var mail models.Mail
-	err := json.Unmarshal(request.Mail, &mail)
+	err := easyjson.Unmarshal(request.Mail, &mail)
 	if err != nil {
 		log.Error(err)
 		return &utils_proto.DatabaseExtendResponse{
@@ -52,7 +52,7 @@ func (c *Database) AddMail(context context.Context, request *repository_proto.Ad
 //Удалить письмо
 func (c *Database) DeleteMail(context context.Context, request *repository_proto.DeleteMailRequest) (*utils_proto.DatabaseResponse, error) {
 	var mail models.Mail
-	err := json.Unmarshal(request.Mail, &mail)
+	err := easyjson.Unmarshal(request.Mail, &mail)
 	if err != nil {
 		log.Error(err)
 		return &utils_proto.DatabaseResponse{
@@ -93,7 +93,7 @@ func (c *Database) DeleteMail(context context.Context, request *repository_proto
 //Прочитать письмо
 func (c *Database) ReadMail(context context.Context, request *repository_proto.ReadMailRequest) (*utils_proto.DatabaseResponse, error) {
 	var mail models.Mail
-	err := json.Unmarshal(request.Mail, &mail)
+	err := easyjson.Unmarshal(request.Mail, &mail)
 	if err != nil {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
@@ -115,7 +115,7 @@ func (c *Database) ReadMail(context context.Context, request *repository_proto.R
 // Получить письмо по ID
 func (c *Database) GetMailInfoById(context context.Context, request *repository_proto.GetMailInfoByIdRequest) (response *repository_proto.ResponseMail, err error) {
 	var mail models.Mail
-	mailBytes, _ := json.Marshal(mail)
+	mailBytes, _ := easyjson.Marshal(mail)
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
@@ -167,7 +167,7 @@ func (c *Database) GetMailInfoById(context context.Context, request *repository_
 		mail.Files = values[6].(string)
 		mail.Read = values[7].(bool)
 	}
-	mailBytes, _ = json.Marshal(mail)
+	mailBytes, _ = easyjson.Marshal(mail)
 	return &repository_proto.ResponseMail{
 		Mail: mailBytes,
 		Response: &utils_proto.DatabaseResponse{
@@ -179,7 +179,7 @@ func (c *Database) GetMailInfoById(context context.Context, request *repository_
 // Получить входящие сообщения пользователя
 func (c *Database) GetIncomeMails(context context.Context, request *repository_proto.GetIncomeMailsRequest) (response *repository_proto.ResponseMails, err error) {
 	var results models.MailList
-	resultsBytes, _ := json.Marshal(results)
+	resultsBytes, _ := easyjson.Marshal(results)
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
@@ -241,7 +241,7 @@ func (c *Database) GetIncomeMails(context context.Context, request *repository_p
 		mail.Id = values[6].(int32)
 		results.Mails = append(results.Mails, mail)
 	}
-	resultsBytes, _ = json.Marshal(results)
+	resultsBytes, _ = easyjson.Marshal(results)
 	return &repository_proto.ResponseMails{
 		Mails: resultsBytes,
 		Response: &utils_proto.DatabaseResponse{
@@ -253,7 +253,7 @@ func (c *Database) GetIncomeMails(context context.Context, request *repository_p
 //Получить отправленные пользователем сообщения
 func (c *Database) GetOutcomeMails(context context.Context, request *repository_proto.GetOutcomeMailsRequest) (response *repository_proto.ResponseMails, err error) {
 	var results models.MailList
-	resultsBytes, _ := json.Marshal(results)
+	resultsBytes, _ := easyjson.Marshal(results)
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
@@ -313,7 +313,7 @@ func (c *Database) GetOutcomeMails(context context.Context, request *repository_
 		mail.Id = values[5].(int32)
 		results.Mails = append(results.Mails, mail)
 	}
-	resultsBytes, _ = json.Marshal(results)
+	resultsBytes, _ = easyjson.Marshal(results)
 	return &repository_proto.ResponseMails{
 		Mails: resultsBytes,
 		Response: &utils_proto.DatabaseResponse{

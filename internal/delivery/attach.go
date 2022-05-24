@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/mailru/easyjson"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/validator.v2"
 	"io"
@@ -58,7 +59,7 @@ func (d *Delivery) UploadAttach(w http.ResponseWriter, r *http.Request) {
 		PayloadSize: header.Size,
 		Payload:     buf.Bytes(),
 	}
-	attachBytes, _ := json.Marshal(attach)
+	attachBytes, _ := easyjson.Marshal(attach)
 	_, err = d.attach.SaveAttach(context.Background(), &attach_proto.SaveAttachRequest{
 		Username: data.Username,
 		MailID:   int32(mailID),
@@ -192,7 +193,7 @@ func (d *Delivery) ListAttach(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var attaches models.AttachList
-	if err := json.Unmarshal(grpcResp.Filenames, &attaches); err != nil {
+	if err := easyjson.Unmarshal(grpcResp.Filenames, &attaches); err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}

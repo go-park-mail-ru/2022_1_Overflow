@@ -12,8 +12,8 @@ import (
 	"OverflowBackend/proto/mailbox_proto"
 	"OverflowBackend/proto/profile_proto"
 	"bytes"
-	"encoding/json"
 	"fmt"
+	"github.com/mailru/easyjson"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -44,7 +44,7 @@ func InitTestRouter(
 }
 
 func SigninUser(client *http.Client, form models.SignInForm, srv_url string) error {
-	dataJson, err := json.Marshal(form)
+	dataJson, err := easyjson.Marshal(form)
 	if err != nil {
 		return err
 	}
