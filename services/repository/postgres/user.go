@@ -5,7 +5,7 @@ import (
 	"OverflowBackend/proto/repository_proto"
 	"OverflowBackend/proto/utils_proto"
 	"context"
-	"encoding/json"
+	"github.com/mailru/easyjson"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -13,7 +13,7 @@ import (
 // Получить данные пользователя по его почте
 func (c *Database) GetUserInfoByUsername(context context.Context, request *repository_proto.GetUserInfoByUsernameRequest) (response *repository_proto.ResponseUser, err error) {
 	var user models.User
-	userBytes, _ := json.Marshal(user)
+	userBytes, _ := easyjson.Marshal(user)
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
@@ -54,7 +54,7 @@ func (c *Database) GetUserInfoByUsername(context context.Context, request *repos
 		user.Password = values[3].(string)
 		user.Username = values[4].(string)
 	}
-	userBytes, _ = json.Marshal(user)
+	userBytes, _ = easyjson.Marshal(user)
 	return &repository_proto.ResponseUser{
 		User: userBytes,
 		Response: &utils_proto.DatabaseResponse{
@@ -66,7 +66,7 @@ func (c *Database) GetUserInfoByUsername(context context.Context, request *repos
 // Получить данные пользователя по его айди в бд
 func (c *Database) GetUserInfoById(context context.Context, request *repository_proto.GetUserInfoByIdRequest) (response *repository_proto.ResponseUser, err error) {
 	var user models.User
-	userBytes, _ := json.Marshal(user)
+	userBytes, _ := easyjson.Marshal(user)
 	defer func() {
 		if errRecover := recover(); errRecover != nil {
 			err = errRecover.(error)
@@ -107,7 +107,7 @@ func (c *Database) GetUserInfoById(context context.Context, request *repository_
 		user.Password = values[3].(string)
 		user.Username = values[4].(string)
 	}
-	userBytes, _ = json.Marshal(user)
+	userBytes, _ = easyjson.Marshal(user)
 	return &repository_proto.ResponseUser{
 		User: userBytes,
 		Response: &utils_proto.DatabaseResponse{
@@ -119,7 +119,7 @@ func (c *Database) GetUserInfoById(context context.Context, request *repository_
 // Добавить пользователя
 func (c *Database) AddUser(context context.Context, request *repository_proto.AddUserRequest) (*utils_proto.DatabaseResponse, error) {
 	var user models.User
-	err := json.Unmarshal(request.User, &user)
+	err := easyjson.Unmarshal(request.User, &user)
 	if err != nil {
 		log.Error(err)
 		return &utils_proto.DatabaseResponse{
@@ -138,8 +138,8 @@ func (c *Database) AddUser(context context.Context, request *repository_proto.Ad
 				Status: utils_proto.DatabaseStatus_ERROR,
 			}, err
 		}
-		err = json.Unmarshal(resp.User, &user)
-		if err != nil{
+		err = easyjson.Unmarshal(resp.User, &user)
+		if err != nil {
 			log.Error(err)
 			return &utils_proto.DatabaseResponse{
 				Status: utils_proto.DatabaseStatus_ERROR,
@@ -159,7 +159,7 @@ func (c *Database) AddUser(context context.Context, request *repository_proto.Ad
 // Изменить пароль
 func (c *Database) ChangeUserPassword(context context.Context, request *repository_proto.ChangeForm) (*utils_proto.DatabaseResponse, error) {
 	var user models.User
-	err := json.Unmarshal(request.User, &user)
+	err := easyjson.Unmarshal(request.User, &user)
 	if err != nil {
 		log.Error(err)
 		return &utils_proto.DatabaseResponse{
@@ -182,7 +182,7 @@ func (c *Database) ChangeUserPassword(context context.Context, request *reposito
 // Изменить имя
 func (c *Database) ChangeUserFirstName(context context.Context, request *repository_proto.ChangeForm) (*utils_proto.DatabaseResponse, error) {
 	var user models.User
-	err := json.Unmarshal(request.User, &user)
+	err := easyjson.Unmarshal(request.User, &user)
 	if err != nil {
 		log.Error(err)
 		return &utils_proto.DatabaseResponse{
@@ -205,7 +205,7 @@ func (c *Database) ChangeUserFirstName(context context.Context, request *reposit
 // Изменить фамилию
 func (c *Database) ChangeUserLastName(context context.Context, request *repository_proto.ChangeForm) (*utils_proto.DatabaseResponse, error) {
 	var user models.User
-	err := json.Unmarshal(request.User, &user)
+	err := easyjson.Unmarshal(request.User, &user)
 	if err != nil {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,

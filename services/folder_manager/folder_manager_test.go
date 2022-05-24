@@ -11,6 +11,7 @@ import (
 	"OverflowBackend/services/folder_manager"
 	"context"
 	"encoding/json"
+	"github.com/mailru/easyjson"
 	"testing"
 	"time"
 
@@ -44,7 +45,7 @@ func TestAddFolder(t *testing.T) {
 		Username:  "test",
 		Password:  "test",
 	}
-	userBytes, _ := json.Marshal(user)
+	userBytes, _ := easyjson.Marshal(user)
 
 	session := utils_proto.Session{
 		Username:      user.Username,
@@ -57,9 +58,9 @@ func TestAddFolder(t *testing.T) {
 		UserId:    user.Id,
 		CreatedAt: time.Now(),
 	}
-	folderBytes, _ := json.Marshal(folder)
+	folderBytes, _ := easyjson.Marshal(folder)
 
-	folderEmptyBytes, _ := json.Marshal(models.Folder{})
+	folderEmptyBytes, _ := easyjson.Marshal(models.Folder{})
 
 	mockDB.EXPECT().GetUserInfoByUsername(context.Background(), &repository_proto.GetUserInfoByUsernameRequest{
 		Username: user.Username,
@@ -122,7 +123,7 @@ func TestAddMailToFolderById(t *testing.T) {
 		Username:  "test",
 		Password:  "test",
 	}
-	userBytes, _ := json.Marshal(user)
+	userBytes, _ := easyjson.Marshal(user)
 
 	session := utils_proto.Session{
 		Username:      user.Username,
@@ -158,7 +159,7 @@ func TestAddMailToFolderById(t *testing.T) {
 		Name:   "folder",
 		UserId: 0,
 	}
-	foldBytes, _ := json.Marshal(fold)
+	foldBytes, _ := easyjson.Marshal(fold)
 	mockDB.EXPECT().GetFolderByName(context.Background(), &repository_proto.GetFolderByNameRequest{
 		FolderName: folderName,
 	}).Return(&repository_proto.ResponseFolder{
@@ -196,7 +197,7 @@ func TestAddMailToFolderByObject(t *testing.T) {
 		Username:  "test",
 		Password:  "test",
 	}
-	userBytes, _ := json.Marshal(user)
+	userBytes, _ := easyjson.Marshal(user)
 
 	session := utils_proto.Session{
 		Username:      user.Username,
@@ -209,7 +210,7 @@ func TestAddMailToFolderByObject(t *testing.T) {
 		Text:      "test",
 		Files:     "files",
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 
 	folderName := "folder"
 
@@ -223,7 +224,7 @@ func TestAddMailToFolderByObject(t *testing.T) {
 		Date:      time.Now(),
 		Read:      false,
 	}
-	mailBytes, _ := json.Marshal(mail)
+	mailBytes, _ := easyjson.Marshal(mail)
 
 	folder := models.Folder{
 		Id:        0,
@@ -231,8 +232,8 @@ func TestAddMailToFolderByObject(t *testing.T) {
 		UserId:    user.Id,
 		CreatedAt: time.Now(),
 	}
-	folderBytes, _ := json.Marshal(folder)
-	//folderEmptyBytes, _ := json.Marshal(models.Folder{})
+	folderBytes, _ := easyjson.Marshal(folder)
+	//folderEmptyBytes, _ := easyjson.Marshal(models.Folder{})
 
 	mockDB.EXPECT().GetFolderByName(context.Background(), &repository_proto.GetFolderByNameRequest{
 		UserId:     user.Id,
@@ -287,7 +288,7 @@ func TestMoveFolderMail(t *testing.T) {
 		Username:  "test",
 		Password:  "test",
 	}
-	userBytes, _ := json.Marshal(user)
+	userBytes, _ := easyjson.Marshal(user)
 
 	session := utils_proto.Session{
 		Username:      user.Username,
@@ -305,7 +306,7 @@ func TestMoveFolderMail(t *testing.T) {
 		UserId:    user.Id,
 		CreatedAt: time.Now(),
 	}
-	folderSrcBytes, _ := json.Marshal(folderSrc)
+	folderSrcBytes, _ := easyjson.Marshal(folderSrc)
 
 	folderDest := models.Folder{
 		Id:        0,
@@ -313,7 +314,7 @@ func TestMoveFolderMail(t *testing.T) {
 		UserId:    user.Id,
 		CreatedAt: time.Now(),
 	}
-	folderDestBytes, _ := json.Marshal(folderDest)
+	folderDestBytes, _ := easyjson.Marshal(folderDest)
 
 	mockDB.EXPECT().GetUserInfoByUsername(context.Background(), &repository_proto.GetUserInfoByUsernameRequest{
 		Username: user.Username,
@@ -380,7 +381,7 @@ func TestChangeFolder(t *testing.T) {
 		Username:  "test",
 		Password:  "test",
 	}
-	userBytes, _ := json.Marshal(user)
+	userBytes, _ := easyjson.Marshal(user)
 
 	session := utils_proto.Session{
 		Username:      user.Username,
@@ -397,11 +398,11 @@ func TestChangeFolder(t *testing.T) {
 			UserId: user.Id,
 			CreatedAt: time.Now(),
 		}
-		folderBytes, _ := json.Marshal(folder)
+		folderBytes, _ := easyjson.Marshal(folder)
 	*/
 
 	folderNew := models.Folder{}
-	folderNewBytes, _ := json.Marshal(folderNew)
+	folderNewBytes, _ := easyjson.Marshal(folderNew)
 
 	mockDB.EXPECT().GetUserInfoByUsername(context.Background(), &repository_proto.GetUserInfoByUsernameRequest{
 		Username: user.Username,
@@ -456,7 +457,7 @@ func TestDeleteFolder(t *testing.T) {
 		Username:  "test",
 		Password:  "test",
 	}
-	userBytes, _ := json.Marshal(user)
+	userBytes, _ := easyjson.Marshal(user)
 
 	session := utils_proto.Session{
 		Username:      user.Username,
@@ -471,8 +472,8 @@ func TestDeleteFolder(t *testing.T) {
 		UserId:    user.Id,
 		CreatedAt: time.Now(),
 	}
-	folderBytes, _ := json.Marshal(folder)
-	//folderEmptyBytes, _ := json.Marshal(models.Folder{})
+	folderBytes, _ := easyjson.Marshal(folder)
+	//folderEmptyBytes, _ := easyjson.Marshal(models.Folder{})
 
 	mockDB.EXPECT().GetFolderByName(context.Background(), &repository_proto.GetFolderByNameRequest{
 		UserId:     user.Id,
@@ -525,7 +526,7 @@ func TestListFolders(t *testing.T) {
 		Username:  "test",
 		Password:  "test",
 	}
-	userBytes, _ := json.Marshal(user)
+	userBytes, _ := easyjson.Marshal(user)
 
 	session := utils_proto.Session{
 		Username:      user.Username,
@@ -543,7 +544,7 @@ func TestListFolders(t *testing.T) {
 			},
 		},
 	}
-	foldersBytes, _ := json.Marshal(folders)
+	foldersBytes, _ := easyjson.Marshal(folders)
 
 	var limit int32 = 10
 	var offset int32 = 0
@@ -597,7 +598,7 @@ func TestListFolder(t *testing.T) {
 		Username:  "test",
 		Password:  "test",
 	}
-	userBytes, _ := json.Marshal(user)
+	userBytes, _ := easyjson.Marshal(user)
 
 	session := utils_proto.Session{
 		Username:      user.Username,
@@ -612,8 +613,8 @@ func TestListFolder(t *testing.T) {
 		UserId:    user.Id,
 		CreatedAt: time.Now(),
 	}
-	folderBytes, _ := json.Marshal(folder)
-	//folderEmptyBytes, _ := json.Marshal(models.Folder{})
+	folderBytes, _ := easyjson.Marshal(folder)
+	//folderEmptyBytes, _ := easyjson.Marshal(models.Folder{})
 
 	mockDB.EXPECT().GetFolderByName(context.Background(), &repository_proto.GetFolderByNameRequest{
 		UserId:     user.Id,
@@ -631,14 +632,14 @@ func TestListFolder(t *testing.T) {
 			Mails: []models.MailAdditional{
 			},
 		}
-		mailsAddBytes, _ := json.Marshal(mailsAdd)
+		mailsAddBytes, _ := easyjson.Marshal(mailsAdd)
 	*/
 
 	mails := models.MailList{
 		Amount: 0,
 		Mails:  []models.Mail{},
 	}
-	mailsBytes, _ := json.Marshal(mails)
+	mailsBytes, _ := easyjson.Marshal(mails)
 
 	var limit int32 = 10
 	var offset int32 = 0
@@ -694,7 +695,7 @@ func TestDeleteFolderMail(t *testing.T) {
 		Username:  "test",
 		Password:  "test",
 	}
-	userBytes, _ := json.Marshal(user)
+	userBytes, _ := easyjson.Marshal(user)
 
 	session := utils_proto.Session{
 		Username:      user.Username,
@@ -710,8 +711,8 @@ func TestDeleteFolderMail(t *testing.T) {
 		UserId:    user.Id,
 		CreatedAt: time.Now(),
 	}
-	folderBytes, _ := json.Marshal(folder)
-	//folderEmptyBytes, _ := json.Marshal(models.Folder{})
+	folderBytes, _ := easyjson.Marshal(folder)
+	//folderEmptyBytes, _ := easyjson.Marshal(models.Folder{})
 
 	mockDB.EXPECT().GetFolderByName(context.Background(), &repository_proto.GetFolderByNameRequest{
 		UserId:     user.Id,
@@ -745,7 +746,7 @@ func TestDeleteFolderMail(t *testing.T) {
 		MailId:     mailId,
 	})
 	var response pkg.JsonResponse
-	json_err := json.Unmarshal(resp.Response, &response)
+	json_err := easyjson.Unmarshal(resp.Response, &response)
 	if err != nil || json_err != nil || response != pkg.NO_ERR {
 		t.Errorf("Неверный ответ от UseCase.")
 		return

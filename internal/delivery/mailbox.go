@@ -10,6 +10,7 @@ import (
 	"OverflowBackend/proto/utils_proto"
 	"context"
 	"encoding/json"
+	"github.com/mailru/easyjson"
 	"net/http"
 	"strconv"
 
@@ -56,7 +57,7 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var response pkg.JsonResponse
-	err = json.Unmarshal(resp.Response.Response, &response)
+	err = easyjson.Unmarshal(resp.Response.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
@@ -108,7 +109,7 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var response pkg.JsonResponse
-	err = json.Unmarshal(resp.Response.Response, &response)
+	err = easyjson.Unmarshal(resp.Response.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
@@ -155,7 +156,7 @@ func (d *Delivery) GetMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var response pkg.JsonResponse
-	err = json.Unmarshal(resp.Response.Response, &response)
+	err = easyjson.Unmarshal(resp.Response.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
@@ -208,7 +209,7 @@ func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var response pkg.JsonResponse
-	err = json.Unmarshal(resp.Response, &response)
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
@@ -267,7 +268,7 @@ func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var response pkg.JsonResponse
-	err = json.Unmarshal(resp.Response, &response)
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
@@ -316,7 +317,7 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 	form.Files = xss.EscapeInput(form.Files)
 	form.Text = xss.EscapeInput(form.Text)
 	form.Theme = xss.EscapeInput(form.Theme)
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 	if err := validator.Validate(form); err != nil {
 		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
 		return
@@ -330,7 +331,7 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var response pkg.JsonResponse
-	err = json.Unmarshal(resp.Response, &response)
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
@@ -398,6 +399,6 @@ func (d *Delivery) GetCountUnread(w http.ResponseWriter, r *http.Request) {
 	countResp := &models.CountUnread{
 		Count: int(resp.Count),
 	}
-	countRespBytes, _ := json.Marshal(countResp)
+	countRespBytes, _ := easyjson.Marshal(countResp)
 	w.Write(countRespBytes)
 }

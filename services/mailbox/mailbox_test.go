@@ -10,7 +10,7 @@ import (
 	"OverflowBackend/proto/utils_proto"
 	"OverflowBackend/services/mailbox"
 	"context"
-	"encoding/json"
+	"github.com/mailru/easyjson"
 	"testing"
 	"time"
 
@@ -40,7 +40,7 @@ func TestIncome(t *testing.T) {
 		Amount: 0,
 		Mails:  []models.Mail{},
 	}
-	mailsBytes, _ := json.Marshal(mails)
+	mailsBytes, _ := easyjson.Marshal(mails)
 
 	user := models.User{
 		Id:        0,
@@ -49,7 +49,7 @@ func TestIncome(t *testing.T) {
 		Username:  "test",
 		Password:  "test",
 	}
-	userBytes, _ := json.Marshal(user)
+	userBytes, _ := easyjson.Marshal(user)
 
 	session := utils_proto.Session{
 		Username:      user.Username,
@@ -85,7 +85,7 @@ func TestIncome(t *testing.T) {
 		Offset: offset,
 	})
 	var response pkg.JsonResponse
-	json_err := json.Unmarshal(resp.Response.Response, &response)
+	json_err := easyjson.Unmarshal(resp.Response.Response, &response)
 	if err != nil || json_err != nil || response != pkg.NO_ERR {
 		t.Errorf("Неверный ответ от UseCase.")
 		return
@@ -102,7 +102,7 @@ func TestOutcome(t *testing.T) {
 		Amount: 0,
 		Mails:  []models.Mail{},
 	}
-	mailsBytes, _ := json.Marshal(mails)
+	mailsBytes, _ := easyjson.Marshal(mails)
 
 	user := models.User{
 		Id:        0,
@@ -111,7 +111,7 @@ func TestOutcome(t *testing.T) {
 		Username:  "test",
 		Password:  "test",
 	}
-	userBytes, _ := json.Marshal(user)
+	userBytes, _ := easyjson.Marshal(user)
 
 	session := utils_proto.Session{
 		Username:      user.Username,
@@ -147,7 +147,7 @@ func TestOutcome(t *testing.T) {
 		Offset: offset,
 	})
 	var response pkg.JsonResponse
-	json_err := json.Unmarshal(resp.Response.Response, &response)
+	json_err := easyjson.Unmarshal(resp.Response.Response, &response)
 	if err != nil || json_err != nil || response != pkg.NO_ERR {
 		t.Errorf("Неверный ответ от UseCase.")
 		return
@@ -167,7 +167,7 @@ func TestGetMail(t *testing.T) {
 		Username:  "test",
 		Password:  "test",
 	}
-	//userBytes, _ := json.Marshal(user)
+	//userBytes, _ := easyjson.Marshal(user)
 
 	session := utils_proto.Session{
 		Username:      user.Username,
@@ -184,7 +184,7 @@ func TestGetMail(t *testing.T) {
 		Date:      time.Now(),
 		Read:      false,
 	}
-	mailBytes, _ := json.Marshal(mail)
+	mailBytes, _ := easyjson.Marshal(mail)
 
 	var mailId int32 = mail.Id
 
@@ -203,8 +203,8 @@ func TestGetMail(t *testing.T) {
 	})
 	var response pkg.JsonResponse
 	var respMail models.Mail
-	json_err := json.Unmarshal(resp.Response.Response, &response)
-	json_mail_err := json.Unmarshal(resp.Mail, &respMail)
+	json_err := easyjson.Unmarshal(resp.Response.Response, &response)
+	json_mail_err := easyjson.Unmarshal(resp.Mail, &respMail)
 	if err != nil || json_err != nil || json_mail_err != nil || response != pkg.NO_ERR {
 		t.Errorf("Неверный ответ от UseCase.")
 		return
@@ -224,7 +224,7 @@ func TestDeleteMail(t *testing.T) {
 		Username:  "test",
 		Password:  "test",
 	}
-	userBytes, _ := json.Marshal(user)
+	userBytes, _ := easyjson.Marshal(user)
 
 	session := utils_proto.Session{
 		Username:      user.Username,
@@ -241,7 +241,7 @@ func TestDeleteMail(t *testing.T) {
 		Date:      time.Now(),
 		Read:      false,
 	}
-	mailBytes, _ := json.Marshal(mail)
+	mailBytes, _ := easyjson.Marshal(mail)
 
 	var mailId int32 = mail.Id
 
@@ -275,7 +275,7 @@ func TestDeleteMail(t *testing.T) {
 		Id:   mailId,
 	})
 	var response pkg.JsonResponse
-	json_err := json.Unmarshal(resp.Response, &response)
+	json_err := easyjson.Unmarshal(resp.Response, &response)
 	if err != nil || json_err != nil || response != pkg.NO_ERR {
 		t.Errorf("Неверный ответ от UseCase.")
 		return
@@ -295,7 +295,7 @@ func TestReadMail(t *testing.T) {
 		Username:  "test",
 		Password:  "test",
 	}
-	//userBytes, _ := json.Marshal(user)
+	//userBytes, _ := easyjson.Marshal(user)
 
 	session := utils_proto.Session{
 		Username:      user.Username,
@@ -312,7 +312,7 @@ func TestReadMail(t *testing.T) {
 		Date:      time.Now(),
 		Read:      false,
 	}
-	mailBytes, _ := json.Marshal(mail)
+	mailBytes, _ := easyjson.Marshal(mail)
 
 	var mailId int32 = mail.Id
 	read := true
@@ -340,7 +340,7 @@ func TestReadMail(t *testing.T) {
 	})
 
 	var response pkg.JsonResponse
-	json_err := json.Unmarshal(resp.Response, &response)
+	json_err := easyjson.Unmarshal(resp.Response, &response)
 	if err != nil || json_err != nil || response != pkg.NO_ERR {
 		t.Errorf("Неверный ответ от UseCase.")
 		return
@@ -360,7 +360,7 @@ func TestSendMail(t *testing.T) {
 		Username:  "test",
 		Password:  "test",
 	}
-	userBytes, _ := json.Marshal(user)
+	userBytes, _ := easyjson.Marshal(user)
 
 	session := utils_proto.Session{
 		Username:      user.Username,
@@ -377,7 +377,7 @@ func TestSendMail(t *testing.T) {
 		Date:      time.Now(),
 		Read:      false,
 	}
-	mailBytes, _ := json.Marshal(mail)
+	mailBytes, _ := easyjson.Marshal(mail)
 
 	form := models.MailForm{
 		Addressee: user.Username,
@@ -385,7 +385,7 @@ func TestSendMail(t *testing.T) {
 		Text:      mail.Text,
 		Files:     mail.Files,
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 
 	mockDB.EXPECT().GetUserInfoByUsername(context.Background(), &repository_proto.GetUserInfoByUsernameRequest{
 		Username: user.Username,
@@ -418,7 +418,7 @@ func TestSendMail(t *testing.T) {
 	})
 
 	var response pkg.JsonResponse
-	json_err := json.Unmarshal(resp.Response, &response)
+	json_err := easyjson.Unmarshal(resp.Response, &response)
 	if err != nil || json_err != nil || response != pkg.NO_ERR {
 		t.Errorf("Неверный ответ от UseCase.")
 		return

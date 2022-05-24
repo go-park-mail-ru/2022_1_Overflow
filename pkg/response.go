@@ -1,7 +1,7 @@
 package pkg
 
 import (
-	"encoding/json"
+	"github.com/mailru/easyjson"
 	"net/http"
 )
 
@@ -31,7 +31,7 @@ type JsonResponse struct {
 }
 
 func (s *JsonResponse) Bytes() []byte {
-	bytes, _ := json.Marshal(s)
+	bytes, _ := easyjson.Marshal(s)
 	return bytes
 }
 
@@ -70,7 +70,7 @@ func WriteJsonErrFull(w http.ResponseWriter, err *JsonResponse) {
 	default:
 		w.WriteHeader(http.StatusInternalServerError)
 	}
-	resp, _ := json.Marshal(err)
+	resp, _ := easyjson.Marshal(err)
 	w.Write(resp)
 }
 

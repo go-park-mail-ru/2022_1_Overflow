@@ -15,6 +15,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/golang/mock/gomock"
+	"github.com/mailru/easyjson"
 	"mime/multipart"
 	"net/http"
 	"net/http/cookiejar"
@@ -52,9 +53,9 @@ func TestGetInfo(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	signinFormBytes, _ := json.Marshal(signinForm)
+	signinFormBytes, _ := easyjson.Marshal(signinForm)
 
-	info, _ := json.Marshal(models.User{
+	info, _ := easyjson.Marshal(models.User{
 		Id:        0,
 		Firstname: "test",
 		Lastname:  "test",
@@ -136,7 +137,7 @@ func TestSetInfo(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	signinFormBytes, _ := json.Marshal(signinForm)
+	signinFormBytes, _ := easyjson.Marshal(signinForm)
 
 	url := fmt.Sprintf("%s/profile/set", srv.URL)
 
@@ -144,7 +145,7 @@ func TestSetInfo(t *testing.T) {
 		Firstname: "changed",
 		Lastname:  "changed",
 	}
-	dataBytes, _ := json.Marshal(data)
+	dataBytes, _ := easyjson.Marshal(data)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: signinFormBytes,
@@ -171,7 +172,7 @@ func TestSetInfo(t *testing.T) {
 		return
 	}
 
-	dataJson, err := json.Marshal(data)
+	dataJson, err := easyjson.Marshal(data)
 	if err != nil {
 		t.Error(err)
 		return
@@ -216,7 +217,7 @@ func TestGetAvatar(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	signinFormBytes, _ := json.Marshal(signinForm)
+	signinFormBytes, _ := easyjson.Marshal(signinForm)
 
 	url := fmt.Sprintf("%s/profile/avatar", srv.URL)
 	expAvatarUrl := "/static/dummy.png"
@@ -280,7 +281,7 @@ func TestSetAvatar(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	signinFormBytes, _ := json.Marshal(signinForm)
+	signinFormBytes, _ := easyjson.Marshal(signinForm)
 
 	reqUrl := fmt.Sprintf("%s/profile/avatar/set", srv.URL)
 
@@ -294,7 +295,7 @@ func TestSetAvatar(t *testing.T) {
 		Username: signinForm.Username,
 		File:     file, //[]byte{10, 10, 10, 10},
 	}
-	avatarBytes, _ := json.Marshal(avatar)
+	avatarBytes, _ := easyjson.Marshal(avatar)
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
@@ -375,7 +376,7 @@ func TestChangePassword(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	signinFormBytes, _ := json.Marshal(signinForm)
+	signinFormBytes, _ := easyjson.Marshal(signinForm)
 
 	reqUrl := fmt.Sprintf("%s/profile/change_password", srv.URL)
 
@@ -384,7 +385,7 @@ func TestChangePassword(t *testing.T) {
 		NewPassword:     "test2",
 		NewPasswordConf: "test2",
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: signinFormBytes,

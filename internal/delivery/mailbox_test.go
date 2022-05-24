@@ -14,6 +14,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/golang/mock/gomock"
+	"github.com/mailru/easyjson"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
@@ -53,13 +54,13 @@ func TestSend(t *testing.T) {
 	}
 
 	mailData := models.MailForm{
-		Addressee: "test2",
+		Addressee: "test",
 		Theme:     "test",
 		Text:      "test",
 		Files:     "test",
 	}
-	formBytesSignIn, _ := json.Marshal(signinForm)
-	formBytesMailData, _ := json.Marshal(mailData)
+	formBytesSignIn, _ := easyjson.Marshal(signinForm)
+	formBytesMailData, _ := easyjson.Marshal(mailData)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: formBytesSignIn,
@@ -87,7 +88,7 @@ func TestSend(t *testing.T) {
 	}, nil)
 	//&models.Session{Username: "test", Authenticated: true}, data)
 
-	dataJson, _ := json.Marshal(mailData)
+	dataJson, _ := easyjson.Marshal(mailData)
 
 	_, err := Post(client, dataJson, sendUrl, http.StatusForbidden, "", "")
 	if err != nil {
@@ -146,7 +147,7 @@ func TestIncome(t *testing.T) {
 		Username: "test2",
 		Password: "test2",
 	}
-	signInFormBytes, _ := json.Marshal(signInForm)
+	signInFormBytes, _ := easyjson.Marshal(signInForm)
 
 	mails, _ := json.Marshal([]models.MailAdditional{})
 
@@ -225,7 +226,7 @@ func TestOutcome(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	signInFormBytes, _ := json.Marshal(signInForm)
+	signInFormBytes, _ := easyjson.Marshal(signInForm)
 
 	mails, _ := json.Marshal([]models.MailAdditional{})
 
@@ -302,7 +303,7 @@ func TestRead(t *testing.T) {
 		Username: "test2",
 		Password: "test2",
 	}
-	signinFormBytes, _ := json.Marshal(signinForm)
+	signinFormBytes, _ := easyjson.Marshal(signinForm)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: signinFormBytes,
@@ -314,7 +315,7 @@ func TestRead(t *testing.T) {
 		Username:      "test2",
 		Authenticated: true,
 	}
-	//readMailDataBytes, _ := json.Marshal(readMailData)
+	//readMailDataBytes, _ := easyjson.Marshal(readMailData)
 	mailboxUC.EXPECT().ReadMail(context.Background(), &mailbox_proto.ReadMailRequest{
 		Data: readMailData,
 		Id:   1,
@@ -343,7 +344,7 @@ func TestRead(t *testing.T) {
 		Id:     1,
 		IsRead: true,
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 
 	r, err := Post(client, formBytes, url, http.StatusOK, token, "")
 	if err != nil {
@@ -391,7 +392,7 @@ func TestDelete(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	signinFormBytes, _ := json.Marshal(signinForm)
+	signinFormBytes, _ := easyjson.Marshal(signinForm)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: signinFormBytes,
@@ -427,7 +428,7 @@ func TestDelete(t *testing.T) {
 	form := &models.DeleteMailForm{
 		Id: 1,
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 	_, err = Post(client, formBytes, url, http.StatusOK, token, "")
 	if err != nil {
 		t.Error(err)
@@ -465,7 +466,7 @@ func TestGetMail(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	signinFormBytes, _ := json.Marshal(signinForm)
+	signinFormBytes, _ := easyjson.Marshal(signinForm)
 
 	mail := models.Mail{
 		Id:        0,
@@ -477,7 +478,7 @@ func TestGetMail(t *testing.T) {
 		Date:      time.Now(),
 		Read:      false,
 	}
-	mailBytes, _ := json.Marshal(mail)
+	mailBytes, _ := easyjson.Marshal(mail)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: signinFormBytes,

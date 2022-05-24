@@ -8,8 +8,8 @@ import (
 	"OverflowBackend/proto/repository_proto"
 	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
+	"github.com/mailru/easyjson"
 	"github.com/minio/minio-go/v7"
 	log "github.com/sirupsen/logrus"
 	"io"
@@ -47,14 +47,14 @@ func (s *AttachService) SaveAttach(ctx context.Context, request *attach_proto.Sa
 	}
 
 	var mail models.Mail
-	err = json.Unmarshal(respMail.Mail, &mail)
+	err = easyjson.Unmarshal(respMail.Mail, &mail)
 	if mail.Sender != request.Username {
 		log.Warning(ErrAccess)
 		return &attach_proto.Nothing{Status: false}, ErrAccess
 	}
 
 	var file models.Attach
-	if err := json.Unmarshal(request.File, &file); err != nil {
+	if err := easyjson.Unmarshal(request.File, &file); err != nil {
 		return &attach_proto.Nothing{Status: false}, err
 	}
 
@@ -93,7 +93,7 @@ func (s *AttachService) GetAttach(ctx context.Context, request *attach_proto.Get
 	}
 
 	var mail models.Mail
-	err = json.Unmarshal(respMail.Mail, &mail)
+	err = easyjson.Unmarshal(respMail.Mail, &mail)
 	if mail.Sender != request.Username {
 		log.Warning(ErrAccess)
 		return &attach_proto.AttachResponse{}, ErrAccess
@@ -142,7 +142,7 @@ func (s *AttachService) ListAttach(ctx context.Context, request *attach_proto.Ge
 	}
 
 	var mail models.Mail
-	err = json.Unmarshal(respMail.Mail, &mail)
+	err = easyjson.Unmarshal(respMail.Mail, &mail)
 	if err != nil {
 		return &attach_proto.AttachListResponse{}, ErrJson
 	}
@@ -163,7 +163,7 @@ func (s *AttachService) ListAttach(ctx context.Context, request *attach_proto.Ge
 	}
 
 	var attaches models.AttachList
-	if err := json.Unmarshal(resp.Filenames, &attaches); err != nil {
+	if err := easyjson.Unmarshal(resp.Filenames, &attaches); err != nil {
 		log.Warning(err)
 		return &attach_proto.AttachListResponse{
 			Filenames: nil,
@@ -175,7 +175,7 @@ func (s *AttachService) ListAttach(ctx context.Context, request *attach_proto.Ge
 		attaches.Attaches[i].Filename = attaches.Attaches[i].Filename[ATTACH_PREFIX_SIZE+1:]
 	}
 
-	attachesBytes, err := json.Marshal(attaches)
+	attachesBytes, err := easyjson.Marshal(attaches)
 	if err != nil {
 		log.Warning(err)
 		return &attach_proto.AttachListResponse{

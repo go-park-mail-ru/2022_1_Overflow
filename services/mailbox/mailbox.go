@@ -9,7 +9,7 @@ import (
 	"OverflowBackend/proto/repository_proto"
 	"OverflowBackend/proto/utils_proto"
 	"context"
-	"encoding/json"
+	"github.com/mailru/easyjson"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -46,7 +46,7 @@ func (s *MailBoxService) Income(context context.Context, request *mailbox_proto.
 		}, nil
 	}
 	var user models.User
-	err = json.Unmarshal(resp.User, &user)
+	err = easyjson.Unmarshal(resp.User, &user)
 	if err != nil {
 		return &mailbox_proto.ResponseMails{
 			Response: &utils_proto.JsonResponse{
@@ -71,7 +71,7 @@ func (s *MailBoxService) Income(context context.Context, request *mailbox_proto.
 		}, nil
 	}
 	var mails models.MailList
-	err = json.Unmarshal(resp2.Mails, &mails)
+	err = easyjson.Unmarshal(resp2.Mails, &mails)
 	if err != nil {
 		return &mailbox_proto.ResponseMails{
 			Response: &utils_proto.JsonResponse{
@@ -96,7 +96,7 @@ func (s *MailBoxService) Income(context context.Context, request *mailbox_proto.
 			}, err
 		}
 		var response pkg.JsonResponse
-		err = json.Unmarshal(resp.Response.Response, &response)
+		err = easyjson.Unmarshal(resp.Response.Response, &response)
 		if err != nil {
 			return &mailbox_proto.ResponseMails{
 				Response: &utils_proto.JsonResponse{
@@ -110,7 +110,7 @@ func (s *MailBoxService) Income(context context.Context, request *mailbox_proto.
 		mail_add.AvatarUrl = resp.Url
 		mails_add.Mails = append(mails_add.Mails, mail_add)
 	}
-	parsed, err := json.Marshal(mails_add)
+	parsed, err := easyjson.Marshal(mails_add)
 	if err != nil {
 		log.Error(err)
 		return &mailbox_proto.ResponseMails{
@@ -145,7 +145,7 @@ func (s *MailBoxService) Outcome(context context.Context, request *mailbox_proto
 		}, nil
 	}
 	var user models.User
-	err = json.Unmarshal(resp.User, &user)
+	err = easyjson.Unmarshal(resp.User, &user)
 	if err != nil {
 		return &mailbox_proto.ResponseMails{
 			Response: &utils_proto.JsonResponse{
@@ -170,7 +170,7 @@ func (s *MailBoxService) Outcome(context context.Context, request *mailbox_proto
 		}, nil
 	}
 	var mails models.MailList
-	err = json.Unmarshal(resp2.Mails, &mails)
+	err = easyjson.Unmarshal(resp2.Mails, &mails)
 	if err != nil {
 		return &mailbox_proto.ResponseMails{
 			Response: &utils_proto.JsonResponse{
@@ -195,7 +195,7 @@ func (s *MailBoxService) Outcome(context context.Context, request *mailbox_proto
 			}, err
 		}
 		var response pkg.JsonResponse
-		err = json.Unmarshal(resp.Response.Response, &response)
+		err = easyjson.Unmarshal(resp.Response.Response, &response)
 		if err != nil {
 			return &mailbox_proto.ResponseMails{
 				Response: &utils_proto.JsonResponse{
@@ -209,7 +209,7 @@ func (s *MailBoxService) Outcome(context context.Context, request *mailbox_proto
 		mail_add.AvatarUrl = resp.Url
 		mails_add.Mails = append(mails_add.Mails, mail_add)
 	}
-	parsed, err := json.Marshal(mails_add)
+	parsed, err := easyjson.Marshal(mails_add)
 	if err != nil {
 		log.Error(err)
 		return &mailbox_proto.ResponseMails{
@@ -246,7 +246,7 @@ func (s *MailBoxService) GetMail(context context.Context, request *mailbox_proto
 		}, nil
 	}
 	var mail models.Mail
-	err = json.Unmarshal(resp.Mail, &mail)
+	err = easyjson.Unmarshal(resp.Mail, &mail)
 	if err != nil {
 		return &mailbox_proto.ResponseMail{
 			Response: &utils_proto.JsonResponse{
@@ -262,7 +262,7 @@ func (s *MailBoxService) GetMail(context context.Context, request *mailbox_proto
 			}, Mail: nil,
 		}, nil
 	}
-	parsed, err := json.Marshal(mail)
+	parsed, err := easyjson.Marshal(mail)
 	if err != nil {
 		log.Error(err)
 		return &mailbox_proto.ResponseMail{
@@ -295,7 +295,7 @@ func (s *MailBoxService) DeleteMail(context context.Context, request *mailbox_pr
 		}, nil
 	}
 	var mail models.Mail
-	err = json.Unmarshal(resp.Mail, &mail)
+	err = easyjson.Unmarshal(resp.Mail, &mail)
 	if err != nil {
 		return &utils_proto.JsonResponse{
 			Response: pkg.JSON_ERR.Bytes(),
@@ -321,7 +321,7 @@ func (s *MailBoxService) DeleteMail(context context.Context, request *mailbox_pr
 		}, nil
 	}
 	var user models.User
-	err = json.Unmarshal(respUser.User, &user)
+	err = easyjson.Unmarshal(respUser.User, &user)
 	if err != nil {
 		return &utils_proto.JsonResponse{
 			Response: pkg.DB_ERR.Bytes(),
@@ -364,7 +364,7 @@ func (s *MailBoxService) ReadMail(context context.Context, request *mailbox_prot
 		}, nil
 	}
 	var mail models.Mail
-	err = json.Unmarshal(resp.Mail, &mail)
+	err = easyjson.Unmarshal(resp.Mail, &mail)
 	if err != nil {
 		return &utils_proto.JsonResponse{
 			Response: pkg.JSON_ERR.Bytes(),
@@ -414,7 +414,7 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 	}
 	data := request.Data
 	var user models.User
-	err = json.Unmarshal(resp.User, &user)
+	err = easyjson.Unmarshal(resp.User, &user)
 	if err != nil {
 		return &utils_proto.JsonExtendResponse{
 			Response: pkg.JSON_ERR.Bytes(),
@@ -426,7 +426,7 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 		}, nil
 	}
 	var form models.MailForm
-	err = json.Unmarshal(request.Form, &form)
+	err = easyjson.Unmarshal(request.Form, &form)
 	if err != nil {
 		return &utils_proto.JsonExtendResponse{
 			Response: pkg.JSON_ERR.Bytes(),
@@ -447,7 +447,7 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 		}, nil
 	}
 	var userAddressee models.User
-	err = json.Unmarshal(resp2.User, &userAddressee)
+	err = easyjson.Unmarshal(resp2.User, &userAddressee)
 	if err != nil {
 		return &utils_proto.JsonExtendResponse{
 			Response: pkg.JSON_ERR.Bytes(),
@@ -466,7 +466,7 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 		Files:     form.Files,
 		Date:      time.Now(),
 	}
-	mailBytes, _ := json.Marshal(mail)
+	mailBytes, _ := easyjson.Marshal(mail)
 	resp3, err := s.db.AddMail(context, &repository_proto.AddMailRequest{
 		Mail: mailBytes,
 	})
