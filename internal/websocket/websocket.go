@@ -3,6 +3,7 @@ package ws
 import (
 	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
+	"time"
 )
 
 const (
@@ -34,6 +35,7 @@ func wsServer(in chan WSMessage) {
 		switch cmd.Type {
 		case TYPE_NEW_CONNECTION:
 			ws[cmd.Username] = cmd.Conn
+			keepAlive(cmd.Conn)
 			log.Info("SW: Client Successfully Connected" + "[username: " + cmd.Username + "]")
 		case TYPE_ALERT:
 			addressee, exist := ws[cmd.Username]
@@ -47,6 +49,28 @@ func wsServer(in chan WSMessage) {
 			log.Info("WS: send message")
 		}
 	}
+}
+
+func keepAlive(c *websocket.Conn) {
+	//lastResponse := time.Now()
+	//c.SetPongHandler(func(msg string) error {
+	//	lastResponse = time.Now()
+	//	return nil
+	//})
+
+	go func() {
+		for {
+			err := c.WriteMessage(websocket.PingMessage, []byte("keepalive"))
+			if err != nil {
+				return
+			}
+			time.Sleep(30 * 1000 * time.Millisecond)
+			//if(time.Since(lastResponse) > timeout) {
+			//	c.Close()
+			//	return
+			//}
+		}
+	}()
 }
 
 func NewWSServer() chan WSMessage {
