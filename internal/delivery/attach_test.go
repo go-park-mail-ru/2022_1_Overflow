@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 )
 
@@ -47,7 +48,7 @@ func TestListAttach(t *testing.T) {
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
-	url := fmt.Sprintf("%s/mail/attach/list", srv.URL)
+	myurl := fmt.Sprintf("%s/mail/attach/list", srv.URL)
 
 	signinForm := models.SignInForm{
 		Username: "test",
@@ -99,7 +100,7 @@ func TestListAttach(t *testing.T) {
 		return
 	}
 
-	_, err, token := Get(client, url, http.StatusMethodNotAllowed)
+	_, err, token := Get(client, myurl, http.StatusMethodNotAllowed)
 	if err != nil {
 		t.Error(err)
 		return
@@ -107,7 +108,7 @@ func TestListAttach(t *testing.T) {
 
 	formBytes := []byte(`{"mail_id":1}`)
 
-	r, err := Post(client, formBytes, url, http.StatusOK, token, "")
+	r, err := Post(client, formBytes, myurl, http.StatusOK, token, "")
 	if err != nil {
 		t.Error(err)
 		return
@@ -124,12 +125,32 @@ func TestListAttach(t *testing.T) {
 
 	formBytesFail := []byte(`{"mail_id":2}`)
 
-	_, err = Post(client, formBytesFail, url, http.StatusInternalServerError, token, "")
+	_, err = Post(client, formBytesFail, myurl, http.StatusInternalServerError, token, "")
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
+	formBytesFail = []byte(`{"id":2}`)
+
+	_, err = Post(client, formBytesFail, myurl, http.StatusBadRequest, token, "")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	parsedUrl, _ := url.Parse(myurl)
+	client.Jar.SetCookies(parsedUrl, []*http.Cookie{{
+		Name:   "OverflowMail",
+		Value:  "some_token",
+		MaxAge: 300,
+	}})
+
+	_, err = Post(client, formBytes, myurl, http.StatusUnauthorized, token, "")
+	if err != nil {
+		t.Error(err)
+		return
+	}
 }
 
 func TestGetAttach(t *testing.T) {
@@ -211,6 +232,63 @@ func TestGetAttach(t *testing.T) {
 
 	_, err = Post(client, formBytes, url, http.StatusInternalServerError, token, "")
 	if err != nil {
+		t.Error(err)
+		return
+	}
+}
+
+func TestUploadAttach(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	authUC := auth_proto.NewMockAuthClient(mockCtrl)
+	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
+	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
+	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
+
+	jar, _ := cookiejar.New(nil)
+
+	client := &http.Client{
+		Jar: jar,
+	}
+
+	d := delivery.Delivery{}
+	router := InitTestRouter(&d, []string{"/mail/attach/add", "/signin"}, []func(http.ResponseWriter, *http.Request){d.UploadAttach, d.SignIn},
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+
+	srv := httptest.NewServer(router)
+	defer srv.Close()
+
+	url := fmt.Sprintf("%s/mail/attach/add", srv.URL)
+
+	signinForm := models.SignInForm{
+		Username: "test",
+		Password: "test",
+	}
+	signinFormBytes, _ := easyjson.Marshal(signinForm)
+
+	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
+		Form: signinFormBytes,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil)
+
+	err := SigninUser(client, signinForm, srv.URL)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	_, err, token := Get(client, url, http.StatusMethodNotAllowed)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	_, err = Post(client, nil, url, http.StatusOK, token, "")
+	if err == nil {
 		t.Error(err)
 		return
 	}

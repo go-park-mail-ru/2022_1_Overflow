@@ -42,6 +42,18 @@ func TestSignin(t *testing.T) {
 	}
 	formBytes, _ := easyjson.Marshal(form)
 
+	formBad := models.SignInForm{
+		Username: "testtest",
+		Password: "test",
+	}
+	formBadBytes, _ := easyjson.Marshal(formBad)
+
+	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
+		Form: formBadBytes,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.WRONG_CREDS_ERR.Bytes(),
+	}, nil)
+	
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: formBytes,
 	}).Return(&utils_proto.JsonResponse{
@@ -58,6 +70,17 @@ func TestSignin(t *testing.T) {
 	}
 
 	_, err, token := Get(client, fmt.Sprintf("%s/signin", srv.URL), http.StatusMethodNotAllowed)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	_, err = Post(client, formBadBytes, fmt.Sprintf("%s/signin", srv.URL), http.StatusBadRequest, token, "")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	_, err, token = Get(client, fmt.Sprintf("%s/signin", srv.URL), http.StatusMethodNotAllowed)
 	if err != nil {
 		t.Error(err)
 		return
