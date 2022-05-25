@@ -29,4 +29,4 @@ jobs:
 #        run: golangci-lint run
 
       - name: Run tests
-        run: go test -cover ./... -coverprofile=profile; go tool cover -func cover.out
+        run: go test -cover ./... -coverprofile=profile; go tool cover -func profile
