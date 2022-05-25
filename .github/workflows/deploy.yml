@@ -61,12 +61,17 @@ jobs:
            host: 95.163.249.116
            username: ubuntu
            key: ${{ secrets.PRIVATE_KEY }}
-           script: chmod 755 /home/ubuntu/deploy/bin/local_run.sh; chmod 755 /home/ubuntu/deploy/bin/local_run.sh;
+           script: |
+             chmod 755 /home/ubuntu/deploy/bin/local_run.sh
+             chmod 755 /home/ubuntu/deploy/bin/local_run.sh;
 
-#       - name: screen and restart server
-#         uses: appleboy/ssh-action@master
-#         with:
-#           host: 95.163.249.116
-#           username: ubuntu
-#           key: ${{ secrets.PRIVATE_KEY }}
-#           script: screen -rd Deploy;
+       - name: screen and restart server
+         uses: appleboy/ssh-action@master
+         with:
+           host: 95.163.249.116
+           username: ubuntu
+           key: ${{ secrets.PRIVATE_KEY }}
+           script: |
+             screen -rd Deploy
+             sh bin/local_clear.sh
+             sh bin/local_run.sh
