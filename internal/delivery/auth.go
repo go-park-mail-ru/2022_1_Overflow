@@ -46,9 +46,10 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
+	log.Info("SignIn: ", data.Username, data.Password)
 	log.Info("SignIn: ", "XSS handling")
 	data.Username = xss.EscapeInput(data.Username)
-	dataBytes, _ := easyjson.Marshal(data)
+	dataBytes, _ := easyjson.Marshal(&data)
 	resp, err := d.auth.SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: dataBytes,
 	})
