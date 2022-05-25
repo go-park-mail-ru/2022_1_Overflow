@@ -38,7 +38,9 @@ func StartRepositoryServer(config *config.Config) {
 	}
 	repositoryServer := grpc.NewServer()
 	repository_proto.RegisterDatabaseRepositoryServer(repositoryServer, repositoryService)
-	repositoryServer.Serve(lis)
+	if err := repositoryServer.Serve(lis); err != nil {
+		log.Warning(err)
+	}
 }
 
 func main() {

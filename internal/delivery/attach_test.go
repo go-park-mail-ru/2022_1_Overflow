@@ -16,6 +16,7 @@ import (
 	"fmt"
 	"github.com/golang/mock/gomock"
 	"github.com/mailru/easyjson"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
@@ -73,6 +74,9 @@ func TestListAttach(t *testing.T) {
 		},
 	}
 	filenamesBytes, err := easyjson.Marshal(filenames)
+	if err != nil {
+		log.Warning(err)
+	}
 
 	attachUC.EXPECT().ListAttach(context.Background(), &attach_proto.GetAttachRequest{
 		Username: signinForm.Username,
@@ -120,7 +124,7 @@ func TestListAttach(t *testing.T) {
 
 	formBytesFail := []byte(`{"mail_id":2}`)
 
-	r, err = Post(client, formBytesFail, url, http.StatusInternalServerError, token, "")
+	_, err = Post(client, formBytesFail, url, http.StatusInternalServerError, token, "")
 	if err != nil {
 		t.Error(err)
 		return

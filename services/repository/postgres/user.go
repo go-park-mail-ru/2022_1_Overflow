@@ -145,7 +145,9 @@ func (c *Database) AddUser(context context.Context, request *repository_proto.Ad
 				Status: utils_proto.DatabaseStatus_ERROR,
 			}, err
 		}
-		c.UserConfig(context, user.Id) // конфигурация профиля пользователя
+		if err := c.UserConfig(context, user.Id); err != nil { // конфигурация профиля пользователя
+			log.Warning(err)
+		}
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_OK,
 		}, err

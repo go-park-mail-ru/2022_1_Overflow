@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"github.com/mailru/easyjson"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -71,7 +72,10 @@ func WriteJsonErrFull(w http.ResponseWriter, err *JsonResponse) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 	resp, _ := easyjson.Marshal(err)
-	w.Write(resp)
+	_, er := w.Write(resp)
+	if er != nil {
+		log.Warning("Resp: ", er)
+	}
 }
 
 func WriteJsonErr(w http.ResponseWriter, status int, message string) {

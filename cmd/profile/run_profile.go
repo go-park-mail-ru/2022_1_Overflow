@@ -26,7 +26,9 @@ func StartProfileServer(config *config.Config, db repository_proto.DatabaseRepos
 	profileService := profile.ProfileService{}
 	profileService.Init(config, db)
 	profile_proto.RegisterProfileServer(profileServer, &profileService)
-	profileServer.Serve(lis)
+	if err := profileServer.Serve(lis); err != nil {
+		log.Warning(err)
+	}
 }
 
 func main() {

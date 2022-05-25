@@ -47,7 +47,9 @@ func (s *AttachService) SaveAttach(ctx context.Context, request *attach_proto.Sa
 	}
 
 	var mail models.Mail
-	err = easyjson.Unmarshal(respMail.Mail, &mail)
+	if err := easyjson.Unmarshal(respMail.Mail, &mail); err != nil {
+		log.Warning(err)
+	}
 	if mail.Sender != request.Username {
 		log.Warning(ErrAccess)
 		return &attach_proto.Nothing{Status: false}, ErrAccess
@@ -93,7 +95,9 @@ func (s *AttachService) GetAttach(ctx context.Context, request *attach_proto.Get
 	}
 
 	var mail models.Mail
-	err = easyjson.Unmarshal(respMail.Mail, &mail)
+	if err := easyjson.Unmarshal(respMail.Mail, &mail); err != nil {
+		log.Warning(err)
+	}
 	if mail.Sender != request.Username {
 		log.Warning(ErrAccess)
 		return &attach_proto.AttachResponse{}, ErrAccess
@@ -125,12 +129,12 @@ func (s *AttachService) GetAttach(ctx context.Context, request *attach_proto.Get
 	defer reader.Close()
 
 	var file bytes.Buffer
-	io.Copy(&file, reader)
+	if _, err := io.Copy(&file, reader); err != nil {
+		log.Warning(err)
+	}
 	return &attach_proto.AttachResponse{
 		File: file.Bytes(),
 	}, nil
-
-	return nil, nil
 }
 
 func (s *AttachService) ListAttach(ctx context.Context, request *attach_proto.GetAttachRequest) (*attach_proto.AttachListResponse, error) {

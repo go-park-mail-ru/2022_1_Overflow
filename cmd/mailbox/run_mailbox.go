@@ -27,7 +27,9 @@ func StartMailBoxServer(config *config.Config, db repository_proto.DatabaseRepos
 	mailboxService := mailbox.MailBoxService{}
 	mailboxService.Init(config, db, profile)
 	mailbox_proto.RegisterMailboxServer(mailboxServer, &mailboxService)
-	mailboxServer.Serve(lis)
+	if err := mailboxServer.Serve(lis); err != nil {
+		log.Warning(err)
+	}
 }
 
 func main() {

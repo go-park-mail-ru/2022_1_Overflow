@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/mailru/easyjson"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 
@@ -64,7 +65,10 @@ func (d *Delivery) AddFolder(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
-	w.Write(resp.Folder)
+
+	if _, err := w.Write(resp.Folder); err != nil {
+		log.Warning()
+	}
 }
 
 // @Router /folder/add [get]
@@ -489,7 +493,9 @@ func (d *Delivery) ListFolders(w http.ResponseWriter, r *http.Request) {
 			pkg.WriteJsonErrFull(w, &response)
 			return
 		}
-		w.Write(resp.Mails)
+		if _, err := w.Write(resp.Mails); err != nil {
+			log.Warning(err)
+		}
 	} else {
 		resp, err := d.folderManager.ListFolders(context.Background(), &folder_manager_proto.ListFoldersRequest{
 			Data:   data,
@@ -510,6 +516,8 @@ func (d *Delivery) ListFolders(w http.ResponseWriter, r *http.Request) {
 			pkg.WriteJsonErrFull(w, &response)
 			return
 		}
-		w.Write(resp.Folders)
+		if _, err := w.Write(resp.Folders); err != nil {
+			log.Warning(err)
+		}
 	}
 }

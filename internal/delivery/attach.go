@@ -61,7 +61,9 @@ func (d *Delivery) UploadAttach(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	io.Copy(&buf, file)
+	if _, err := io.Copy(&buf, file); err != nil {
+		log.Warning(err)
+	}
 	attach := models.Attach{
 		Filename:    header.Filename,
 		PayloadSize: header.Size,
@@ -206,7 +208,9 @@ func (d *Delivery) ListAttach(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(grpcResp.Filenames)
+	if _, err := w.Write(grpcResp.Filenames); err != nil {
+		log.Warning()
+	}
 }
 
 // ListAttach

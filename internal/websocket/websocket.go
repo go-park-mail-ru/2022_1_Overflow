@@ -74,7 +74,7 @@ func keepAlive(c *websocket.Conn) {
 }
 
 func NewWSServer() chan WSMessage {
-	in := make(chan WSMessage, 0)
+	in := make(chan WSMessage)
 	go wsServer(in)
 	return in
 }

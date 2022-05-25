@@ -11,6 +11,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/mailru/easyjson"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 
@@ -66,7 +67,9 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
-	w.Write(resp.Mails)
+	if _, err := w.Write(resp.Mails); err != nil {
+		log.Warning(err)
+	}
 }
 
 // Outcome godoc
@@ -118,7 +121,9 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
-	w.Write(resp.Mails)
+	if _, err := w.Write(resp.Mails); err != nil {
+		log.Warning(err)
+	}
 }
 
 // GetMail godoc
@@ -166,7 +171,9 @@ func (d *Delivery) GetMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	w.Write(resp.Mail)
+	if _, err := w.Write(resp.Mail); err != nil {
+		log.Warning(err)
+	}
 }
 
 // DeleteMail godoc
@@ -400,5 +407,7 @@ func (d *Delivery) GetCountUnread(w http.ResponseWriter, r *http.Request) {
 		Count: int(resp.Count),
 	}
 	countRespBytes, _ := easyjson.Marshal(countResp)
-	w.Write(countRespBytes)
+	if _, err := w.Write(countRespBytes); err != nil {
+		log.Warning(err)
+	}
 }

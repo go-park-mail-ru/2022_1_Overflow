@@ -5,10 +5,6 @@ import (
 	"time"
 )
 
-const (
-	defaultLength = 10
-)
-
 var (
 	letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	source      = rand.NewSource(time.Now().UnixNano())

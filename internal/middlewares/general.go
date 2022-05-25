@@ -3,15 +3,14 @@ package middlewares
 import (
 	"OverflowBackend/internal/config"
 	"OverflowBackend/proto/attach_proto"
-	"net/http"
-	"time"
-
 	"github.com/gorilla/csrf"
+	"net/http"
 )
 
 var CsrfWrapper func(http.Handler) http.Handler
-var csrfToken string
-var csrfTokenTicker *time.Ticker
+
+//var csrfToken string
+//var csrfTokenTicker *time.Ticker
 
 func GetCSRFToken(r *http.Request) (token string, isNew bool) {
 	token = csrf.Token(r)
@@ -44,8 +43,8 @@ func GetCSRFToken(r *http.Request) (token string, isNew bool) {
 
 func Init(config *config.Config, attachDial attach_proto.AttachClient) {
 	attach = attachDial
-	tokenTimeout := config.Server.Timeout.CSRFTimeout
-	csrfTokenTicker = time.NewTicker(tokenTimeout)
+	//tokenTimeout := config.Server.Timeout.CSRFTimeout
+	//csrfTokenTicker = time.NewTicker(tokenTimeout)
 	csrfKey := config.Server.Keys.CSRFAuthKey
 	CsrfWrapper = csrf.Protect(
 		[]byte(csrfKey),

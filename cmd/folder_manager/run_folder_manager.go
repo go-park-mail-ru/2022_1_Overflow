@@ -28,7 +28,9 @@ func StartFolderManagerServer(config *config.Config, db repository_proto.Databas
 	folderManagerService := folder_manager.FolderManagerService{}
 	folderManagerService.Init(config, db, profile)
 	folder_manager_proto.RegisterFolderManagerServer(folderManagerServer, &folderManagerService)
-	folderManagerServer.Serve(lis)
+	if err := folderManagerServer.Serve(lis); err != nil {
+		log.Warning(err)
+	}
 }
 
 func main() {

@@ -56,7 +56,9 @@ func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
-	w.Write(resp.Data)
+	if _, err := w.Write(resp.Data); err != nil {
+		log.Warning(err)
+	}
 }
 
 // SetInfo godoc
@@ -271,7 +273,9 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 	//}
 
 	buf := new(bytes.Buffer)
-	io.Copy(buf, file)
+	if _, err := io.Copy(buf, file); err != nil {
+		log.Warning(err)
+	}
 	avatar := models.Avatar{
 		Name:     multipartFileHeader.Filename,
 		Username: data.Username,

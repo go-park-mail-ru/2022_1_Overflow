@@ -26,7 +26,9 @@ func StartAuthServer(config *config.Config, db repository_proto.DatabaseReposito
 	authService := auth.AuthService{}
 	authService.Init(config, db)
 	auth_proto.RegisterAuthServer(authServer, &authService)
-	authServer.Serve(lis)
+	if err := authServer.Serve(lis); err != nil {
+		log.Warning(err)
+	}
 }
 
 func main() {

@@ -28,7 +28,9 @@ func StartAttachServer(config *config.Config, db repository_proto.DatabaseReposi
 	attachService := attach.AttachService{}
 	attachService.Init(config, db, s3)
 	attach_proto.RegisterAttachServer(attachServer, &attachService)
-	attachServer.Serve(lis)
+	if err := attachServer.Serve(lis); err != nil {
+		log.Warning(err)
+	}
 }
 
 func main() {

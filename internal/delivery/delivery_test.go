@@ -32,7 +32,9 @@ func InitTestRouter(
 	handles []func(http.ResponseWriter, *http.Request),
 	auth auth_proto.AuthClient, profile profile_proto.ProfileClient, mailbox mailbox_proto.MailboxClient, folderManager folder_manager_proto.FolderManagerClient, attach attach_proto.AttachClient,
 ) http.Handler {
-	session.Init(DefConf)
+	if err := session.Init(DefConf); err != nil {
+		log.Warning(err)
+	}
 	middlewares.Init(DefConf, attach)
 
 	d.Init(DefConf, auth, profile, mailbox, folderManager, attach)

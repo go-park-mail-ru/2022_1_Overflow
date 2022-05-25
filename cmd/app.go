@@ -9,6 +9,7 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	_ "OverflowBackend/docs"
 )
@@ -64,8 +65,8 @@ func (app *Application) Run(configPath string) {
 	attachDial, err := grpc.Dial(fmt.Sprintf("%v:%v", config.Server.Services.Attach.Address, config.Server.Services.Attach.Port),
 		grpc.WithDefaultCallOptions(
 			grpc.MaxCallRecvMsgSize(30<<20),
-			grpc.MaxCallSendMsgSize(30<<20)),
-		grpc.WithInsecure())
+			grpc.MaxCallSendMsgSize(30<<20)), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	//grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("Ошибка подключения к микросервису Attach:", err)
 	}
