@@ -522,3 +522,90 @@ func TestGetMail(t *testing.T) {
 		return
 	}
 }
+
+func TestCountUnread(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	authUC := auth_proto.NewMockAuthClient(mockCtrl)
+	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
+	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
+	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
+
+	jar, _ := cookiejar.New(nil)
+
+	client := &http.Client{
+		Jar: jar,
+	}
+
+	d := delivery.Delivery{}
+	router := InitTestRouter(&d, []string{"/mail/get", "/signin"}, []func(http.ResponseWriter, *http.Request){d.GetMail, d.SignIn},
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+
+	srv := httptest.NewServer(router)
+	defer srv.Close()
+
+	url := fmt.Sprintf("%s/mail/get?id=0", srv.URL)
+
+	signinForm := models.SignInForm{
+		Username: "test",
+		Password: "test",
+	}
+	signinFormBytes, _ := easyjson.Marshal(signinForm)
+
+	mail := models.Mail{
+		Id:        0,
+		Sender:    "test",
+		Addressee: "test2",
+		Theme:     "test",
+		Text:      "test",
+		Files:     "files",
+		Date:      time.Now(),
+		Read:      false,
+	}
+	mailBytes, _ := easyjson.Marshal(mail)
+
+	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
+		Form: signinFormBytes,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil)
+
+	getMailData := &utils_proto.Session{
+		Username:      "test",
+		Authenticated: true,
+	}
+	mailboxUC.EXPECT().GetMail(context.Background(), &mailbox_proto.GetMailRequest{
+		Data: getMailData,
+	}).Return(&mailbox_proto.ResponseMail{
+		Mail: mailBytes,
+		Response: &utils_proto.JsonResponse{
+			Response: pkg.NO_ERR.Bytes(),
+		},
+	}, nil)
+
+	//&models.Session{Username: "test", Authenticated: true}, int32(0)
+	err := SigninUser(client, signinForm, srv.URL)
+
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	r, err, _ := Get(client, url, http.StatusOK)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	var resp utils_proto.JsonResponse
+
+	err = json.NewDecoder(r.Body).Decode(&resp)
+
+	if err != nil {
+		t.Error(err)
+		return
+	}
+}

@@ -1,16 +1,14 @@
 package repository_test
 
-/*
 import (
 	"OverflowBackend/internal/models"
+	"OverflowBackend/proto/repository_proto"
 	"OverflowBackend/services/repository/postgres"
 	"context"
+	"github.com/mailru/easyjson"
+	"github.com/pashagolub/pgxmock"
 	"regexp"
 	"testing"
-	"time"
-
-	"github.com/jackc/pgconn"
-	"github.com/pashagolub/pgxmock"
 )
 
 func TestAddUser(t *testing.T) {
@@ -28,9 +26,10 @@ func TestAddUser(t *testing.T) {
 		Password:  "passw",
 		Username:  "john",
 	}
+	userBytes, _ := easyjson.Marshal(user)
 
 	mock.ExpectQuery(
-		regexp.QuoteMeta("insert into overflow.users(first_name, last_name, password, username) values ($1, $2, $3, $4);"),
+		regexp.QuoteMeta("INSERT INTO overflow.users(first_name, last_name, password, username) VALUES ($1, $2, $3, $4);"),
 	).WithArgs(
 		user.Firstname,
 		user.Lastname,
@@ -38,11 +37,19 @@ func TestAddUser(t *testing.T) {
 		user.Username,
 	).WillReturnRows(&pgxmock.Rows{})
 
+	mock.ExpectQuery(
+		regexp.QuoteMeta("Select id, first_name, last_name, password, username from overflow.users where username = $1;"),
+	).WithArgs(
+		user.Username,
+	).WillReturnRows(&pgxmock.Rows{})
+
 	testDB := postgres.Database{
-		Conn:   mock,
+		Conn: mock,
 	}
 
-	err = testDB.AddUser(user)
+	_, err = testDB.AddUser(context.Background(), &repository_proto.AddUserRequest{
+		User: userBytes,
+	})
 	if err != nil {
 		t.Error(err)
 		return
@@ -54,6 +61,7 @@ func TestAddUser(t *testing.T) {
 	}
 }
 
+/*
 func TestGetUserInfoByUsername(t *testing.T) {
 	mock, err := pgxmock.NewConn()
 	if err != nil {

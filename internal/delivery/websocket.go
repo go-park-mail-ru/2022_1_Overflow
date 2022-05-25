@@ -30,10 +30,13 @@ func (d *Delivery) WSConnect(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Warning(err)
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
+		return
 	}
 
 	if err := conn.WriteMessage(1, []byte("okey")); err != nil {
 		log.Warning(err)
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
 
