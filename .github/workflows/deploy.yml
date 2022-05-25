@@ -72,7 +72,7 @@ jobs:
            username: ubuntu
            key: ${{ secrets.PRIVATE_KEY }}
            script: |
-             PATH="/usr/local/go/bin/:$PATH"
+             PATH="/home/ubuntu/.nvm/versions/node/v12.22.10/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
              cd /home/ubuntu/deploy/bin
              nohup ./local_clear.sh > /dev/null 2>&1&
              nohup ./local_run.sh > logs.log &
