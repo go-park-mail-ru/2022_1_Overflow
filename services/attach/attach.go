@@ -146,7 +146,7 @@ func (s *AttachService) ListAttach(ctx context.Context, request *attach_proto.Ge
 	if err != nil {
 		return &attach_proto.AttachListResponse{}, ErrJson
 	}
-	if mail.Sender != request.Username {
+	if mail.Sender != request.Username && mail.Addressee != request.Username {
 		log.Warning(ErrAccess)
 		return &attach_proto.AttachListResponse{}, ErrAccess
 	}

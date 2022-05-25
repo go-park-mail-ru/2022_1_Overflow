@@ -126,7 +126,7 @@ func (s *AuthService) SignUp(context context.Context, request *auth_proto.SignUp
 			Response: pkg.CreateJsonErr(pkg.STATUS_USER_EXISTS, "Пользователь уже существует.").Bytes(),
 		}, nil
 	}
-	userBytes, _ := easyjson.Marshal(user) // преобразуем объект пользователя в байтовое представление
+	userBytes, _ := easyjson.Marshal(user)   // преобразуем объект пользователя в байтовое представление
 	req2 := repository_proto.AddUserRequest{ // форма запроса добавления пользователя в БД
 		User: userBytes,
 	}
