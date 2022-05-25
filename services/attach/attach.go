@@ -50,7 +50,7 @@ func (s *AttachService) SaveAttach(ctx context.Context, request *attach_proto.Sa
 	if err := easyjson.Unmarshal(respMail.Mail, &mail); err != nil {
 		log.Warning(err)
 	}
-	if mail.Sender != request.Username {
+	if mail.Sender != request.Username || mail.Addressee != request.Username {
 		log.Warning(ErrAccess)
 		return &attach_proto.Nothing{Status: false}, ErrAccess
 	}
