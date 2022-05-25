@@ -39,12 +39,13 @@ func (d *Delivery) UploadAttach(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-	mailID, err := strconv.Atoi(r.FormValue("mailID"))
-	if err != nil {
-		log.Warning(err)
-		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
-		return
-	}
+	//mailID, err := strconv.Atoi(r.FormValue("mailID"))
+	//if err != nil {
+	//	log.Warning(err)
+	//	pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
+	//	return
+	//}
+	mailID := 3
 	var buf bytes.Buffer
 	file, header, err := r.FormFile("attach")
 	if err != nil {

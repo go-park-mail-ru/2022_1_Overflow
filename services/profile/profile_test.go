@@ -245,3 +245,19 @@ func TestChangePassword(t *testing.T) {
 		return
 	}
 }
+
+func TestGetAvatar(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	_, uc := InitTestUseCase(mockCtrl)
+
+	_, err := uc.GetAvatar(context.Background(), &profile_proto.GetAvatarRequest{
+		Username: "test",
+	})
+
+	if err != nil {
+		t.Errorf("Неверный ответ от UseCase.")
+		return
+	}
+}

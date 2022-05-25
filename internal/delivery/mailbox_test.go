@@ -540,14 +540,14 @@ func TestCountUnread(t *testing.T) {
 	}
 
 	d := delivery.Delivery{}
-	router := InitTestRouter(&d, []string{"/mail/get", "/signin"}, []func(http.ResponseWriter, *http.Request){d.GetMail, d.SignIn},
+	router := InitTestRouter(&d, []string{"/mail/countunread", "/signin"}, []func(http.ResponseWriter, *http.Request){d.GetCountUnread, d.SignIn},
 		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
 
-	url := fmt.Sprintf("%s/mail/get?id=0", srv.URL)
+	url := fmt.Sprintf("%s/mail/countunread", srv.URL)
 
 	signinForm := models.SignInForm{
 		Username: "test",
@@ -555,35 +555,20 @@ func TestCountUnread(t *testing.T) {
 	}
 	signinFormBytes, _ := easyjson.Marshal(signinForm)
 
-	mail := models.Mail{
-		Id:        0,
-		Sender:    "test",
-		Addressee: "test2",
-		Theme:     "test",
-		Text:      "test",
-		Files:     "files",
-		Date:      time.Now(),
-		Read:      false,
-	}
-	mailBytes, _ := easyjson.Marshal(mail)
-
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: signinFormBytes,
 	}).Return(&utils_proto.JsonResponse{
 		Response: pkg.NO_ERR.Bytes(),
 	}, nil)
 
-	getMailData := &utils_proto.Session{
+	sessionData := &utils_proto.Session{
 		Username:      "test",
 		Authenticated: true,
 	}
-	mailboxUC.EXPECT().GetMail(context.Background(), &mailbox_proto.GetMailRequest{
-		Data: getMailData,
-	}).Return(&mailbox_proto.ResponseMail{
-		Mail: mailBytes,
-		Response: &utils_proto.JsonResponse{
-			Response: pkg.NO_ERR.Bytes(),
-		},
+	mailboxUC.EXPECT().CountUnread(context.Background(), &mailbox_proto.CountUnreadRequest{
+		Data: sessionData,
+	}).Return(&mailbox_proto.ResponseCountUnread{
+		Count: 5,
 	}, nil)
 
 	//&models.Session{Username: "test", Authenticated: true}, int32(0)
@@ -600,7 +585,7 @@ func TestCountUnread(t *testing.T) {
 		return
 	}
 
-	var resp utils_proto.JsonResponse
+	var resp models.CountUnread
 
 	err = json.NewDecoder(r.Body).Decode(&resp)
 

@@ -10,6 +10,7 @@ import (
 	"OverflowBackend/proto/utils_proto"
 	"OverflowBackend/services/mailbox"
 	"context"
+	"errors"
 	"github.com/mailru/easyjson"
 	"testing"
 	"time"
@@ -420,6 +421,47 @@ func TestSendMail(t *testing.T) {
 	var response pkg.JsonResponse
 	json_err := easyjson.Unmarshal(resp.Response, &response)
 	if err != nil || json_err != nil || response != pkg.NO_ERR {
+		t.Errorf("Неверный ответ от UseCase.")
+		return
+	}
+}
+
+func TestCountUnread(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	mockDB, _, uc := InitTestUseCase(mockCtrl)
+
+	var username = "testname"
+
+	mockDB.EXPECT().CountUnread(context.Background(), &repository_proto.CountUnreadRequest{
+		Username: username,
+	}).Return(&repository_proto.ResponseCountUnread{
+		Count: 5,
+	}, nil)
+
+	resp, err := uc.CountUnread(context.Background(), &mailbox_proto.CountUnreadRequest{
+		Data: &utils_proto.Session{
+			Username:      username,
+			Authenticated: true,
+		},
+	})
+	if err != nil || resp.Count != 5 {
+		t.Errorf("Неверный ответ от UseCase.")
+		return
+	}
+
+	mockDB.EXPECT().CountUnread(context.Background(), &repository_proto.CountUnreadRequest{
+		Username: username + "fail",
+	}).Return(nil, errors.New("fail username"))
+
+	_, err = uc.CountUnread(context.Background(), &mailbox_proto.CountUnreadRequest{
+		Data: &utils_proto.Session{
+			Username:      username + "fail",
+			Authenticated: true,
+		},
+	})
+	if err == nil {
 		t.Errorf("Неверный ответ от UseCase.")
 		return
 	}

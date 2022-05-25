@@ -496,6 +496,7 @@ func (s *MailBoxService) CountUnread(ctx context.Context, request *mailbox_proto
 		log.Warning(err)
 		return nil, err
 	}
+
 	return &mailbox_proto.ResponseCountUnread{
 		Count: countMess.Count,
 	}, nil
