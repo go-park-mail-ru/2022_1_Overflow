@@ -11,16 +11,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Set up Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.17
+#      - name: Set up Go
+#        uses: actions/setup-go@v2
+#        with:
+#          go-version: 1.17
+#
+#      - name: Verify dependencies
+#        run: go mod verify
 
-      - name: Verify dependencies
-        run: go mod verify
-
-      - name: Build
-        run: go build cmd/repository/run_repository.go; go build cmd/profile/run_profile.go; go build cmd/mailbox/run_mailbox.go; go build cmd/folder_manager/run_folder_manager.go; go build cmd/auth/run_auth.go; go build cmd/attach/run_attach.go; go build cmd/app/main.go;
+#      - name: Build
+#        run: go build cmd/repository/run_repository.go; go build cmd/profile/run_profile.go; go build cmd/mailbox/run_mailbox.go; go build cmd/folder_manager/run_folder_manager.go; go build cmd/auth/run_auth.go; go build cmd/attach/run_attach.go; go build cmd/app/main.go;
 
 #      - name: Install golangci-lint
 #        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.2
@@ -72,5 +72,6 @@ jobs:
            username: ubuntu
            key: ${{ secrets.PRIVATE_KEY }}
            script: |
-             nohup /home/ubuntu/deploy/bin/local_clear.sh > /dev/null 2>&1&
-             nohup /home/ubuntu/deploy/bin/local_run.sh > logs.log &
+             cd /home/ubuntu/deploy/bin
+             nohup ./local_clear.sh > /dev/null 2>&1&
+             nohup ./local_run.sh > logs.log &
