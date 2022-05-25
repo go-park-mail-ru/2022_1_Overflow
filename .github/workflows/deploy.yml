@@ -21,12 +21,12 @@ jobs:
 
 #      - name: Download library
 #        run: sudo apt-get update; sudo apt-get install libwebp-dev;
-#
-#      - name: Install golangci-lint
-#        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.2
 
-#      - name: Run golangci-lint
-#        run: golangci-lint run
+      - name: Install golangci-lint
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.2
+
+      - name: Run golangci-lint
+        run: golangci-lint run
 
       - name: Run tests
         run: go test -cover ./... -coverprofile=profile; go tool cover -func profile
