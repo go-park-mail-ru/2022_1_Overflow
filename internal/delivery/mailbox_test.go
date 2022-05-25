@@ -412,7 +412,13 @@ func TestDelete(t *testing.T) {
 	}, nil)
 	//&models.Session{Username: "test", Authenticated: true}, int32(0)
 
-	err := SigninUser(client, signinForm, srv.URL)
+	_, err, _ := Get(client, url, http.StatusUnauthorized)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	err = SigninUser(client, signinForm, srv.URL)
 
 	if err != nil {
 		t.Error(err)
@@ -499,8 +505,14 @@ func TestGetMail(t *testing.T) {
 		},
 	}, nil)
 
+	_, err, _ := Get(client, url, http.StatusUnauthorized)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
 	//&models.Session{Username: "test", Authenticated: true}, int32(0)
-	err := SigninUser(client, signinForm, srv.URL)
+	err = SigninUser(client, signinForm, srv.URL)
 
 	if err != nil {
 		t.Error(err)
@@ -571,8 +583,14 @@ func TestCountUnread(t *testing.T) {
 		Count: 5,
 	}, nil)
 
+	_, err, _ := Get(client, url, http.StatusUnauthorized)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
 	//&models.Session{Username: "test", Authenticated: true}, int32(0)
-	err := SigninUser(client, signinForm, srv.URL)
+	err = SigninUser(client, signinForm, srv.URL)
 
 	if err != nil {
 		t.Error(err)
