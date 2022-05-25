@@ -20,16 +20,37 @@ jobs:
         run: go mod verify
 
       - name: Build
-        run: go build cmd/repository/run_repository.go; go build cmd/profile/run_profile.go; go build cmd/mailbox/run_mailbox.go; go build cmd/folder_manager/run_folder_manager.go; go build cmd/auth/run_auth.go; go build cmd/attach/run_attach.go; go build cmd/app/main.go;
+        run: go build cmd/repository/run_repository.go; #go build cmd/profile/run_profile.go; go build cmd/mailbox/run_mailbox.go; go build cmd/folder_manager/run_folder_manager.go; go build cmd/auth/run_auth.go; go build cmd/attach/run_attach.go; go build cmd/app/main.go;
 
-#      - name: Download library
-#        run: sudo apt-get update; sudo apt-get install libwebp-dev;
+#      - name: Install golangci-lint
+#        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.2
+#
+#      - name: Run golangci-lint
+#        run: golangci-lint run
 
-      - name: Install golangci-lint
-        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.2
+#      - name: Run tests
+#        run: go test -cover ./... -coverprofile=profile; go tool cover -func profile
 
-      - name: Run golangci-lint
-        run: golangci-lint run
+      - name: Upload build result
+        uses: actions/upload-artifact@v1
+        with:
+          name: rep
+          path: ./run_repository
 
-      - name: Run tests
-        run: go test -cover ./... -coverprofile=profile; go tool cover -func profile
+  deploy:
+     runs-on: ubuntu-latest
+     needs: build
+     steps:
+       - name: Download bin file
+         uses: actions/download-artifact@v1
+         with:
+           name: rep
+
+       - name: Transfer bin file to server
+         uses: appleboy/scp-action@v0.0.10
+         with:
+           host: 95.163.249.116
+           username: ubuntu
+           key: ${{ secrets.PRIVATE_KEY }}
+           source: "rep/run_repository"
+           target: "/home/ubuntu/deploy"
