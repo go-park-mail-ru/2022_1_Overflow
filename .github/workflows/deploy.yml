@@ -63,7 +63,7 @@ jobs:
            key: ${{ secrets.PRIVATE_KEY }}
            script: |
              chmod 755 /home/ubuntu/deploy/bin/local_run.sh
-             chmod 755 /home/ubuntu/deploy/bin/local_run.sh;
+             chmod 755 /home/ubuntu/deploy/bin/local_clear.sh
 
        - name: screen and restart server
          uses: appleboy/ssh-action@master
@@ -72,6 +72,5 @@ jobs:
            username: ubuntu
            key: ${{ secrets.PRIVATE_KEY }}
            script: |
-             screen -rd Deploy
-             sh bin/local_clear.sh
-             sh bin/local_run.sh
+             nohup /home/ubuntu/deploy/bin/local_clear.sh > /dev/null 2>&1&
+             nohup /home/ubuntu/deploy/bin/local_run.sh > logs.log &
