@@ -53,6 +53,13 @@ func (d *Delivery) UploadAttach(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
+
+	if header.Size > (20 << 20) {
+		log.Warning("Размер файла превышает 20мб.")
+		pkg.WriteJsonErrFull(w, &pkg.BAD_FILETYPE)
+		return
+	}
+
 	io.Copy(&buf, file)
 	attach := models.Attach{
 		Filename:    header.Filename,

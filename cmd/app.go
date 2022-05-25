@@ -7,8 +7,8 @@ import (
 	"OverflowBackend/pkg"
 	"OverflowBackend/proto/attach_proto"
 	"fmt"
-
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
 
 	_ "OverflowBackend/docs"
 )
@@ -60,7 +60,12 @@ func (app *Application) Run(configPath string) {
 		log.Fatal("Ошибка подключения к микросервису FolderManager:", err)
 	}
 	log.Info("Успешное подключение к микросервису FolderManager.")
-	attachDial, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.Attach.Address, config.Server.Services.Attach.Port))
+	//attachDial, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.Attach.Address, config.Server.Services.Attach.Port))
+	attachDial, err := grpc.Dial(fmt.Sprintf("%v:%v", config.Server.Services.Attach.Address, config.Server.Services.Attach.Port),
+		grpc.WithDefaultCallOptions(
+			grpc.MaxCallRecvMsgSize(30<<20),
+			grpc.MaxCallSendMsgSize(30<<20)),
+		grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("Ошибка подключения к микросервису Attach:", err)
 	}
