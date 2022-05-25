@@ -19,6 +19,9 @@ jobs:
       - name: Verify dependencies
         run: go mod verify
 
+      - name: Build
+        run: go build cmd/repository/run_repository.go; go build cmd/profile/run_profile.go; go build cmd/mailbox/run_mailbox.go; go build cmd/folder_manager/run_folder_manager.go; go build cmd/auth/run_auth.go; go build cmd/attach/run_attach.go; go build cmd/app/main.go;
+
 #      - name: Download library
 #        run: sudo apt-get update; sudo apt-get install libwebp-dev;
 
