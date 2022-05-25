@@ -7,6 +7,7 @@ import (
 	"OverflowBackend/pkg"
 	"OverflowBackend/proto/auth_proto"
 	"context"
+	"github.com/mailru/easyjson"
 
 	"encoding/json"
 	"net/http"
@@ -45,9 +46,10 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
+	log.Info("SignIn: ", data.Username, data.Password)
 	log.Info("SignIn: ", "XSS handling")
 	data.Username = xss.EscapeInput(data.Username)
-	dataBytes, _ := json.Marshal(data)
+	dataBytes, _ := easyjson.Marshal(&data)
 	resp, err := d.auth.SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: dataBytes,
 	})
@@ -55,13 +57,13 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
@@ -118,13 +120,13 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	data.Firstname = xss.EscapeInput(data.Firstname)
 	data.Lastname = xss.EscapeInput(data.Lastname)
 	/*
-	passSafe := xss.EscapeInput(data.Password)
-	if passSafe != data.Password {
-		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, "Пароль содержит недопустимое содержимое.")
-		return
-	}
+		passSafe := xss.EscapeInput(data.Password)
+		if passSafe != data.Password {
+			pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, "Пароль содержит недопустимое содержимое.")
+			return
+		}
 	*/
-	dataBytes, _ := json.Marshal(data)
+	dataBytes, _ := easyjson.Marshal(data)
 	resp, err := d.auth.SignUp(context.Background(), &auth_proto.SignUpRequest{
 		Form: dataBytes,
 	})
@@ -132,13 +134,13 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}

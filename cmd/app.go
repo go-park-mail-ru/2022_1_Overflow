@@ -5,6 +5,7 @@ import (
 	"OverflowBackend/internal/middlewares"
 	"OverflowBackend/internal/session"
 	"OverflowBackend/pkg"
+	"OverflowBackend/proto/attach_proto"
 	"fmt"
 
 	log "github.com/sirupsen/logrus"
@@ -22,7 +23,8 @@ type Application struct{}
 // @contact.url https://vk.com/l____l____l____l____l____l
 // @contact.username jellybe@yandex.ru
 
-// @BasePath /
+// @BasePath /api/v1
+
 func (app *Application) Run(configPath string) {
 	log.Info("Чтение конфигурационного файла сервера.")
 	config, err := config.NewConfig(configPath)
@@ -37,7 +39,6 @@ func (app *Application) Run(configPath string) {
 	}
 
 	log.Info("Инициализация роутеров.")
-	middlewares.Init(config)
 	router := RouterManager{}
 	authDial, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.Auth.Address, config.Server.Services.Auth.Port))
 	if err != nil {
@@ -59,6 +60,12 @@ func (app *Application) Run(configPath string) {
 		log.Fatal("Ошибка подключения к микросервису FolderManager:", err)
 	}
 	log.Info("Успешное подключение к микросервису FolderManager.")
-	router.Init(config, authDial, profileDial, mailboxDial, folderManagerDial)
+	attachDial, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.Attach.Address, config.Server.Services.Attach.Port))
+	if err != nil {
+		log.Fatal("Ошибка подключения к микросервису Attach:", err)
+	}
+	log.Info("Успешное подключение к микросервису Attach.")
+	router.Init(config, authDial, profileDial, mailboxDial, folderManagerDial, attachDial)
+	middlewares.Init(config, attach_proto.NewAttachClient(attachDial))
 	HandleServer(config, router)
 }

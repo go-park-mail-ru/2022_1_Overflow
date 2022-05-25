@@ -9,6 +9,9 @@ server:
   static:
     dir: "static"
     handle: "/static/"
+  minio:
+    dir: "minio-storage"
+    handle: "/minio-storage"
   keys:
     csrf_authkey: "7ad7b8be40fef684833eaf00770082cf"
     auth_key: "aPdSgVkYp3s6v9y$B&E)H+MbQeThWmZq"
@@ -29,6 +32,9 @@ server:
     database:
       address: "localhost"
       port: 8085
+    attach:
+      address: "localhost"
+      port: 8086
   session_manager: "standard"
   
 database:
@@ -37,3 +43,9 @@ database:
   host: "localhost"
   port: 5432
   dbname: "postgres"
+
+minio:
+  user: "minio"
+  password: "minio1234"
+  url: "localhost:9000"
+  bucket: "attach"

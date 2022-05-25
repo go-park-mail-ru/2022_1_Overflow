@@ -4,14 +4,15 @@ import (
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/models"
 	"OverflowBackend/pkg"
+	"OverflowBackend/proto/attach_proto"
 	"OverflowBackend/proto/auth_proto"
 	"OverflowBackend/proto/folder_manager_proto"
 	"OverflowBackend/proto/mailbox_proto"
 	"OverflowBackend/proto/profile_proto"
 	"OverflowBackend/proto/utils_proto"
 	"context"
-	"encoding/json"
 	"fmt"
+	"github.com/mailru/easyjson"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
@@ -28,17 +29,18 @@ func TestSignin(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/signin"}, []func(http.ResponseWriter, *http.Request){d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	form := models.SignInForm{
 		Username: "test",
 		Password: "test",
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: formBytes,
@@ -75,17 +77,18 @@ func TestBadSignin(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/signin"}, []func(http.ResponseWriter, *http.Request){d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	data := models.SignInForm{
 		Username: "test",
 		Password: "pass",
 	}
-	formBytes, _ := json.Marshal(data)
+	formBytes, _ := easyjson.Marshal(data)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: formBytes,
@@ -102,7 +105,7 @@ func TestBadSignin(t *testing.T) {
 		Jar: jar,
 	}
 
-	dataJson, _ := json.Marshal(data)
+	dataJson, _ := easyjson.Marshal(data)
 	_, err, token := Get(client, fmt.Sprintf("%s/signin", srv.URL), http.StatusMethodNotAllowed)
 	if err != nil {
 		t.Error(err)
@@ -123,11 +126,12 @@ func TestSignup(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	data := models.SignUpForm{
 		Lastname:             "John",
@@ -136,7 +140,7 @@ func TestSignup(t *testing.T) {
 		Password:             "pass",
 		PasswordConfirmation: "pass",
 	}
-	formBytes, _ := json.Marshal(data)
+	formBytes, _ := easyjson.Marshal(data)
 
 	authUC.EXPECT().SignUp(context.Background(), &auth_proto.SignUpRequest{
 		Form: formBytes,
@@ -153,7 +157,7 @@ func TestSignup(t *testing.T) {
 		Jar: jar,
 	}
 
-	dataJson, _ := json.Marshal(data)
+	dataJson, _ := easyjson.Marshal(data)
 	_, err, token := Get(client, fmt.Sprintf("%s/signup", srv.URL), http.StatusMethodNotAllowed)
 	if err != nil {
 		t.Error(err)
@@ -174,11 +178,12 @@ func TestBadPassword(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	data := models.SignUpForm{
 		Lastname:             "John",
@@ -187,7 +192,7 @@ func TestBadPassword(t *testing.T) {
 		Password:             "pass",
 		PasswordConfirmation: "passd",
 	}
-	formBytes, _ := json.Marshal(data)
+	formBytes, _ := easyjson.Marshal(data)
 
 	authUC.EXPECT().SignUp(context.Background(), &auth_proto.SignUpRequest{
 		Form: formBytes,
@@ -204,7 +209,7 @@ func TestBadPassword(t *testing.T) {
 		Jar: jar,
 	}
 
-	dataJson, _ := json.Marshal(data)
+	dataJson, _ := easyjson.Marshal(data)
 
 	_, err, token := Get(client, fmt.Sprintf("%s/signup", srv.URL), http.StatusMethodNotAllowed)
 	if err != nil {
@@ -226,11 +231,12 @@ func TestEmptyForm(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/signup"}, []func(http.ResponseWriter, *http.Request){d.SignUp},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	data := models.SignUpForm{
 		Lastname:             "",
@@ -239,7 +245,7 @@ func TestEmptyForm(t *testing.T) {
 		Password:             "pass",
 		PasswordConfirmation: "passd",
 	}
-	formBytes, _ := json.Marshal(data)
+	formBytes, _ := easyjson.Marshal(data)
 
 	authUC.EXPECT().SignUp(context.Background(), &auth_proto.SignUpRequest{
 		Form: formBytes,
@@ -256,7 +262,7 @@ func TestEmptyForm(t *testing.T) {
 		Jar: jar,
 	}
 
-	dataJson, _ := json.Marshal(data)
+	dataJson, _ := easyjson.Marshal(data)
 	_, err, token := Get(client, fmt.Sprintf("%s/signup", srv.URL), http.StatusMethodNotAllowed)
 	if err != nil {
 		t.Error(err)
@@ -277,6 +283,7 @@ func TestSignout(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -286,7 +293,7 @@ func TestSignout(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/logout", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SignOut, d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -297,7 +304,7 @@ func TestSignout(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: formBytes,

@@ -6,13 +6,14 @@ import (
 	"OverflowBackend/internal/middlewares"
 	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/session"
+	"OverflowBackend/proto/attach_proto"
 	"OverflowBackend/proto/auth_proto"
 	"OverflowBackend/proto/folder_manager_proto"
 	"OverflowBackend/proto/mailbox_proto"
 	"OverflowBackend/proto/profile_proto"
 	"bytes"
-	"encoding/json"
 	"fmt"
+	"github.com/mailru/easyjson"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -29,12 +30,12 @@ func InitTestRouter(
 	d *delivery.Delivery,
 	urls []string,
 	handles []func(http.ResponseWriter, *http.Request),
-	auth auth_proto.AuthClient, profile profile_proto.ProfileClient, mailbox mailbox_proto.MailboxClient, folderManager folder_manager_proto.FolderManagerClient,
-	) http.Handler {
+	auth auth_proto.AuthClient, profile profile_proto.ProfileClient, mailbox mailbox_proto.MailboxClient, folderManager folder_manager_proto.FolderManagerClient, attach attach_proto.AttachClient,
+) http.Handler {
 	session.Init(DefConf)
-	middlewares.Init(DefConf)
+	middlewares.Init(DefConf, attach)
 
-	d.Init(DefConf, auth, profile, mailbox, folderManager)
+	d.Init(DefConf, auth, profile, mailbox, folderManager, attach)
 	router := mux.NewRouter()
 	for i := range urls {
 		router.HandleFunc(urls[i], handles[i])
@@ -43,7 +44,7 @@ func InitTestRouter(
 }
 
 func SigninUser(client *http.Client, form models.SignInForm, srv_url string) error {
-	dataJson, err := json.Marshal(form)
+	dataJson, err := easyjson.Marshal(form)
 	if err != nil {
 		return err
 	}

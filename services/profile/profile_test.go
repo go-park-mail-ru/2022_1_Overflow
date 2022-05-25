@@ -9,8 +9,8 @@ import (
 	"OverflowBackend/proto/utils_proto"
 	"OverflowBackend/services/profile"
 	"context"
-	"encoding/json"
 	"fmt"
+	"github.com/mailru/easyjson"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -19,13 +19,12 @@ import (
 	"bou.ke/monkey"
 	"github.com/golang/mock/gomock"
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
 func InitTestUseCase(ctrl *gomock.Controller) (*repository_proto.MockDatabaseRepositoryClient, *profile.ProfileService) {
-	monkey.Patch(os.WriteFile, func(name string, data []byte, perm fs.FileMode) error {return nil})
+	monkey.Patch(os.WriteFile, func(name string, data []byte, perm fs.FileMode) error { return nil })
 	monkey.Patch(os.MkdirAll, func(path string, perm fs.FileMode) error { return nil })
-	monkey.Patch(filepath.Glob, func(pattern string) (matches []string, err error) {return []string{}, nil})
+	monkey.Patch(filepath.Glob, func(pattern string) (matches []string, err error) { return []string{}, nil })
 	log.SetLevel(log.FatalLevel)
 	db := repository_proto.NewMockDatabaseRepositoryClient(ctrl)
 	uc := profile.ProfileService{}
@@ -46,18 +45,18 @@ func TestGetInfo(t *testing.T) {
 		Password:  "test",
 		Username:  "test",
 	}
-	userBytes, _ := json.Marshal(user)
+	userBytes, _ := easyjson.Marshal(user)
 
 	profileInfo := models.ProfileInfo{
-		Id: user.Id,
+		Id:        user.Id,
 		Firstname: user.Firstname,
-		Lastname: user.Lastname,
-		Username: user.Username,
+		Lastname:  user.Lastname,
+		Username:  user.Username,
 	}
 
-	session := utils_proto.Session {
+	session := utils_proto.Session{
 		Username:      user.Username,
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 
 	mockDB.EXPECT().GetUserInfoByUsername(context.Background(), &repository_proto.GetUserInfoByUsernameRequest{
@@ -73,7 +72,7 @@ func TestGetInfo(t *testing.T) {
 	resp, err := uc.GetInfo(context.Background(), &profile_proto.GetInfoRequest{
 		Data: &session,
 	})
-	json_err := json.Unmarshal(resp.Response.Response, &response)
+	json_err := easyjson.Unmarshal(resp.Response.Response, &response)
 	if err != nil || json_err != nil || response != pkg.NO_ERR {
 		t.Errorf("Неверный ответ от UseCase.")
 		return
@@ -81,7 +80,7 @@ func TestGetInfo(t *testing.T) {
 
 	profileInfoResp := models.ProfileInfo{}
 
-	err = json.Unmarshal(resp.Data, &profileInfoResp)
+	err = easyjson.Unmarshal(resp.Data, &profileInfoResp)
 	if err != nil {
 		t.Error(err)
 		return
@@ -106,17 +105,17 @@ func TestSetInfo(t *testing.T) {
 		Password:  "test",
 		Username:  "test",
 	}
-	userBytes, _ := json.Marshal(user)
+	userBytes, _ := easyjson.Marshal(user)
 
 	settings := models.ProfileSettingsForm{
-		Firstname: user.Firstname+"test",
-		Lastname:  user.Lastname+"test",
+		Firstname: user.Firstname + "test",
+		Lastname:  user.Lastname + "test",
 	}
-	settingsBytes, _ := json.Marshal(settings)
+	settingsBytes, _ := easyjson.Marshal(settings)
 
 	session := utils_proto.Session{
 		Username:      user.Username,
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 
 	mockDB.EXPECT().GetUserInfoByUsername(context.Background(), &repository_proto.GetUserInfoByUsernameRequest{
@@ -145,7 +144,7 @@ func TestSetInfo(t *testing.T) {
 		Form: settingsBytes,
 	})
 	var response pkg.JsonResponse
-	json_err := json.Unmarshal(resp.Response, &response)
+	json_err := easyjson.Unmarshal(resp.Response, &response)
 	if err != nil || json_err != nil || response != pkg.NO_ERR {
 		t.Errorf("Неверный ответ от UseCase.")
 		return
@@ -157,25 +156,25 @@ func TestSetAvatar(t *testing.T) {
 	defer mockCtrl.Finish()
 
 	_, uc := InitTestUseCase(mockCtrl)
-	
+
 	session := utils_proto.Session{
 		Username:      "test",
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 
 	avatar := models.Avatar{
-		Name:      "avatar",
+		Name:     "avatar",
 		Username: session.Username,
-		File:   []byte{10, 10, 10, 10},
+		File:     []byte{10, 10, 10, 10},
 	}
-	avatarBytes, _ := json.Marshal(avatar)
+	avatarBytes, _ := easyjson.Marshal(avatar)
 
 	var response pkg.JsonResponse
 	resp, err := uc.SetAvatar(context.Background(), &profile_proto.SetAvatarRequest{
-		Data: &session,
+		Data:   &session,
 		Avatar: avatarBytes,
 	})
-	json_err := json.Unmarshal(resp.Response, &response)
+	json_err := easyjson.Unmarshal(resp.Response, &response)
 	if err != nil || json_err != nil || response != pkg.NO_ERR {
 		t.Errorf("Неверный ответ от UseCase.")
 		return
@@ -183,16 +182,15 @@ func TestSetAvatar(t *testing.T) {
 
 	monkey.Patch(os.MkdirAll, func(path string, perm fs.FileMode) error { return fmt.Errorf("Ошибка.") })
 	resp, _ = uc.SetAvatar(context.Background(), &profile_proto.SetAvatarRequest{
-		Data: &session,
+		Data:   &session,
 		Avatar: avatarBytes,
 	})
-	json_err = json.Unmarshal(resp.Response, &response)
+	json_err = easyjson.Unmarshal(resp.Response, &response)
 	if json_err != nil || response.Status != pkg.STATUS_UNKNOWN {
 		t.Errorf("Неверный ответ от UseCase.")
 		return
 	}
 }
-
 
 func TestChangePassword(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
@@ -207,16 +205,16 @@ func TestChangePassword(t *testing.T) {
 		Password:  pkg.HashPassword("test"),
 		Username:  "test",
 	}
-	userBytes, _ := json.Marshal(user)
+	userBytes, _ := easyjson.Marshal(user)
 
-	session := utils_proto.Session {
+	session := utils_proto.Session{
 		Username:      user.Username,
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 
 	form := models.ChangePasswordForm{
-		OldPassword: "test",
-		NewPassword: "test2",
+		OldPassword:     "test",
+		NewPassword:     "test2",
 		NewPasswordConf: "test2",
 	}
 
@@ -237,11 +235,11 @@ func TestChangePassword(t *testing.T) {
 
 	var response pkg.JsonResponse
 	resp, err := uc.ChangePassword(context.Background(), &profile_proto.ChangePasswordRequest{
-		Data: &session,
+		Data:        &session,
 		PasswordOld: form.OldPassword,
 		PasswordNew: form.NewPassword,
 	})
-	json_err := json.Unmarshal(resp.Response, &response)
+	json_err := easyjson.Unmarshal(resp.Response, &response)
 	if err != nil || json_err != nil || response != pkg.NO_ERR {
 		t.Errorf("Неверный ответ от UseCase.")
 		return

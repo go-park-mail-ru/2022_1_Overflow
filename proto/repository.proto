@@ -1,9 +1,10 @@
 syntax = "proto3";
 package repository_proto;
 
-option go_package = "./repository_proto";
-
+option go_package = "./proto/repository_proto";
 import "proto/utils.proto";
+
+// protoc --go_out=. --go-grpc_out=. proto/repository.proto
 
 service DatabaseRepository {
     rpc GetUserInfoByUsername(GetUserInfoByUsernameRequest) returns (ResponseUser) {}
@@ -17,10 +18,11 @@ service DatabaseRepository {
 
     rpc GetIncomeMails(GetIncomeMailsRequest) returns (ResponseMails) {}
     rpc GetOutcomeMails(GetOutcomeMailsRequest) returns (ResponseMails) {}
-    rpc AddMail(AddMailRequest) returns (utils.DatabaseResponse) {}
+    rpc AddMail(AddMailRequest) returns (utils.DatabaseExtendResponse) {}
     rpc DeleteMail(DeleteMailRequest) returns (utils.DatabaseResponse) {}
     rpc ReadMail(ReadMailRequest) returns (utils.DatabaseResponse) {}
     rpc GetMailInfoById(GetMailInfoByIdRequest) returns (ResponseMail) {}
+    rpc CountUnread(CountUnreadRequest) returns (ResponseCountUnread) {}
 
     rpc GetFolderById(GetFolderByIdRequest) returns (ResponseFolder) {}
     rpc GetFolderByName(GetFolderByNameRequest) returns (ResponseFolder) {}
@@ -33,6 +35,11 @@ service DatabaseRepository {
     rpc AddMailToFolderByObject(AddMailToFolderByObjectRequest) returns (utils.DatabaseResponse) {}
     rpc DeleteFolderMail(DeleteFolderMailRequest) returns (utils.DatabaseResponse) {}
     rpc MoveFolderMail(MoveFolderMailRequest) returns (utils.DatabaseResponse) {}
+
+    rpc AddAttachLink (AddAttachLinkRequest) returns (Nothing) {}
+    rpc CheckAttachLink (GetAttachRequest) returns (Nothing) {}
+    rpc ListAttaches (GetAttachRequest) returns (ResponseAttaches) {}
+    rpc CheckAttachPermission (AttachPermissionRequest) returns (ResponseAttachPermission) {}
 }
 
 // ================ requests ================
@@ -147,6 +154,25 @@ message DeleteFolderMailRequest {
     int32 mailId = 2;
 }
 
+message AddAttachLinkRequest {
+    int32 mailID = 1;
+    string filename = 2;
+}
+
+message GetAttachRequest {
+    int32 mailID = 1;
+    string filename = 2;
+}
+
+message CountUnreadRequest{
+    string username = 1;
+}
+
+message AttachPermissionRequest {
+    string username = 1;
+    string filename = 2;
+}
+
 // ================= responses ==================
 
 message ResponseUser {
@@ -172,4 +198,20 @@ message ResponseFolders {
 message ResponseMails {
     utils.DatabaseResponse response = 1;
     bytes mails = 2;
+}
+
+message Nothing {
+    bool status = 1;
+}
+
+message ResponseAttaches {
+    bytes filenames = 1;
+}
+
+message ResponseCountUnread{
+    int32 count = 1;
+}
+
+message ResponseAttachPermission {
+    bool access = 1;
 }

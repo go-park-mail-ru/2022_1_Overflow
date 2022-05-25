@@ -4,10 +4,13 @@ import (
 	"OverflowBackend/internal/models"
 	"OverflowBackend/internal/security/xss"
 	"OverflowBackend/internal/session"
+	ws "OverflowBackend/internal/websocket"
 	"OverflowBackend/pkg"
 	"OverflowBackend/proto/mailbox_proto"
+	"OverflowBackend/proto/utils_proto"
 	"context"
 	"encoding/json"
+	"github.com/mailru/easyjson"
 	"net/http"
 	"strconv"
 
@@ -45,21 +48,21 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 		offset = 0
 	}
 	resp, err := d.mailbox.Income(context.Background(), &mailbox_proto.IncomeRequest{
-		Data: data,
-		Limit: int32(limit),
+		Data:   data,
+		Limit:  int32(limit),
 		Offset: int32(offset),
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
@@ -97,21 +100,21 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 		offset = 0
 	}
 	resp, err := d.mailbox.Outcome(context.Background(), &mailbox_proto.OutcomeRequest{
-		Data: data,
-		Limit: int32(limit),
+		Data:   data,
+		Limit:  int32(limit),
 		Offset: int32(offset),
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
@@ -152,13 +155,13 @@ func (d *Delivery) GetMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
@@ -205,13 +208,13 @@ func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
@@ -264,13 +267,13 @@ func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
@@ -314,7 +317,7 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 	form.Files = xss.EscapeInput(form.Files)
 	form.Text = xss.EscapeInput(form.Text)
 	form.Theme = xss.EscapeInput(form.Theme)
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 	if err := validator.Validate(form); err != nil {
 		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
 		return
@@ -327,17 +330,35 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
-	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
+	response.Message = resp.Param
+	pkg.WriteJsonErrFull(w, &response)
+
+	respCU, err := d.mailbox.CountUnread(context.Background(), &mailbox_proto.CountUnreadRequest{
+		Data: &utils_proto.Session{
+			Username:      form.Addressee,
+			Authenticated: true,
+		},
+	})
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
+		return
+	}
+	d.ws <- ws.WSMessage{
+		Type:          ws.TYPE_ALERT,
+		Username:      form.Addressee,
+		Message:       strconv.Itoa(int(respCU.Count)),
+		MessageStatus: ws.STATUS_INFO,
+	}
 }
 
 // @Router /mail/send [get]
@@ -345,3 +366,39 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 // @Header 200 {string} X-CSRF-Token "CSRF токен"
 // @Tags mailbox
 func SendMail() {}
+
+// CountUnread godoc
+// @Summary Выполняет отправку письма получателю
+// @Success 200 {object} pkg.JsonResponse "Успешная отправка письма."
+// @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
+// @Failure 500 {object} pkg.JsonResponse "Получатель не существует, ошибка БД."
+// @Accept json
+// @Produce json
+// @Router /mail/countunread [get]
+// @Tags mailbox
+func (d *Delivery) GetCountUnread(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodGet {
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
+		return
+	}
+	data, err := session.Manager.GetData(r)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
+		return
+	}
+
+	resp, err := d.mailbox.CountUnread(context.Background(), &mailbox_proto.CountUnreadRequest{
+		Data: data,
+	})
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
+		return
+	}
+
+	countResp := &models.CountUnread{
+		Count: int(resp.Count),
+	}
+	countRespBytes, _ := easyjson.Marshal(countResp)
+	w.Write(countRespBytes)
+}

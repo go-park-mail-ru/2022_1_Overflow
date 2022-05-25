@@ -1,0 +1,45 @@
+syntax = "proto3";
+package attach_proto;
+
+option go_package = "./attach_proto";
+
+
+service Attach {
+  rpc GetAttach(GetAttachRequest) returns (AttachResponse) {}
+  rpc SaveAttach(SaveAttachRequest) returns (Nothing) {}
+  rpc ListAttach(GetAttachRequest) returns (AttachListResponse) {}
+  rpc CheckAttachPermission(AttachPermissionRequest) returns (AttachPermissionResponse) {}
+}
+
+message SaveAttachRequest {
+  string username = 1;
+  int32 mailID = 2;
+  bytes file = 3;
+}
+
+message Nothing {
+  bool status = 1;
+}
+
+message GetAttachRequest {
+  string username = 1;
+  int32  mailID = 2;
+  string filename = 3;
+}
+
+message AttachPermissionRequest {
+  string username = 1;
+  string fileUrl = 2;
+}
+
+message AttachResponse {
+  bytes file = 1;
+}
+
+message AttachListResponse {
+  bytes filenames = 1;
+}
+
+message AttachPermissionResponse {
+  bool access = 1;
+}
