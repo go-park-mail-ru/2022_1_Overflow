@@ -11,25 +11,25 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-#      - name: Set up Go
-#        uses: actions/setup-go@v2
-#        with:
-#          go-version: 1.17
-#
-#      - name: Verify dependencies
-#        run: go mod verify
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
 
-#      - name: Build
-#        run: go build cmd/repository/run_repository.go; go build cmd/profile/run_profile.go; go build cmd/mailbox/run_mailbox.go; go build cmd/folder_manager/run_folder_manager.go; go build cmd/auth/run_auth.go; go build cmd/attach/run_attach.go; go build cmd/app/main.go;
+      - name: Verify dependencies
+        run: go mod verify
 
-#      - name: Install golangci-lint
-#        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.2
-#
-#      - name: Run golangci-lint
-#        run: golangci-lint run
+      - name: Build
+        run: go build cmd/repository/run_repository.go; go build cmd/profile/run_profile.go; go build cmd/mailbox/run_mailbox.go; go build cmd/folder_manager/run_folder_manager.go; go build cmd/auth/run_auth.go; go build cmd/attach/run_attach.go; go build cmd/app/main.go;
 
-#      - name: Run tests
-#        run: go test -cover ./... -coverprofile=profile; go tool cover -func profile
+      - name: Install golangci-lint
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.2
+
+      - name: Run golangci-lint
+        run: golangci-lint run
+
+      - name: Run tests
+        run: go test -cover ./... -coverprofile=profile; go tool cover -func profile
 
       - name: Upload build result
         uses: actions/upload-artifact@v1
