@@ -52,5 +52,5 @@ jobs:
            host: 95.163.249.116
            username: ubuntu
            key: ${{ secrets.PRIVATE_KEY }}
-           source: "rep/run_repository"
+           source: "bin"
            target: "/home/ubuntu/deploy"
