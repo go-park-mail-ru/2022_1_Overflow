@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: [ OV-66 ]
+#    branches: [ OV-66 ]
 
 jobs:
   build:
