@@ -459,7 +459,7 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 		log.Debug("Выполнение SMTP запроса...")
 		err = smtp.SendMail(domain, authentication, data.Username, to, msg)
 		if err != nil {
-			log.Debug("Неудачная отправка по SMTP.")
+			log.Debug("Неудачная отправка по SMTP: ", err)
 			return &utils_proto.JsonExtendResponse{
 				Response: pkg.CreateJsonErr(pkg.STATUS_INTERNAL, "Ошибка при отправке письма по SMTP.").Bytes(),
 			}, err
