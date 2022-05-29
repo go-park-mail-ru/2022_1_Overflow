@@ -57,5 +57,5 @@ func Init(config *config.Config, attachDial attach_proto.AttachClient) {
 
 func Middleware(handler http.Handler) http.Handler {
 	//return Recover(CreateSession(CheckLogin(handler)))
-	return Recover(CSRFProtectWrapper(CSRFGetWrapper(CreateSession(CheckLogin(handler)))))
+	return Recover(CSRFProtectWrapper(CreateSession(CheckLogin(handler))))
 }

@@ -67,12 +67,6 @@ func (d *Delivery) AddFolder(w http.ResponseWriter, r *http.Request) {
 	w.Write(resp.Folder)
 }
 
-// @Router /folder/add [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags folder_manager
-func AddFolder() {}
-
 // AddMailToFolderById godoc
 // @Summary Добавить письмо в папку с письмами по его id
 // @Produce json
@@ -126,12 +120,6 @@ func (d *Delivery) AddMailToFolderById(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
-
-// @Router /folder/mail/add [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags folder_manager
-func AddMailToFolder() {}
 
 // AddMailToFolderByObject godoc
 // @Summary Добавить письмо в папку с письмами по форме
@@ -193,12 +181,6 @@ func (d *Delivery) AddMailToFolderByObject(w http.ResponseWriter, r *http.Reques
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
-// @Router /folder/mail/add_form [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags folder_manager
-func AddMailToFolderByObject() {}
-
 // MoveFolderMail godoc
 // @Summary Переместить письмо из одной папки в другую
 // @Produce json
@@ -253,12 +235,6 @@ func (d *Delivery) MoveFolderMail(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
-// @Router /folder/mail/move [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags folder_manager
-func MoveFolderMail() {}
-
 // ChangeFolder godoc
 // @Summary Переименовать папку с письмами
 // @Produce json
@@ -312,12 +288,6 @@ func (d *Delivery) ChangeFolder(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
-// @Router /folder/rename [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags folder_manager
-func ChangeFolder() {}
-
 // DeleteFolder godoc
 // @Summary Удалить папку с письмами
 // @Produce json
@@ -369,12 +339,6 @@ func (d *Delivery) DeleteFolder(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
-
-// @Router /folder/delete [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags folder_manager
-func DeleteFolder() {}
 
 // UpdateFolderMail godoc
 // @Summary Обновить данные письма в папке. Письмо должно быть уникальным для данной папки.
@@ -487,12 +451,6 @@ func (d *Delivery) DeleteFolderMail(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
-
-// @Router /folder/mail/delete [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags folder_manager
-func DeleteFolderMail() {}
 
 // ListFolders godoc
 // @Summary Получить список папок пользователя или список писем в определенной папке

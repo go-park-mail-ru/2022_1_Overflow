@@ -81,6 +81,7 @@ func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 	routerAPI.HandleFunc("/folder/list", rm.d.ListFolders)
 	// ======================================================================
 	routerAPI.HandleFunc("/ws", rm.d.WSConnect)
+	routerAPI.HandleFunc("/get_token", rm.d.GetToken)
 	// ======================================================================
 	routerAPI.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
 		httpSwagger.URL("/api/v1/swagger/doc.json"), //The url pointing to API definition

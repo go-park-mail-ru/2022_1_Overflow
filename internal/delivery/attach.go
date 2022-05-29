@@ -83,13 +83,6 @@ func (d *Delivery) UploadAttach(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
-// UploadAttach
-// @Router /mail/attach/add [get]
-// @Tags mailbox
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-func UploadAttach() {}
-
 // GetAttach godoc
 // @Summary Получение вложения по filename и mailID
 // @Success 200 {object} pkg.JsonResponse "Успешная оттдача файла."
@@ -144,13 +137,6 @@ func (d *Delivery) GetAttach(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
-
-// GetAttach
-// @Router /mail/attach/get [get]
-// @Tags mailbox
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-func GetAttach() {}
 
 // ListAttach godoc
 //@Summary Получение списка вложений письма
@@ -207,10 +193,3 @@ func (d *Delivery) ListAttach(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(grpcResp.Filenames)
 }
-
-// ListAttach
-// @Router /mail/attach/list [get]
-// @Tags mailbox
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-func ListAttach() {}

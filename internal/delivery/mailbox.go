@@ -221,12 +221,6 @@ func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
-// @Router /mail/delete [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags mailbox
-func DeleteMail() {}
-
 // ReadMail godoc
 // @Summary Отметить число прочитанным/непрочитанным по его id. При отсутствии параметра isread запрос отмечает письмо с заданным id прочитанным.
 // @Produce json
@@ -279,12 +273,6 @@ func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
-
-// @Router /mail/read [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags mailbox
-func ReadMail() {}
 
 // SendMail godoc
 // @Summary Выполняет отправку письма получателю
@@ -360,12 +348,6 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 		MessageStatus: ws.STATUS_INFO,
 	}
 }
-
-// @Router /mail/send [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags mailbox
-func SendMail() {}
 
 // CountUnread godoc
 // @Summary Выполняет отправку письма получателю

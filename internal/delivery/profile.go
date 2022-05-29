@@ -114,12 +114,6 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
-// @Router /profile/set [get]
-// @Tags profile
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-func SetInfo() {}
-
 // ChangePassword godoc
 // @Summary Изменение пароля пользователя
 // @Success 200 {object} pkg.JsonResponse "Успешное изменение пароля."
@@ -180,12 +174,6 @@ func (d *Delivery) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
-
-// @Router /profile/change_password [get]
-// @Tags profile
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-func ChangePassword() {}
 
 const (
 	MB = 1 << 20
@@ -298,12 +286,6 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
-
-// @Router /profile/avatar/set [get]
-// @Tags profile
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-func SetAvatar() {}
 
 // GetAvatar godoc
 // @Summary Получение ссылки на аватарку пользователя

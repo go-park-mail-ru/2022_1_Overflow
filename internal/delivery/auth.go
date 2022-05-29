@@ -79,12 +79,6 @@ func (d *Delivery) SignIn(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
-// @Router /signin [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags auth
-func SignIn() {}
-
 // SignUp godoc
 // @Summary Выполняет регистрацию пользователя
 // @Description Выполняет регистрацию пользователя, НЕ выставляет сессионый cookie.
@@ -147,12 +141,6 @@ func (d *Delivery) SignUp(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
-// @Router /signup [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags auth
-func SignUp() {}
-
 // SignOut godoc
 // @Summary Завершение сессии пользователя
 // @Success 200 {object} pkg.JsonResponse "Успешное завершение сессии."
@@ -175,9 +163,3 @@ func (d *Delivery) SignOut(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
-
-// @Router /logout [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags auth
-func SignOut() {}

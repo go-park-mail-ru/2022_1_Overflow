@@ -20,25 +20,6 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/folder/add": {
-            "get": {
-                "tags": [
-                    "folder_manager"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "produces": [
                     "application/json"
@@ -94,25 +75,6 @@ const docTemplate = `{
             }
         },
         "/folder/delete": {
-            "get": {
-                "tags": [
-                    "folder_manager"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "produces": [
                     "application/json"
@@ -225,25 +187,6 @@ const docTemplate = `{
             }
         },
         "/folder/mail/add": {
-            "get": {
-                "tags": [
-                    "folder_manager"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "produces": [
                     "application/json"
@@ -299,25 +242,6 @@ const docTemplate = `{
             }
         },
         "/folder/mail/add_form": {
-            "get": {
-                "tags": [
-                    "folder_manager"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "produces": [
                     "application/json"
@@ -373,25 +297,6 @@ const docTemplate = `{
             }
         },
         "/folder/mail/delete": {
-            "get": {
-                "tags": [
-                    "folder_manager"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "produces": [
                     "application/json"
@@ -447,25 +352,6 @@ const docTemplate = `{
             }
         },
         "/folder/mail/move": {
-            "get": {
-                "tags": [
-                    "folder_manager"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "produces": [
                     "application/json"
@@ -576,25 +462,6 @@ const docTemplate = `{
             }
         },
         "/folder/rename": {
-            "get": {
-                "tags": [
-                    "folder_manager"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "produces": [
                     "application/json"
@@ -649,11 +516,12 @@ const docTemplate = `{
                 }
             }
         },
-        "/logout": {
+        "/get_token": {
             "get": {
                 "tags": [
-                    "auth"
+                    "security"
                 ],
+                "summary": "Получить CSRF-Token",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -668,7 +536,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/logout": {
             "post": {
                 "produces": [
                     "application/json"
@@ -709,25 +579,6 @@ const docTemplate = `{
             }
         },
         "/mail/attach/add": {
-            "get": {
-                "tags": [
-                    "mailbox"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "consumes": [
                     "multipart/form-data"
@@ -785,25 +636,6 @@ const docTemplate = `{
             }
         },
         "/mail/attach/get": {
-            "get": {
-                "tags": [
-                    "mailbox"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "consumes": [
                     "application/json"
@@ -856,25 +688,6 @@ const docTemplate = `{
             }
         },
         "/mail/attach/list": {
-            "get": {
-                "tags": [
-                    "mailbox"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "consumes": [
                     "application/json"
@@ -961,25 +774,6 @@ const docTemplate = `{
             }
         },
         "/mail/delete": {
-            "get": {
-                "tags": [
-                    "mailbox"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "produces": [
                     "application/json"
@@ -1183,25 +977,6 @@ const docTemplate = `{
             }
         },
         "/mail/read": {
-            "get": {
-                "tags": [
-                    "mailbox"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "produces": [
                     "application/json"
@@ -1257,25 +1032,6 @@ const docTemplate = `{
             }
         },
         "/mail/send": {
-            "get": {
-                "tags": [
-                    "mailbox"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "consumes": [
                     "application/json"
@@ -1405,25 +1161,6 @@ const docTemplate = `{
             }
         },
         "/profile/avatar/set": {
-            "get": {
-                "tags": [
-                    "profile"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "consumes": [
                     "multipart/form-data"
@@ -1474,25 +1211,6 @@ const docTemplate = `{
             }
         },
         "/profile/change_password": {
-            "get": {
-                "tags": [
-                    "profile"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "consumes": [
                     "application/json"
@@ -1545,25 +1263,6 @@ const docTemplate = `{
             }
         },
         "/profile/set": {
-            "get": {
-                "tags": [
-                    "profile"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "consumes": [
                     "application/json"
@@ -1616,25 +1315,6 @@ const docTemplate = `{
             }
         },
         "/signin": {
-            "get": {
-                "tags": [
-                    "auth"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "consumes": [
                     "application/json"
@@ -1681,25 +1361,6 @@ const docTemplate = `{
             }
         },
         "/signup": {
-            "get": {
-                "tags": [
-                    "auth"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "description": "Выполняет регистрацию пользователя, НЕ выставляет сессионый cookie.",
                 "consumes": [
