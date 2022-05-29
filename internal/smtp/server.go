@@ -44,7 +44,12 @@ func (s *SMTPServer) Init(
 
 func (s *SMTPServer) AnonymousLogin(state *smtp.ConnectionState) (smtp.Session, error) {
 	log.Debug("Попытка анонимного входа: ", *state)
-	return nil, nil
+	sess := &Session{}
+	sess.Init(s.config, s.auth, s.profile, s.mailbox, s.folderManager, &utils_proto.Session{
+		Username: "anonymous",
+		Authenticated: true,
+	})
+	return sess, nil
 }
 
 func (s *SMTPServer) Login(state *smtp.ConnectionState, username string, password string)  (smtp.Session, error) {
