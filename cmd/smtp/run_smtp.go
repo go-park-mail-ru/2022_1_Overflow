@@ -14,6 +14,7 @@ import (
 
 	"github.com/emersion/go-smtp"
 	log "github.com/sirupsen/logrus"
+	sasl "github.com/emersion/go-sasl"
 )
 
 func initServer(configPath string) *smtp_server.SMTPServer {
@@ -73,6 +74,19 @@ func main() {
 		return
 	}
 	// Configure the TLS support
+	// Add deprecated LOGIN auth method as some clients haven't learned
+	s.EnableAuth(sasl.Login, func(conn *smtp.Conn) sasl.Server {
+		return sasl.NewLoginServer(func(username, password string) error {
+			state := conn.State()
+			session, err := server.Login(&state, username, password)
+			if err != nil {
+				return err
+			}
+
+			conn.SetSession(session)
+			return nil
+		})
+	})
 	s.TLSConfig = &tls.Config{Certificates: []tls.Certificate{cer}}
 	log.Println("Starting server at", s.Addr)
 	if err := s.ListenAndServe(); err != nil {
