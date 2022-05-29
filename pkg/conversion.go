@@ -45,3 +45,11 @@ func ParseDomain(email string) (string, error) {
 		return "", errors.New("Не удалось распознать домен почтового адреса.")
 	}
 }
+
+func ConvertDomain(domain string) string {
+	if domain == "gmail.com" {
+		return "smtp.gmail.com:587"
+	} else {
+		return domain + ":25"
+	}
+}
