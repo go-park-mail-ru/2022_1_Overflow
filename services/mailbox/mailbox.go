@@ -9,8 +9,12 @@ import (
 	"OverflowBackend/proto/repository_proto"
 	"OverflowBackend/proto/utils_proto"
 	"context"
-	"github.com/mailru/easyjson"
+	"strings"
 	"time"
+
+	"github.com/emersion/go-smtp"
+	"github.com/emersion/go-sasl"
+	"github.com/mailru/easyjson"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -433,6 +437,33 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 		return &utils_proto.JsonExtendResponse{
 			Response: pkg.JSON_ERR.Bytes(),
 		}, err
+	}
+	if !pkg.IsLocalEmail(form.Addressee) {
+		authentication := sasl.NewAnonymousClient("")
+		// Connect to the server, authenticate, set the sender and recipient,
+		// and send the email all in one step.
+		to := []string{form.Addressee}
+		msg := strings.NewReader("To: "+form.Addressee+"\r\n" +
+			"Subject: "+form.Theme+"\r\n" +
+			"\r\n" +
+			form.Text+"\r\n")
+		domain, err := pkg.ParseDomain(form.Addressee)
+		if err != nil {
+			return &utils_proto.JsonExtendResponse{
+				Response: pkg.CreateJsonErr(pkg.STATUS_INTERNAL, "Ошибка при отправке письма по SMTP.").Bytes(),
+			}, err
+		}
+		err = smtp.SendMail(domain+":25", authentication, data.Username, to, msg)
+		if err != nil {
+			return &utils_proto.JsonExtendResponse{
+				Response: pkg.CreateJsonErr(pkg.STATUS_INTERNAL, "Ошибка при отправке письма по SMTP.").Bytes(),
+			}, err
+		} else {
+			return &utils_proto.JsonExtendResponse{
+				Response: pkg.NO_ERR.Bytes(),
+				Param:    "",
+			}, nil
+		}
 	}
 	form.Addressee = pkg.EmailToUsername(form.Addressee)
 	resp2, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{

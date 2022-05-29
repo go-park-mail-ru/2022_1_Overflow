@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"OverflowBackend/internal/models"
+	"errors"
 	"strings"
 )
 
@@ -25,5 +26,22 @@ func EmailToUsername(email string) string {
 		}
 	} else {
 		return email
+	}
+}
+
+func IsLocalEmail(email string) bool {
+	if strings.Contains(email, "@") {
+		parts := strings.Split(email, "@")
+		return parts[1] == domain
+	} else {
+		return true
+	}
+}
+
+func ParseDomain(email string) (string, error) {
+	if strings.Contains(email, "@") {
+		return strings.Split(email, "@")[1], nil
+	} else {
+		return "", errors.New("Не удалось распознать домен почтового адреса.")
 	}
 }
