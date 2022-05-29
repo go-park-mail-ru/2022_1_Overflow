@@ -8,7 +8,7 @@ import (
 	"OverflowBackend/proto/repository_proto"
 	"OverflowBackend/proto/utils_proto"
 	"context"
-	"encoding/json"
+	"github.com/mailru/easyjson"
 	"os"
 	"path/filepath"
 
@@ -17,7 +17,7 @@ import (
 
 type ProfileService struct {
 	config *config.Config
-	db repository_proto.DatabaseRepositoryClient
+	db     repository_proto.DatabaseRepositoryClient
 }
 
 func (s *ProfileService) Init(config *config.Config, db repository_proto.DatabaseRepositoryClient) {
@@ -39,7 +39,7 @@ func (s *ProfileService) GetInfo(context context.Context, request *profile_proto
 		}, err
 	}
 	var user models.User
-	err = json.Unmarshal(resp.User, &user)
+	err = easyjson.Unmarshal(resp.User, &user)
 	if err != nil {
 		return &profile_proto.GetInfoResponse{
 			Response: &utils_proto.JsonResponse{
@@ -53,7 +53,7 @@ func (s *ProfileService) GetInfo(context context.Context, request *profile_proto
 	info.Firstname = user.Firstname
 	info.Lastname = user.Lastname
 	info.Username = user.Username
-	infoBytes, _ := json.Marshal(info)
+	infoBytes, _ := easyjson.Marshal(info)
 	return &profile_proto.GetInfoResponse{
 		Response: &utils_proto.JsonResponse{
 			Response: pkg.NO_ERR.Bytes(),
@@ -73,7 +73,7 @@ func (s *ProfileService) SetAvatar(context context.Context, request *profile_pro
 		}, err
 	}
 	var avatar models.Avatar
-	err := json.Unmarshal(request.Avatar, &avatar)
+	err := easyjson.Unmarshal(request.Avatar, &avatar)
 	if err != nil {
 		return &utils_proto.JsonResponse{
 			Response: pkg.JSON_ERR.Bytes(),
@@ -113,7 +113,7 @@ func (s *ProfileService) SetInfo(context context.Context, request *profile_proto
 	data := request.Data
 	log.Debug("Установка настроек пользователя: ", data.Username)
 	var settings models.ProfileSettingsForm
-	err := json.Unmarshal(request.Form, &settings)
+	err := easyjson.Unmarshal(request.Form, &settings)
 	if err != nil {
 		return &utils_proto.JsonResponse{
 			Response: pkg.JSON_ERR.Bytes(),
@@ -231,7 +231,7 @@ func (s *ProfileService) ChangePassword(context context.Context, request *profil
 	}
 	userBytes := resp.User
 	var user models.User
-	err = json.Unmarshal(userBytes, &user)
+	err = easyjson.Unmarshal(userBytes, &user)
 	if err != nil {
 		return &utils_proto.JsonResponse{
 			Response: pkg.JSON_ERR.Bytes(),

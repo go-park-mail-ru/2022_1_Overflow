@@ -4,6 +4,7 @@ import (
 	"OverflowBackend/internal/delivery"
 	"OverflowBackend/internal/models"
 	"OverflowBackend/pkg"
+	"OverflowBackend/proto/attach_proto"
 	"OverflowBackend/proto/auth_proto"
 	"OverflowBackend/proto/folder_manager_proto"
 	"OverflowBackend/proto/mailbox_proto"
@@ -13,7 +14,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/golang/mock/gomock"
-	"google.golang.org/protobuf/types/known/wrapperspb"
+	"github.com/mailru/easyjson"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
@@ -29,6 +30,7 @@ func TestSend(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -38,8 +40,8 @@ func TestSend(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/mail/send", "/signin"}, []func(http.ResponseWriter, *http.Request){d.SendMail, d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -52,13 +54,13 @@ func TestSend(t *testing.T) {
 	}
 
 	mailData := models.MailForm{
-		Addressee: "test2",
+		Addressee: "test",
 		Theme:     "test",
 		Text:      "test",
 		Files:     "test",
 	}
-	formBytesSignIn, _ := json.Marshal(signinForm)
-	formBytesMailData, _ := json.Marshal(mailData)
+	formBytesSignIn, _ := easyjson.Marshal(signinForm)
+	formBytesMailData, _ := easyjson.Marshal(mailData)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: formBytesSignIn,
@@ -68,17 +70,25 @@ func TestSend(t *testing.T) {
 
 	data := &utils_proto.Session{
 		Username:      "test",
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 	mailboxUC.EXPECT().SendMail(context.Background(), &mailbox_proto.SendMailRequest{
 		Data: data,
 		Form: formBytesMailData,
-	}).Return(&utils_proto.JsonResponse{
+	}).Return(&utils_proto.JsonExtendResponse{
 		Response: pkg.NO_ERR.Bytes(),
+		Param:    "1",
+	}, nil)
+
+	var UNREAD_COUNT = 5
+	mailboxUC.EXPECT().CountUnread(context.Background(), &mailbox_proto.CountUnreadRequest{
+		Data: data,
+	}).Return(&mailbox_proto.ResponseCountUnread{
+		Count: int32(UNREAD_COUNT),
 	}, nil)
 	//&models.Session{Username: "test", Authenticated: true}, data)
 
-	dataJson, _ := json.Marshal(mailData)
+	dataJson, _ := easyjson.Marshal(mailData)
 
 	_, err := Post(client, dataJson, sendUrl, http.StatusForbidden, "", "")
 	if err != nil {
@@ -115,6 +125,7 @@ func TestIncome(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -124,8 +135,8 @@ func TestIncome(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/mail/income", "/signin"}, []func(http.ResponseWriter, *http.Request){d.Income, d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -136,7 +147,7 @@ func TestIncome(t *testing.T) {
 		Username: "test2",
 		Password: "test2",
 	}
-	signInFormBytes, _ := json.Marshal(signInForm)
+	signInFormBytes, _ := easyjson.Marshal(signInForm)
 
 	mails, _ := json.Marshal([]models.MailAdditional{})
 
@@ -148,7 +159,7 @@ func TestIncome(t *testing.T) {
 
 	incomeData := &utils_proto.Session{
 		Username:      "test2",
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 	mailboxUC.EXPECT().Income(context.Background(), &mailbox_proto.IncomeRequest{
 		Data:  incomeData,
@@ -193,6 +204,7 @@ func TestOutcome(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -202,8 +214,8 @@ func TestOutcome(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/mail/outcome", "/signin"}, []func(http.ResponseWriter, *http.Request){d.Outcome, d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -214,7 +226,7 @@ func TestOutcome(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	signInFormBytes, _ := json.Marshal(signInForm)
+	signInFormBytes, _ := easyjson.Marshal(signInForm)
 
 	mails, _ := json.Marshal([]models.MailAdditional{})
 
@@ -226,7 +238,7 @@ func TestOutcome(t *testing.T) {
 
 	outcomeData := &utils_proto.Session{
 		Username:      "test",
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 	mailboxUC.EXPECT().Outcome(context.Background(), &mailbox_proto.OutcomeRequest{
 		Data:  outcomeData,
@@ -271,6 +283,7 @@ func TestRead(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -280,8 +293,8 @@ func TestRead(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/mail/read", "/signin"}, []func(http.ResponseWriter, *http.Request){d.ReadMail, d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -290,7 +303,7 @@ func TestRead(t *testing.T) {
 		Username: "test2",
 		Password: "test2",
 	}
-	signinFormBytes, _ := json.Marshal(signinForm)
+	signinFormBytes, _ := easyjson.Marshal(signinForm)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: signinFormBytes,
@@ -300,9 +313,9 @@ func TestRead(t *testing.T) {
 
 	readMailData := &utils_proto.Session{
 		Username:      "test2",
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
-	//readMailDataBytes, _ := json.Marshal(readMailData)
+	//readMailDataBytes, _ := easyjson.Marshal(readMailData)
 	mailboxUC.EXPECT().ReadMail(context.Background(), &mailbox_proto.ReadMailRequest{
 		Data: readMailData,
 		Id:   1,
@@ -331,7 +344,7 @@ func TestRead(t *testing.T) {
 		Id:     1,
 		IsRead: true,
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 
 	r, err := Post(client, formBytes, url, http.StatusOK, token, "")
 	if err != nil {
@@ -357,6 +370,7 @@ func TestDelete(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -366,8 +380,8 @@ func TestDelete(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/mail/delete", "/signin"}, []func(http.ResponseWriter, *http.Request){d.DeleteMail, d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -378,7 +392,7 @@ func TestDelete(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	signinFormBytes, _ := json.Marshal(signinForm)
+	signinFormBytes, _ := easyjson.Marshal(signinForm)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: signinFormBytes,
@@ -388,7 +402,7 @@ func TestDelete(t *testing.T) {
 
 	deleteData := &utils_proto.Session{
 		Username:      "test",
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 	mailboxUC.EXPECT().DeleteMail(context.Background(), &mailbox_proto.DeleteMailRequest{
 		Data: deleteData,
@@ -414,7 +428,7 @@ func TestDelete(t *testing.T) {
 	form := &models.DeleteMailForm{
 		Id: 1,
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 	_, err = Post(client, formBytes, url, http.StatusOK, token, "")
 	if err != nil {
 		t.Error(err)
@@ -430,6 +444,7 @@ func TestGetMail(t *testing.T) {
 	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
 	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
 	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
 
 	jar, _ := cookiejar.New(nil)
 
@@ -439,8 +454,8 @@ func TestGetMail(t *testing.T) {
 
 	d := delivery.Delivery{}
 	router := InitTestRouter(&d, []string{"/mail/get", "/signin"}, []func(http.ResponseWriter, *http.Request){d.GetMail, d.SignIn},
-		authUC, profileUC, mailboxUC, folderManagerUC)
-	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC)
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
 
 	srv := httptest.NewServer(router)
 	defer srv.Close()
@@ -451,7 +466,7 @@ func TestGetMail(t *testing.T) {
 		Username: "test",
 		Password: "test",
 	}
-	signinFormBytes, _ := json.Marshal(signinForm)
+	signinFormBytes, _ := easyjson.Marshal(signinForm)
 
 	mail := models.Mail{
 		Id:        0,
@@ -463,7 +478,7 @@ func TestGetMail(t *testing.T) {
 		Date:      time.Now(),
 		Read:      false,
 	}
-	mailBytes, _ := json.Marshal(mail)
+	mailBytes, _ := easyjson.Marshal(mail)
 
 	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
 		Form: signinFormBytes,
@@ -473,7 +488,7 @@ func TestGetMail(t *testing.T) {
 
 	getMailData := &utils_proto.Session{
 		Username:      "test",
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 	mailboxUC.EXPECT().GetMail(context.Background(), &mailbox_proto.GetMailRequest{
 		Data: getMailData,
@@ -499,6 +514,78 @@ func TestGetMail(t *testing.T) {
 	}
 
 	var resp utils_proto.JsonResponse
+
+	err = json.NewDecoder(r.Body).Decode(&resp)
+
+	if err != nil {
+		t.Error(err)
+		return
+	}
+}
+
+func TestCountUnread(t *testing.T) {
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	authUC := auth_proto.NewMockAuthClient(mockCtrl)
+	folderManagerUC := folder_manager_proto.NewMockFolderManagerClient(mockCtrl)
+	mailboxUC := mailbox_proto.NewMockMailboxClient(mockCtrl)
+	profileUC := profile_proto.NewMockProfileClient(mockCtrl)
+	attachUC := attach_proto.NewMockAttachClient(mockCtrl)
+
+	jar, _ := cookiejar.New(nil)
+
+	client := &http.Client{
+		Jar: jar,
+	}
+
+	d := delivery.Delivery{}
+	router := InitTestRouter(&d, []string{"/mail/countunread", "/signin"}, []func(http.ResponseWriter, *http.Request){d.GetCountUnread, d.SignIn},
+		authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+	d.Init(DefConf, authUC, profileUC, mailboxUC, folderManagerUC, attachUC)
+
+	srv := httptest.NewServer(router)
+	defer srv.Close()
+
+	url := fmt.Sprintf("%s/mail/countunread", srv.URL)
+
+	signinForm := models.SignInForm{
+		Username: "test",
+		Password: "test",
+	}
+	signinFormBytes, _ := easyjson.Marshal(signinForm)
+
+	authUC.EXPECT().SignIn(context.Background(), &auth_proto.SignInRequest{
+		Form: signinFormBytes,
+	}).Return(&utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil)
+
+	sessionData := &utils_proto.Session{
+		Username:      "test",
+		Authenticated: true,
+	}
+	mailboxUC.EXPECT().CountUnread(context.Background(), &mailbox_proto.CountUnreadRequest{
+		Data: sessionData,
+	}).Return(&mailbox_proto.ResponseCountUnread{
+		Count: 5,
+	}, nil)
+
+	//&models.Session{Username: "test", Authenticated: true}, int32(0)
+	err := SigninUser(client, signinForm, srv.URL)
+
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	r, err, _ := Get(client, url, http.StatusOK)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	var resp models.CountUnread
 
 	err = json.NewDecoder(r.Body).Decode(&resp)
 

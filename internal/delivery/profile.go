@@ -10,10 +10,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"github.com/mailru/easyjson"
+	log "github.com/sirupsen/logrus"
+	"gopkg.in/validator.v2"
+	_ "image/jpeg"
+	_ "image/png"
 	"io"
 	"net/http"
-
-	"gopkg.in/validator.v2"
 )
 
 // GetInfo godoc
@@ -43,13 +46,13 @@ func (d *Delivery) GetInfo(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
@@ -89,7 +92,7 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
 		return
 	}
-	formBytes, _ := json.Marshal(form)
+	formBytes, _ := easyjson.Marshal(form)
 	resp, err := d.profile.SetInfo(context.Background(), &profile_proto.SetInfoRequest{
 		Data: data,
 		Form: formBytes,
@@ -98,24 +101,18 @@ func (d *Delivery) SetInfo(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
-
-// @Router /profile/set [get]
-// @Tags profile
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-func SetInfo() {}
 
 // ChangePassword godoc
 // @Summary Изменение пароля пользователя
@@ -157,7 +154,7 @@ func (d *Delivery) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	resp, err := d.profile.ChangePassword(context.Background(), &profile_proto.ChangePasswordRequest{
-		Data: data,
+		Data:        data,
 		PasswordOld: form.OldPassword,
 		PasswordNew: form.NewPassword,
 	})
@@ -165,24 +162,22 @@ func (d *Delivery) ChangePassword(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
-// @Router /profile/change_password [get]
-// @Tags profile
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-func ChangePassword() {}
+const (
+	MB = 1 << 20
+)
 
 // SetAvatar godoc
 // @Summary Установка/смена аватарки пользователя
@@ -206,20 +201,71 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
 		return
 	}
-	var buf bytes.Buffer
-	file, header, err := r.FormFile("file")
+
+	if err := r.ParseMultipartForm(10 * MB); err != nil {
+		log.Warning(err)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_FILETYPE)
+		return
+	}
+
+	// Limit upload size
+	r.Body = http.MaxBytesReader(w, r.Body, 10*MB) // 10 Mb
+
+	file, multipartFileHeader, err := r.FormFile("file")
 	if err != nil {
-		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
+		pkg.WriteJsonErrFull(w, &pkg.BAD_FILETYPE)
 		return
 	}
 	defer file.Close()
-	io.Copy(&buf, file)
+
+	// Create a buffer to store the header of the file in
+	fileHeader := make([]byte, 512)
+
+	// Copy the headers into the FileHeader buffer
+	if _, err := file.Read(fileHeader); err != nil {
+		log.Warning(err)
+		return
+	}
+
+	// set position back to start.
+	if _, err := file.Seek(0, 0); err != nil {
+		log.Warning(err)
+		return
+	}
+
+	//log.Printf("Name: %#v\n", multipartFileHeader.Filename)
+	//log.Printf("Size: %#v\n", file.(Sizer).Size())
+	log.Printf("MIME: %#v\n", http.DetectContentType(fileHeader))
+	mime := http.DetectContentType(fileHeader)
+
+	if mime != "image/png" && mime != "image/jpeg" && mime != "image/webp" {
+		log.Warning("file is not jpeg or png")
+		pkg.WriteJsonErrFull(w, &pkg.BAD_FILETYPE)
+		return
+	}
+
+	//file, header, err := r.FormFile("file")
+	//if err != nil {
+	//	pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
+	//	return
+	//}
+	//defer file.Close()
+
+	//img, format, err := image.Decode(file)
+	//if err != nil {
+	//	log.Warning("can't decode file: ", err)
+	//	pkg.WriteJsonErrFull(w, &pkg.BAD_FILETYPE)
+	//	return
+	//}
+
+	buf := new(bytes.Buffer)
+	io.Copy(buf, file)
 	avatar := models.Avatar{
-		Name:     header.Filename,
+		Name:     multipartFileHeader.Filename,
 		Username: data.Username,
 		File:     buf.Bytes(),
 	}
-	avatarBytes, _ := json.Marshal(avatar)
+	avatarBytes, _ := easyjson.Marshal(avatar)
 	resp, err := d.profile.SetAvatar(context.Background(), &profile_proto.SetAvatarRequest{
 		Data:   data,
 		Avatar: avatarBytes,
@@ -228,24 +274,18 @@ func (d *Delivery) SetAvatar(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
-
-// @Router /profile/avatar/set [get]
-// @Tags profile
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-func SetAvatar() {}
 
 // GetAvatar godoc
 // @Summary Получение ссылки на аватарку пользователя
@@ -279,13 +319,13 @@ func (d *Delivery) GetAvatar(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}

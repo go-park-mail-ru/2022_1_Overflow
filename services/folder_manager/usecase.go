@@ -18,4 +18,5 @@ type FolderManagerServiceInterface interface {
 	ListFolder(context context.Context, request *folder_manager_proto.ListFolderRequest) (*folder_manager_proto.ListFolderRequest, error)
 	DeleteFolderMail(context context.Context, request *folder_manager_proto.DeleteFolderMailRequest) (*utils_proto.JsonResponse, error)
 	MoveFolderMail(context context.Context, request *folder_manager_proto.MoveFolderMailRequest) (*utils_proto.JsonResponse, error)
+	UpdateFolderMail(context context.Context, request *folder_manager_proto.UpdateFolderMailRequest) (*utils_proto.JsonResponse, error)
 }

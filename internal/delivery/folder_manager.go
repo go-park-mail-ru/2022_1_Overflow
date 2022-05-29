@@ -8,6 +8,7 @@ import (
 	"OverflowBackend/proto/folder_manager_proto"
 	"context"
 	"encoding/json"
+	"github.com/mailru/easyjson"
 	"net/http"
 	"strconv"
 
@@ -53,24 +54,18 @@ func (d *Delivery) AddFolder(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	w.Write(resp.Folder)
 }
-
-// @Router /folder/add [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags folder_manager
-func AddFolder() {}
 
 // AddMailToFolderById godoc
 // @Summary Добавить письмо в папку с письмами по его id
@@ -107,30 +102,24 @@ func (d *Delivery) AddMailToFolderById(w http.ResponseWriter, r *http.Request) {
 		Data:       data,
 		FolderName: form.FolderName,
 		MailId:     form.MailId,
-		Move: form.Move,
+		Move:       form.Move,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
-
-// @Router /folder/mail/add [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags folder_manager
-func AddMailToFolder() {}
 
 // AddMailToFolderByObject godoc
 // @Summary Добавить письмо в папку с письмами по форме
@@ -163,38 +152,34 @@ func (d *Delivery) AddMailToFolderByObject(w http.ResponseWriter, r *http.Reques
 	form.Mail.Files = xss.EscapeInput(form.Mail.Files)
 	form.Mail.Text = xss.EscapeInput(form.Mail.Text)
 	form.Mail.Theme = xss.EscapeInput(form.Mail.Theme)
-	formBytes, _ := json.Marshal(form.Mail)
-	if err := validator.Validate(form); err != nil {
+	formBytes, _ := easyjson.Marshal(form.Mail)
+	objectValidator := validator.NewValidator()
+	objectValidator.SetTag("folder_object")
+	if err := objectValidator.Validate(form); err != nil {
 		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
 		return
 	}
 	resp, err := d.folderManager.AddMailToFolderByObject(context.Background(), &folder_manager_proto.AddMailToFolderByObjectRequest{
 		Data:       data,
 		FolderName: form.FolderName,
-		Form:     formBytes,
+		Form:       formBytes,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
-
-// @Router /folder/mail/add_form [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags folder_manager
-func AddMailToFolderByObject() {}
 
 // MoveFolderMail godoc
 // @Summary Переместить письмо из одной папки в другую
@@ -228,33 +213,27 @@ func (d *Delivery) MoveFolderMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	resp, err := d.folderManager.MoveFolderMail(context.Background(), &folder_manager_proto.MoveFolderMailRequest{
-		Data: data,
-		FolderNameSrc: form.FolderNameSrc,
+		Data:           data,
+		FolderNameSrc:  form.FolderNameSrc,
 		FolderNameDest: form.FolderNameDest,
-		MailId: form.MailId,
+		MailId:         form.MailId,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
-
-// @Router /folder/mail/move [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags folder_manager
-func MoveFolderMail() {}
 
 // ChangeFolder godoc
 // @Summary Переименовать папку с письмами
@@ -296,24 +275,18 @@ func (d *Delivery) ChangeFolder(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
-
-// @Router /folder/rename [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags folder_manager
-func ChangeFolder() {}
 
 // DeleteFolder godoc
 // @Summary Удалить папку с письмами
@@ -347,31 +320,84 @@ func (d *Delivery) DeleteFolder(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	resp, err := d.folderManager.DeleteFolder(context.Background(), &folder_manager_proto.DeleteFolderRequest{
-		Data: data,
+		Data:       data,
 		FolderName: form.FolderName,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
-// @Router /folder/delete [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
+// UpdateFolderMail godoc
+// @Summary Обновить данные письма в папке. Письмо должно быть уникальным для данной папки.
+// @Produce json
+// @Param UpdateFolderMailForm body models.UpdateFolderMailForm true "Форма запроса"
+// @Success 200 {object} pkg.JsonResponse "OK"
+// @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
+// @Failure 405 {object} pkg.JsonResponse
+// @Failure 500 {object} pkg.JsonResponse "Ошибка БД, неверные GET параметры."
+// @Router /folder/mail/update [post]
+// @Param X-CSRF-Token header string true "CSRF токен"
 // @Tags folder_manager
-func DeleteFolder() {}
+func (d *Delivery) UpdateFolderMail(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodPost {
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
+		return
+	}
+	data, e := session.Manager.GetData(r)
+	if e != nil {
+		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
+		return
+	}
+	var form models.UpdateFolderMailForm
+	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if err := validator.Validate(form); err != nil {
+		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
+		return
+	}
+	mailFormBytes, err := easyjson.Marshal(form.MailForm)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	resp, err := d.folderManager.UpdateFolderMail(context.Background(), &folder_manager_proto.UpdateFolderMailRequest{
+		Data: data,
+		FolderName: form.FolderName,
+		MailId: form.MailId,
+		MailForm: mailFormBytes,
+	})
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
+		return
+	}
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if response != pkg.NO_ERR {
+		pkg.WriteJsonErrFull(w, &response)
+		return
+	}
+	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
+}
 
 // DeleteFolderMail godoc
 // @Summary Удалить письмо из папки
@@ -405,32 +431,26 @@ func (d *Delivery) DeleteFolderMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	resp, err := d.folderManager.DeleteFolderMail(context.Background(), &folder_manager_proto.DeleteFolderMailRequest{
-		Data: data,
+		Data:       data,
 		FolderName: form.FolderName,
-		MailId: form.MailId,
+		MailId:     form.MailId,
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	var response pkg.JsonResponse 
-	err = json.Unmarshal(resp.Response, &response)
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response, &response)
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if (response != pkg.NO_ERR) {
+	if response != pkg.NO_ERR {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
-
-// @Router /folder/mail/delete [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags folder_manager
-func DeleteFolderMail() {}
 
 // ListFolders godoc
 // @Summary Получить список папок пользователя или список писем в определенной папке
@@ -467,30 +487,30 @@ func (d *Delivery) ListFolders(w http.ResponseWriter, r *http.Request) {
 	folderName := r.URL.Query().Get("folder_name")
 	if len(folderName) > 0 {
 		resp, err := d.folderManager.ListFolder(context.Background(), &folder_manager_proto.ListFolderRequest{
-			Data: data,
+			Data:       data,
 			FolderName: folderName,
-			Limit: int32(limit),
-			Offset: int32(offset),
+			Limit:      int32(limit),
+			Offset:     int32(offset),
 		})
 		if err != nil {
 			pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 			return
 		}
-		var response pkg.JsonResponse 
-		err = json.Unmarshal(resp.Response.Response, &response)
+		var response pkg.JsonResponse
+		err = easyjson.Unmarshal(resp.Response.Response, &response)
 		if err != nil {
 			pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 			return
 		}
-		if (response != pkg.NO_ERR) {
+		if response != pkg.NO_ERR {
 			pkg.WriteJsonErrFull(w, &response)
 			return
 		}
 		w.Write(resp.Mails)
 	} else {
 		resp, err := d.folderManager.ListFolders(context.Background(), &folder_manager_proto.ListFoldersRequest{
-			Data: data,
-			Limit: int32(limit),
+			Data:   data,
+			Limit:  int32(limit),
 			Offset: int32(offset),
 			ShowReserved: false,
 		})
@@ -498,13 +518,13 @@ func (d *Delivery) ListFolders(w http.ResponseWriter, r *http.Request) {
 			pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 			return
 		}
-		var response pkg.JsonResponse 
-		err = json.Unmarshal(resp.Response.Response, &response)
+		var response pkg.JsonResponse
+		err = easyjson.Unmarshal(resp.Response.Response, &response)
 		if err != nil {
 			pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 			return
 		}
-		if (response != pkg.NO_ERR) {
+		if response != pkg.NO_ERR {
 			pkg.WriteJsonErrFull(w, &response)
 			return
 		}

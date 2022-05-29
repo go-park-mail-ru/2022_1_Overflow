@@ -9,9 +9,10 @@ service Mailbox {
     rpc Income(IncomeRequest) returns (ResponseMails) {}
     rpc Outcome(OutcomeRequest) returns (ResponseMails) {}
     rpc GetMail(GetMailRequest) returns (ResponseMail) {}
+    rpc CountUnread(CountUnreadRequest) returns (ResponseCountUnread) {}
     rpc DeleteMail(DeleteMailRequest) returns (utils.JsonResponse) {}
     rpc ReadMail(ReadMailRequest) returns (utils.JsonResponse) {}
-    rpc SendMail(SendMailRequest) returns (utils.JsonResponse) {}
+    rpc SendMail(SendMailRequest) returns (utils.JsonExtendResponse) {}
 }
 
 message IncomeRequest {
@@ -55,4 +56,12 @@ message ResponseMail {
 message ResponseMails {
     utils.JsonResponse response = 1;
     bytes mails = 2;
+}
+
+message CountUnreadRequest {
+    utils.Session data = 1;
+}
+
+message ResponseCountUnread {
+    int32 count = 1;
 }

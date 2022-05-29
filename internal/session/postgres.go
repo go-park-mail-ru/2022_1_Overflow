@@ -9,7 +9,7 @@ import (
 
 	"github.com/antonlindstrom/pgstore"
 	"github.com/gorilla/sessions"
-	"google.golang.org/protobuf/types/known/wrapperspb"
+	log "github.com/sirupsen/logrus"
 )
 
 type PostgresManager struct {
@@ -43,29 +43,22 @@ func (pm *PostgresManager) Init(config *config.Config) (err error) {
 }
 
 func (pm *PostgresManager) CreateSession(w http.ResponseWriter, r *http.Request, username string) error {
-	session, err := pm.store.Get(r, session_name)
-	if err != nil {
-		return err
-	}
+	session, _ := pm.store.Get(r, session_name)
 	data := &utils_proto.Session{
 		Username:      username,
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	}
 	session.Values["data"] = data
-	err = session.Save(r, w)
+	err := session.Save(r, w)
 	return err
 }
 
 func (pm *PostgresManager) DeleteSession(w http.ResponseWriter, r *http.Request) error {
-	session, err := pm.store.Get(r, session_name)
-	if err != nil {
-		return err
-	}
-
+	session, _ := pm.store.Get(r, session_name)
 	session.Values["data"] = &utils_proto.Session{}
 	session.Options.MaxAge = -1
 
-	err = session.Save(r, w)
+	err := session.Save(r, w)
 	if err != nil {
 		return err
 	}
@@ -85,6 +78,7 @@ func (pm *PostgresManager) GetData(r *http.Request) (data *utils_proto.Session, 
 	defer func() {
 		errRecover := recover()
 		if errRecover != nil {
+			log.Error(errRecover)
 			data, err = nil, errRecover.(error)
 		}
 	}()

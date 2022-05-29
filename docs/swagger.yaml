@@ -1,4 +1,4 @@
-basePath: /
+basePath: /api/v1
 definitions:
   models.AddFolderForm:
     properties:
@@ -76,6 +76,18 @@ definitions:
         items:
           $ref: '#/definitions/models.Folder'
         type: array
+    type: object
+  models.GetAttachForm:
+    properties:
+      attach_id:
+        type: string
+      mail_id:
+        type: integer
+    type: object
+  models.GetListAttachForm:
+    properties:
+      mail_id:
+        type: integer
     type: object
   models.Mail:
     properties:
@@ -193,6 +205,15 @@ definitions:
         maxLength: 45
         type: string
     type: object
+  models.UpdateFolderMailForm:
+    properties:
+      folder_name:
+        type: string
+      form:
+        $ref: '#/definitions/models.MailForm'
+      mail_id:
+        type: integer
+    type: object
   pkg.JsonResponse:
     properties:
       message:
@@ -209,18 +230,6 @@ info:
   version: "1.0"
 paths:
   /folder/add:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - folder_manager
     post:
       parameters:
       - description: Форма запроса
@@ -257,18 +266,6 @@ paths:
       tags:
       - folder_manager
   /folder/delete:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - folder_manager
     post:
       parameters:
       - description: Форма запроса
@@ -343,18 +340,6 @@ paths:
       tags:
       - folder_manager
   /folder/mail/add:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - folder_manager
     post:
       parameters:
       - description: Форма запроса
@@ -391,18 +376,6 @@ paths:
       tags:
       - folder_manager
   /folder/mail/add_form:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - folder_manager
     post:
       parameters:
       - description: Форма запроса
@@ -439,18 +412,6 @@ paths:
       tags:
       - folder_manager
   /folder/mail/delete:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - folder_manager
     post:
       parameters:
       - description: Форма запроса
@@ -487,18 +448,6 @@ paths:
       tags:
       - folder_manager
   /folder/mail/move:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - folder_manager
     post:
       parameters:
       - description: Форма запроса
@@ -534,19 +483,44 @@ paths:
       summary: Переместить письмо из одной папки в другую
       tags:
       - folder_manager
-  /folder/rename:
-    get:
+  /folder/mail/update:
+    post:
+      parameters:
+      - description: Форма запроса
+        in: body
+        name: UpdateFolderMailForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateFolderMailForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка БД, неверные GET параметры.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Обновить данные письма в папке. Письмо должно быть уникальным для данной
+        папки.
       tags:
       - folder_manager
+  /folder/rename:
     post:
       parameters:
       - description: Форма запроса
@@ -582,7 +556,7 @@ paths:
       summary: Переименовать папку с письмами
       tags:
       - folder_manager
-  /logout:
+  /get_token:
     get:
       responses:
         "200":
@@ -593,8 +567,10 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      summary: Получить CSRF-Token
       tags:
-      - auth
+      - security
+  /logout:
     post:
       parameters:
       - description: CSRF токен
@@ -620,19 +596,135 @@ paths:
       summary: Завершение сессии пользователя
       tags:
       - auth
-  /mail/delete:
-    get:
+  /mail/attach/add:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Файл вложения.
+        in: formData
+        name: attach
+        required: true
+        type: file
+      - description: MailID
+        in: formData
+        name: mailID
+        required: true
+        type: string
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
       responses:
         "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
+          description: Успешное добавление вложения.
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка валидации формы, БД или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Добавление вложения в письмо
       tags:
       - mailbox
+  /mail/attach/get:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Форма получения вложения
+        in: body
+        name: GetAttachForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.GetAttachForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешная оттдача файла.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка валидации формы, БД или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Получение вложения по filename и mailID
+      tags:
+      - mailbox
+  /mail/attach/list:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Форма получения списка вложений.
+        in: body
+        name: GetListAttachForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.GetListAttachForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное установка аватарки.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка валидации формы, БД или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Получение списка вложений письма
+      tags:
+      - mailbox
+  /mail/countunread:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешная отправка письма.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Получатель не существует, ошибка БД.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Выполняет отправку письма получателю
+      tags:
+      - mailbox
+  /mail/delete:
     post:
       parameters:
       - description: Форма запроса
@@ -766,18 +858,6 @@ paths:
       tags:
       - mailbox
   /mail/read:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - mailbox
     post:
       parameters:
       - description: Форма запроса
@@ -816,18 +896,6 @@ paths:
       tags:
       - mailbox
   /mail/send:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - mailbox
     post:
       consumes:
       - application/json
@@ -913,18 +981,6 @@ paths:
       tags:
       - profile
   /profile/avatar/set:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - profile
     post:
       consumes:
       - multipart/form-data
@@ -958,18 +1014,6 @@ paths:
       tags:
       - profile
   /profile/change_password:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - profile
     post:
       consumes:
       - application/json
@@ -1004,18 +1048,6 @@ paths:
       tags:
       - profile
   /profile/set:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - profile
     post:
       consumes:
       - application/json
@@ -1050,18 +1082,6 @@ paths:
       tags:
       - profile
   /signin:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - auth
     post:
       consumes:
       - application/json
@@ -1093,18 +1113,6 @@ paths:
       tags:
       - auth
   /signup:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - auth
     post:
       consumes:
       - application/json

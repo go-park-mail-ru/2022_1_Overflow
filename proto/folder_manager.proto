@@ -17,6 +17,14 @@ service FolderManager {
     rpc ListFolder(ListFolderRequest) returns (ResponseMails) {}
     rpc DeleteFolderMail(DeleteFolderMailRequest) returns (utils.JsonResponse) {}
     rpc MoveFolderMail(MoveFolderMailRequest) returns (utils.JsonResponse) {}
+    rpc UpdateFolderMail(UpdateFolderMailRequest) returns (utils.JsonResponse) {}
+}
+
+message UpdateFolderMailRequest {
+    utils.Session data = 1;
+    string folderName = 2;
+    int32 mailId = 3;
+    bytes mailForm = 4;
 }
 
 message MoveFolderMailRequest {

@@ -13,7 +13,7 @@ CREATE TABLE overflow.users (
 CREATE TABLE overflow.mails (
     id serial not null primary key,
     sender varchar(45),
-    addressee varchar(45),
+    addressee varchar(45) DEFAULT null,
     date timestamp not null,
     theme varchar(100) DEFAULT null,
     text text DEFAULT null,
@@ -25,11 +25,17 @@ CREATE TABLE overflow.mails (
 
 /* для папок */
 CREATE TABLE overflow.folders (
-	id serial not null primary key,
-	name varchar(50) not null,
-	user_id int not null,
+  id serial not null primary key,
+  name varchar(50) not null,
+  user_id int not null,
   created_at timestamp not null DEFAULT NOW(),
-	foreign key(user_id) references overflow.users(id) on delete cascade
+  foreign key(user_id) references overflow.users(id) on delete cascade
+);
+
+/* для вложений */
+CREATE TABLE overflow.attaches (
+   mail_id serial not null references overflow.mails(id) on delete cascade,
+   filename varchar(100) not null
 );
 
 CREATE OR REPLACE FUNCTION trg_ab_upbef_nulldel()

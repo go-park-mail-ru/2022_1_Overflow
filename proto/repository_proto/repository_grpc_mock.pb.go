@@ -36,6 +36,26 @@ func (m *MockDatabaseRepositoryClient) EXPECT() *MockDatabaseRepositoryClientMoc
 	return m.recorder
 }
 
+// AddAttachLink mocks base method.
+func (m *MockDatabaseRepositoryClient) AddAttachLink(ctx context.Context, in *AddAttachLinkRequest, opts ...grpc.CallOption) (*Nothing, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "AddAttachLink", varargs...)
+	ret0, _ := ret[0].(*Nothing)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddAttachLink indicates an expected call of AddAttachLink.
+func (mr *MockDatabaseRepositoryClientMockRecorder) AddAttachLink(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddAttachLink", reflect.TypeOf((*MockDatabaseRepositoryClient)(nil).AddAttachLink), varargs...)
+}
+
 // AddFolder mocks base method.
 func (m *MockDatabaseRepositoryClient) AddFolder(ctx context.Context, in *AddFolderRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error) {
 	m.ctrl.T.Helper()
@@ -57,14 +77,14 @@ func (mr *MockDatabaseRepositoryClientMockRecorder) AddFolder(ctx, in interface{
 }
 
 // AddMail mocks base method.
-func (m *MockDatabaseRepositoryClient) AddMail(ctx context.Context, in *AddMailRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error) {
+func (m *MockDatabaseRepositoryClient) AddMail(ctx context.Context, in *AddMailRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseExtendResponse, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "AddMail", varargs...)
-	ret0, _ := ret[0].(*utils_proto.DatabaseResponse)
+	ret0, _ := ret[0].(*utils_proto.DatabaseExtendResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -214,6 +234,66 @@ func (mr *MockDatabaseRepositoryClientMockRecorder) ChangeUserPassword(ctx, in i
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeUserPassword", reflect.TypeOf((*MockDatabaseRepositoryClient)(nil).ChangeUserPassword), varargs...)
+}
+
+// CheckAttachLink mocks base method.
+func (m *MockDatabaseRepositoryClient) CheckAttachLink(ctx context.Context, in *GetAttachRequest, opts ...grpc.CallOption) (*Nothing, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CheckAttachLink", varargs...)
+	ret0, _ := ret[0].(*Nothing)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckAttachLink indicates an expected call of CheckAttachLink.
+func (mr *MockDatabaseRepositoryClientMockRecorder) CheckAttachLink(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckAttachLink", reflect.TypeOf((*MockDatabaseRepositoryClient)(nil).CheckAttachLink), varargs...)
+}
+
+// CheckAttachPermission mocks base method.
+func (m *MockDatabaseRepositoryClient) CheckAttachPermission(ctx context.Context, in *AttachPermissionRequest, opts ...grpc.CallOption) (*ResponseAttachPermission, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CheckAttachPermission", varargs...)
+	ret0, _ := ret[0].(*ResponseAttachPermission)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckAttachPermission indicates an expected call of CheckAttachPermission.
+func (mr *MockDatabaseRepositoryClientMockRecorder) CheckAttachPermission(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckAttachPermission", reflect.TypeOf((*MockDatabaseRepositoryClient)(nil).CheckAttachPermission), varargs...)
+}
+
+// CountUnread mocks base method.
+func (m *MockDatabaseRepositoryClient) CountUnread(ctx context.Context, in *CountUnreadRequest, opts ...grpc.CallOption) (*ResponseCountUnread, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "CountUnread", varargs...)
+	ret0, _ := ret[0].(*ResponseCountUnread)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CountUnread indicates an expected call of CountUnread.
+func (mr *MockDatabaseRepositoryClientMockRecorder) CountUnread(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountUnread", reflect.TypeOf((*MockDatabaseRepositoryClient)(nil).CountUnread), varargs...)
 }
 
 // DeleteFolder mocks base method.
@@ -456,6 +536,46 @@ func (mr *MockDatabaseRepositoryClientMockRecorder) GetUserInfoByUsername(ctx, i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserInfoByUsername", reflect.TypeOf((*MockDatabaseRepositoryClient)(nil).GetUserInfoByUsername), varargs...)
 }
 
+// IsMailMoved mocks base method.
+func (m *MockDatabaseRepositoryClient) IsMailMoved(ctx context.Context, in *IsMailMovedRequest, opts ...grpc.CallOption) (*ResponseIsMoved, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "IsMailMoved", varargs...)
+	ret0, _ := ret[0].(*ResponseIsMoved)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsMailMoved indicates an expected call of IsMailMoved.
+func (mr *MockDatabaseRepositoryClientMockRecorder) IsMailMoved(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsMailMoved", reflect.TypeOf((*MockDatabaseRepositoryClient)(nil).IsMailMoved), varargs...)
+}
+
+// ListAttaches mocks base method.
+func (m *MockDatabaseRepositoryClient) ListAttaches(ctx context.Context, in *GetAttachRequest, opts ...grpc.CallOption) (*ResponseAttaches, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ListAttaches", varargs...)
+	ret0, _ := ret[0].(*ResponseAttaches)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListAttaches indicates an expected call of ListAttaches.
+func (mr *MockDatabaseRepositoryClientMockRecorder) ListAttaches(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAttaches", reflect.TypeOf((*MockDatabaseRepositoryClient)(nil).ListAttaches), varargs...)
+}
+
 // MoveFolderMail mocks base method.
 func (m *MockDatabaseRepositoryClient) MoveFolderMail(ctx context.Context, in *MoveFolderMailRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error) {
 	m.ctrl.T.Helper()
@@ -496,6 +616,26 @@ func (mr *MockDatabaseRepositoryClientMockRecorder) ReadMail(ctx, in interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadMail", reflect.TypeOf((*MockDatabaseRepositoryClient)(nil).ReadMail), varargs...)
 }
 
+// UpdateMail mocks base method.
+func (m *MockDatabaseRepositoryClient) UpdateMail(ctx context.Context, in *UpdateMailRequest, opts ...grpc.CallOption) (*utils_proto.DatabaseResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateMail", varargs...)
+	ret0, _ := ret[0].(*utils_proto.DatabaseResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateMail indicates an expected call of UpdateMail.
+func (mr *MockDatabaseRepositoryClientMockRecorder) UpdateMail(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMail", reflect.TypeOf((*MockDatabaseRepositoryClient)(nil).UpdateMail), varargs...)
+}
+
 // MockDatabaseRepositoryServer is a mock of DatabaseRepositoryServer interface.
 type MockDatabaseRepositoryServer struct {
 	ctrl     *gomock.Controller
@@ -519,6 +659,21 @@ func (m *MockDatabaseRepositoryServer) EXPECT() *MockDatabaseRepositoryServerMoc
 	return m.recorder
 }
 
+// AddAttachLink mocks base method.
+func (m *MockDatabaseRepositoryServer) AddAttachLink(arg0 context.Context, arg1 *AddAttachLinkRequest) (*Nothing, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddAttachLink", arg0, arg1)
+	ret0, _ := ret[0].(*Nothing)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddAttachLink indicates an expected call of AddAttachLink.
+func (mr *MockDatabaseRepositoryServerMockRecorder) AddAttachLink(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddAttachLink", reflect.TypeOf((*MockDatabaseRepositoryServer)(nil).AddAttachLink), arg0, arg1)
+}
+
 // AddFolder mocks base method.
 func (m *MockDatabaseRepositoryServer) AddFolder(arg0 context.Context, arg1 *AddFolderRequest) (*utils_proto.DatabaseResponse, error) {
 	m.ctrl.T.Helper()
@@ -535,10 +690,10 @@ func (mr *MockDatabaseRepositoryServerMockRecorder) AddFolder(arg0, arg1 interfa
 }
 
 // AddMail mocks base method.
-func (m *MockDatabaseRepositoryServer) AddMail(arg0 context.Context, arg1 *AddMailRequest) (*utils_proto.DatabaseResponse, error) {
+func (m *MockDatabaseRepositoryServer) AddMail(arg0 context.Context, arg1 *AddMailRequest) (*utils_proto.DatabaseExtendResponse, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddMail", arg0, arg1)
-	ret0, _ := ret[0].(*utils_proto.DatabaseResponse)
+	ret0, _ := ret[0].(*utils_proto.DatabaseExtendResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -652,6 +807,51 @@ func (m *MockDatabaseRepositoryServer) ChangeUserPassword(arg0 context.Context, 
 func (mr *MockDatabaseRepositoryServerMockRecorder) ChangeUserPassword(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeUserPassword", reflect.TypeOf((*MockDatabaseRepositoryServer)(nil).ChangeUserPassword), arg0, arg1)
+}
+
+// CheckAttachLink mocks base method.
+func (m *MockDatabaseRepositoryServer) CheckAttachLink(arg0 context.Context, arg1 *GetAttachRequest) (*Nothing, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckAttachLink", arg0, arg1)
+	ret0, _ := ret[0].(*Nothing)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckAttachLink indicates an expected call of CheckAttachLink.
+func (mr *MockDatabaseRepositoryServerMockRecorder) CheckAttachLink(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckAttachLink", reflect.TypeOf((*MockDatabaseRepositoryServer)(nil).CheckAttachLink), arg0, arg1)
+}
+
+// CheckAttachPermission mocks base method.
+func (m *MockDatabaseRepositoryServer) CheckAttachPermission(arg0 context.Context, arg1 *AttachPermissionRequest) (*ResponseAttachPermission, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckAttachPermission", arg0, arg1)
+	ret0, _ := ret[0].(*ResponseAttachPermission)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckAttachPermission indicates an expected call of CheckAttachPermission.
+func (mr *MockDatabaseRepositoryServerMockRecorder) CheckAttachPermission(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckAttachPermission", reflect.TypeOf((*MockDatabaseRepositoryServer)(nil).CheckAttachPermission), arg0, arg1)
+}
+
+// CountUnread mocks base method.
+func (m *MockDatabaseRepositoryServer) CountUnread(arg0 context.Context, arg1 *CountUnreadRequest) (*ResponseCountUnread, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CountUnread", arg0, arg1)
+	ret0, _ := ret[0].(*ResponseCountUnread)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CountUnread indicates an expected call of CountUnread.
+func (mr *MockDatabaseRepositoryServerMockRecorder) CountUnread(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountUnread", reflect.TypeOf((*MockDatabaseRepositoryServer)(nil).CountUnread), arg0, arg1)
 }
 
 // DeleteFolder mocks base method.
@@ -834,6 +1034,36 @@ func (mr *MockDatabaseRepositoryServerMockRecorder) GetUserInfoByUsername(arg0, 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserInfoByUsername", reflect.TypeOf((*MockDatabaseRepositoryServer)(nil).GetUserInfoByUsername), arg0, arg1)
 }
 
+// IsMailMoved mocks base method.
+func (m *MockDatabaseRepositoryServer) IsMailMoved(arg0 context.Context, arg1 *IsMailMovedRequest) (*ResponseIsMoved, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsMailMoved", arg0, arg1)
+	ret0, _ := ret[0].(*ResponseIsMoved)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// IsMailMoved indicates an expected call of IsMailMoved.
+func (mr *MockDatabaseRepositoryServerMockRecorder) IsMailMoved(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsMailMoved", reflect.TypeOf((*MockDatabaseRepositoryServer)(nil).IsMailMoved), arg0, arg1)
+}
+
+// ListAttaches mocks base method.
+func (m *MockDatabaseRepositoryServer) ListAttaches(arg0 context.Context, arg1 *GetAttachRequest) (*ResponseAttaches, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListAttaches", arg0, arg1)
+	ret0, _ := ret[0].(*ResponseAttaches)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListAttaches indicates an expected call of ListAttaches.
+func (mr *MockDatabaseRepositoryServerMockRecorder) ListAttaches(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAttaches", reflect.TypeOf((*MockDatabaseRepositoryServer)(nil).ListAttaches), arg0, arg1)
+}
+
 // MoveFolderMail mocks base method.
 func (m *MockDatabaseRepositoryServer) MoveFolderMail(arg0 context.Context, arg1 *MoveFolderMailRequest) (*utils_proto.DatabaseResponse, error) {
 	m.ctrl.T.Helper()
@@ -862,6 +1092,21 @@ func (m *MockDatabaseRepositoryServer) ReadMail(arg0 context.Context, arg1 *Read
 func (mr *MockDatabaseRepositoryServerMockRecorder) ReadMail(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ReadMail", reflect.TypeOf((*MockDatabaseRepositoryServer)(nil).ReadMail), arg0, arg1)
+}
+
+// UpdateMail mocks base method.
+func (m *MockDatabaseRepositoryServer) UpdateMail(arg0 context.Context, arg1 *UpdateMailRequest) (*utils_proto.DatabaseResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateMail", arg0, arg1)
+	ret0, _ := ret[0].(*utils_proto.DatabaseResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateMail indicates an expected call of UpdateMail.
+func (mr *MockDatabaseRepositoryServerMockRecorder) UpdateMail(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMail", reflect.TypeOf((*MockDatabaseRepositoryServer)(nil).UpdateMail), arg0, arg1)
 }
 
 // mustEmbedUnimplementedDatabaseRepositoryServer mocks base method.
