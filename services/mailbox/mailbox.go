@@ -440,7 +440,7 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 	}
 	if !pkg.IsLocalEmail(form.Addressee) {
 		log.Debug("Отправка письма по SMTP.")
-		authentication := sasl.NewAnonymousClient("")
+		authentication := sasl.NewAnonymousClient(form.Addressee)
 		// Connect to the server, authenticate, set the sender and recipient,
 		// and send the email all in one step.
 		to := []string{form.Addressee}
