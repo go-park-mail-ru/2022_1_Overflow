@@ -124,6 +124,7 @@ message GetFoldersByUserRequest {
     int32 userId = 1;
     int32 limit = 2;
     int32 offset = 3;
+    bool showReserved = 4;
 }
 
 message GetFolderMailRequest {

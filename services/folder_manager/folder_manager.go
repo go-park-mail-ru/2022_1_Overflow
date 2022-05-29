@@ -256,12 +256,12 @@ func (s *FolderManagerService) MoveFolderMail(context context.Context, request *
 			Response: pkg.CreateJsonErr(pkg.STATUS_UNAUTHORIZED, "Нельзя перемещать письма из папки с черновиками.").Bytes(),
 		}, nil
 	}
-	if !s.FolderExists(context, user.Id, request.FolderNameSrc) {
+	if !s.FolderExistsByUserId(context, user.Id, request.FolderNameSrc) {
 		return &utils_proto.JsonResponse{
 			Response: pkg.CreateJsonErr(pkg.STATUS_OBJECT_EXISTS, "Папки источника не существует.").Bytes(),
 		}, nil
 	}
-	if !s.FolderExists(context, user.Id, request.FolderNameDest) {
+	if !s.FolderExistsByUserId(context, user.Id, request.FolderNameDest) {
 		return &utils_proto.JsonResponse{
 			Response: pkg.CreateJsonErr(pkg.STATUS_OBJECT_EXISTS, "Такой папки не существует.").Bytes(),
 		}, nil
@@ -302,7 +302,7 @@ func (s *FolderManagerService) ChangeFolder(context context.Context, request *fo
 			Response: pkg.UNAUTHORIZED_ERR.Bytes(),
 		}, nil
 	}
-	if s.FolderExists(context, user.Id, request.FolderNewName) {
+	if s.FolderExistsByUserId(context, user.Id, request.FolderNewName) {
 		return &utils_proto.JsonResponse{
 			Response: pkg.CreateJsonErr(pkg.STATUS_OBJECT_EXISTS, "Такая папка уже существует.").Bytes(),
 		}, nil
@@ -381,6 +381,7 @@ func (s *FolderManagerService) ListFolders(context context.Context, request *fol
 		UserId: user.Id,
 		Limit:  request.Limit,
 		Offset: request.Offset,
+		ShowReserved: request.ShowReserved,
 	})
 	if err != nil {
 		log.Error(err)

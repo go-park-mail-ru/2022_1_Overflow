@@ -847,9 +847,10 @@ type GetFoldersByUserRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	UserId int32 `protobuf:"varint,1,opt,name=userId,proto3" json:"userId,omitempty"`
-	Limit  int32 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
-	Offset int32 `protobuf:"varint,3,opt,name=offset,proto3" json:"offset,omitempty"`
+	UserId       int32 `protobuf:"varint,1,opt,name=userId,proto3" json:"userId,omitempty"`
+	Limit        int32 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset       int32 `protobuf:"varint,3,opt,name=offset,proto3" json:"offset,omitempty"`
+	ShowReserved bool  `protobuf:"varint,4,opt,name=showReserved,proto3" json:"showReserved,omitempty"`
 }
 
 func (x *GetFoldersByUserRequest) Reset() {
@@ -903,6 +904,13 @@ func (x *GetFoldersByUserRequest) GetOffset() int32 {
 		return x.Offset
 	}
 	return 0
+}
+
+func (x *GetFoldersByUserRequest) GetShowReserved() bool {
+	if x != nil {
+		return x.ShowReserved
+	}
+	return false
 }
 
 type GetFolderMailRequest struct {

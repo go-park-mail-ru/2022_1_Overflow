@@ -167,7 +167,12 @@ func (c *Database) GetFoldersByUser(context context.Context, request *repository
 		}, err
 	}
 	folders.Amount = count
-	rows, err := c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE user_id=$1 AND name NOT IN ($2, $3) ORDER BY created_at DESC OFFSET $5 LIMIT $4;", request.UserId, pkg.FOLDER_SPAM, pkg.FOLDER_DRAFTS, request.Limit, request.Offset)
+	var rows pgx.Rows
+	if request.ShowReserved {
+		rows, err = c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE user_id=$1 ORDER BY created_at DESC OFFSET $3 LIMIT $2;", request.UserId, request.Limit, request.Offset)
+	} else {
+		rows, err = c.Conn.Query(context, "SELECT id, name, user_id, created_at FROM overflow.folders WHERE user_id=$1 AND name NOT IN ($2, $3) ORDER BY created_at DESC OFFSET $5 LIMIT $4;", request.UserId, pkg.FOLDER_SPAM, pkg.FOLDER_DRAFTS, request.Limit, request.Offset)
+	}
 	if err != nil {
 		log.Error(err)
 		return &repository_proto.ResponseFolders{

@@ -707,9 +707,10 @@ type ListFoldersRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Data   *utils_proto.Session `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
-	Limit  int32                `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
-	Offset int32                `protobuf:"varint,3,opt,name=offset,proto3" json:"offset,omitempty"`
+	Data         *utils_proto.Session `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
+	Limit        int32                `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset       int32                `protobuf:"varint,3,opt,name=offset,proto3" json:"offset,omitempty"`
+	ShowReserved bool                 `protobuf:"varint,4,opt,name=showReserved,proto3" json:"showReserved,omitempty"`
 }
 
 func (x *ListFoldersRequest) Reset() {
@@ -763,6 +764,13 @@ func (x *ListFoldersRequest) GetOffset() int32 {
 		return x.Offset
 	}
 	return 0
+}
+
+func (x *ListFoldersRequest) GetShowReserved() bool {
+	if x != nil {
+		return x.ShowReserved
+	}
+	return false
 }
 
 type ListFolderRequest struct {

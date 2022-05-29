@@ -105,6 +105,7 @@ message ListFoldersRequest {
     utils.Session data = 1;
     int32 limit = 2;
     int32 offset = 3;
+    bool showReserved = 4;
 }
 
 message ListFolderRequest {
