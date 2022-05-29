@@ -56,6 +56,7 @@ func initServer(configPath string) *smtp_server.SMTPServer {
 }
 
 func main() {
+	log.SetLevel(log.DebugLevel)
 	server := initServer("./configs/main.yml")
 	s := smtp.NewServer(server)
 	s.Addr = ":25"
