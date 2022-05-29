@@ -8,6 +8,7 @@ import (
 	"OverflowBackend/proto/folder_manager_proto"
 	"OverflowBackend/proto/mailbox_proto"
 	"OverflowBackend/proto/profile_proto"
+	"crypto/tls"
 	"fmt"
 	"time"
 
@@ -63,6 +64,16 @@ func main() {
 	s.MaxMessageBytes = 1024 * 1024
 	s.MaxRecipients = 50
 	s.AllowInsecureAuth = true
+	// force TLS for auth
+	s.AllowInsecureAuth = false
+	// Load the certificate and key
+	cer, err := tls.LoadX509KeyPair("/etc/server.crt", "/etc/server.key")
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	// Configure the TLS support
+	s.TLSConfig = &tls.Config{Certificates: []tls.Certificate{cer}}
 	log.Println("Starting server at", s.Addr)
 	if err := s.ListenAndServe(); err != nil {
 		log.Fatal(err)
