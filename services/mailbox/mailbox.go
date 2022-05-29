@@ -398,6 +398,8 @@ func (s *MailBoxService) ReadMail(context context.Context, request *mailbox_prot
 
 func (s *MailBoxService) SendMail(context context.Context, request *mailbox_proto.SendMailRequest) (*utils_proto.JsonExtendResponse, error) {
 	log.Debug("Отправить письмо, username = ", request.Data.Username)
+	data := request.Data
+	/*
 	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
 		Username: request.Data.Username,
 	})
@@ -412,7 +414,6 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 			Response: pkg.DB_ERR.Bytes(),
 		}, nil
 	}
-	data := request.Data
 	var user models.User
 	err = easyjson.Unmarshal(resp.User, &user)
 	if err != nil {
@@ -425,13 +426,15 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 			Response: pkg.NO_USER_EXIST.Bytes(),
 		}, nil
 	}
+	*/
 	var form models.MailForm
-	err = easyjson.Unmarshal(request.Form, &form)
+	err := easyjson.Unmarshal(request.Form, &form)
 	if err != nil {
 		return &utils_proto.JsonExtendResponse{
 			Response: pkg.JSON_ERR.Bytes(),
 		}, err
 	}
+	form.Addressee = pkg.EmailToUsername(form.Addressee)
 	resp2, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
 		Username: form.Addressee,
 	})
