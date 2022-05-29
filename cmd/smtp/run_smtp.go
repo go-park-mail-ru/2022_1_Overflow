@@ -56,7 +56,7 @@ func initServer(configPath string) *smtp_server.SMTPServer {
 func main() {
 	server := initServer("./configs/main.yml")
 	s := smtp.NewServer(server)
-	s.Addr = ":1025"
+	s.Addr = ":25"
 	s.Domain = "localhost"
 	s.ReadTimeout = 10 * time.Second
 	s.WriteTimeout = 10 * time.Second
