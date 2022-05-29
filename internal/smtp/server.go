@@ -16,7 +16,6 @@ import (
 
 	"github.com/emersion/go-smtp"
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 	enmime "github.com/jhillyerd/enmime"
 )
 
@@ -76,7 +75,7 @@ func (s *SMTPServer) Login(state *smtp.ConnectionState, username string, passwor
 	sess := &Session{}
 	sess.Init(s.config, s.auth, s.profile, s.mailbox, s.folderManager, &utils_proto.Session{
 		Username: username,
-		Authenticated: wrapperspb.Bool(true),
+		Authenticated: true,
 	})
 	log.Debug("Успешный вход.")
 	return sess, nil
