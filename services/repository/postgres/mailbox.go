@@ -100,14 +100,26 @@ func (c *Database) UpdateMail(context context.Context, request *repository_proto
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err
 	}
-
+	_, err = c.Conn.Exec(context, "ALTER TABLE overflow.mails DISABLE TRIGGER ALL;")
+	if err != nil {
+		log.Error(err)
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}, err
+	}
 	_, err = c.Conn.Exec(context, "UPDATE overflow.mails SET addressee = $2, date = $3, files = $4, read = $5, sender = $6, text = $7, theme = $8 WHERE id = $1;", mailId, mail.Addressee, mail.Date, mail.Files, mail.Read, mail.Sender, mail.Text, mail.Theme)
 	if err != nil {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err
 	}
-
+	_, err = c.Conn.Exec(context, "ALTER TABLE overflow.mails ENABLE TRIGGER ALL;")
+	if err != nil {
+		log.Error(err)
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}, err
+	}
 	return &utils_proto.DatabaseResponse{
 		Status: utils_proto.DatabaseStatus_OK,
 	}, nil
