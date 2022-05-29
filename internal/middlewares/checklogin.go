@@ -14,6 +14,7 @@ var allowedPaths = []string{
 	"/signin",
 	"/signup",
 	"/swagger",
+	"/get_token",
 }
 
 var minioPath = "/minio-storage"
