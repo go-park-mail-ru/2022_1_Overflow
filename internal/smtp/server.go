@@ -44,7 +44,7 @@ func (s *SMTPServer) Init(
 
 func (s *SMTPServer) AnonymousLogin(state *smtp.ConnectionState) (smtp.Session, error) {
 	log.Debug("Попытка анонимного входа: ", *state)
-	return nil, smtp.ErrAuthUnsupported
+	return nil, nil
 }
 
 func (s *SMTPServer) Login(state *smtp.ConnectionState, username string, password string)  (smtp.Session, error) {
