@@ -439,6 +439,7 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 		}, err
 	}
 	if !pkg.IsLocalEmail(form.Addressee) {
+		log.Debug("Отправка письма по SMTP.")
 		authentication := sasl.NewAnonymousClient("")
 		// Connect to the server, authenticate, set the sender and recipient,
 		// and send the email all in one step.
@@ -453,12 +454,16 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 				Response: pkg.CreateJsonErr(pkg.STATUS_INTERNAL, "Ошибка при отправке письма по SMTP.").Bytes(),
 			}, err
 		}
+		log.Debug("Получен домен получателя: ", domain)
+		log.Debug("Выполнение SMTP запроса...")
 		err = smtp.SendMail(domain+":25", authentication, data.Username, to, msg)
 		if err != nil {
+			log.Debug("Неудачная отправка по SMTP.")
 			return &utils_proto.JsonExtendResponse{
 				Response: pkg.CreateJsonErr(pkg.STATUS_INTERNAL, "Ошибка при отправке письма по SMTP.").Bytes(),
 			}, err
 		} else {
+			log.Debug("Успешная отправка по SMTP.")
 			return &utils_proto.JsonExtendResponse{
 				Response: pkg.NO_ERR.Bytes(),
 				Param:    "",
