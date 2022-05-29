@@ -1,7 +1,7 @@
 syntax = "proto3";
 package mailbox_proto;
 
-option go_package = "./proto/mailbox_proto";
+option go_package = "./mailbox_proto";
 
 import "proto/utils.proto";
 

@@ -1,7 +1,7 @@
 syntax = "proto3";
 package repository_proto;
 
-option go_package = "./proto/repository_proto";
+option go_package = "./repository_proto";
 import "proto/utils.proto";
 
 // protoc --go_out=. --go-grpc_out=. proto/repository.proto
@@ -20,6 +20,7 @@ service DatabaseRepository {
     rpc GetOutcomeMails(GetOutcomeMailsRequest) returns (ResponseMails) {}
     rpc AddMail(AddMailRequest) returns (utils.DatabaseExtendResponse) {}
     rpc DeleteMail(DeleteMailRequest) returns (utils.DatabaseResponse) {}
+    rpc UpdateMail(UpdateMailRequest) returns (utils.DatabaseResponse) {}
     rpc ReadMail(ReadMailRequest) returns (utils.DatabaseResponse) {}
     rpc GetMailInfoById(GetMailInfoByIdRequest) returns (ResponseMail) {}
     rpc CountUnread(CountUnreadRequest) returns (ResponseCountUnread) {}
@@ -35,6 +36,7 @@ service DatabaseRepository {
     rpc AddMailToFolderByObject(AddMailToFolderByObjectRequest) returns (utils.DatabaseResponse) {}
     rpc DeleteFolderMail(DeleteFolderMailRequest) returns (utils.DatabaseResponse) {}
     rpc MoveFolderMail(MoveFolderMailRequest) returns (utils.DatabaseResponse) {}
+    rpc IsMailMoved(IsMailMovedRequest) returns (ResponseIsMoved) {}
 
     rpc AddAttachLink (AddAttachLinkRequest) returns (Nothing) {}
     rpc CheckAttachLink (GetAttachRequest) returns (Nothing) {}
@@ -43,6 +45,17 @@ service DatabaseRepository {
 }
 
 // ================ requests ================
+
+message IsMailMovedRequest {
+    int32 userId = 1;
+    int32 mailId = 2;
+}
+
+message UpdateMailRequest {
+    int32 userId = 1;
+    int32 mailId = 2;
+    bytes mail = 3;
+}
 
 message MoveFolderMailRequest {
     int32 userId = 1;
@@ -174,6 +187,10 @@ message AttachPermissionRequest {
 }
 
 // ================= responses ==================
+
+message ResponseIsMoved {
+    bool moved = 1;
+}
 
 message ResponseUser {
     utils.DatabaseResponse response = 1;

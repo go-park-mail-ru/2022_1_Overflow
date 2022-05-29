@@ -512,6 +512,61 @@
                 }
             }
         },
+        "/folder/mail/update": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "folder_manager"
+                ],
+                "summary": "Обновить данные письма в папке. Письмо должно быть уникальным для данной папки.",
+                "parameters": [
+                    {
+                        "description": "Форма запроса",
+                        "name": "UpdateFolderMailForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateFolderMailForm"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка БД, неверные GET параметры.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/folder/rename": {
             "get": {
                 "tags": [
@@ -1991,6 +2046,20 @@
                 "username": {
                     "type": "string",
                     "maxLength": 45
+                }
+            }
+        },
+        "models.UpdateFolderMailForm": {
+            "type": "object",
+            "properties": {
+                "folder_name": {
+                    "type": "string"
+                },
+                "form": {
+                    "$ref": "#/definitions/models.MailForm"
+                },
+                "mail_id": {
+                    "type": "integer"
                 }
             }
         },

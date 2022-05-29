@@ -523,6 +523,97 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 	}, nil
 }
 
+func (s *FolderManagerService) UpdateFolderMail(context context.Context, request *folder_manager_proto.UpdateFolderMailRequest) (*utils_proto.JsonResponse, error) {
+	log.Debug("Обновление письма в папке, folderName = ", request.FolderName, ", mailId = ", request.MailId, ", username = ", request.Data.Username)
+	user, resp, err := s.GetValidateUser(context, request.Data.Username)
+	if err != nil || resp != pkg.NO_ERR {
+		return &utils_proto.JsonResponse{
+			Response: resp.Bytes(),
+		}, err
+	}
+	if !s.FolderExists(context, user.Id, request.FolderName) {
+		return &utils_proto.JsonResponse{
+			Response: pkg.CreateJsonErr(pkg.STATUS_OBJECT_EXISTS, "Такой папки не существует.").Bytes(),
+		}, nil
+	}
+	resp2, err := s.db.IsMailMoved(context, &repository_proto.IsMailMovedRequest{
+		UserId: user.Id,
+		MailId: request.MailId,
+	})
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
+	}
+	if !resp2.Moved {
+		return &utils_proto.JsonResponse{
+			Response: pkg.CreateJsonErr(pkg.STATUS_UNAUTHORIZED, "Отказано в доступе: письмо не является перемещенным в папку.").Bytes(),
+		}, nil
+	}
+	resp3, err := s.db.GetMailInfoById(context, &repository_proto.GetMailInfoByIdRequest{
+		MailId: request.MailId,
+	})
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
+	}
+	if resp3.Response.Status != utils_proto.DatabaseStatus_OK {
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
+	}
+	var mail models.Mail
+	err = easyjson.Unmarshal(resp3.Mail, &mail)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.JSON_ERR.Bytes(),
+		}, err
+	}
+	if mail.Sender != user.Username {
+		return &utils_proto.JsonResponse{
+			Response: pkg.CreateJsonErr(pkg.STATUS_UNAUTHORIZED, "Отказано в доступе: обновлять данные письма может только отправитель.").Bytes(),
+		}, nil
+	}
+	mailFormBytes := request.MailForm
+	var mailForm models.MailForm
+	err = easyjson.Unmarshal(mailFormBytes, &mailForm)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.JSON_ERR.Bytes(),
+		}, err
+	}
+	mail.Date = time.Now()
+	mail.Addressee = mailForm.Addressee
+	mail.Files = mailForm.Files
+	mail.Text = mailForm.Text
+	mail.Theme = mailForm.Theme
+	mailBytes, err := easyjson.Marshal(mail)
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.JSON_ERR.Bytes(),
+		}, err
+	}
+	resp4, err := s.db.UpdateMail(context, &repository_proto.UpdateMailRequest{
+		UserId: user.Id,
+		MailId: request.MailId,
+		Mail: mailBytes,
+	})
+	if err != nil {
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, err
+	}
+	if resp4.Status != utils_proto.DatabaseStatus_OK {
+		return &utils_proto.JsonResponse{
+			Response: pkg.DB_ERR.Bytes(),
+		}, nil
+	}
+	return &utils_proto.JsonResponse{
+		Response: pkg.NO_ERR.Bytes(),
+	}, nil
+}
+
 func (s *FolderManagerService) DeleteFolderMail(context context.Context, request *folder_manager_proto.DeleteFolderMailRequest) (*utils_proto.JsonResponse, error) {
 	log.Debug("Удаление письма из папки, folderName = ", request.FolderName, ", mailId = ", request.MailId, ", username = ", request.Data.Username)
 	user, resp, err := s.GetValidateUser(context, request.Data.Username)

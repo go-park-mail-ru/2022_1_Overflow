@@ -90,6 +90,29 @@ func (c *Database) DeleteMail(context context.Context, request *repository_proto
 	}
 }
 
+func (c *Database) UpdateMail(context context.Context, request *repository_proto.UpdateMailRequest) (*utils_proto.DatabaseResponse, error) {
+	var mail models.Mail
+	mailId := request.MailId
+
+	err := easyjson.Unmarshal(request.Mail, &mail)
+	if err != nil {
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}, err
+	}
+
+	_, err = c.Conn.Exec(context, "UPDATE overflow.mails SET addressee = $2, date = $3, files = $4, read = $5, sender = $6, text = $7, theme = $8 WHERE id = $1;", mailId, mail.Addressee, mail.Date, mail.Files, mail.Read, mail.Sender, mail.Text, mail.Theme)
+	if err != nil {
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}, err
+	}
+	
+	return &utils_proto.DatabaseResponse{
+		Status: utils_proto.DatabaseStatus_OK,
+	}, nil
+}
+
 //Прочитать письмо
 func (c *Database) ReadMail(context context.Context, request *repository_proto.ReadMailRequest) (*utils_proto.DatabaseResponse, error) {
 	var mail models.Mail

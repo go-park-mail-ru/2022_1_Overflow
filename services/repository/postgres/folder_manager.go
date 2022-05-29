@@ -23,13 +23,21 @@ func (c *Database) IsMailInAnyFolder(context context.Context, mailId int32, user
 }
 
 // Является ли письмо перемещенным в какую либо папку
-func (c *Database) IsMailMoved(context context.Context, mailId int32, userId int32) bool {
+func (c *Database) IsMailMoved(context context.Context, request *repository_proto.IsMailMovedRequest) (response *repository_proto.ResponseIsMoved, err error) {
 	var counter int
-	err := c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.folder_to_mail WHERE mail_id=$1 AND folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$2) AND only_folder=true", mailId, userId).Scan(&counter)
+	userId := request.UserId
+	mailId := request.MailId
+	err = c.Conn.QueryRow(context, "SELECT COUNT(*) FROM overflow.folder_to_mail WHERE mail_id=$1 AND folder_id IN (SELECT id FROM overflow.folders WHERE user_id=$2) AND only_folder=true", mailId, userId).Scan(&counter)
 	if err != nil {
 		log.Error(err)
+		return &repository_proto.ResponseIsMoved{
+			Moved: false,
+		}, err
 	}
-	return err == nil && counter > 0
+	moved := err == nil && counter > 0
+	return &repository_proto.ResponseIsMoved{
+		Moved: moved,
+	}, nil
 }
 
 func (c *Database) GetFolderById(context context.Context, request *repository_proto.GetFolderByIdRequest) (response *repository_proto.ResponseFolder, err error) {
@@ -318,7 +326,16 @@ func (c *Database) ChangeFolderName(context context.Context, request *repository
 
 // Добавить письмо в папку
 func (c *Database) AddMailToFolderById(context context.Context, request *repository_proto.AddMailToFolderByIdRequest) (*utils_proto.DatabaseResponse, error) {
-	if c.IsMailMoved(context, request.MailId, request.UserId) {
+	resp, err := c.IsMailMoved(context, &repository_proto.IsMailMovedRequest{
+		UserId: request.UserId,
+		MailId: request.MailId,
+	})
+	if err != nil {
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}, err
+	}
+	if resp.Moved {
 		return &utils_proto.DatabaseResponse{
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, nil

@@ -376,6 +376,65 @@ func (d *Delivery) DeleteFolder(w http.ResponseWriter, r *http.Request) {
 // @Tags folder_manager
 func DeleteFolder() {}
 
+// UpdateFolderMail godoc
+// @Summary Обновить данные письма в папке. Письмо должно быть уникальным для данной папки.
+// @Produce json
+// @Param UpdateFolderMailForm body models.UpdateFolderMailForm true "Форма запроса"
+// @Success 200 {object} pkg.JsonResponse "OK"
+// @Failure 401 {object} pkg.JsonResponse "Сессия отсутствует или сессия не валидна."
+// @Failure 405 {object} pkg.JsonResponse
+// @Failure 500 {object} pkg.JsonResponse "Ошибка БД, неверные GET параметры."
+// @Router /folder/mail/update [post]
+// @Param X-CSRF-Token header string true "CSRF токен"
+// @Tags folder_manager
+func (d *Delivery) UpdateFolderMail(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodPost {
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
+		return
+	}
+	data, e := session.Manager.GetData(r)
+	if e != nil {
+		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
+		return
+	}
+	var form models.UpdateFolderMailForm
+	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if err := validator.Validate(form); err != nil {
+		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
+		return
+	}
+	mailFormBytes, err := easyjson.Marshal(form.MailForm)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	resp, err := d.folderManager.UpdateFolderMail(context.Background(), &folder_manager_proto.UpdateFolderMailRequest{
+		Data: data,
+		FolderName: form.FolderName,
+		MailId: form.MailId,
+		MailForm: mailFormBytes,
+	})
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
+		return
+	}
+	var response pkg.JsonResponse
+	err = easyjson.Unmarshal(resp.Response, &response)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if response != pkg.NO_ERR {
+		pkg.WriteJsonErrFull(w, &response)
+		return
+	}
+	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
+}
+
 // DeleteFolderMail godoc
 // @Summary Удалить письмо из папки
 // @Produce json

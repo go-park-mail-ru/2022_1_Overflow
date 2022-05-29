@@ -205,6 +205,15 @@ definitions:
         maxLength: 45
         type: string
     type: object
+  models.UpdateFolderMailForm:
+    properties:
+      folder_name:
+        type: string
+      form:
+        $ref: '#/definitions/models.MailForm'
+      mail_id:
+        type: integer
+    type: object
   pkg.JsonResponse:
     properties:
       message:
@@ -544,6 +553,43 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Переместить письмо из одной папки в другую
+      tags:
+      - folder_manager
+  /folder/mail/update:
+    post:
+      parameters:
+      - description: Форма запроса
+        in: body
+        name: UpdateFolderMailForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateFolderMailForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка БД, неверные GET параметры.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Обновить данные письма в папке. Письмо должно быть уникальным для данной
+        папки.
       tags:
       - folder_manager
   /folder/rename:

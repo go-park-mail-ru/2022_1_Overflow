@@ -21,17 +21,21 @@ type DatabaseRepository interface {
 	GetIncomeMails(context.Context, *repository_proto.GetIncomeMailsRequest) (*repository_proto.ResponseMails, error)   // Получить входящие письма
 	GetOutcomeMails(context.Context, *repository_proto.GetOutcomeMailsRequest) (*repository_proto.ResponseMails, error) // Получить исходящие письма
 	AddMail(context.Context, *repository_proto.AddMailRequest) (*utils_proto.DatabaseExtendResponse, error)             // Добавить письмо
+	UpdateMail(context.Context, *repository_proto.UpdateMailRequest) (*utils_proto.DatabaseResponse, error) // Обновить данные письма
 	DeleteMail(context.Context, *repository_proto.DeleteMailRequest) (*utils_proto.DatabaseResponse, error)             // Удалить письмо
 	ReadMail(context.Context, *repository_proto.ReadMailRequest) (*utils_proto.DatabaseResponse, error)                 // Прочитать письмо
 	GetMailInfoById(context.Context, *repository_proto.GetMailInfoByIdRequest) (*repository_proto.ResponseMail, error)  // Получить информацию о письме по его id
 	CountUnread(ctx context.Context, request *repository_proto.CountUnreadRequest) (*repository_proto.ResponseCountUnread, error)
 
+	AttachRepositoryInterface
+	FolderRepositoryInterface
+}
+
+type AttachRepositoryInterface interface {
 	AddAttachLink(ctx context.Context, request *repository_proto.AddAttachLinkRequest) (*repository_proto.Nothing, error)
 	CheckAttachLink(ctx context.Context, request *repository_proto.GetAttachRequest) (*repository_proto.Nothing, error)
 	ListAttaches(ctx context.Context, request *repository_proto.GetAttachRequest) (*repository_proto.ResponseAttaches, error)
 	CheckAttachPermission(ctx context.Context, request *repository_proto.AttachPermissionRequest) (*repository_proto.ResponseAttachPermission, error)
-
-	FolderRepositoryInterface
 }
 
 type FolderRepositoryInterface interface {
@@ -46,4 +50,5 @@ type FolderRepositoryInterface interface {
 	AddMailToFolderByObject(context.Context, *repository_proto.AddMailToFolderByObjectRequest) (*utils_proto.DatabaseResponse, error) // Добавить письмо в папку по объекту письма
 	DeleteFolderMail(context.Context, *repository_proto.DeleteFolderMailRequest) (*utils_proto.DatabaseResponse, error)               // Удалить письмо из папки
 	MoveFolderMail(context.Context, *repository_proto.MoveFolderMailRequest) (*utils_proto.DatabaseResponse, error)                   // Переместить письмо из одной папки в другую
+	IsMailMoved(context.Context, *repository_proto.IsMailMovedRequest) (*repository_proto.ResponseIsMoved, error) // Является ли данное письмо перемещенным в папку
 }
