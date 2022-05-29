@@ -527,6 +527,9 @@ func (s *FolderManagerService) UpdateFolderMail(context context.Context, request
 	log.Debug("Обновление письма в папке, folderName = ", request.FolderName, ", mailId = ", request.MailId, ", username = ", request.Data.Username)
 	user, resp, err := s.GetValidateUser(context, request.Data.Username)
 	if err != nil || resp != pkg.NO_ERR {
+		if err != nil {
+			log.Error(err)
+		}
 		return &utils_proto.JsonResponse{
 			Response: resp.Bytes(),
 		}, err
@@ -541,6 +544,7 @@ func (s *FolderManagerService) UpdateFolderMail(context context.Context, request
 		MailId: request.MailId,
 	})
 	if err != nil {
+		log.Error(err)
 		return &utils_proto.JsonResponse{
 			Response: pkg.DB_ERR.Bytes(),
 		}, err
@@ -554,6 +558,7 @@ func (s *FolderManagerService) UpdateFolderMail(context context.Context, request
 		MailId: request.MailId,
 	})
 	if err != nil {
+		log.Error(err)
 		return &utils_proto.JsonResponse{
 			Response: pkg.DB_ERR.Bytes(),
 		}, err
@@ -566,6 +571,7 @@ func (s *FolderManagerService) UpdateFolderMail(context context.Context, request
 	var mail models.Mail
 	err = easyjson.Unmarshal(resp3.Mail, &mail)
 	if err != nil {
+		log.Error(err)
 		return &utils_proto.JsonResponse{
 			Response: pkg.JSON_ERR.Bytes(),
 		}, err
@@ -579,6 +585,7 @@ func (s *FolderManagerService) UpdateFolderMail(context context.Context, request
 	var mailForm models.MailForm
 	err = easyjson.Unmarshal(mailFormBytes, &mailForm)
 	if err != nil {
+		log.Error(err)
 		return &utils_proto.JsonResponse{
 			Response: pkg.JSON_ERR.Bytes(),
 		}, err
@@ -590,6 +597,7 @@ func (s *FolderManagerService) UpdateFolderMail(context context.Context, request
 	mail.Theme = mailForm.Theme
 	mailBytes, err := easyjson.Marshal(mail)
 	if err != nil {
+		log.Error(err)
 		return &utils_proto.JsonResponse{
 			Response: pkg.JSON_ERR.Bytes(),
 		}, err
@@ -600,6 +608,7 @@ func (s *FolderManagerService) UpdateFolderMail(context context.Context, request
 		Mail: mailBytes,
 	})
 	if err != nil {
+		log.Error(err)
 		return &utils_proto.JsonResponse{
 			Response: pkg.DB_ERR.Bytes(),
 		}, err

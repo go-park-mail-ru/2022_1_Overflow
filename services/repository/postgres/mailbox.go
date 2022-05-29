@@ -107,7 +107,7 @@ func (c *Database) UpdateMail(context context.Context, request *repository_proto
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err
 	}
-	
+
 	return &utils_proto.DatabaseResponse{
 		Status: utils_proto.DatabaseStatus_OK,
 	}, nil
@@ -241,7 +241,6 @@ func (c *Database) GetIncomeMails(context context.Context, request *repository_p
 	for rows.Next() {
 		var mail models.Mail
 		values, err := rows.Values()
-		log.Debug("Получены значения: ", values)
 		if err != nil {
 			log.Error(err)
 			return &repository_proto.ResponseMails{
