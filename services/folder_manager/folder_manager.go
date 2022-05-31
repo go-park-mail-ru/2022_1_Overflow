@@ -9,7 +9,6 @@ import (
 	"OverflowBackend/proto/repository_proto"
 	"OverflowBackend/proto/utils_proto"
 	"context"
-	"strings"
 	"time"
 
 	"github.com/mailru/easyjson"
@@ -85,7 +84,7 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 			},
 		}, nil
 	}
-	if len(strings.TrimSpace(request.Name)) == 0 {
+	if pkg.IsEmpty(request.Name) {
 		return &folder_manager_proto.ResponseFolder{
 			Response: &utils_proto.JsonResponse{
 				Response: pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, "Имя папки не может состоять из одних пробелов.").Bytes(),
@@ -288,7 +287,7 @@ func (s *FolderManagerService) ChangeFolder(context context.Context, request *fo
 			Response: pkg.CreateJsonErr(pkg.STATUS_OBJECT_EXISTS, "Такая папка уже существует.").Bytes(),
 		}, nil
 	}
-	if len(strings.TrimSpace(request.FolderNewName)) == 0 {
+	if pkg.IsEmpty(request.FolderNewName) {
 		return &utils_proto.JsonResponse{
 			Response: pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, "Имя папки не может состоять из одних пробелов.").Bytes(),
 		}, nil
