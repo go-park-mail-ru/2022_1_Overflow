@@ -367,7 +367,9 @@ func (d *Delivery) UpdateFolderMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
 		return
 	}
-	if err := validator.Validate(form); err != nil {
+	objectValidator := validator.NewValidator()
+	objectValidator.SetTag("folder_object")
+	if err := objectValidator.Validate(form, ); err != nil {
 		pkg.WriteJsonErr(w, pkg.STATUS_BAD_VALIDATION, err.Error())
 		return
 	}
