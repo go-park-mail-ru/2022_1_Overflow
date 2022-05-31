@@ -474,9 +474,15 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 	for _, mail := range mails.Mails {
 		mail_add := models.MailAdditional{}
 		mail_add.Mail = mail
+		var username string
+		if mail.Sender == user.Username {
+			username = mail.Addressee
+		} else {
+			username = mail.Sender
+		}
 		resp, err := s.profile.GetAvatar(
 			context,
-			&profile_proto.GetAvatarRequest{Username: mail.Sender},
+			&profile_proto.GetAvatarRequest{Username: username},
 		)
 		if err != nil {
 			return &folder_manager_proto.ResponseMails{
