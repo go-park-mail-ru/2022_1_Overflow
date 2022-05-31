@@ -9,6 +9,7 @@ import (
 	"OverflowBackend/proto/repository_proto"
 	"OverflowBackend/proto/utils_proto"
 	"context"
+	"strings"
 	"time"
 
 	"github.com/mailru/easyjson"
@@ -77,38 +78,17 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 			},
 		}, err
 	}
-	resp2, err := s.db.GetFolderByName(context, &repository_proto.GetFolderByNameRequest{
-		UserId:     user.Id,
-		FolderName: request.Name,
-	})
-	if err != nil {
-		log.Error(err)
-		return &folder_manager_proto.ResponseFolder{
-			Response: &utils_proto.JsonResponse{
-				Response: pkg.DB_ERR.Bytes(),
-			},
-		}, nil
-	}
-	if resp2.Response.Status != utils_proto.DatabaseStatus_OK {
-		return &folder_manager_proto.ResponseFolder{
-			Response: &utils_proto.JsonResponse{
-				Response: pkg.DB_ERR.Bytes(),
-			},
-		}, nil
-	}
-	var folder models.Folder
-	err = easyjson.Unmarshal(resp2.Folder, &folder)
-	if err != nil {
-		return &folder_manager_proto.ResponseFolder{
-			Response: &utils_proto.JsonResponse{
-				Response: pkg.JSON_ERR.Bytes(),
-			},
-		}, nil
-	}
-	if (folder != models.Folder{}) {
+	if s.FolderExists(context, user.Id, request.Name) {
 		return &folder_manager_proto.ResponseFolder{
 			Response: &utils_proto.JsonResponse{
 				Response: pkg.CreateJsonErr(pkg.STATUS_OBJECT_EXISTS, "Такая папка уже существует.").Bytes(),
+			},
+		}, nil
+	}
+	if len(strings.TrimSpace(request.Name)) == 0 {
+		return &folder_manager_proto.ResponseFolder{
+			Response: &utils_proto.JsonResponse{
+				Response: pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, "Имя папки не может состоять из одних пробелов.").Bytes(),
 			},
 		}, nil
 	}
@@ -264,7 +244,7 @@ func (s *FolderManagerService) MoveFolderMail(context context.Context, request *
 	}
 	if !s.FolderExists(context, user.Id, request.FolderNameDest) {
 		return &utils_proto.JsonResponse{
-			Response: pkg.CreateJsonErr(pkg.STATUS_OBJECT_EXISTS, "Такой папки не существует.").Bytes(),
+			Response: pkg.CreateJsonErr(pkg.STATUS_OBJECT_EXISTS, "Папки назначения не существует.").Bytes(),
 		}, nil
 	}
 	resp2, err := s.db.MoveFolderMail(context, &repository_proto.MoveFolderMailRequest{
@@ -306,6 +286,11 @@ func (s *FolderManagerService) ChangeFolder(context context.Context, request *fo
 	if s.FolderExists(context, user.Id, request.FolderNewName) {
 		return &utils_proto.JsonResponse{
 			Response: pkg.CreateJsonErr(pkg.STATUS_OBJECT_EXISTS, "Такая папка уже существует.").Bytes(),
+		}, nil
+	}
+	if len(strings.TrimSpace(request.FolderNewName)) == 0 {
+		return &utils_proto.JsonResponse{
+			Response: pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, "Имя папки не может состоять из одних пробелов.").Bytes(),
 		}, nil
 	}
 	resp3, err := s.db.ChangeFolderName(context, &repository_proto.ChangeFolderNameRequest{
