@@ -439,6 +439,10 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 		}, err
 	}
 	if !pkg.IsLocalEmail(form.Addressee) {
+		return &utils_proto.JsonExtendResponse{
+			Response: pkg.CreateJsonErr(pkg.STATUS_NOT_IMP, "Отправка писем сторонним адресам не поддеживается.").Bytes(),
+		}, nil
+		
 		log.Debug("Отправка письма по SMTP.")
 		authentication := sasl.NewPlainClient("", "overmail.info@gmail.com", "Dp4-FrM-5xj-UU9")
 		// Connect to the server, authenticate, set the sender and recipient,
