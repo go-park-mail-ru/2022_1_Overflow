@@ -84,13 +84,15 @@ func (s *FolderManagerService) AddFolder(context context.Context, request *folde
 			},
 		}, nil
 	}
-	if pkg.IsEmpty(request.Name) {
+	name, err := pkg.ValidateFormatFolderName(request.Name)
+	if err != nil {
 		return &folder_manager_proto.ResponseFolder{
 			Response: &utils_proto.JsonResponse{
-				Response: pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, "Имя папки не может состоять из одних пробелов.").Bytes(),
+				Response: pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, err.Error()).Bytes(),
 			},
 		}, nil
 	}
+	request.Name = name
 	resp3, err := s.db.AddFolder(context, &repository_proto.AddFolderRequest{
 		Name:   request.Name,
 		UserId: user.Id,
@@ -287,11 +289,13 @@ func (s *FolderManagerService) ChangeFolder(context context.Context, request *fo
 			Response: pkg.CreateJsonErr(pkg.STATUS_OBJECT_EXISTS, "Такая папка уже существует.").Bytes(),
 		}, nil
 	}
-	if pkg.IsEmpty(request.FolderNewName) {
+	name, err := pkg.ValidateFormatFolderName(request.FolderNewName)
+	if err != nil {
 		return &utils_proto.JsonResponse{
-			Response: pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, "Имя папки не может состоять из одних пробелов.").Bytes(),
+			Response: pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, err.Error()).Bytes(),
 		}, nil
 	}
+	request.FolderNewName = name
 	resp3, err := s.db.ChangeFolderName(context, &repository_proto.ChangeFolderNameRequest{
 		UserId:     user.Id,
 		FolderName: request.FolderName,
