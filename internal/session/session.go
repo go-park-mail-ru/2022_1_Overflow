@@ -14,6 +14,8 @@ type SessionManager interface {
 	DeleteSession(w http.ResponseWriter, r *http.Request) error
 	IsLoggedIn(r *http.Request) bool
 	GetData(r *http.Request) (data *utils_proto.Session, err error)
+	GetDataFull(r *http.Request, storeName string, field string) (interface{}, error)
+	SetDataFull(w http.ResponseWriter, r *http.Request, storeName, field string, value interface{}) (err error)
 }
 
 func Init(config *config.Config) error {

@@ -89,3 +89,8 @@ type UpdateFolderMailForm struct {
 	MailId int32 `json:"mail_id" validate:"nonzero"`
 	MailForm MailForm `json:"form"`
 }
+
+type SetDataForm struct {
+	FieldName string `json:"name" validate:"nonzero"`
+	Value string `json:"value"`
+}

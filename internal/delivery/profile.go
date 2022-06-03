@@ -331,3 +331,64 @@ func (d *Delivery) GetAvatar(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErr(w, pkg.STATUS_OK, resp.Url)
 }
+
+
+// SetData godoc
+// @Summary Выставить значение дополнительного поля сессии пользователя
+// @Description Выставить значение дополнительного поля сессии пользователя. Для удаления параметра необходимо отправить пустое значение поля.
+// @Success 200 {object} pkg.JsonResponse
+// @Failure 405 {object} pkg.JsonResponse
+// @Param SetDataForm body models.SetDataForm true "Форма запроса."
+// @Produce json
+// @Router /profile/data/set [post]
+// @Tags profile
+func (d *Delivery) SetData(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodPost {
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
+		return
+	}
+	var form models.SetDataForm
+	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.JSON_ERR)
+		return
+	}
+	if err := validator.Validate(form); err != nil {
+		pkg.WriteJsonErrFull(w, pkg.CreateJsonErr(pkg.STATUS_BAD_VALIDATION, err.Error()))
+		return
+	}
+	err := session.Manager.SetDataFull(w, r, session.AddStoreName, form.FieldName, form.Value)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
+		return
+	}
+	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
+}
+
+// GetData godoc
+// @Summary Получить значение дополнительного поля сессии пользователя
+// @Description Получить значение дополнительного поля сессии пользователя.
+// @Param name query string false "Имя поля."
+// @Success 200 {object} pkg.JsonResponse 
+// @Failure 405 {object} pkg.JsonResponse
+// @Produce json
+// @Router /profile/data/get [get]
+// @Tags profile
+func (d *Delivery) GetData(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodGet {
+		pkg.WriteJsonErrFull(w, &pkg.BAD_METHOD_ERR)
+		return
+	}
+	name := r.URL.Query().Get("name")
+	if len(name) == 0 {
+		pkg.WriteJsonErrFull(w, &pkg.GET_ERR)
+		return
+	}
+	value, err := session.Manager.GetDataFull(r, session.AddStoreName, name)
+	if err != nil {
+		pkg.WriteJsonErrFull(w, &pkg.SESSION_ERR)
+		return
+	}
+	pkg.WriteJsonErr(w, pkg.STATUS_OK, value.(string))
+}
