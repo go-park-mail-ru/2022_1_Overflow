@@ -439,9 +439,9 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 		}, err
 	}
 	if !pkg.IsLocalEmail(form.Addressee) {
-		//return &utils_proto.JsonExtendResponse{
-		//	Response: pkg.CreateJsonErr(pkg.STATUS_NOT_IMP, "Отправка писем сторонним адресам не поддеживается.").Bytes(),
-		//}, nil
+		return &utils_proto.JsonExtendResponse{
+			Response: pkg.CreateJsonErr(pkg.STATUS_NOT_IMP, "Отправка писем сторонним адресам не поддеживается.").Bytes(),
+		}, nil
 		
 		mailgunDomain := "sandbox" +
 		"62098" + 
