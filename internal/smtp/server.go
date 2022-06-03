@@ -3,6 +3,7 @@ package smtp_server
 import (
 	"OverflowBackend/internal/config"
 	"OverflowBackend/internal/models"
+	ws "OverflowBackend/internal/websocket"
 	"OverflowBackend/pkg"
 	"OverflowBackend/proto/auth_proto"
 	"OverflowBackend/proto/folder_manager_proto"
@@ -13,10 +14,11 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"strconv"
 
 	"github.com/emersion/go-smtp"
-	log "github.com/sirupsen/logrus"
 	enmime "github.com/jhillyerd/enmime"
+	log "github.com/sirupsen/logrus"
 )
 
 
@@ -159,6 +161,26 @@ func (s *Session) Data(r io.Reader) error {
 		err = errors.New(response.Message)
 		log.Error("Ошибка отправки сообщения: ", err)
 		return err
+	}
+
+	addresse := pkg.EmailToUsername(s.mailForm.Addressee)
+
+	respCU, err := s.mailbox.CountUnread(context.Background(), &mailbox_proto.CountUnreadRequest{
+		Data: &utils_proto.Session{
+			Username:      addresse,
+			Authenticated: true,
+		},
+	})
+	
+	if err != nil {
+		return err
+	}
+
+	ws.WSChannel <- ws.WSMessage{
+		Type:          ws.TYPE_ALERT,
+		Username:      addresse,
+		Message:       strconv.Itoa(int(respCU.Count)),
+		MessageStatus: ws.STATUS_INFO,
 	}
 	return nil
 }

@@ -4,9 +4,11 @@ import (
 	"OverflowBackend/internal/config"
 	"OverflowBackend/internal/middlewares"
 	"OverflowBackend/internal/session"
+	smtp_server "OverflowBackend/cmd/smtp"
 	"OverflowBackend/pkg"
 	"OverflowBackend/proto/attach_proto"
 	"fmt"
+
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
@@ -72,5 +74,8 @@ func (app *Application) Run(configPath string) {
 	log.Info("Успешное подключение к микросервису Attach.")
 	router.Init(config, authDial, profileDial, mailboxDial, folderManagerDial, attachDial)
 	middlewares.Init(config, attach_proto.NewAttachClient(attachDial))
+
+	go smtp_server.SetupServer()
+	
 	HandleServer(config, router)
 }

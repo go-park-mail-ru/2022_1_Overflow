@@ -29,6 +29,7 @@ message GetInfoRequest {
 
 message GetAvatarRequest {
     string username = 1;
+    string dummyName = 2;
 }
 
 message ChangePasswordRequest {

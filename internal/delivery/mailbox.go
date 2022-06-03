@@ -328,8 +328,6 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
-	response.Message = resp.Param
-	pkg.WriteJsonErrFull(w, &response)
 
 	respCU, err := d.mailbox.CountUnread(context.Background(), &mailbox_proto.CountUnreadRequest{
 		Data: &utils_proto.Session{
@@ -337,11 +335,16 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 			Authenticated: true,
 		},
 	})
+
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	d.ws <- ws.WSMessage{
+
+	response.Message = resp.Param
+	pkg.WriteJsonErrFull(w, &response)
+
+	ws.WSChannel <- ws.WSMessage{
 		Type:          ws.TYPE_ALERT,
 		Username:      form.Addressee,
 		Message:       strconv.Itoa(int(respCU.Count)),

@@ -53,3 +53,11 @@ func ConvertDomain(domain string) string {
 		return domain + ":25"
 	}
 }
+
+func ThemeToAvatarName(theme string) string {
+	if IsThemeReserved(theme) {
+		return "dummy_" + theme
+	} else {
+		return "dummy_blue"
+	}
+}

@@ -1,4 +1,4 @@
-package main
+package smtp_server
 
 import (
 	"OverflowBackend/internal/config"
@@ -55,7 +55,7 @@ func initServer(configPath string) *smtp_server.SMTPServer {
 	return server
 }
 
-func main() {
+func SetupServer() {
 	log.SetLevel(log.DebugLevel)
 	server := initServer("./configs/main.yml")
 	s := smtp.NewServer(server)
@@ -93,4 +93,8 @@ func main() {
 	if err := s.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func main() {
+
 }

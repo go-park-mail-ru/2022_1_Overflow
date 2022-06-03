@@ -312,8 +312,16 @@ func (d *Delivery) GetAvatar(w http.ResponseWriter, r *http.Request) {
 		}
 		username = data.Username
 	}
+	var theme string
+	themeInt, err := session.Manager.GetDataFull(r, session.AddStoreName, "theme")
+	if err != nil {
+		theme = "blue"
+	} else {
+		theme = themeInt.(string)
+	}
 	resp, err := d.profile.GetAvatar(context.Background(), &profile_proto.GetAvatarRequest{
 		Username: username,
+		DummyName: pkg.ThemeToAvatarName(theme),
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)

@@ -22,6 +22,8 @@ type WSMessage struct {
 	MessageStatus int
 }
 
+var WSChannel chan WSMessage
+
 func wsServer(in chan WSMessage) {
 	log.Info("WS: server start")
 	ws := map[string]*websocket.Conn{}
@@ -38,7 +40,9 @@ func wsServer(in chan WSMessage) {
 			keepAlive(cmd.Conn)
 			log.Info("SW: Client Successfully Connected" + "[username: " + cmd.Username + "]")
 		case TYPE_ALERT:
+			log.Debug("cmd.Username = ", cmd.Username)
 			addressee, exist := ws[cmd.Username]
+			log.Debug("exist = ", exist)
 			if !exist {
 				continue
 			}
@@ -74,7 +78,7 @@ func keepAlive(c *websocket.Conn) {
 }
 
 func NewWSServer() chan WSMessage {
-	in := make(chan WSMessage, 0)
-	go wsServer(in)
-	return in
+	WSChannel = make(chan WSMessage, 0)
+	go wsServer(WSChannel)
+	return WSChannel
 }

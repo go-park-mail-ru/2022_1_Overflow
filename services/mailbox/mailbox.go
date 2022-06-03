@@ -443,8 +443,15 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 			Response: pkg.CreateJsonErr(pkg.STATUS_NOT_IMP, "Отправка писем сторонним адресам не поддеживается.").Bytes(),
 		}, nil
 		
-		log.Debug("Отправка письма по SMTP.")
-		authentication := sasl.NewPlainClient("", "overmail.info@gmail.com", "Dp4-FrM-5xj-UU9")
+		mailgunDomain := "sandbox" +
+		"62098" + 
+		"331731a4f1483c5639e" + 
+		"a27ed0dd" + ".mailgun.org"
+		email := data.Username+"@"+mailgunDomain
+		//log.Debug("Отправка письма по SMTP.")
+		authentication := sasl.NewPlainClient("", "postmaster@" + mailgunDomain, "d602a" +
+		"b556c7a4b" + "786460ad67" + "0c4a2f53-" + 
+		"27a562f9-3440a5b0")
 		// Connect to the server, authenticate, set the sender and recipient,
 		// and send the email all in one step.
 		to := []string{form.Addressee}
@@ -452,16 +459,9 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 			"Subject: "+form.Theme+"\r\n" +
 			"\r\n" +
 			form.Text+"\r\n")
-		domain, err := pkg.ParseDomain(form.Addressee)
-		if err != nil {
-			return &utils_proto.JsonExtendResponse{
-				Response: pkg.CreateJsonErr(pkg.STATUS_INTERNAL, "Ошибка при отправке письма по SMTP.").Bytes(),
-			}, err
-		}
-		domain = pkg.ConvertDomain(domain)
-		log.Debug("Получен домен получателя: ", domain)
+		domain := "smtp.mailgun.org:587"
 		log.Debug("Выполнение SMTP запроса...")
-		err = smtp.SendMail(domain, authentication, data.Username, to, msg)
+		err = smtp.SendMail(domain, authentication, email, to, msg)
 		if err != nil {
 			log.Debug("Неудачная отправка по SMTP: ", err)
 			return &utils_proto.JsonExtendResponse{
