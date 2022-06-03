@@ -90,7 +90,7 @@ func (s *MailBoxService) Income(context context.Context, request *mailbox_proto.
 		mail_add.Mail = mail
 		resp, err := s.profile.GetAvatar(
 			context,
-			&profile_proto.GetAvatarRequest{Username: mail.Sender},
+			&profile_proto.GetAvatarRequest{Username: mail.Sender, DummyName: request.DummyName},
 		)
 		if err != nil {
 			return &mailbox_proto.ResponseMails{
@@ -189,7 +189,7 @@ func (s *MailBoxService) Outcome(context context.Context, request *mailbox_proto
 		mail_add.Mail = mail
 		resp, err := s.profile.GetAvatar(
 			context,
-			&profile_proto.GetAvatarRequest{Username: mail.Addressee},
+			&profile_proto.GetAvatarRequest{Username: mail.Addressee, DummyName: request.DummyName},
 		)
 		if err != nil {
 			return &mailbox_proto.ResponseMails{

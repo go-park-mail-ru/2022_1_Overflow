@@ -19,12 +19,14 @@ message IncomeRequest {
     utils.Session data = 1;
     int32 limit = 2;
     int32 offset = 3;
+    string dummyName = 4;
 }
 
 message OutcomeRequest {
     utils.Session data = 1;
     int32 limit = 2;
     int32 offset = 3;
+    string dummyName = 4;
 }
 
 message GetMailRequest {

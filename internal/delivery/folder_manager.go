@@ -488,11 +488,19 @@ func (d *Delivery) ListFolders(w http.ResponseWriter, r *http.Request) {
 	}
 	folderName := r.URL.Query().Get("folder_name")
 	if len(folderName) > 0 {
+		var theme string
+		themeInt, err := session.Manager.GetDataFull(r, session.AddStoreName, "theme")
+		if err != nil {
+			theme = pkg.THEME_BLUE
+		} else {
+			theme = themeInt.(string)
+		}
 		resp, err := d.folderManager.ListFolder(context.Background(), &folder_manager_proto.ListFolderRequest{
 			Data:       data,
 			FolderName: folderName,
 			Limit:      int32(limit),
 			Offset:     int32(offset),
+			DummyName: pkg.ThemeToAvatarName(theme),
 		})
 		if err != nil {
 			pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
