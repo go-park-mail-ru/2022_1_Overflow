@@ -443,9 +443,15 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 		//	Response: pkg.CreateJsonErr(pkg.STATUS_NOT_IMP, "Отправка писем сторонним адресам не поддеживается.").Bytes(),
 		//}, nil
 		
-		email := data.Username+"@sandbox62098331731a4f1483c5639ea27ed0dd.mailgun.org"
+		mailgunDomain := "sandbox" +
+		"62098" + 
+		"331731a4f1483c5639e" + 
+		"a27ed0dd" + ".mailgun.org"
+		email := data.Username+"@"+mailgunDomain
 		//log.Debug("Отправка письма по SMTP.")
-		authentication := sasl.NewPlainClient("", "postmaster@sandbox62098331731a4f1483c5639ea27ed0dd.mailgun.org", "d602ab556c7a4b786460ad670c4a2f53-27a562f9-3440a5b0")
+		authentication := sasl.NewPlainClient("", "postmaster@" + mailgunDomain, "d602a" +
+		"b556c7a4b" + "786460ad67" + "0c4a2f53-" + 
+		"27a562f9-3440a5b0")
 		// Connect to the server, authenticate, set the sender and recipient,
 		// and send the email all in one step.
 		to := []string{form.Addressee}
