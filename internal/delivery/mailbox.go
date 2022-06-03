@@ -335,7 +335,7 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 			Authenticated: true,
 		},
 	})
-	
+
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
@@ -344,7 +344,7 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 	response.Message = resp.Param
 	pkg.WriteJsonErrFull(w, &response)
 
-	d.ws <- ws.WSMessage{
+	ws.WSChannel <- ws.WSMessage{
 		Type:          ws.TYPE_ALERT,
 		Username:      form.Addressee,
 		Message:       strconv.Itoa(int(respCU.Count)),
