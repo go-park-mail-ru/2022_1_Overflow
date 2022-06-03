@@ -342,6 +342,7 @@ func (d *Delivery) GetAvatar(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Router /profile/data/set [post]
 // @Tags profile
+// @Param X-CSRF-Token header string true "CSRF токен"
 func (d *Delivery) SetData(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodPost {

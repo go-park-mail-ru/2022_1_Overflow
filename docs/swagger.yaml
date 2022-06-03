@@ -178,6 +178,13 @@ definitions:
       isread:
         type: boolean
     type: object
+  models.SetDataForm:
+    properties:
+      name:
+        type: string
+      value:
+        type: string
+    type: object
   models.SignInForm:
     properties:
       password:
@@ -1045,6 +1052,58 @@ paths:
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
       summary: Изменение пароля пользователя
+      tags:
+      - profile
+  /profile/data/get:
+    get:
+      description: Получить значение дополнительного поля сессии пользователя.
+      parameters:
+      - description: Имя поля.
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Получить значение дополнительного поля сессии пользователя
+      tags:
+      - profile
+  /profile/data/set:
+    post:
+      description: Выставить значение дополнительного поля сессии пользователя. Для
+        удаления параметра необходимо отправить пустое значение поля.
+      parameters:
+      - description: Форма запроса.
+        in: body
+        name: SetDataForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.SetDataForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Выставить значение дополнительного поля сессии пользователя
       tags:
       - profile
   /profile/set:

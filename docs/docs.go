@@ -1262,6 +1262,84 @@ const docTemplate = `{
                 }
             }
         },
+        "/profile/data/get": {
+            "get": {
+                "description": "Получить значение дополнительного поля сессии пользователя.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile"
+                ],
+                "summary": "Получить значение дополнительного поля сессии пользователя",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Имя поля.",
+                        "name": "name",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/profile/data/set": {
+            "post": {
+                "description": "Выставить значение дополнительного поля сессии пользователя. Для удаления параметра необходимо отправить пустое значение поля.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile"
+                ],
+                "summary": "Выставить значение дополнительного поля сессии пользователя",
+                "parameters": [
+                    {
+                        "description": "Форма запроса.",
+                        "name": "SetDataForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SetDataForm"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/profile/set": {
             "post": {
                 "consumes": [
@@ -1677,6 +1755,17 @@ const docTemplate = `{
                 },
                 "isread": {
                     "type": "boolean"
+                }
+            }
+        },
+        "models.SetDataForm": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
                 }
             }
         },
