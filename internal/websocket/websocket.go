@@ -40,7 +40,9 @@ func wsServer(in chan WSMessage) {
 			keepAlive(cmd.Conn)
 			log.Info("SW: Client Successfully Connected" + "[username: " + cmd.Username + "]")
 		case TYPE_ALERT:
+			log.Debug("cmd.Username = ", cmd.Username)
 			addressee, exist := ws[cmd.Username]
+			log.Debug("exist = ", exist)
 			if !exist {
 				continue
 			}
