@@ -7,13 +7,13 @@ CREATE TABLE overflow.users (
     first_name varchar(45) not null,
     last_name varchar(45) not null,
     password varchar(45) not null,
-    username varchar(45) not null unique
+    username varchar(90) not null unique
 );
 
 CREATE TABLE overflow.mails (
     id serial not null primary key,
-    sender varchar(45),
-    addressee varchar(45) DEFAULT null,
+    sender varchar(90),
+    addressee varchar(90) DEFAULT null,
     date timestamp not null,
     theme varchar(100) DEFAULT null,
     text text DEFAULT null,
