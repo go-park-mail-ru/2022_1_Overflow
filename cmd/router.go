@@ -58,6 +58,8 @@ func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 	routerAPI.HandleFunc("/profile/set", rm.d.SetInfo)
 	routerAPI.HandleFunc("/profile/avatar/set", rm.d.SetAvatar)
 	routerAPI.HandleFunc("/profile/change_password", rm.d.ChangePassword)
+	routerAPI.HandleFunc("/profile/data/get", rm.d.GetData)
+	routerAPI.HandleFunc("/profile/data/set", rm.d.SetData)
 	// ======================================================================
 	routerAPI.HandleFunc("/mail/income", rm.d.Income)
 	routerAPI.HandleFunc("/mail/outcome", rm.d.Outcome)
