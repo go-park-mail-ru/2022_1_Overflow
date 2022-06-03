@@ -163,9 +163,11 @@ func (s *Session) Data(r io.Reader) error {
 		return err
 	}
 
+	addresse := pkg.EmailToUsername(s.mailForm.Addressee)
+
 	respCU, err := s.mailbox.CountUnread(context.Background(), &mailbox_proto.CountUnreadRequest{
 		Data: &utils_proto.Session{
-			Username:      s.mailForm.Addressee,
+			Username:      addresse,
 			Authenticated: true,
 		},
 	})
@@ -173,8 +175,6 @@ func (s *Session) Data(r io.Reader) error {
 	if err != nil {
 		return err
 	}
-
-	addresse := pkg.EmailToUsername(s.mailForm.Addressee)
 
 	ws.WSChannel <- ws.WSMessage{
 		Type:          ws.TYPE_ALERT,
