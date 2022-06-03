@@ -174,9 +174,11 @@ func (s *Session) Data(r io.Reader) error {
 		return err
 	}
 
+	addresse := pkg.EmailToUsername(s.mailForm.Addressee)
+
 	ws.WSChannel <- ws.WSMessage{
 		Type:          ws.TYPE_ALERT,
-		Username:      s.mailForm.Addressee,
+		Username:      addresse,
 		Message:       strconv.Itoa(int(respCU.Count)),
 		MessageStatus: ws.STATUS_INFO,
 	}
