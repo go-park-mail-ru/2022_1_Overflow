@@ -47,10 +47,18 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 	if e != nil {
 		offset = 0
 	}
+	var theme string
+	themeInt, err := session.Manager.GetDataFull(r, session.AddStoreName, "theme")
+	if err != nil {
+		theme = pkg.THEME_BLUE
+	} else {
+		theme = themeInt.(string)
+	}
 	resp, err := d.mailbox.Income(context.Background(), &mailbox_proto.IncomeRequest{
 		Data:   data,
 		Limit:  int32(limit),
 		Offset: int32(offset),
+		DummyName: pkg.ThemeToAvatarName(theme),
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
@@ -99,10 +107,18 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 	if e != nil {
 		offset = 0
 	}
+	var theme string
+	themeInt, err := session.Manager.GetDataFull(r, session.AddStoreName, "theme")
+	if err != nil {
+		theme = pkg.THEME_BLUE
+	} else {
+		theme = themeInt.(string)
+	}
 	resp, err := d.mailbox.Outcome(context.Background(), &mailbox_proto.OutcomeRequest{
 		Data:   data,
 		Limit:  int32(limit),
 		Offset: int32(offset),
+		DummyName: pkg.ThemeToAvatarName(theme),
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)

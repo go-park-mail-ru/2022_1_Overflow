@@ -315,7 +315,7 @@ func (d *Delivery) GetAvatar(w http.ResponseWriter, r *http.Request) {
 	var theme string
 	themeInt, err := session.Manager.GetDataFull(r, session.AddStoreName, "theme")
 	if err != nil {
-		theme = "blue"
+		theme = pkg.THEME_BLUE
 	} else {
 		theme = themeInt.(string)
 	}

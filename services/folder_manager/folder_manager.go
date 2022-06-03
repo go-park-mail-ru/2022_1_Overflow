@@ -470,7 +470,7 @@ func (s *FolderManagerService) ListFolder(context context.Context, request *fold
 		}
 		resp, err := s.profile.GetAvatar(
 			context,
-			&profile_proto.GetAvatarRequest{Username: username},
+			&profile_proto.GetAvatarRequest{Username: username, DummyName: request.DummyName},
 		)
 		if err != nil {
 			return &folder_manager_proto.ResponseMails{

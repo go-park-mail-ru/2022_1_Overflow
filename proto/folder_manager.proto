@@ -113,4 +113,5 @@ message ListFolderRequest {
     string folderName = 2;
     int32 limit = 3;
     int32 offset = 4;
+    string dummyName = 5;
 }
