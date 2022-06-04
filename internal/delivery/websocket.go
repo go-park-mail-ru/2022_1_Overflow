@@ -40,7 +40,7 @@ func (d *Delivery) WSConnect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	d.ws <- ws.WSMessage{
+	ws.WSChannel <- ws.WSMessage{
 		Type:     ws.TYPE_NEW_CONNECTION,
 		Username: data.Username,
 		Conn:     conn,

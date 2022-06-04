@@ -24,7 +24,7 @@ func StartAttachServer(config *config.Config, db repository_proto.DatabaseReposi
 		log.Fatal(SERVICE_PREFIX, err)
 	}
 
-	attachServer := grpc.NewServer()
+	attachServer := grpc.NewServer(grpc.MaxRecvMsgSize(30<<20), grpc.MaxSendMsgSize(30<<20))
 	attachService := attach.AttachService{}
 	attachService.Init(config, db, s3)
 	attach_proto.RegisterAttachServer(attachServer, &attachService)

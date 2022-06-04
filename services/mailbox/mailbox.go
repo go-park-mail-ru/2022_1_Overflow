@@ -9,8 +9,12 @@ import (
 	"OverflowBackend/proto/repository_proto"
 	"OverflowBackend/proto/utils_proto"
 	"context"
-	"github.com/mailru/easyjson"
+	"strings"
 	"time"
+
+	"github.com/emersion/go-smtp"
+	"github.com/emersion/go-sasl"
+	"github.com/mailru/easyjson"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -86,7 +90,7 @@ func (s *MailBoxService) Income(context context.Context, request *mailbox_proto.
 		mail_add.Mail = mail
 		resp, err := s.profile.GetAvatar(
 			context,
-			&profile_proto.GetAvatarRequest{Username: mail.Sender},
+			&profile_proto.GetAvatarRequest{Username: mail.Sender, DummyName: request.DummyName},
 		)
 		if err != nil {
 			return &mailbox_proto.ResponseMails{
@@ -185,7 +189,7 @@ func (s *MailBoxService) Outcome(context context.Context, request *mailbox_proto
 		mail_add.Mail = mail
 		resp, err := s.profile.GetAvatar(
 			context,
-			&profile_proto.GetAvatarRequest{Username: mail.Addressee},
+			&profile_proto.GetAvatarRequest{Username: mail.Addressee, DummyName: request.DummyName},
 		)
 		if err != nil {
 			return &mailbox_proto.ResponseMails{
@@ -398,6 +402,8 @@ func (s *MailBoxService) ReadMail(context context.Context, request *mailbox_prot
 
 func (s *MailBoxService) SendMail(context context.Context, request *mailbox_proto.SendMailRequest) (*utils_proto.JsonExtendResponse, error) {
 	log.Debug("Отправить письмо, username = ", request.Data.Username)
+	data := request.Data
+	/*
 	resp, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
 		Username: request.Data.Username,
 	})
@@ -412,7 +418,6 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 			Response: pkg.DB_ERR.Bytes(),
 		}, nil
 	}
-	data := request.Data
 	var user models.User
 	err = easyjson.Unmarshal(resp.User, &user)
 	if err != nil {
@@ -425,13 +430,52 @@ func (s *MailBoxService) SendMail(context context.Context, request *mailbox_prot
 			Response: pkg.NO_USER_EXIST.Bytes(),
 		}, nil
 	}
+	*/
 	var form models.MailForm
-	err = easyjson.Unmarshal(request.Form, &form)
+	err := easyjson.Unmarshal(request.Form, &form)
 	if err != nil {
 		return &utils_proto.JsonExtendResponse{
 			Response: pkg.JSON_ERR.Bytes(),
 		}, err
 	}
+	if !pkg.IsLocalEmail(form.Addressee) {
+		return &utils_proto.JsonExtendResponse{
+			Response: pkg.CreateJsonErr(pkg.STATUS_NOT_IMP, "Отправка писем сторонним адресам не поддеживается.").Bytes(),
+		}, nil
+		
+		mailgunDomain := "sandbox" +
+		"62098" + 
+		"331731a4f1483c5639e" + 
+		"a27ed0dd" + ".mailgun.org"
+		email := data.Username+"@"+mailgunDomain
+		//log.Debug("Отправка письма по SMTP.")
+		authentication := sasl.NewPlainClient("", "postmaster@" + mailgunDomain, "d602a" +
+		"b556c7a4b" + "786460ad67" + "0c4a2f53-" + 
+		"27a562f9-3440a5b0")
+		// Connect to the server, authenticate, set the sender and recipient,
+		// and send the email all in one step.
+		to := []string{form.Addressee}
+		msg := strings.NewReader("To: "+form.Addressee+"\r\n" +
+			"Subject: "+form.Theme+"\r\n" +
+			"\r\n" +
+			form.Text+"\r\n")
+		domain := "smtp.mailgun.org:587"
+		log.Debug("Выполнение SMTP запроса...")
+		err = smtp.SendMail(domain, authentication, email, to, msg)
+		if err != nil {
+			log.Debug("Неудачная отправка по SMTP: ", err)
+			return &utils_proto.JsonExtendResponse{
+				Response: pkg.CreateJsonErr(pkg.STATUS_INTERNAL, "Ошибка при отправке письма по SMTP.").Bytes(),
+			}, err
+		} else {
+			log.Debug("Успешная отправка по SMTP.")
+			return &utils_proto.JsonExtendResponse{
+				Response: pkg.NO_ERR.Bytes(),
+				Param:    "",
+			}, nil
+		}
+	}
+	form.Addressee = pkg.EmailToUsername(form.Addressee)
 	resp2, err := s.db.GetUserInfoByUsername(context, &repository_proto.GetUserInfoByUsernameRequest{
 		Username: form.Addressee,
 	})
@@ -496,6 +540,7 @@ func (s *MailBoxService) CountUnread(ctx context.Context, request *mailbox_proto
 		log.Warning(err)
 		return nil, err
 	}
+
 	return &mailbox_proto.ResponseCountUnread{
 		Count: countMess.Count,
 	}, nil

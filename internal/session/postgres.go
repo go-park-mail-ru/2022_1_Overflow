@@ -4,6 +4,7 @@ import (
 	"OverflowBackend/internal/config"
 	"OverflowBackend/proto/utils_proto"
 	"encoding/gob"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -82,10 +83,35 @@ func (pm *PostgresManager) GetData(r *http.Request) (data *utils_proto.Session, 
 			data, err = nil, errRecover.(error)
 		}
 	}()
-	session, err := pm.store.Get(r, session_name)
+	val, err := pm.GetDataFull(r, session_name, "data")
 	if err != nil {
 		return nil, err
 	}
-	sessionData := session.Values["data"].(*utils_proto.Session)
+	sessionData := val.(*utils_proto.Session)
 	return sessionData, nil
+}
+
+func (pm *PostgresManager) GetDataFull(r *http.Request, storeName string, field string) (interface{}, error) {
+	session, err := pm.store.Get(r, storeName)
+	if err != nil {
+		return nil, err
+	}
+	if val, ok := session.Values[field]; ok {
+		return val, nil
+	}
+	return nil, errors.New("Поле не существует.")
+}
+
+func (pm *PostgresManager) SetDataFull(w http.ResponseWriter, r *http.Request, storeName, field string, value interface{}) (err error) {
+	defer func() {
+		errRecover := recover()
+		if errRecover != nil {
+			log.Error(errRecover)
+			err = errRecover.(error)
+		}
+	}()
+	session, _ := pm.store.Get(r, storeName)
+	session.Values[field] = value
+	err = session.Save(r, w)
+	return
 }

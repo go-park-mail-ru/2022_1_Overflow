@@ -190,7 +190,7 @@ func (s *ProfileService) GetAvatar(context context.Context, request *profile_pro
 		}, e
 	}
 	if len(matches) == 0 {
-		avatarUrl := pkg.JoinURL(s.config.Server.Static.Handle, "dummy.png")
+		avatarUrl := pkg.JoinURL(s.config.Server.Static.Handle, request.DummyName+".png")
 		return &profile_proto.GetAvatarResponse{
 			Response: &utils_proto.JsonResponse{
 				Response: pkg.NO_ERR.Bytes(),

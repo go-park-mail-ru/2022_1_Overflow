@@ -58,6 +58,8 @@ func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 	routerAPI.HandleFunc("/profile/set", rm.d.SetInfo)
 	routerAPI.HandleFunc("/profile/avatar/set", rm.d.SetAvatar)
 	routerAPI.HandleFunc("/profile/change_password", rm.d.ChangePassword)
+	routerAPI.HandleFunc("/profile/data/get", rm.d.GetData)
+	routerAPI.HandleFunc("/profile/data/set", rm.d.SetData)
 	// ======================================================================
 	routerAPI.HandleFunc("/mail/income", rm.d.Income)
 	routerAPI.HandleFunc("/mail/outcome", rm.d.Outcome)
@@ -75,11 +77,13 @@ func (rm *RouterManager) NewRouter(swaggerPort string) http.Handler {
 	routerAPI.HandleFunc("/folder/mail/add_form", rm.d.AddMailToFolderByObject)
 	routerAPI.HandleFunc("/folder/mail/move", rm.d.MoveFolderMail)
 	routerAPI.HandleFunc("/folder/mail/delete", rm.d.DeleteFolderMail)
+	routerAPI.HandleFunc("/folder/mail/update", rm.d.UpdateFolderMail)
 	routerAPI.HandleFunc("/folder/rename", rm.d.ChangeFolder)
 	routerAPI.HandleFunc("/folder/delete", rm.d.DeleteFolder)
 	routerAPI.HandleFunc("/folder/list", rm.d.ListFolders)
 	// ======================================================================
 	routerAPI.HandleFunc("/ws", rm.d.WSConnect)
+	routerAPI.HandleFunc("/get_token", rm.d.GetToken)
 	// ======================================================================
 	routerAPI.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
 		httpSwagger.URL("/api/v1/swagger/doc.json"), //The url pointing to API definition

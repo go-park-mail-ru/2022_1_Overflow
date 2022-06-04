@@ -37,25 +37,6 @@ func (m *MockFolderManagerClient) EXPECT() *MockFolderManagerClientMockRecorder 
 }
 
 // AddFolder mocks base method.
-func (m *MockFolderManagerClient) FolderExist(ctx context.Context, userId int32, folderName string, opts ...grpc.CallOption) bool {
-	m.ctrl.T.Helper()
-	varargs := []interface{}{ctx, userId, folderName}
-	for _, a := range opts {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "FolderExist", varargs...)
-	ret0, _ := ret[0].(bool)
-	return ret0
-}
-
-// AddFolder indicates an expected call of AddFolder.
-func (mr *MockFolderManagerClientMockRecorder) FolderExist(ctx, in interface{}, opts ...interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FolderExist", reflect.TypeOf((*MockFolderManagerClient)(nil).FolderExist), varargs...)
-}
-
-// AddFolder mocks base method.
 func (m *MockFolderManagerClient) AddFolder(ctx context.Context, in *AddFolderRequest, opts ...grpc.CallOption) (*ResponseFolder, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, in}
@@ -235,6 +216,26 @@ func (mr *MockFolderManagerClientMockRecorder) MoveFolderMail(ctx, in interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MoveFolderMail", reflect.TypeOf((*MockFolderManagerClient)(nil).MoveFolderMail), varargs...)
 }
 
+// UpdateFolderMail mocks base method.
+func (m *MockFolderManagerClient) UpdateFolderMail(ctx context.Context, in *UpdateFolderMailRequest, opts ...grpc.CallOption) (*utils_proto.JsonResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateFolderMail", varargs...)
+	ret0, _ := ret[0].(*utils_proto.JsonResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateFolderMail indicates an expected call of UpdateFolderMail.
+func (mr *MockFolderManagerClientMockRecorder) UpdateFolderMail(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateFolderMail", reflect.TypeOf((*MockFolderManagerClient)(nil).UpdateFolderMail), varargs...)
+}
+
 // MockFolderManagerServer is a mock of FolderManagerServer interface.
 type MockFolderManagerServer struct {
 	ctrl     *gomock.Controller
@@ -391,6 +392,21 @@ func (m *MockFolderManagerServer) MoveFolderMail(arg0 context.Context, arg1 *Mov
 func (mr *MockFolderManagerServerMockRecorder) MoveFolderMail(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "MoveFolderMail", reflect.TypeOf((*MockFolderManagerServer)(nil).MoveFolderMail), arg0, arg1)
+}
+
+// UpdateFolderMail mocks base method.
+func (m *MockFolderManagerServer) UpdateFolderMail(arg0 context.Context, arg1 *UpdateFolderMailRequest) (*utils_proto.JsonResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateFolderMail", arg0, arg1)
+	ret0, _ := ret[0].(*utils_proto.JsonResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateFolderMail indicates an expected call of UpdateFolderMail.
+func (mr *MockFolderManagerServerMockRecorder) UpdateFolderMail(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateFolderMail", reflect.TypeOf((*MockFolderManagerServer)(nil).UpdateFolderMail), arg0, arg1)
 }
 
 // mustEmbedUnimplementedFolderManagerServer mocks base method.

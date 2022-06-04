@@ -178,6 +178,13 @@ definitions:
       isread:
         type: boolean
     type: object
+  models.SetDataForm:
+    properties:
+      name:
+        type: string
+      value:
+        type: string
+    type: object
   models.SignInForm:
     properties:
       password:
@@ -205,6 +212,15 @@ definitions:
         maxLength: 45
         type: string
     type: object
+  models.UpdateFolderMailForm:
+    properties:
+      folder_name:
+        type: string
+      form:
+        $ref: '#/definitions/models.MailForm'
+      mail_id:
+        type: integer
+    type: object
   pkg.JsonResponse:
     properties:
       message:
@@ -221,18 +237,6 @@ info:
   version: "1.0"
 paths:
   /folder/add:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - folder_manager
     post:
       parameters:
       - description: Форма запроса
@@ -269,18 +273,6 @@ paths:
       tags:
       - folder_manager
   /folder/delete:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - folder_manager
     post:
       parameters:
       - description: Форма запроса
@@ -355,18 +347,6 @@ paths:
       tags:
       - folder_manager
   /folder/mail/add:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - folder_manager
     post:
       parameters:
       - description: Форма запроса
@@ -403,18 +383,6 @@ paths:
       tags:
       - folder_manager
   /folder/mail/add_form:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - folder_manager
     post:
       parameters:
       - description: Форма запроса
@@ -451,18 +419,6 @@ paths:
       tags:
       - folder_manager
   /folder/mail/delete:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - folder_manager
     post:
       parameters:
       - description: Форма запроса
@@ -499,18 +455,6 @@ paths:
       tags:
       - folder_manager
   /folder/mail/move:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - folder_manager
     post:
       parameters:
       - description: Форма запроса
@@ -546,19 +490,44 @@ paths:
       summary: Переместить письмо из одной папки в другую
       tags:
       - folder_manager
-  /folder/rename:
-    get:
+  /folder/mail/update:
+    post:
+      parameters:
+      - description: Форма запроса
+        in: body
+        name: UpdateFolderMailForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateFolderMailForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+        "401":
+          description: Сессия отсутствует или сессия не валидна.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "500":
+          description: Ошибка БД, неверные GET параметры.
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Обновить данные письма в папке. Письмо должно быть уникальным для данной
+        папки.
       tags:
       - folder_manager
+  /folder/rename:
     post:
       parameters:
       - description: Форма запроса
@@ -594,7 +563,7 @@ paths:
       summary: Переименовать папку с письмами
       tags:
       - folder_manager
-  /logout:
+  /get_token:
     get:
       responses:
         "200":
@@ -605,8 +574,10 @@ paths:
               type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+      summary: Получить CSRF-Token
       tags:
-      - auth
+      - security
+  /logout:
     post:
       parameters:
       - description: CSRF токен
@@ -633,18 +604,6 @@ paths:
       tags:
       - auth
   /mail/attach/add:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - mailbox
     post:
       consumes:
       - multipart/form-data
@@ -683,18 +642,6 @@ paths:
       tags:
       - mailbox
   /mail/attach/get:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - mailbox
     post:
       consumes:
       - application/json
@@ -729,18 +676,6 @@ paths:
       tags:
       - mailbox
   /mail/attach/list:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - mailbox
     post:
       consumes:
       - application/json
@@ -797,18 +732,6 @@ paths:
       tags:
       - mailbox
   /mail/delete:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - mailbox
     post:
       parameters:
       - description: Форма запроса
@@ -942,18 +865,6 @@ paths:
       tags:
       - mailbox
   /mail/read:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - mailbox
     post:
       parameters:
       - description: Форма запроса
@@ -992,18 +903,6 @@ paths:
       tags:
       - mailbox
   /mail/send:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - mailbox
     post:
       consumes:
       - application/json
@@ -1089,18 +988,6 @@ paths:
       tags:
       - profile
   /profile/avatar/set:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - profile
     post:
       consumes:
       - multipart/form-data
@@ -1134,18 +1021,6 @@ paths:
       tags:
       - profile
   /profile/change_password:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - profile
     post:
       consumes:
       - application/json
@@ -1179,19 +1054,59 @@ paths:
       summary: Изменение пароля пользователя
       tags:
       - profile
-  /profile/set:
+  /profile/data/get:
     get:
+      description: Получить значение дополнительного поля сессии пользователя.
+      parameters:
+      - description: Имя поля.
+        in: query
+        name: name
+        type: string
+      produces:
+      - application/json
       responses:
         "200":
           description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
           schema:
             $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Получить значение дополнительного поля сессии пользователя
       tags:
       - profile
+  /profile/data/set:
+    post:
+      description: Выставить значение дополнительного поля сессии пользователя. Для
+        удаления параметра необходимо отправить пустое значение поля.
+      parameters:
+      - description: Форма запроса.
+        in: body
+        name: SetDataForm
+        required: true
+        schema:
+          $ref: '#/definitions/models.SetDataForm'
+      - description: CSRF токен
+        in: header
+        name: X-CSRF-Token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/pkg.JsonResponse'
+      summary: Выставить значение дополнительного поля сессии пользователя
+      tags:
+      - profile
+  /profile/set:
     post:
       consumes:
       - application/json
@@ -1226,18 +1141,6 @@ paths:
       tags:
       - profile
   /signin:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - auth
     post:
       consumes:
       - application/json
@@ -1269,18 +1172,6 @@ paths:
       tags:
       - auth
   /signup:
-    get:
-      responses:
-        "200":
-          description: OK
-          headers:
-            X-CSRF-Token:
-              description: CSRF токен
-              type: string
-          schema:
-            $ref: '#/definitions/pkg.JsonResponse'
-      tags:
-      - auth
     post:
       consumes:
       - application/json

@@ -12,25 +12,6 @@
     "basePath": "/api/v1",
     "paths": {
         "/folder/add": {
-            "get": {
-                "tags": [
-                    "folder_manager"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "produces": [
                     "application/json"
@@ -86,25 +67,6 @@
             }
         },
         "/folder/delete": {
-            "get": {
-                "tags": [
-                    "folder_manager"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "produces": [
                     "application/json"
@@ -217,25 +179,6 @@
             }
         },
         "/folder/mail/add": {
-            "get": {
-                "tags": [
-                    "folder_manager"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "produces": [
                     "application/json"
@@ -291,25 +234,6 @@
             }
         },
         "/folder/mail/add_form": {
-            "get": {
-                "tags": [
-                    "folder_manager"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "produces": [
                     "application/json"
@@ -365,25 +289,6 @@
             }
         },
         "/folder/mail/delete": {
-            "get": {
-                "tags": [
-                    "folder_manager"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "produces": [
                     "application/json"
@@ -439,25 +344,6 @@
             }
         },
         "/folder/mail/move": {
-            "get": {
-                "tags": [
-                    "folder_manager"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "produces": [
                     "application/json"
@@ -512,26 +398,62 @@
                 }
             }
         },
-        "/folder/rename": {
-            "get": {
+        "/folder/mail/update": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "folder_manager"
+                ],
+                "summary": "Обновить данные письма в папке. Письмо должно быть уникальным для данной папки.",
+                "parameters": [
+                    {
+                        "description": "Форма запроса",
+                        "name": "UpdateFolderMailForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.UpdateFolderMailForm"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
+                    }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Сессия отсутствует или сессия не валидна.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка БД, неверные GET параметры.",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
                         }
                     }
                 }
-            },
+            }
+        },
+        "/folder/rename": {
             "post": {
                 "produces": [
                     "application/json"
@@ -586,11 +508,12 @@
                 }
             }
         },
-        "/logout": {
+        "/get_token": {
             "get": {
                 "tags": [
-                    "auth"
+                    "security"
                 ],
+                "summary": "Получить CSRF-Token",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -605,7 +528,9 @@
                         }
                     }
                 }
-            },
+            }
+        },
+        "/logout": {
             "post": {
                 "produces": [
                     "application/json"
@@ -646,25 +571,6 @@
             }
         },
         "/mail/attach/add": {
-            "get": {
-                "tags": [
-                    "mailbox"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "consumes": [
                     "multipart/form-data"
@@ -722,25 +628,6 @@
             }
         },
         "/mail/attach/get": {
-            "get": {
-                "tags": [
-                    "mailbox"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "consumes": [
                     "application/json"
@@ -793,25 +680,6 @@
             }
         },
         "/mail/attach/list": {
-            "get": {
-                "tags": [
-                    "mailbox"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "consumes": [
                     "application/json"
@@ -898,25 +766,6 @@
             }
         },
         "/mail/delete": {
-            "get": {
-                "tags": [
-                    "mailbox"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "produces": [
                     "application/json"
@@ -1120,25 +969,6 @@
             }
         },
         "/mail/read": {
-            "get": {
-                "tags": [
-                    "mailbox"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "produces": [
                     "application/json"
@@ -1194,25 +1024,6 @@
             }
         },
         "/mail/send": {
-            "get": {
-                "tags": [
-                    "mailbox"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "consumes": [
                     "application/json"
@@ -1342,25 +1153,6 @@
             }
         },
         "/profile/avatar/set": {
-            "get": {
-                "tags": [
-                    "profile"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "consumes": [
                     "multipart/form-data"
@@ -1411,25 +1203,6 @@
             }
         },
         "/profile/change_password": {
-            "get": {
-                "tags": [
-                    "profile"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "consumes": [
                     "application/json"
@@ -1481,26 +1254,85 @@
                 }
             }
         },
-        "/profile/set": {
+        "/profile/data/get": {
             "get": {
+                "description": "Получить значение дополнительного поля сессии пользователя.",
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "profile"
+                ],
+                "summary": "Получить значение дополнительного поля сессии пользователя",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Имя поля.",
+                        "name": "name",
+                        "in": "query"
+                    }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
                         }
                     }
                 }
-            },
+            }
+        },
+        "/profile/data/set": {
+            "post": {
+                "description": "Выставить значение дополнительного поля сессии пользователя. Для удаления параметра необходимо отправить пустое значение поля.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "profile"
+                ],
+                "summary": "Выставить значение дополнительного поля сессии пользователя",
+                "parameters": [
+                    {
+                        "description": "Форма запроса.",
+                        "name": "SetDataForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SetDataForm"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "CSRF токен",
+                        "name": "X-CSRF-Token",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/profile/set": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -1553,25 +1385,6 @@
             }
         },
         "/signin": {
-            "get": {
-                "tags": [
-                    "auth"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "consumes": [
                     "application/json"
@@ -1618,25 +1431,6 @@
             }
         },
         "/signup": {
-            "get": {
-                "tags": [
-                    "auth"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.JsonResponse"
-                        },
-                        "headers": {
-                            "X-CSRF-Token": {
-                                "type": "string",
-                                "description": "CSRF токен"
-                            }
-                        }
-                    }
-                }
-            },
             "post": {
                 "description": "Выполняет регистрацию пользователя, НЕ выставляет сессионый cookie.",
                 "consumes": [
@@ -1956,6 +1750,17 @@
                 }
             }
         },
+        "models.SetDataForm": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
         "models.SignInForm": {
             "type": "object",
             "properties": {
@@ -1991,6 +1796,20 @@
                 "username": {
                     "type": "string",
                     "maxLength": 45
+                }
+            }
+        },
+        "models.UpdateFolderMailForm": {
+            "type": "object",
+            "properties": {
+                "folder_name": {
+                    "type": "string"
+                },
+                "form": {
+                    "$ref": "#/definitions/models.MailForm"
+                },
+                "mail_id": {
+                    "type": "integer"
                 }
             }
         },

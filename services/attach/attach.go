@@ -130,7 +130,6 @@ func (s *AttachService) GetAttach(ctx context.Context, request *attach_proto.Get
 		File: file.Bytes(),
 	}, nil
 
-	return nil, nil
 }
 
 func (s *AttachService) ListAttach(ctx context.Context, request *attach_proto.GetAttachRequest) (*attach_proto.AttachListResponse, error) {

@@ -1,47 +1,29 @@
-package cmd
+package smtp_server
 
 import (
 	"OverflowBackend/internal/config"
-	"OverflowBackend/internal/middlewares"
-	"OverflowBackend/internal/session"
-	smtp_server "OverflowBackend/cmd/smtp"
+	"OverflowBackend/internal/smtp"
 	"OverflowBackend/pkg"
-	"OverflowBackend/proto/attach_proto"
+	"OverflowBackend/proto/auth_proto"
+	"OverflowBackend/proto/folder_manager_proto"
+	"OverflowBackend/proto/mailbox_proto"
+	"OverflowBackend/proto/profile_proto"
+	"crypto/tls"
 	"fmt"
+	"time"
 
+	"github.com/emersion/go-smtp"
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
-
-	_ "OverflowBackend/docs"
+	sasl "github.com/emersion/go-sasl"
 )
 
-type Application struct{}
-
-// @title OverMail API
-// @version 1.0
-// @description API почтового сервиса команды Overflow.
-
-// @contact.name Роман Медников
-// @contact.url https://vk.com/l____l____l____l____l____l
-// @contact.username jellybe@yandex.ru
-
-// @BasePath /api/v1
-
-func (app *Application) Run(configPath string) {
+func initServer(configPath string) *smtp_server.SMTPServer {
 	log.Info("Чтение конфигурационного файла сервера.")
 	config, err := config.NewConfig(configPath)
 	if err != nil {
 		log.Fatalf("Ошибка при чтении конфигурационного файла сервера: %v", err)
 	}
 
-	log.Info("Инициализация менджера сессий.")
-	err = session.Init(config)
-	if err != nil {
-		log.Fatalf("Ошибка при инициализации менеджера сессий: %v", err)
-	}
-
-	log.Info("Инициализация роутеров.")
-	router := RouterManager{}
 	authDial, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.Auth.Address, config.Server.Services.Auth.Port))
 	if err != nil {
 		log.Fatal("Ошибка подключения к микросервису Auth:", err)
@@ -62,20 +44,57 @@ func (app *Application) Run(configPath string) {
 		log.Fatal("Ошибка подключения к микросервису FolderManager:", err)
 	}
 	log.Info("Успешное подключение к микросервису FolderManager.")
-	//attachDial, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.Attach.Address, config.Server.Services.Attach.Port))
-	attachDial, err := grpc.Dial(fmt.Sprintf("%v:%v", config.Server.Services.Attach.Address, config.Server.Services.Attach.Port),
-		grpc.WithDefaultCallOptions(
-			grpc.MaxCallRecvMsgSize(30<<20),
-			grpc.MaxCallSendMsgSize(30<<20)),
-		grpc.WithInsecure())
-	if err != nil {
-		log.Fatal("Ошибка подключения к микросервису Attach:", err)
-	}
-	log.Info("Успешное подключение к микросервису Attach.")
-	router.Init(config, authDial, profileDial, mailboxDial, folderManagerDial, attachDial)
-	middlewares.Init(config, attach_proto.NewAttachClient(attachDial))
+	server := &smtp_server.SMTPServer{}
+	server.Init(
+		config,
+		auth_proto.NewAuthClient(authDial),
+		profile_proto.NewProfileClient(profileDial),
+		mailbox_proto.NewMailboxClient(mailboxDial),
+		folder_manager_proto.NewFolderManagerClient(folderManagerDial),
+	)
+	return server
+}
 
-	go smtp_server.SetupServer()
-	
-	HandleServer(config, router)
+func SetupServer() {
+	log.SetLevel(log.DebugLevel)
+	server := initServer("./configs/main.yml")
+	s := smtp.NewServer(server)
+	s.Addr = ":25"
+	s.Domain = "localhost"
+	s.ReadTimeout = 10 * time.Second
+	s.WriteTimeout = 10 * time.Second
+	s.MaxMessageBytes = 1024 * 1024
+	s.MaxRecipients = 50
+	s.AllowInsecureAuth = true
+	// force TLS for auth
+	s.AllowInsecureAuth = false
+	// Load the certificate and key
+	cer, err := tls.LoadX509KeyPair("/etc/server.crt", "/etc/server.key")
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	// Configure the TLS support
+	// Add deprecated LOGIN auth method as some clients haven't learned
+	s.EnableAuth(sasl.Login, func(conn *smtp.Conn) sasl.Server {
+		return sasl.NewLoginServer(func(username, password string) error {
+			state := conn.State()
+			session, err := server.Login(&state, username, password)
+			if err != nil {
+				return err
+			}
+
+			conn.SetSession(session)
+			return nil
+		})
+	})
+	s.TLSConfig = &tls.Config{Certificates: []tls.Certificate{cer}}
+	log.Println("Starting server at", s.Addr)
+	if err := s.ListenAndServe(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func main() {
+
 }

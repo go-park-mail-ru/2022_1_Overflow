@@ -24,9 +24,23 @@ func (c *Database) AddMail(context context.Context, request *repository_proto.Ad
 			Param:  "",
 		}, err
 	}
+	_, err = c.Conn.Exec(context, "ALTER TABLE overflow.mails DISABLE TRIGGER ALL;")
+	if err != nil {
+		log.Error(err)
+		return &utils_proto.DatabaseExtendResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}, err
+	}
 	res, err := c.Conn.Query(context, "INSERT INTO overflow.mails(sender, addressee, theme, text, files, date) VALUES ($1, $2, $3, $4, $5, $6);", mail.Sender, mail.Addressee, mail.Theme, mail.Text, mail.Files, mail.Date)
 	if err == nil {
 		res.Close()
+		_, err = c.Conn.Exec(context, "ALTER TABLE overflow.mails ENABLE TRIGGER ALL;")
+		if err != nil {
+			log.Error(err)
+			return &utils_proto.DatabaseExtendResponse{
+				Status: utils_proto.DatabaseStatus_ERROR,
+			}, err
+		}
 		row := c.Conn.QueryRow(context, "SELECT max(id) FROM overflow.mails WHERE sender = $1", mail.Sender)
 		var mailid int
 		if err := row.Scan(&mailid); err != nil {
@@ -88,6 +102,41 @@ func (c *Database) DeleteMail(context context.Context, request *repository_proto
 			Status: utils_proto.DatabaseStatus_ERROR,
 		}, err
 	}
+}
+
+func (c *Database) UpdateMail(context context.Context, request *repository_proto.UpdateMailRequest) (*utils_proto.DatabaseResponse, error) {
+	var mail models.Mail
+	mailId := request.MailId
+
+	err := easyjson.Unmarshal(request.Mail, &mail)
+	if err != nil {
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}, err
+	}
+	_, err = c.Conn.Exec(context, "ALTER TABLE overflow.mails DISABLE TRIGGER ALL;")
+	if err != nil {
+		log.Error(err)
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}, err
+	}
+	_, err = c.Conn.Exec(context, "UPDATE overflow.mails SET addressee = $2, date = $3, files = $4, read = $5, sender = $6, text = $7, theme = $8 WHERE id = $1;", mailId, mail.Addressee, mail.Date, mail.Files, mail.Read, mail.Sender, mail.Text, mail.Theme)
+	if err != nil {
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}, err
+	}
+	_, err = c.Conn.Exec(context, "ALTER TABLE overflow.mails ENABLE TRIGGER ALL;")
+	if err != nil {
+		log.Error(err)
+		return &utils_proto.DatabaseResponse{
+			Status: utils_proto.DatabaseStatus_ERROR,
+		}, err
+	}
+	return &utils_proto.DatabaseResponse{
+		Status: utils_proto.DatabaseStatus_OK,
+	}, nil
 }
 
 //Прочитать письмо
@@ -218,7 +267,6 @@ func (c *Database) GetIncomeMails(context context.Context, request *repository_p
 	for rows.Next() {
 		var mail models.Mail
 		values, err := rows.Values()
-		log.Debug("Получены значения: ", values)
 		if err != nil {
 			log.Error(err)
 			return &repository_proto.ResponseMails{

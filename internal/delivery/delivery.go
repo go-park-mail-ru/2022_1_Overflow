@@ -34,5 +34,5 @@ func (d *Delivery) Init(
 	d.mailbox = mailbox
 	d.folderManager = folderManager
 	d.attach = attach
-	d.ws = ws.NewWSServer()
+	ws.NewWSServer()
 }

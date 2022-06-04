@@ -47,10 +47,18 @@ func (d *Delivery) Income(w http.ResponseWriter, r *http.Request) {
 	if e != nil {
 		offset = 0
 	}
+	var theme string
+	themeInt, err := session.Manager.GetDataFull(r, session.AddStoreName, "theme")
+	if err != nil {
+		theme = pkg.THEME_BLUE
+	} else {
+		theme = themeInt.(string)
+	}
 	resp, err := d.mailbox.Income(context.Background(), &mailbox_proto.IncomeRequest{
 		Data:   data,
 		Limit:  int32(limit),
 		Offset: int32(offset),
+		DummyName: pkg.ThemeToAvatarName(theme),
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
@@ -99,10 +107,18 @@ func (d *Delivery) Outcome(w http.ResponseWriter, r *http.Request) {
 	if e != nil {
 		offset = 0
 	}
+	var theme string
+	themeInt, err := session.Manager.GetDataFull(r, session.AddStoreName, "theme")
+	if err != nil {
+		theme = pkg.THEME_BLUE
+	} else {
+		theme = themeInt.(string)
+	}
 	resp, err := d.mailbox.Outcome(context.Background(), &mailbox_proto.OutcomeRequest{
 		Data:   data,
 		Limit:  int32(limit),
 		Offset: int32(offset),
+		DummyName: pkg.ThemeToAvatarName(theme),
 	})
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
@@ -221,12 +237,6 @@ func (d *Delivery) DeleteMail(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
-// @Router /mail/delete [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags mailbox
-func DeleteMail() {}
-
 // ReadMail godoc
 // @Summary Отметить число прочитанным/непрочитанным по его id. При отсутствии параметра isread запрос отмечает письмо с заданным id прочитанным.
 // @Produce json
@@ -280,12 +290,6 @@ func (d *Delivery) ReadMail(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
-// @Router /mail/read [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags mailbox
-func ReadMail() {}
-
 // SendMail godoc
 // @Summary Выполняет отправку письма получателю
 // @Success 200 {object} pkg.JsonResponse "Успешная отправка письма."
@@ -314,6 +318,9 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	form.Addressee = xss.EscapeInput(form.Addressee)
+	if pkg.IsLocalEmail(form.Addressee) {
+		form.Addressee = pkg.EmailToUsername(form.Addressee)
+	}
 	form.Files = xss.EscapeInput(form.Files)
 	form.Text = xss.EscapeInput(form.Text)
 	form.Theme = xss.EscapeInput(form.Theme)
@@ -340,8 +347,6 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 		pkg.WriteJsonErrFull(w, &response)
 		return
 	}
-	response.Message = resp.Param
-	pkg.WriteJsonErrFull(w, &response)
 
 	respCU, err := d.mailbox.CountUnread(context.Background(), &mailbox_proto.CountUnreadRequest{
 		Data: &utils_proto.Session{
@@ -349,23 +354,22 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 			Authenticated: true,
 		},
 	})
+
 	if err != nil {
 		pkg.WriteJsonErrFull(w, &pkg.INTERNAL_ERR)
 		return
 	}
-	d.ws <- ws.WSMessage{
+
+	response.Message = resp.Param
+	pkg.WriteJsonErrFull(w, &response)
+
+	ws.WSChannel <- ws.WSMessage{
 		Type:          ws.TYPE_ALERT,
 		Username:      form.Addressee,
 		Message:       strconv.Itoa(int(respCU.Count)),
 		MessageStatus: ws.STATUS_INFO,
 	}
 }
-
-// @Router /mail/send [get]
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-// @Tags mailbox
-func SendMail() {}
 
 // CountUnread godoc
 // @Summary Выполняет отправку письма получателю

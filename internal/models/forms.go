@@ -83,3 +83,14 @@ type GetAttachForm struct {
 type GetListAttachForm struct {
 	MailID int32 `json:"mail_id" validate:"nonzero"`
 }
+
+type UpdateFolderMailForm struct {
+	FolderName string `json:"folder_name" validate:"nonzero"`
+	MailId int32 `json:"mail_id" validate:"nonzero"`
+	MailForm MailForm `json:"form"`
+}
+
+type SetDataForm struct {
+	FieldName string `json:"name" validate:"nonzero"`
+	Value string `json:"value"`
+}

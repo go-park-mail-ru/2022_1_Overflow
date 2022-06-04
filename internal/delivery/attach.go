@@ -53,6 +53,13 @@ func (d *Delivery) UploadAttach(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
+
+	if header.Size > (20 << 20) {
+		log.Warning("Размер файла превышает 20мб.")
+		pkg.WriteJsonErrFull(w, &pkg.BAD_FILETYPE)
+		return
+	}
+
 	io.Copy(&buf, file)
 	attach := models.Attach{
 		Filename:    header.Filename,
@@ -75,13 +82,6 @@ func (d *Delivery) UploadAttach(w http.ResponseWriter, r *http.Request) {
 	}
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
-
-// UploadAttach
-// @Router /mail/attach/add [get]
-// @Tags mailbox
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-func UploadAttach() {}
 
 // GetAttach godoc
 // @Summary Получение вложения по filename и mailID
@@ -138,13 +138,6 @@ func (d *Delivery) GetAttach(w http.ResponseWriter, r *http.Request) {
 	pkg.WriteJsonErrFull(w, &pkg.NO_ERR)
 }
 
-// GetAttach
-// @Router /mail/attach/get [get]
-// @Tags mailbox
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-func GetAttach() {}
-
 // ListAttach godoc
 //@Summary Получение списка вложений письма
 //@Success 200 {object} pkg.JsonResponse "Успешное установка аватарки."
@@ -200,10 +193,3 @@ func (d *Delivery) ListAttach(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(grpcResp.Filenames)
 }
-
-// ListAttach
-// @Router /mail/attach/list [get]
-// @Tags mailbox
-// @Response 200 {object} pkg.JsonResponse
-// @Header 200 {string} X-CSRF-Token "CSRF токен"
-func ListAttach() {}
