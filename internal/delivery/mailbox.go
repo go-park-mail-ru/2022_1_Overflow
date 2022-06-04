@@ -318,6 +318,9 @@ func (d *Delivery) SendMail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	form.Addressee = xss.EscapeInput(form.Addressee)
+	if pkg.IsLocalEmail(form.Addressee) {
+		form.Addressee = pkg.EmailToUsername(form.Addressee)
+	}
 	form.Files = xss.EscapeInput(form.Files)
 	form.Text = xss.EscapeInput(form.Text)
 	form.Theme = xss.EscapeInput(form.Theme)
