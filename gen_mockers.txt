@@ -1,0 +1,2 @@
+mockgen -destination="mocks/mock_usecase.go" -package="mocks" OverflowBackend/internal/usecase UseCaseInterface
+swag init -g cmd/app.go 

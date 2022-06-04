@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -11,14 +12,14 @@ import (
 // Параметры валидации
 
 var SigninKeys = []string{
-	"email",
+	"username",
 	"password",
 }
 
 var SignupKeys = []string{
 	"first_name",
 	"last_name",
-	"email",
+	"username",
 	"password",
 	"password_confirmation",
 }
@@ -31,24 +32,66 @@ type Config struct {
 	Server struct {
 		Port    string `yaml:"port"`
 		Timeout struct {
-			Server time.Duration `yaml:"server"`
-			Write  time.Duration `yaml:"write"`
-			Read   time.Duration `yaml:"read"`
-			Idle   time.Duration `yaml:"idle"`
+			Server      time.Duration `yaml:"server"`
+			Write       time.Duration `yaml:"write"`
+			Read        time.Duration `yaml:"read"`
+			Idle        time.Duration `yaml:"idle"`
+			CSRFTimeout time.Duration `yaml:"csrf_timeout"`
 		} `yaml:"timeout"`
 		Static struct {
-			Dir		string  `yaml:"dir"`
-			Handle	string	`yaml:"handle"`
+			Dir    string `yaml:"dir"`
+			Handle string `yaml:"handle"`
 		} `yaml:"static"`
+		Minio struct {
+			Dir    string `yaml:"dir"`
+			Handle string `yaml:"handle"`
+		} `yaml:"minio"`
+		Keys struct {
+			CSRFAuthKey string `yaml:"csrf_authkey"`
+			AuthKey     string `yaml:"auth_key"`
+			EncKey      string `yaml:"enc_key"`
+		} `yaml:"keys"`
+		Services struct {
+			Auth struct {
+				Address string `yaml:"address"`
+				Port    string `yaml:"port"`
+			} `yaml:"auth"`
+			Profile struct {
+				Address string `yaml:"address"`
+				Port    string `yaml:"port"`
+			} `yaml:"profile"`
+			MailBox struct {
+				Address string `yaml:"address"`
+				Port    string `yaml:"port"`
+			} `yaml:"mailbox"`
+			FolderManager struct {
+				Address string `yaml:"address"`
+				Port    string `yaml:"port"`
+			} `yaml:"folder_manager"`
+			Database struct {
+				Address string `yaml:"address"`
+				Port    string `yaml:"port"`
+			} `yaml:"database"`
+			Attach struct {
+				Address string `yaml:"address"`
+				Port    string `yaml:"port"`
+			} `yaml:"attach"`
+		}
+		SessionType string `yaml:"session_manager"`
 	} `yaml:"server"`
 	Database struct {
-		Type     string `yaml:"type"`
 		User     string `yaml:"user"`
 		Password string `yaml:"password"`
 		Host     string `yaml:"host"`
 		Port     int    `yaml:"port"`
 		Name     string `yaml:"dbname"`
 	} `yaml:"database"`
+	Minio struct {
+		User     string `yaml:"user"`
+		Password string `yaml:"password"`
+		Url      string `yaml:"url"`
+		Bucket   string `yaml:"bucket"`
+	} `yaml:"minio"`
 }
 
 func NewConfig(configPath string) (*Config, error) {
@@ -74,35 +117,9 @@ func NewConfig(configPath string) (*Config, error) {
 }
 
 func TestConfig() *Config {
-	config := &Config{
-		Server: struct{Port string "yaml:\"port\""; Timeout struct{Server time.Duration "yaml:\"server\""; Write time.Duration "yaml:\"write\""; Read time.Duration "yaml:\"read\""; Idle time.Duration "yaml:\"idle\""} "yaml:\"timeout\""; Static struct{Dir string "yaml:\"dir\""; Handle string "yaml:\"handle\""} "yaml:\"static\""} {
-			Port: "8080",
-			Timeout: struct {
-				Server time.Duration "yaml:\"server\""
-				Write  time.Duration "yaml:\"write\""
-				Read   time.Duration "yaml:\"read\""
-				Idle   time.Duration "yaml:\"idle\""
-			}{
-				Server: 10 * time.Second,
-				Write:  5 * time.Second,
-				Read:   5 * time.Second,
-				Idle:   5 * time.Second,
-			},
-			Static: struct{Dir string "yaml:\"dir\""; Handle string "yaml:\"handle\""}{
-				Dir: "static",
-				Handle: "/static",
-			},
-		},
-		Database: struct {
-			Type     string "yaml:\"type\""
-			User     string "yaml:\"user\""
-			Password string "yaml:\"password\""
-			Host     string "yaml:\"host\""
-			Port     int    "yaml:\"port\""
-			Name     string "yaml:\"dbname\""
-		}{
-			Type: "mock",
-		},
+	config, err := NewConfig("configs/test.yml")
+	if err != nil {
+		log.Fatal(err)
 	}
 	return config
 }

@@ -1,0 +1,32 @@
+syntax = "proto3";
+package utils;
+
+option go_package = "./utils_proto";
+
+enum DatabaseStatus {
+    OK = 0x0;
+    ERROR = 0x1;
+}
+
+message DatabaseResponse {
+    DatabaseStatus status = 1;
+}
+
+message DatabaseExtendResponse {
+    DatabaseStatus status = 1;
+    string param = 2;
+}
+
+message Session {
+    string username = 1;
+    bool authenticated = 2;
+}
+
+message JsonResponse {
+    bytes response = 1;
+}
+
+message JsonExtendResponse {
+    bytes response = 1;
+    string param = 2;
+}

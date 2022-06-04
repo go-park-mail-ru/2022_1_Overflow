@@ -1,0 +1,49 @@
+syntax = "proto3";
+package profile_proto;
+
+option go_package = "./profile_proto";
+
+import "proto/utils.proto";
+
+service Profile {
+    rpc GetInfo(GetInfoRequest) returns (GetInfoResponse) {}
+    rpc SetInfo(SetInfoRequest) returns (utils.JsonResponse) {}
+    rpc GetAvatar(GetAvatarRequest) returns (GetAvatarResponse) {}
+    rpc SetAvatar(SetAvatarRequest) returns (utils.JsonResponse) {}
+    rpc ChangePassword(ChangePasswordRequest) returns (utils.JsonResponse) {}
+}
+
+message SetAvatarRequest {
+    utils.Session data = 1;
+    bytes avatar = 2;
+}
+
+message SetInfoRequest {
+    utils.Session data = 1;
+    bytes form = 2;
+}
+
+message GetInfoRequest {
+    utils.Session data = 1;
+}
+
+message GetAvatarRequest {
+    string username = 1;
+    string dummyName = 2;
+}
+
+message ChangePasswordRequest {
+    utils.Session data = 1;
+    string passwordOld = 2;
+    string passwordNew = 3;
+}
+
+message GetInfoResponse {
+    utils.JsonResponse response = 1;
+    bytes data = 2;
+}
+
+message GetAvatarResponse {
+    utils.JsonResponse response = 1;
+    string url = 2;
+}

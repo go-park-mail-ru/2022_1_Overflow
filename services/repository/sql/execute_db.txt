@@ -1,0 +1,4 @@
+// Команды для обновления скриптов базы данных
+sudo su postgres -c psql template
+\i './init.sql'
+quit

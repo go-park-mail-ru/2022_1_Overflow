@@ -2,7 +2,17 @@ package cmd
 
 import (
 	"OverflowBackend/internal/config"
-	"log"
+	"OverflowBackend/internal/middlewares"
+	"OverflowBackend/internal/session"
+	smtp_server "OverflowBackend/cmd/smtp"
+	"OverflowBackend/pkg"
+	"OverflowBackend/proto/attach_proto"
+	"fmt"
+
+	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
+
+	_ "OverflowBackend/docs"
 )
 
 type Application struct{}
@@ -13,23 +23,59 @@ type Application struct{}
 
 // @contact.name Роман Медников
 // @contact.url https://vk.com/l____l____l____l____l____l
-// @contact.email jellybe@yandex.ru
+// @contact.username jellybe@yandex.ru
 
-// @BasePath /
+// @BasePath /api/v1
+
 func (app *Application) Run(configPath string) {
+	log.Info("Чтение конфигурационного файла сервера.")
 	config, err := config.NewConfig(configPath)
 	if err != nil {
 		log.Fatalf("Ошибка при чтении конфигурационного файла сервера: %v", err)
 	}
 
-	db, err := HandleDatabase(config)
-	
+	log.Info("Инициализация менджера сессий.")
+	err = session.Init(config)
 	if err != nil {
-		log.Fatalf("Ошибка при подключении к БД: %v", err)
+		log.Fatalf("Ошибка при инициализации менеджера сессий: %v", err)
 	}
 
-	router:= RouterManager{}
-	router.Init(db, config)
+	log.Info("Инициализация роутеров.")
+	router := RouterManager{}
+	authDial, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.Auth.Address, config.Server.Services.Auth.Port))
+	if err != nil {
+		log.Fatal("Ошибка подключения к микросервису Auth:", err)
+	}
+	log.Info("Успешное подключение к микросервису Auth.")
+	profileDial, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.Profile.Address, config.Server.Services.Profile.Port))
+	if err != nil {
+		log.Fatal("Ошибка подключения к микросервису Profile:", err)
+	}
+	log.Info("Успешное подключение к микросервису Profile.")
+	mailboxDial, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.MailBox.Address, config.Server.Services.MailBox.Port))
+	if err != nil {
+		log.Fatal("Ошибка подключения к микросервису Mailbox:", err)
+	}
+	log.Info("Успешное подключение к микросервису Mailbox.")
+	folderManagerDial, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.FolderManager.Address, config.Server.Services.FolderManager.Port))
+	if err != nil {
+		log.Fatal("Ошибка подключения к микросервису FolderManager:", err)
+	}
+	log.Info("Успешное подключение к микросервису FolderManager.")
+	//attachDial, err := pkg.CreateGRPCDial(fmt.Sprintf("%v:%v", config.Server.Services.Attach.Address, config.Server.Services.Attach.Port))
+	attachDial, err := grpc.Dial(fmt.Sprintf("%v:%v", config.Server.Services.Attach.Address, config.Server.Services.Attach.Port),
+		grpc.WithDefaultCallOptions(
+			grpc.MaxCallRecvMsgSize(30<<20),
+			grpc.MaxCallSendMsgSize(30<<20)),
+		grpc.WithInsecure())
+	if err != nil {
+		log.Fatal("Ошибка подключения к микросервису Attach:", err)
+	}
+	log.Info("Успешное подключение к микросервису Attach.")
+	router.Init(config, authDial, profileDial, mailboxDial, folderManagerDial, attachDial)
+	middlewares.Init(config, attach_proto.NewAttachClient(attachDial))
 
+	go smtp_server.SetupServer()
+	
 	HandleServer(config, router)
 }

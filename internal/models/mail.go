@@ -1,17 +1,50 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
-// Письмо
-// @Description Структура письма
 type Mail struct {
-	Id		  int32		`json:"id"`
-	Client_id int32		`json:"client_id"`
-	Sender    string    `json:"sender"`
-	Addressee string    `json:"addressee"`
+	Id        int32     `json:"id"`
+	Sender    string    `json:"sender" validate:"nonzero,max=45"`
+	Addressee string    `json:"addressee" validate:"max=45"`
 	Theme     string    `json:"theme"`
 	Text      string    `json:"text"`
 	Files     string    `json:"files"`
 	Date      time.Time `json:"date"`
-	Read	  bool		`json:"read"`
+	Read      bool      `json:"read"`
+}
+
+type MailAdditional struct {
+	Mail      Mail   `json:"mail"`
+	AvatarUrl string `json:"avatar_url"`
+}
+
+type MailAddList struct {
+	Amount int              `json:"amount"`
+	Mails  []MailAdditional `json:"mails"`
+}
+
+type MailList struct {
+	Amount int    `json:"amount"`
+	Mails  []Mail `json:"mails"`
+}
+
+type Attach struct {
+	Filename    string `json:"filename"`
+	Payload     []byte `json:"payload"`
+	PayloadSize int64  `json:"payload_size"`
+}
+
+type AttachShort struct {
+	Filename string `json:"filename"`
+	Url      string `json:"url"`
+}
+
+type AttachList struct {
+	Attaches []AttachShort `json:"attaches"`
+}
+
+type CountUnread struct {
+	Count int `json:"count"`
 }
