@@ -61,12 +61,15 @@ func (s *StandardManager) DeleteSession(w http.ResponseWriter, r *http.Request) 
 		return err
 	}
 
+	/*
 	session, err = s.store.Get(r, AddStoreName)
 	if err != nil {
 		return nil
 	}
 	session.Options.MaxAge = -1
 	session.Save(r, w)
+	*/
+	
 	return nil
 }
 

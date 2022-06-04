@@ -64,13 +64,15 @@ func (pm *PostgresManager) DeleteSession(w http.ResponseWriter, r *http.Request)
 		return err
 	}
 
+	/*
 	session, err = pm.store.Get(r, AddStoreName)
 	if err != nil {
 		return nil
 	}
 	session.Options.MaxAge = -1
 	session.Save(r, w)
-
+	*/
+	
 	return nil
 }
 
